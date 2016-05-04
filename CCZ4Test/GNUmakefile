@@ -4,13 +4,13 @@
 ###  variable using the libraries named in the `LibNames' variable.
 
 # included makefiles need an absolute path
-CHOMBO_HOME := $(HOME)//IPCC/wtf/GRChombo.minimal/GRChombo/Chombo/lib
+CHOMBO_HOME := $(HOME)/Documents/Chombo_threaded/lib
 
 ebase := CCZ4Test
 
-LibNames := BoxTools
+LibNames := BoxTools 
 
-src_dirs := 
+src_dirs := ../utils ../simd ../CCZ4
 
 include $(CHOMBO_HOME)/mk/Make.test
 
