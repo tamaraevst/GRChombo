@@ -143,10 +143,9 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    CCZ4_exec(
+    CCZ4(
         in_fab,
         out_fab,
-        box,
         params,
         dx,
         sigma

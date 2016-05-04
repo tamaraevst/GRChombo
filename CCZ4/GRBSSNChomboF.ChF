@@ -130,7 +130,7 @@ c     set to zero to use 4th order advection, 1 for 2nd order
       advec2 = 0
 
       !------------ Main loop starts here --------
-!$omp PARALLEL DO DEFAULT(FIRSTPRIVATE) COLLAPSE(3),
+!$omp PARALLEL DO DEFAULT(FIRSTPRIVATE) COLLAPSE(2),
 !$omp& SCHEDULE(STATIC),
 !$omp& SHARED(dchidt,dhdt,dKdt,dAdt,dThetadt),
 !$omp& SHARED(dGamma1dt,dlapsedt,dshiftdt,dBdt),
