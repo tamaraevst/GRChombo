@@ -5,6 +5,7 @@
 
 #include "FArrayBox.H"
 #include <iostream>
+#include <iomanip>
 #include <sys/time.h>
 
 #include "CCZ4.hpp"
@@ -147,7 +148,9 @@ int main()
     CCZ4(params, dx, sigma).execute(in_fab, out_fab);
 
     gettimeofday(&end, NULL);
-    std::cout << "C++ version took " << end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000 << "ms" << std::endl;
+
+    int cxx_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
+    std::cout << "C++ version took " << cxx_time << "ms" << std::endl;
 
 #ifdef COMPARE_WITH_CHF
 
@@ -190,7 +193,11 @@ int main()
                     CHF_BOX(box));
 
     gettimeofday(&end, NULL);
-    std::cout << "ChF version took " << end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000 << "ms" << std::endl;
+
+    int fort_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
+    std::cout << "ChF version took " << fort_time << "ms" << std::endl;
+
+    std::cout << "C++ speedup = " << setprecision(2) << (double) fort_time / cxx_time << "x" << std::endl;
 
     out_fab -= out_fab_chf;
     for (int i = 0; i < c_NUM; ++i)

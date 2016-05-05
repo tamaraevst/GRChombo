@@ -60,16 +60,16 @@ CCZ4::compute(int x, int y, int z)
 {
     const int idx = m_stride[2]*(z-m_in_lo[2]) + m_stride[1]*(y-m_in_lo[1]) + (x-m_in_lo[0]);
 
-    vars_t<data_t> vars = {};
+    vars_t<data_t> vars;
     local_vars(idx, vars);
     
-    vars_t<data_t> d1[CH_SPACEDIM] = {};
+    vars_t<data_t> d1[CH_SPACEDIM];
     for (int i = 0; i < 3; ++i)
     {
         diff1(idx, m_stride[i], d1[i]);
     }
 
-    vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM] = {};
+    vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM];
 
     // Repeated derivatives
     for (int i = 0; i < 3; ++i)
@@ -86,10 +86,10 @@ CCZ4::compute(int x, int y, int z)
     d2[2][0] = d2[0][2];
     d2[2][1] = d2[1][2];
 
-    vars_t<data_t> advec = {};
+    vars_t<data_t> advec;
     advection(idx, vars.shift, advec);
 
-    vars_t<data_t> dssp = {};
+    vars_t<data_t> dssp;
     dissipation(idx, dssp);
 
     vars_t<data_t> rhs = {};
@@ -157,10 +157,11 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    tensor<3, data_t> chris = {};
+    tensor<3, data_t> chris;
     {
         FOR3(i,j,k)
         {
+            chris[i][j][k] = 0;
             FOR1(l)
             {
                 chris[i][j][k] += h_UU[i][l]*chris_LLL[l][j][k];
@@ -171,10 +172,11 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     // Technically we can write chrisvec[i] = h_UU[j][k]*chris[i][j][k],
     // but this is not numerically stable: h_UU[j][k]*d1[i].h[j][k] should be zero
     // but in practice can be > O(1).
-    tensor<1, data_t> chrisvec = {};
+    tensor<1, data_t> chrisvec;
     {
         FOR1(i)
         {
+            chrisvec[i] = 0;
             FOR3(j,k,l)
             {
                 chrisvec[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
@@ -278,10 +280,11 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    tensor<2, data_t> A_UU = {};
+    tensor<2, data_t> A_UU;
     {
         FOR2(i,j)
         {
+            A_UU[i][j] = 0;
             FOR2(k,l)
             {
                 A_UU[i][j] += h_UU[i][k]*h_UU[j][l]*vars.A[k][l];
@@ -416,10 +419,14 @@ CCZ4::diff1(int idx, int stride, vars_t<data_t>& out)
     for (int i = 0; i < c_NUM; ++i)
     {
         auto in = SIMDIFY<data_t>(m_in_ptr[i]);
-        result[i] = (+8.33333333333333333333e-2 * in[idx - 2*stride]
-                     -6.66666666666666666667e-1 * in[idx - stride]
-                     +6.66666666666666666667e-1 * in[idx + stride]
-                     -8.33333333333333333333e-2 * in[idx + 2*stride]) / m_dx;
+
+        data_t weight_far  = 8.33333333333333333333e-2;
+        data_t weight_near = 6.66666666666666666667e-1;
+
+        result[i] = (  weight_far  * in[idx - 2*stride]
+                     - weight_near * in[idx - stride]
+                     + weight_near * in[idx + stride]
+                     - weight_far  * in[idx + 2*stride]) / m_dx;
     }
     demarshall(result, out);
 }
@@ -432,11 +439,16 @@ CCZ4::diff2(int idx, int stride, vars_t<data_t>& out)
     for (int i = 0; i < c_NUM; ++i)
     {
         auto in = SIMDIFY<data_t>(m_in_ptr[i]);
-        result[i] = (-8.33333333333333333333e-2 * in[idx - 2*stride]
-                     +1.33333333333333333333e+0 * in[idx - stride]
-                     -2.50000000000000000000e+0 * in[idx]
-                     +1.33333333333333333333e+0 * in[idx + stride]
-                     -8.33333333333333333333e-2 * in[idx + 2*stride]) / (m_dx*m_dx);
+
+        data_t weight_far   = 8.33333333333333333333e-2;
+        data_t weight_near  = 1.33333333333333333333e+0;
+        data_t weight_local = 2.50000000000000000000e+0;
+
+        result[i] = (- weight_far   * in[idx - 2*stride]
+                     + weight_near  * in[idx - stride]
+                     - weight_local * in[idx]
+                     + weight_near  * in[idx + stride]
+                     - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
     }
     demarshall(result, out);
 }
@@ -449,25 +461,30 @@ CCZ4::mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out)
     for (int i = 0; i < c_NUM; ++i)
     {
         auto in = SIMDIFY<data_t>(m_in_ptr[i]);
-        result[i] = (+6.94444444444444444444e-3 * in[idx - 2*stride1 - 2*stride2]
-                     -5.55555555555555555556e-2 * in[idx - 2*stride1 - stride2]
-                     +5.55555555555555555556e-2 * in[idx - 2*stride1 + stride2]
-                     -6.94444444444444444444e-3 * in[idx - 2*stride1 + 2*stride2]
 
-                     -5.55555555555555555556e-2 * in[idx - stride1 - 2*stride2]
-                     +4.44444444444444444444e-1 * in[idx - stride1 - stride2]
-                     -4.44444444444444444444e-1 * in[idx - stride1 + stride2]
-                     +5.55555555555555555556e-2 * in[idx - stride1 + 2*stride2]
+        data_t weight_far_far   = 6.94444444444444444444e-3;
+        data_t weight_near_far  = 5.55555555555555555556e-2;
+        data_t weight_near_near = 4.44444444444444444444e-1;
 
-                     +5.55555555555555555556e-2 * in[idx + stride1 - 2*stride2]
-                     -4.44444444444444444444e-1 * in[idx + stride1 - stride2]
-                     +4.44444444444444444444e-1 * in[idx + stride1 + stride2]
-                     -5.55555555555555555556e-2 * in[idx + stride1 + 2*stride2]
+        result[i] = (  weight_far_far   * in[idx - 2*stride1 - 2*stride2]
+                     - weight_near_far  * in[idx - 2*stride1 - stride2]
+                     + weight_near_far  * in[idx - 2*stride1 + stride2]
+                     - weight_far_far   * in[idx - 2*stride1 + 2*stride2]
 
-                     -6.94444444444444444444e-3 * in[idx + 2*stride1 - 2*stride2]
-                     +5.55555555555555555556e-2 * in[idx + 2*stride1 - stride2]
-                     -5.55555555555555555556e-2 * in[idx + 2*stride1 + stride2]
-                     +6.94444444444444444444e-3 * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
+                     - weight_near_far  * in[idx - stride1 - 2*stride2]
+                     + weight_near_near * in[idx - stride1 - stride2]
+                     - weight_near_near * in[idx - stride1 + stride2]
+                     + weight_near_far  * in[idx - stride1 + 2*stride2]
+
+                     + weight_near_far  * in[idx + stride1 - 2*stride2]
+                     - weight_near_near * in[idx + stride1 - stride2]
+                     + weight_near_near * in[idx + stride1 + stride2]
+                     - weight_near_far  * in[idx + stride1 + 2*stride2]
+
+                     - weight_far_far   * in[idx + 2*stride1 - 2*stride2]
+                     + weight_near_far  * in[idx + 2*stride1 - stride2]
+                     - weight_near_far  * in[idx + 2*stride1 + stride2]
+                     + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
     }
     demarshall(result, out);
 }
@@ -477,34 +494,45 @@ void
 CCZ4::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        result[i] = 0;
+    }
+
     for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
     {
-        const int _stride = m_stride[dim];
-        const auto _shift = shift[dim];
-        const auto _shift_positive = simd_compare_gt(_shift, 0.0);
+        const int stride = m_stride[dim];
+        const auto shift_val = shift[dim];
+        const auto shift_positive = simd_compare_gt(shift_val, 0.0);
 
         for (int i = 0; i < c_NUM; ++i)
         {
             const auto in = SIMDIFY<data_t>(m_in_ptr[i]);
-            const data_t _left = in[idx - _stride];
-            const data_t _centre = in[idx];
-            const data_t _right = in[idx + _stride];
+            const data_t in_left = in[idx - stride];
+            const data_t in_centre = in[idx];
+            const data_t in_right = in[idx + stride];
             
+            data_t weight_0 = -2.50000000000000000000e-1;
+            data_t weight_1 = -8.33333333333333333333e-1;
+            data_t weight_2 = +1.50000000000000000000e+0;
+            data_t weight_3 = -5.00000000000000000000e-1;
+            data_t weight_4 = +8.33333333333333333333e-2;
+
             data_t upwind;
-            upwind = _shift * (-2.50000000000000000000e-1 * _left
-                               -8.33333333333333333333e-1 * _centre
-                               +1.50000000000000000000e+0 * _right
-                               -5.00000000000000000000e-1 * in[idx + 2*_stride]
-                               +8.33333333333333333333e-2 * in[idx + 3*_stride]) / m_dx;
+            upwind = shift_val * (  weight_0 * in_left
+                                  + weight_1 * in_centre
+                                  + weight_2 * in_right
+                                  + weight_3 * in[idx + 2*stride]
+                                  + weight_4 * in[idx + 3*stride]) / m_dx;
 
             data_t downwind;
-            downwind = _shift * (-8.33333333333333333333e-2 * in[idx - 3*_stride]
-                                 +5.00000000000000000000e-1 * in[idx - 2*_stride]
-                                 -1.50000000000000000000e+0 * _left
-                                 +8.33333333333333333333e-1 * _centre
-                                 +2.50000000000000000000e-1 * _right) / m_dx;
+            downwind = shift_val * (- weight_4 * in[idx - 3*stride]
+                                    - weight_3 * in[idx - 2*stride]
+                                    - weight_2 * in_left
+                                    - weight_1 * in_centre
+                                    - weight_0 * in_right) / m_dx;
 
-            result[i] += simd_conditional(_shift_positive, upwind , downwind);
+            result[i] += simd_conditional(shift_positive, upwind , downwind);
         }
     }
     demarshall(result, out);
@@ -515,19 +543,30 @@ void
 CCZ4::dissipation(int idx, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        result[i] = 0;
+    }
+
     for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
     {
-        const int _stride = m_stride[dim];
+        const int stride = m_stride[dim];
         for (int i = 0; i < c_NUM; ++i)
         {
             auto in = SIMDIFY<data_t>(m_in_ptr[i]);
-            result[i] += (+1.56250e-2 * in[idx - 3*_stride]
-                          -9.37500e-2 * in[idx - 2*_stride]
-                          +2.34375e-1 * in[idx - _stride]
-                          -3.12500e-1 * in[idx]
-                          +2.34375e-1 * in[idx + _stride]
-                          -9.37500e-2 * in[idx + 2*_stride]
-                          +1.56250e-2 * in[idx + 3*_stride]) / m_dx;
+
+            data_t weight_vfar  = 1.56250e-2;
+            data_t weight_far   = 9.37500e-2;
+            data_t weight_near  = 2.34375e-1;
+            data_t weight_local = 3.12500e-1;
+
+            result[i] += ( weight_vfar   * in[idx - 3*stride]
+                          - weight_far   * in[idx - 2*stride]
+                          + weight_near  * in[idx - stride]
+                          - weight_local * in[idx]
+                          + weight_near  * in[idx + stride]
+                          - weight_far   * in[idx + 2*stride]
+                          + weight_vfar  * in[idx + 3*stride]) / m_dx;
         }
     }
     demarshall(result, out);

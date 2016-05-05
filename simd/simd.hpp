@@ -1,11 +1,7 @@
 #ifndef SIMD_HPP_
 #define SIMD_HPP_
 
-#if defined(__GNUC__)
-#define ALWAYS_INLINE __attribute__((always_inline)) __inline__
-#else
-#define ALWAYS_INLINE inline
-#endif
+#include "always_inline.hpp"
 
 template <typename t> struct _simd_remove_const { typedef t type; };
 template <typename t> struct _simd_remove_const<const t> { typedef t type; };
@@ -99,7 +95,5 @@ struct simd
 #endif
 
 #include "simdify.hpp"
-
-#undef ALWAYS_INLINE
 
 #endif /* SIMD_HPP_ */

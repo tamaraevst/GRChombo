@@ -3,6 +3,7 @@
 
 #include "FArrayBox.H"
 #include "simd.hpp"
+#include "tensor.hpp"
 #include "GRUtils.H"
 
 enum {
