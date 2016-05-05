@@ -1,4 +1,5 @@
 #define COMPARE_WITH_CHF
+#define COVARIANTZ4
 
 #include <omp.h>
 
@@ -129,7 +130,7 @@ int main()
         }
     }
 
-    CCZ4_params params;
+    CCZ4::params_t params;
     params.kappa1 = 0.1;
     params.kappa2 = 0;
     params.kappa3 = 1;
@@ -143,13 +144,7 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    CCZ4(
-        in_fab,
-        out_fab,
-        params,
-        dx,
-        sigma
-    );
+    CCZ4(params, dx, sigma).execute(in_fab, out_fab);
 
     gettimeofday(&end, NULL);
     std::cout << "C++ version took " << end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000 << "ms" << std::endl;
