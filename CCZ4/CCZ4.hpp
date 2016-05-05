@@ -3,10 +3,10 @@
 
 #include "FArrayBox.H"
 #include "simd.hpp"
+#include "tensor.hpp"
 #include "GRUtils.H"
 
-enum
-{
+enum {
     c_chi,
 
     c_h,
@@ -49,97 +49,85 @@ enum
     c_NUM
 };
 
-template <class data_t>
-struct CCZ4_vars
+class CCZ4
 {
-    data_t chi;
-    tensor<2, data_t> h;
-    data_t K;
-    tensor<2, data_t> A;
-    tensor<1, data_t> Gamma;
-    data_t Theta;
-    data_t lapse;
-    tensor<1, data_t> shift;
-    tensor<1, data_t> B;
+protected:
+    template <class data_t>
+    struct vars_t
+    {
+        data_t chi;
+        tensor<2, data_t> h;
+        data_t K;
+        tensor<2, data_t> A;
+        tensor<1, data_t> Gamma;
+        data_t Theta;
+        data_t lapse;
+        tensor<1, data_t> shift;
+        tensor<1, data_t> B;
+    };
+
+public:
+    struct params_t
+    {
+        double kappa1;
+        double kappa2;
+        double kappa3;
+        double shift_gamma_coeff;
+        double lapse_advec_coeff;
+        double shift_advec_coeff;
+        double beta_driver;
+    };
+
+protected:
+    params_t m_params;
+    double m_dx;
+    double m_sigma;
+
+    const double *m_in_ptr[c_NUM];
+    const int *m_in_lo;
+    const int *m_in_hi;
+    int m_stride[3];
+
+    double *m_out_ptr[c_NUM];
+    const int *m_out_lo;
+    const int *m_out_hi;
+    int m_out_stride[3];
+    
+public:
+    CCZ4(params_t params, double dx, double sigma);
+    void execute(const FArrayBox& in, FArrayBox& out);
+
+protected:
+    template <class data_t>
+    void compute(int x, int y, int z);
+
+    template <class data_t>
+    void demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out);
+
+    template <class data_t>
+    void local_vars(int idx, vars_t<data_t>& out);
+
+    template <class data_t>
+    void diff1(int idx, int stride, vars_t<data_t>& out);
+
+    template <class data_t>
+    void diff2(int idx, int stride, vars_t<data_t>& out);
+
+    template <class data_t>
+    void mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out);
+
+    template <class data_t>
+    void advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out);
+
+    template <class data_t>
+    void dissipation(int idx, vars_t<data_t>& out);
+
+    template <class data_t>
+    void rhs_equation(const vars_t<data_t> &vars,
+             const vars_t<data_t> (&d1)[CH_SPACEDIM],
+             const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+             const vars_t<data_t> &advec,
+             vars_t<data_t> &rhs);
 };
-
-struct CCZ4_params
-{
-    double kappa1;
-    double kappa2;
-    double kappa3;
-    double shift_gamma_coeff;
-    double lapse_advec_coeff;
-    double shift_advec_coeff;
-    double beta_driver;
-};
-
-struct CCZ4_context
-{
-    const double *in_ptr[c_NUM];
-    double *out_ptr[c_NUM];
-
-    const int *in_lo;
-    const int *in_hi;
-    int stride[3];
-
-    const int *out_lo;
-    const int *out_hi;
-    int out_stride[3];
-
-    CCZ4_params params;
-    double dx;
-    double sigma;
-};
-
-// Main RHS driver, loops through a box, apply stencils, etc.
-// Can make this explicitly SIMD if required
-void CCZ4(
-    const FArrayBox& in,
-    FArrayBox& out,
-    CCZ4_params params,
-    double dx,
-    double sigma
-);
-
-template <class data_t>
-void CCZ4_exec(
-    CCZ4_context& ctx,
-    int x, int y, int z
-);
-
-// General stencil applicator
-template <class data_t, int stencil_size>
-void CCZ4_apply(
-    const stencil<stencil_size> &s,
-    const double **in_arr,
-    int idx,
-    int stride,
-    CCZ4_vars<data_t> &out,
-    data_t multiplier = 1
-);
-
-// Apply tensor product of stencils, e.g. for mixed second derivatives
-template <class data_t, int stencil_size1, int stencil_size2>
-void CCZ4_apply2(
-    const stencil<stencil_size1> &s1,
-    const stencil<stencil_size2> &s2,
-    const double **in_arr,
-    int idx,
-    int stride1,
-    int stride2,
-    CCZ4_vars<data_t> &out
-);
-
-// Actual RHS equations
-template <class data_t, bool covariantZ4 = true>
-void CCZ4_rhs(
-    const CCZ4_vars<data_t> &vars,
-    const CCZ4_vars<data_t> (&d1)[CH_SPACEDIM],
-    const CCZ4_vars<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
-    const CCZ4_vars<data_t> &advec,
-    CCZ4_vars<data_t> &rhs,
-    CCZ4_params &params
-);
 
 #endif /* CCZ4_HPP_ */

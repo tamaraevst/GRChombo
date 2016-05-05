@@ -1,290 +1,136 @@
 #include "CCZ4.hpp"
 
-void CCZ4(
-    const FArrayBox& in,
-    FArrayBox& out,
-    CCZ4_params params,
-    double dx,
-    double sigma
-)
-{
-    CCZ4_context ctx;
-    ctx.params = params;
-    ctx.dx = dx;
-    ctx.sigma = sigma;
+#define COVARIANTZ4
 
+CCZ4::CCZ4(params_t params, double dx, double sigma) :
+    m_params (params),
+    m_dx (dx),
+    m_sigma (sigma)
+{}
+
+void
+CCZ4::execute(const FArrayBox& in, FArrayBox& out)
+{
     // dataPtr in Chombo does CH_assert bound check
     // which we don't want to do in a loop
     for (int i = 0; i < c_NUM; ++i)
     {
-        ctx.in_ptr[i] = in.dataPtr(i);
-        ctx.out_ptr[i] = out.dataPtr(i);
+        m_in_ptr[i] = in.dataPtr(i);
+        m_out_ptr[i] = out.dataPtr(i);
     }
 
-    ctx.in_lo = in.loVect();
-    ctx.in_hi = in.hiVect();
-    ctx.stride[0] = 1;
-    ctx.stride[1] = ctx.in_hi[0]-ctx.in_lo[0]+1;
-    ctx.stride[2] = (ctx.in_hi[1]-ctx.in_lo[1]+1)*ctx.stride[1];
+    m_in_lo = in.loVect();
+    m_in_hi = in.hiVect();
+    m_stride[0] = 1;
+    m_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
+    m_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_stride[1];
 
-    ctx.out_lo = out.loVect();
-    ctx.out_hi = out.hiVect(); 
-    ctx.out_stride[0] = 1;
-    ctx.out_stride[1] = ctx.out_hi[0]-ctx.out_lo[0]+1;
-    ctx.out_stride[2] = (ctx.out_hi[1]-ctx.out_lo[1]+1)*ctx.out_stride[1];
+    m_out_lo = out.loVect();
+    m_out_hi = out.hiVect(); 
+    m_out_stride[0] = 1;
+    m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
+    m_out_stride[2] = (m_out_hi[1]-m_out_lo[1]+1)*m_out_stride[1];
 
 #pragma omp parallel for default(shared) collapse(2)
-    for (int z = ctx.out_lo[2]; z <= ctx.out_hi[2]; ++z)
-    for (int y = ctx.out_lo[1]; y <= ctx.out_hi[1]; ++y)
+    for (int z = m_out_lo[2]; z <= m_out_hi[2]; ++z)
+    for (int y = m_out_lo[1]; y <= m_out_hi[1]; ++y)
     {
-        int x_simd_max = ctx.out_lo[0] + simd<double>::simd_len * (((ctx.out_hi[0] - ctx.out_lo[0] + 1) / simd<double>::simd_len) - 1);
+        int x_simd_max = m_out_lo[0] + simd<double>::simd_len * (((m_out_hi[0] - m_out_lo[0] + 1) / simd<double>::simd_len) - 1);
 
         // SIMD LOOP
         #pragma novector
-        for (int x = ctx.out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
+        for (int x = m_out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
         {
-            CCZ4_exec<simd<double> >(ctx, x, y, z);
+            compute<simd<double> >(x, y, z);
         }
 
         // REMAINDER LOOP
         #pragma novector
-        for (int x = x_simd_max + simd<double>::simd_len; x <= ctx.out_hi[0]; ++x)
+        for (int x = x_simd_max + simd<double>::simd_len; x <= m_out_hi[0]; ++x)
         {
-            CCZ4_exec<double>(ctx, x, y, z);
+            compute<double>(x, y, z);
         }
     }
+
 }
 
 template <class data_t>
-void CCZ4_exec(
-    CCZ4_context& ctx,
-    int x, int y, int z
-)
+void
+CCZ4::compute(int x, int y, int z)
 {
-    const int idx = ctx.stride[2]*(z-ctx.in_lo[2]) + ctx.stride[1]*(y-ctx.in_lo[1]) + (x-ctx.in_lo[0]);
+    const int idx = m_stride[2]*(z-m_in_lo[2]) + m_stride[1]*(y-m_in_lo[1]) + (x-m_in_lo[0]);
 
-    // Copying out a local struct of CCZ4 variables is the same as applying a trivial 1-wide stencil
-    stencil<1> local;
-    local.offset[0] = 0; local.weight[0] = 1.0;
-
-    stencil<4> d1_stencil;
-    d1_stencil.offset[0] = -2; d1_stencil.weight[0] = +8.33333333333333333333e-2 / ctx.dx;
-    d1_stencil.offset[1] = -1; d1_stencil.weight[1] = -6.66666666666666666667e-1 / ctx.dx;
-    d1_stencil.offset[2] = +1; d1_stencil.weight[2] = +6.66666666666666666667e-1 / ctx.dx;
-    d1_stencil.offset[3] = +2; d1_stencil.weight[3] = -8.33333333333333333333e-2 / ctx.dx;
-
-    stencil<5> d2_stencil;
-    d2_stencil.offset[0] = -2; d2_stencil.weight[0] = -8.33333333333333333333e-2 / (ctx.dx*ctx.dx);
-    d2_stencil.offset[1] = -1; d2_stencil.weight[1] = +1.33333333333333333333e+0 / (ctx.dx*ctx.dx);
-    d2_stencil.offset[2] =  0; d2_stencil.weight[2] = -2.50000000000000000000e+0 / (ctx.dx*ctx.dx);
-    d2_stencil.offset[3] = +1; d2_stencil.weight[3] = +1.33333333333333333333e+0 / (ctx.dx*ctx.dx);
-    d2_stencil.offset[4] = +2; d2_stencil.weight[4] = -8.33333333333333333333e-2 / (ctx.dx*ctx.dx);
-
-    stencil<5> d1_upwind;
-    d1_upwind.offset[0] = -1; d1_upwind.weight[0] = -2.50000000000000000000e-1 / ctx.dx;
-    d1_upwind.offset[1] =  0; d1_upwind.weight[1] = -8.33333333333333333333e-1 / ctx.dx;
-    d1_upwind.offset[2] = +1; d1_upwind.weight[2] = +1.50000000000000000000e+0 / ctx.dx;
-    d1_upwind.offset[3] = +2; d1_upwind.weight[3] = -5.00000000000000000000e-1 / ctx.dx;
-    d1_upwind.offset[4] = +3; d1_upwind.weight[4] = +8.33333333333333333333e-2 / ctx.dx;
-
-    stencil<7> dissipation;
-    dissipation.offset[0] = -3; dissipation.weight[0] = +1.56250e-2 / ctx.dx;
-    dissipation.offset[1] = -2; dissipation.weight[1] = -9.37500e-2 / ctx.dx;
-    dissipation.offset[2] = -1; dissipation.weight[2] = +2.34375e-1 / ctx.dx;
-    dissipation.offset[3] =  0; dissipation.weight[3] = -3.12500e-1 / ctx.dx;
-    dissipation.offset[4] = +1; dissipation.weight[4] = +2.34375e-1 / ctx.dx;
-    dissipation.offset[5] = +2; dissipation.weight[5] = -9.37500e-2 / ctx.dx;
-    dissipation.offset[6] = +3; dissipation.weight[6] = +1.56250e-2 / ctx.dx;
-
-    CCZ4_vars<data_t> vars = {};
-    CCZ4_apply(local, ctx.in_ptr, idx, 1, vars);
+    vars_t<data_t> vars;
+    local_vars(idx, vars);
     
-    CCZ4_vars<data_t> d1[CH_SPACEDIM] = {};
+    vars_t<data_t> d1[CH_SPACEDIM];
     for (int i = 0; i < 3; ++i)
     {
-        CCZ4_apply(d1_stencil, ctx.in_ptr, idx, ctx.stride[i], d1[i]);
+        diff1(idx, m_stride[i], d1[i]);
     }
 
-    CCZ4_vars<data_t> d2[CH_SPACEDIM][CH_SPACEDIM] = {};
+    vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM];
 
     // Repeated derivatives
     for (int i = 0; i < 3; ++i)
     {
-        CCZ4_apply(d2_stencil, ctx.in_ptr, idx, ctx.stride[i], d2[i][i]);
+        diff2(idx, m_stride[i], d2[i][i]);
     }
 
     // Mixed derivatives
-    CCZ4_apply2(d1_stencil, d1_stencil, ctx.in_ptr, idx, ctx.stride[1], ctx.stride[0], d2[0][1]);
-    CCZ4_apply2(d1_stencil, d1_stencil, ctx.in_ptr, idx, ctx.stride[2], ctx.stride[0], d2[0][2]);
-    CCZ4_apply2(d1_stencil, d1_stencil, ctx.in_ptr, idx, ctx.stride[2], ctx.stride[1], d2[1][2]);
+    mixed_diff2(idx, m_stride[1], m_stride[0], d2[0][1]);
+    mixed_diff2(idx, m_stride[2], m_stride[0], d2[0][2]);
+    mixed_diff2(idx, m_stride[2], m_stride[1], d2[1][2]);
 
     d2[1][0] = d2[0][1];
     d2[2][0] = d2[0][2];
     d2[2][1] = d2[1][2];
 
-    CCZ4_vars<data_t> advec = {};
-    for (int i = 0; i < 3; ++i)
-    {
-        CCZ4_vars<data_t> upwind = {};
-        CCZ4_apply(d1_upwind, ctx.in_ptr, idx, ctx.stride[i], upwind, vars.shift[i]);
+    vars_t<data_t> advec;
+    advection(idx, vars.shift, advec);
 
-        CCZ4_vars<data_t> downwind = {};
-        CCZ4_apply(d1_upwind, ctx.in_ptr, idx, -ctx.stride[i], downwind, -vars.shift[i]);
+    vars_t<data_t> dssp;
+    dissipation(idx, dssp);
 
-        typename simd_compare<data_t>::type shift_positive = simd_compare_gt(vars.shift[i], 0.0);
-        advec.chi      += simd_conditional(shift_positive, upwind.chi     , downwind.chi     );
-        advec.h[0][0]  += simd_conditional(shift_positive, upwind.h[0][0] , downwind.h[0][0] );
-        advec.h[0][1]  += simd_conditional(shift_positive, upwind.h[0][1] , downwind.h[0][1] );
-        advec.h[0][2]  += simd_conditional(shift_positive, upwind.h[0][2] , downwind.h[0][2] );
-        advec.h[1][1]  += simd_conditional(shift_positive, upwind.h[1][1] , downwind.h[1][1] );
-        advec.h[1][2]  += simd_conditional(shift_positive, upwind.h[1][2] , downwind.h[1][2] );
-        advec.h[2][2]  += simd_conditional(shift_positive, upwind.h[2][2] , downwind.h[2][2] );
-        advec.K        += simd_conditional(shift_positive, upwind.K       , downwind.K       );
-        advec.A[0][0]  += simd_conditional(shift_positive, upwind.A[0][0] , downwind.A[0][0] );
-        advec.A[0][1]  += simd_conditional(shift_positive, upwind.A[0][1] , downwind.A[0][1] );
-        advec.A[0][2]  += simd_conditional(shift_positive, upwind.A[0][2] , downwind.A[0][2] );
-        advec.A[1][1]  += simd_conditional(shift_positive, upwind.A[1][1] , downwind.A[1][1] );
-        advec.A[1][2]  += simd_conditional(shift_positive, upwind.A[1][2] , downwind.A[1][2] );
-        advec.A[2][2]  += simd_conditional(shift_positive, upwind.A[2][2] , downwind.A[2][2] );
-        advec.Gamma[0] += simd_conditional(shift_positive, upwind.Gamma[0], downwind.Gamma[0]);
-        advec.Gamma[1] += simd_conditional(shift_positive, upwind.Gamma[1], downwind.Gamma[1]);
-        advec.Gamma[2] += simd_conditional(shift_positive, upwind.Gamma[2], downwind.Gamma[2]);
-        advec.Theta    += simd_conditional(shift_positive, upwind.Theta   , downwind.Theta   );
-        advec.lapse    += simd_conditional(shift_positive, upwind.lapse   , downwind.lapse   );
-        advec.shift[0] += simd_conditional(shift_positive, upwind.shift[0], downwind.shift[0]);
-        advec.shift[1] += simd_conditional(shift_positive, upwind.shift[1], downwind.shift[1]);
-        advec.shift[2] += simd_conditional(shift_positive, upwind.shift[2], downwind.shift[2]);
-        advec.B[0]     += simd_conditional(shift_positive, upwind.B[0]    , downwind.B[0]    );
-        advec.B[1]     += simd_conditional(shift_positive, upwind.B[1]    , downwind.B[1]    );
-        advec.B[2]     += simd_conditional(shift_positive, upwind.B[2]    , downwind.B[2]    );
-    }
-
-    advec.h[1][0] = advec.h[0][1];
-    advec.h[2][0] = advec.h[0][2];
-    advec.h[2][1] = advec.h[1][2];
-
-    advec.A[1][0] = advec.A[0][1];
-    advec.A[2][0] = advec.A[0][2];
-    advec.A[2][1] = advec.A[1][2];
-
-    CCZ4_vars<data_t> rhs;
-    CCZ4_rhs(vars, d1, d2, advec, rhs, ctx.params);
-
-    CCZ4_vars<data_t> dssp = {};
-    CCZ4_apply(dissipation, ctx.in_ptr, idx, ctx.stride[0], dssp);
-    CCZ4_apply(dissipation, ctx.in_ptr, idx, ctx.stride[1], dssp);
-    CCZ4_apply(dissipation, ctx.in_ptr, idx, ctx.stride[2], dssp);
+    vars_t<data_t> rhs = {};
+    rhs_equation(vars, d1, d2, advec, rhs);
 
     // TODO: I really do not like this, but cannot think of a better way to do it yet...
-    const int out_idx = ctx.out_stride[2]*(z-ctx.out_lo[2]) + ctx.out_stride[1]*(y-ctx.out_lo[1]) + (x-ctx.out_lo[0]);
-    SIMDIFY<data_t>(ctx.out_ptr[c_chi])[out_idx]    = rhs.chi      + ctx.sigma * dssp.chi;
-    SIMDIFY<data_t>(ctx.out_ptr[c_h11])[out_idx]    = rhs.h[0][0]  + ctx.sigma * dssp.h[0][0];
-    SIMDIFY<data_t>(ctx.out_ptr[c_h12])[out_idx]    = rhs.h[0][1]  + ctx.sigma * dssp.h[0][1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_h13])[out_idx]    = rhs.h[0][2]  + ctx.sigma * dssp.h[0][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_h22])[out_idx]    = rhs.h[1][1]  + ctx.sigma * dssp.h[1][1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_h23])[out_idx]    = rhs.h[1][2]  + ctx.sigma * dssp.h[1][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_h33])[out_idx]    = rhs.h[2][2]  + ctx.sigma * dssp.h[2][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_K])[out_idx]      = rhs.K        + ctx.sigma * dssp.K;
-    SIMDIFY<data_t>(ctx.out_ptr[c_A11])[out_idx]    = rhs.A[0][0]  + ctx.sigma * dssp.A[0][0];
-    SIMDIFY<data_t>(ctx.out_ptr[c_A12])[out_idx]    = rhs.A[0][1]  + ctx.sigma * dssp.A[0][1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_A13])[out_idx]    = rhs.A[0][2]  + ctx.sigma * dssp.A[0][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_A22])[out_idx]    = rhs.A[1][1]  + ctx.sigma * dssp.A[1][1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_A23])[out_idx]    = rhs.A[1][2]  + ctx.sigma * dssp.A[1][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_A33])[out_idx]    = rhs.A[2][2]  + ctx.sigma * dssp.A[2][2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_Gamma1])[out_idx] = rhs.Gamma[0] + ctx.sigma * dssp.Gamma[0];
-    SIMDIFY<data_t>(ctx.out_ptr[c_Gamma2])[out_idx] = rhs.Gamma[1] + ctx.sigma * dssp.Gamma[1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_Gamma3])[out_idx] = rhs.Gamma[2] + ctx.sigma * dssp.Gamma[2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_Theta])[out_idx]  = rhs.Theta    + ctx.sigma * dssp.Theta;
-    SIMDIFY<data_t>(ctx.out_ptr[c_lapse])[out_idx]  = rhs.lapse    + ctx.sigma * dssp.lapse;
-    SIMDIFY<data_t>(ctx.out_ptr[c_shift1])[out_idx] = rhs.shift[0] + ctx.sigma * dssp.shift[0];
-    SIMDIFY<data_t>(ctx.out_ptr[c_shift2])[out_idx] = rhs.shift[1] + ctx.sigma * dssp.shift[1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_shift3])[out_idx] = rhs.shift[2] + ctx.sigma * dssp.shift[2];
-    SIMDIFY<data_t>(ctx.out_ptr[c_B1])[out_idx]     = rhs.B[0]     + ctx.sigma * dssp.B[0];
-    SIMDIFY<data_t>(ctx.out_ptr[c_B2])[out_idx]     = rhs.B[1]     + ctx.sigma * dssp.B[1];
-    SIMDIFY<data_t>(ctx.out_ptr[c_B3])[out_idx]     = rhs.B[2]     + ctx.sigma * dssp.B[2];
+    const int out_idx = m_out_stride[2]*(z-m_out_lo[2]) + m_out_stride[1]*(y-m_out_lo[1]) + (x-m_out_lo[0]);
+    SIMDIFY<data_t>(m_out_ptr[c_chi])[out_idx]    = rhs.chi      + m_sigma * dssp.chi;
+    SIMDIFY<data_t>(m_out_ptr[c_h11])[out_idx]    = rhs.h[0][0]  + m_sigma * dssp.h[0][0];
+    SIMDIFY<data_t>(m_out_ptr[c_h12])[out_idx]    = rhs.h[0][1]  + m_sigma * dssp.h[0][1];
+    SIMDIFY<data_t>(m_out_ptr[c_h13])[out_idx]    = rhs.h[0][2]  + m_sigma * dssp.h[0][2];
+    SIMDIFY<data_t>(m_out_ptr[c_h22])[out_idx]    = rhs.h[1][1]  + m_sigma * dssp.h[1][1];
+    SIMDIFY<data_t>(m_out_ptr[c_h23])[out_idx]    = rhs.h[1][2]  + m_sigma * dssp.h[1][2];
+    SIMDIFY<data_t>(m_out_ptr[c_h33])[out_idx]    = rhs.h[2][2]  + m_sigma * dssp.h[2][2];
+    SIMDIFY<data_t>(m_out_ptr[c_K])[out_idx]      = rhs.K        + m_sigma * dssp.K;
+    SIMDIFY<data_t>(m_out_ptr[c_A11])[out_idx]    = rhs.A[0][0]  + m_sigma * dssp.A[0][0];
+    SIMDIFY<data_t>(m_out_ptr[c_A12])[out_idx]    = rhs.A[0][1]  + m_sigma * dssp.A[0][1];
+    SIMDIFY<data_t>(m_out_ptr[c_A13])[out_idx]    = rhs.A[0][2]  + m_sigma * dssp.A[0][2];
+    SIMDIFY<data_t>(m_out_ptr[c_A22])[out_idx]    = rhs.A[1][1]  + m_sigma * dssp.A[1][1];
+    SIMDIFY<data_t>(m_out_ptr[c_A23])[out_idx]    = rhs.A[1][2]  + m_sigma * dssp.A[1][2];
+    SIMDIFY<data_t>(m_out_ptr[c_A33])[out_idx]    = rhs.A[2][2]  + m_sigma * dssp.A[2][2];
+    SIMDIFY<data_t>(m_out_ptr[c_Gamma1])[out_idx] = rhs.Gamma[0] + m_sigma * dssp.Gamma[0];
+    SIMDIFY<data_t>(m_out_ptr[c_Gamma2])[out_idx] = rhs.Gamma[1] + m_sigma * dssp.Gamma[1];
+    SIMDIFY<data_t>(m_out_ptr[c_Gamma3])[out_idx] = rhs.Gamma[2] + m_sigma * dssp.Gamma[2];
+    SIMDIFY<data_t>(m_out_ptr[c_Theta])[out_idx]  = rhs.Theta    + m_sigma * dssp.Theta;
+    SIMDIFY<data_t>(m_out_ptr[c_lapse])[out_idx]  = rhs.lapse    + m_sigma * dssp.lapse;
+    SIMDIFY<data_t>(m_out_ptr[c_shift1])[out_idx] = rhs.shift[0] + m_sigma * dssp.shift[0];
+    SIMDIFY<data_t>(m_out_ptr[c_shift2])[out_idx] = rhs.shift[1] + m_sigma * dssp.shift[1];
+    SIMDIFY<data_t>(m_out_ptr[c_shift3])[out_idx] = rhs.shift[2] + m_sigma * dssp.shift[2];
+    SIMDIFY<data_t>(m_out_ptr[c_B1])[out_idx]     = rhs.B[0]     + m_sigma * dssp.B[0];
+    SIMDIFY<data_t>(m_out_ptr[c_B2])[out_idx]     = rhs.B[1]     + m_sigma * dssp.B[1];
+    SIMDIFY<data_t>(m_out_ptr[c_B3])[out_idx]     = rhs.B[2]     + m_sigma * dssp.B[2];
 }
 
-template <class data_t, int stencil_size>
-void CCZ4_apply(
-    const stencil<stencil_size> &s,
-    const double **in_arr,
-    int idx,
-    int stride,
-    CCZ4_vars<data_t> &out,
-    data_t multiplier
-)
-{
-    for (int i = 0; i < stencil_size; ++i)
-    {
-        int idx_shifted = idx + s.offset[i]*stride;
-        data_t weight = multiplier*s.weight[i];
-
-        out.chi      += weight * SIMDIFY<data_t>(in_arr[c_chi])[idx_shifted];
-        out.h[0][0]  += weight * SIMDIFY<data_t>(in_arr[c_h11])[idx_shifted];
-        out.h[0][1]  += weight * SIMDIFY<data_t>(in_arr[c_h12])[idx_shifted];
-        out.h[0][2]  += weight * SIMDIFY<data_t>(in_arr[c_h13])[idx_shifted];
-        out.h[1][1]  += weight * SIMDIFY<data_t>(in_arr[c_h22])[idx_shifted];
-        out.h[1][2]  += weight * SIMDIFY<data_t>(in_arr[c_h23])[idx_shifted];
-        out.h[2][2]  += weight * SIMDIFY<data_t>(in_arr[c_h33])[idx_shifted];
-
-        out.K        += weight * SIMDIFY<data_t>(in_arr[c_K])[idx_shifted];
-        out.A[0][0]  += weight * SIMDIFY<data_t>(in_arr[c_A11])[idx_shifted];
-        out.A[0][1]  += weight * SIMDIFY<data_t>(in_arr[c_A12])[idx_shifted];
-        out.A[0][2]  += weight * SIMDIFY<data_t>(in_arr[c_A13])[idx_shifted];
-        out.A[1][1]  += weight * SIMDIFY<data_t>(in_arr[c_A22])[idx_shifted];
-        out.A[1][2]  += weight * SIMDIFY<data_t>(in_arr[c_A23])[idx_shifted];
-        out.A[2][2]  += weight * SIMDIFY<data_t>(in_arr[c_A33])[idx_shifted];
-
-        out.Gamma[0] += weight * SIMDIFY<data_t>(in_arr[c_Gamma1])[idx_shifted];
-        out.Gamma[1] += weight * SIMDIFY<data_t>(in_arr[c_Gamma2])[idx_shifted];
-        out.Gamma[2] += weight * SIMDIFY<data_t>(in_arr[c_Gamma3])[idx_shifted];
-
-        out.Theta    += weight * SIMDIFY<data_t>(in_arr[c_Theta])[idx_shifted];
-
-        out.lapse    += weight * SIMDIFY<data_t>(in_arr[c_lapse])[idx_shifted];
-        out.shift[0] += weight * SIMDIFY<data_t>(in_arr[c_shift1])[idx_shifted];
-        out.shift[1] += weight * SIMDIFY<data_t>(in_arr[c_shift2])[idx_shifted];
-        out.shift[2] += weight * SIMDIFY<data_t>(in_arr[c_shift3])[idx_shifted];
-
-        out.B[0]     += weight * SIMDIFY<data_t>(in_arr[c_B1])[idx_shifted];
-        out.B[1]     += weight * SIMDIFY<data_t>(in_arr[c_B2])[idx_shifted];
-        out.B[2]     += weight * SIMDIFY<data_t>(in_arr[c_B3])[idx_shifted];
-    }
-
-    out.h[1][0] = out.h[0][1];
-    out.h[2][0] = out.h[0][2];
-    out.h[2][1] = out.h[1][2];
-
-    out.A[1][0] = out.A[0][1];
-    out.A[2][0] = out.A[0][2];
-    out.A[2][1] = out.A[1][2];
-}
-
-template <class data_t, int stencil_size1, int stencil_size2>
-void CCZ4_apply2(
-    const stencil<stencil_size1> &s1,
-    const stencil<stencil_size2> &s2,
-    const double **in_arr,
-    int idx,
-    int stride1,
-    int stride2,
-    CCZ4_vars<data_t> &out
-)
-{
-    for (int i = 0; i < stencil_size1; ++i)
-    {
-        CCZ4_apply(s2, in_arr, idx+s1.offset[i]*stride1, stride2, out, static_cast<data_t>(s1.weight[i]));
-    }
-}
-
-template <class data_t, bool covariantZ4>
-void CCZ4_rhs(
-    const CCZ4_vars<data_t> &vars,
-    const CCZ4_vars<data_t> (&d1)[CH_SPACEDIM],
-    const CCZ4_vars<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
-    const CCZ4_vars<data_t> &advec,
-    CCZ4_vars<data_t> &rhs,
-    CCZ4_params &params
+template <class data_t>
+void
+CCZ4::rhs_equation(const vars_t<data_t> &vars,
+          const vars_t<data_t> (&d1)[CH_SPACEDIM],
+          const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+          const vars_t<data_t> &advec,
+          vars_t<data_t> &rhs
 )
 {
     const data_t chi_regularised = simd_max(1e-6, vars.chi);
@@ -311,10 +157,11 @@ void CCZ4_rhs(
         }
     }
 
-    tensor<3, data_t> chris = {};
+    tensor<3, data_t> chris;
     {
         FOR3(i,j,k)
         {
+            chris[i][j][k] = 0;
             FOR1(l)
             {
                 chris[i][j][k] += h_UU[i][l]*chris_LLL[l][j][k];
@@ -325,10 +172,11 @@ void CCZ4_rhs(
     // Technically we can write chrisvec[i] = h_UU[j][k]*chris[i][j][k],
     // but this is not numerically stable: h_UU[j][k]*d1[i].h[j][k] should be zero
     // but in practice can be > O(1).
-    tensor<1, data_t> chrisvec = {};
+    tensor<1, data_t> chrisvec;
     {
         FOR1(i)
         {
+            chrisvec[i] = 0;
             FOR3(j,k,l)
             {
                 chrisvec[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
@@ -432,10 +280,11 @@ void CCZ4_rhs(
         }
     }
 
-    tensor<2, data_t> A_UU = {};
+    tensor<2, data_t> A_UU;
     {
         FOR2(i,j)
         {
+            A_UU[i][j] = 0;
             FOR2(k,l)
             {
                 A_UU[i][j] += h_UU[i][k]*h_UU[j][l]*vars.A[k][l];
@@ -498,32 +347,36 @@ void CCZ4_rhs(
         }
     }
 
-    data_t kappa1_lapse = params.kappa1 * (covariantZ4 ? 1.0 : vars.lapse);
+#ifdef COVARIANTZ4
+    data_t kappa1_lapse = m_params.kappa1;
+#else
+    data_t kappa1_lapse = m_params.kappa1 * vars.lapse;
+#endif
 
     {
-        data_t Thetadot = 0.5*vars.lapse*(tr_ricci - tr_AA + ((GR_SPACEDIM-1)/(data_t) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
+        data_t Thetadot = 0.5*vars.lapse*(tr_ricci - tr_AA + ((GR_SPACEDIM-1)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
         rhs.Theta = advec.Theta + Thetadot;
 
-        rhs.K = advec.K + 2*Thetadot + vars.lapse*(tr_AA + (1.0/GR_SPACEDIM)*vars.K*vars.K) + kappa1_lapse*(1-params.kappa2)*vars.Theta + 2*Z_dot_d1lapse - tr_covd2lapse;
+        rhs.K = advec.K + 2*Thetadot + vars.lapse*(tr_AA + (1.0/GR_SPACEDIM)*vars.K*vars.K) + kappa1_lapse*(1-m_params.kappa2)*vars.Theta + 2*Z_dot_d1lapse - tr_covd2lapse;
     }
 
     tensor<1, data_t> Gammadot;
     {
         FOR1(i)
         {
-            Gammadot[i] = (2.0/GR_SPACEDIM)*(divshift*(chrisvec[i] + 2*params.kappa3*Z_over_chi[i]) - 2*vars.lapse*vars.K*Z_over_chi[i]) - 2*kappa1_lapse*Z_over_chi[i];
+            Gammadot[i] = (2.0/GR_SPACEDIM)*(divshift*(chrisvec[i] + 2*m_params.kappa3*Z_over_chi[i]) - 2*vars.lapse*vars.K*Z_over_chi[i]) - 2*kappa1_lapse*Z_over_chi[i];
             FOR1(j)
             {
                 Gammadot[i] += 2*h_UU[i][j]*(vars.lapse*d1[j].Theta - vars.Theta*d1[j].lapse)
                     - 2*A_UU[i][j]*d1[j].lapse
-                    - vars.lapse*((2*(GR_SPACEDIM-1)/(data_t) GR_SPACEDIM)*h_UU[i][j]*d1[j].K + GR_SPACEDIM*A_UU[i][j]*d1[j].chi/chi_regularised)
-                    - (chrisvec[j] + 2*params.kappa3*Z_over_chi[j])*d1[j].shift[i];
+                    - vars.lapse*((2*(GR_SPACEDIM-1)/(double) GR_SPACEDIM)*h_UU[i][j]*d1[j].K + GR_SPACEDIM*A_UU[i][j]*d1[j].chi/chi_regularised)
+                    - (chrisvec[j] + 2*m_params.kappa3*Z_over_chi[j])*d1[j].shift[i];
 
                 FOR1(k)
                 {
                     Gammadot[i] += 2*vars.lapse*chris[i][j][k]*A_UU[j][k]
                         + h_UU[j][k]*d2[j][k].shift[i]
-                        + ((GR_SPACEDIM-2)/(data_t) GR_SPACEDIM)*h_UU[i][j]*d2[j][k].shift[k];
+                        + ((GR_SPACEDIM-2)/(double) GR_SPACEDIM)*h_UU[i][j]*d2[j][k].shift[k];
                 }
             }
         }
@@ -534,14 +387,231 @@ void CCZ4_rhs(
         }
     }
     
-    data_t eta = 1;
+    const data_t eta = 1;
 
     {
-        rhs.lapse = params.lapse_advec_coeff*advec.lapse - 2*vars.lapse*(vars.K - 2*vars.Theta);
+        rhs.lapse = m_params.lapse_advec_coeff*advec.lapse - 2*vars.lapse*(vars.K - 2*vars.Theta);
         FOR1(i)
         {
-            rhs.shift[i] = params.shift_advec_coeff*advec.shift[i] + params.shift_gamma_coeff*vars.B[i];
-            rhs.B[i] = params.shift_advec_coeff*advec.B[i] + (1 - params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - params.beta_driver*eta*vars.B[i];
+            rhs.shift[i] = m_params.shift_advec_coeff*advec.shift[i] + m_params.shift_gamma_coeff*vars.B[i];
+            rhs.B[i] = m_params.shift_advec_coeff*advec.B[i] + (1 - m_params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - m_params.beta_driver*eta*vars.B[i];
         }
     }
+}
+
+template <class data_t>
+void
+CCZ4::local_vars(int idx, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        result[i] = SIMDIFY<data_t>(m_in_ptr[i])[idx];
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::diff1(int idx, int stride, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        auto in = SIMDIFY<data_t>(m_in_ptr[i]);
+
+        data_t weight_far  = 8.33333333333333333333e-2;
+        data_t weight_near = 6.66666666666666666667e-1;
+
+        result[i] = (  weight_far  * in[idx - 2*stride]
+                     - weight_near * in[idx - stride]
+                     + weight_near * in[idx + stride]
+                     - weight_far  * in[idx + 2*stride]) / m_dx;
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::diff2(int idx, int stride, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        auto in = SIMDIFY<data_t>(m_in_ptr[i]);
+
+        data_t weight_far   = 8.33333333333333333333e-2;
+        data_t weight_near  = 1.33333333333333333333e+0;
+        data_t weight_local = 2.50000000000000000000e+0;
+
+        result[i] = (- weight_far   * in[idx - 2*stride]
+                     + weight_near  * in[idx - stride]
+                     - weight_local * in[idx]
+                     + weight_near  * in[idx + stride]
+                     - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        auto in = SIMDIFY<data_t>(m_in_ptr[i]);
+
+        data_t weight_far_far   = 6.94444444444444444444e-3;
+        data_t weight_near_far  = 5.55555555555555555556e-2;
+        data_t weight_near_near = 4.44444444444444444444e-1;
+
+        result[i] = (  weight_far_far   * in[idx - 2*stride1 - 2*stride2]
+                     - weight_near_far  * in[idx - 2*stride1 - stride2]
+                     + weight_near_far  * in[idx - 2*stride1 + stride2]
+                     - weight_far_far   * in[idx - 2*stride1 + 2*stride2]
+
+                     - weight_near_far  * in[idx - stride1 - 2*stride2]
+                     + weight_near_near * in[idx - stride1 - stride2]
+                     - weight_near_near * in[idx - stride1 + stride2]
+                     + weight_near_far  * in[idx - stride1 + 2*stride2]
+
+                     + weight_near_far  * in[idx + stride1 - 2*stride2]
+                     - weight_near_near * in[idx + stride1 - stride2]
+                     + weight_near_near * in[idx + stride1 + stride2]
+                     - weight_near_far  * in[idx + stride1 + 2*stride2]
+
+                     - weight_far_far   * in[idx + 2*stride1 - 2*stride2]
+                     + weight_near_far  * in[idx + 2*stride1 - stride2]
+                     - weight_near_far  * in[idx + 2*stride1 + stride2]
+                     + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        result[i] = 0;
+    }
+
+    for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
+    {
+        const int stride = m_stride[dim];
+        const auto shift_val = shift[dim];
+        const auto shift_positive = simd_compare_gt(shift_val, 0.0);
+
+        for (int i = 0; i < c_NUM; ++i)
+        {
+            const auto in = SIMDIFY<data_t>(m_in_ptr[i]);
+            const data_t in_left = in[idx - stride];
+            const data_t in_centre = in[idx];
+            const data_t in_right = in[idx + stride];
+            
+            data_t weight_0 = -2.50000000000000000000e-1;
+            data_t weight_1 = -8.33333333333333333333e-1;
+            data_t weight_2 = +1.50000000000000000000e+0;
+            data_t weight_3 = -5.00000000000000000000e-1;
+            data_t weight_4 = +8.33333333333333333333e-2;
+
+            data_t upwind;
+            upwind = shift_val * (  weight_0 * in_left
+                                  + weight_1 * in_centre
+                                  + weight_2 * in_right
+                                  + weight_3 * in[idx + 2*stride]
+                                  + weight_4 * in[idx + 3*stride]) / m_dx;
+
+            data_t downwind;
+            downwind = shift_val * (- weight_4 * in[idx - 3*stride]
+                                    - weight_3 * in[idx - 2*stride]
+                                    - weight_2 * in_left
+                                    - weight_1 * in_centre
+                                    - weight_0 * in_right) / m_dx;
+
+            result[i] += simd_conditional(shift_positive, upwind , downwind);
+        }
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::dissipation(int idx, vars_t<data_t>& out)
+{
+    data_t result[c_NUM];
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        result[i] = 0;
+    }
+
+    for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
+    {
+        const int stride = m_stride[dim];
+        for (int i = 0; i < c_NUM; ++i)
+        {
+            auto in = SIMDIFY<data_t>(m_in_ptr[i]);
+
+            data_t weight_vfar  = 1.56250e-2;
+            data_t weight_far   = 9.37500e-2;
+            data_t weight_near  = 2.34375e-1;
+            data_t weight_local = 3.12500e-1;
+
+            result[i] += ( weight_vfar   * in[idx - 3*stride]
+                          - weight_far   * in[idx - 2*stride]
+                          + weight_near  * in[idx - stride]
+                          - weight_local * in[idx]
+                          + weight_near  * in[idx + stride]
+                          - weight_far   * in[idx + 2*stride]
+                          + weight_vfar  * in[idx + 3*stride]) / m_dx;
+        }
+    }
+    demarshall(result, out);
+}
+
+template <class data_t>
+void
+CCZ4::demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out)
+{
+    out.chi      = in[c_chi];
+    out.h[0][0]  = in[c_h11];
+    out.h[0][1]  = in[c_h12];
+    out.h[0][2]  = in[c_h13];
+    out.h[1][1]  = in[c_h22];
+    out.h[1][2]  = in[c_h23];
+    out.h[2][2]  = in[c_h33];
+
+    out.h[1][0] = out.h[0][1];
+    out.h[2][0] = out.h[0][2];
+    out.h[2][1] = out.h[1][2];
+
+    out.K        = in[c_K];
+    out.A[0][0]  = in[c_A11];
+    out.A[0][1]  = in[c_A12];
+    out.A[0][2]  = in[c_A13];
+    out.A[1][1]  = in[c_A22];
+    out.A[1][2]  = in[c_A23];
+    out.A[2][2]  = in[c_A33];
+
+    out.A[1][0] = out.A[0][1];
+    out.A[2][0] = out.A[0][2];
+    out.A[2][1] = out.A[1][2];
+
+    out.Gamma[0] = in[c_Gamma1];
+    out.Gamma[1] = in[c_Gamma2];
+    out.Gamma[2] = in[c_Gamma3];
+
+    out.Theta    = in[c_Theta];
+
+    out.lapse    = in[c_lapse];
+    out.shift[0] = in[c_shift1];
+    out.shift[1] = in[c_shift2];
+    out.shift[2] = in[c_shift3];
+
+    out.B[0]     = in[c_B1];
+    out.B[1]     = in[c_B2];
+    out.B[2]     = in[c_B3];
 }
