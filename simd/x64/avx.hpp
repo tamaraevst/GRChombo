@@ -33,17 +33,17 @@ struct simd<double> : public simd_base<double>
 
     ALWAYS_INLINE
     simd() :
-        simd_base (_mm256_undefined_pd())
+        simd_base<double> (_mm256_undefined_pd())
     {}
 
     ALWAYS_INLINE
     simd(const double& s) :
-        simd_base (_mm256_set1_pd(s))
+        simd_base<double> (_mm256_set1_pd(s))
     {}
 
     ALWAYS_INLINE
     simd(const data_t& v) :
-        simd_base (v)
+        simd_base<double> (v)
     {}
 
     ALWAYS_INLINE
@@ -127,17 +127,17 @@ struct simd<float> : public simd_base<float>
 
     ALWAYS_INLINE
     simd() :
-        simd_base (_mm256_undefined_ps())
+        simd_base<float> (_mm256_undefined_ps())
     {}
     
     ALWAYS_INLINE
     simd(const float& x) :
-        simd_base (_mm256_set1_ps(x))
+        simd_base<float> (_mm256_set1_ps(x))
     {}
 
     ALWAYS_INLINE
     simd(const data_t& v) :
-        simd_base (v)
+        simd_base<float> (v)
     {}
 
     ALWAYS_INLINE
