@@ -125,57 +125,51 @@ GRChombo::s_state_names[s_num_comps] =
   "B1",
   "B2",
   "B3",
-
-  "Psi4r",
-  "Psi4i"
 };
 
-enum
-{
-  c_chi,
-
-  c_h,
-  c_h11 = c_h,
-  c_h12,
-  c_h13,
-  c_h22,
-  c_h23,
-  c_h33,
-
-  c_K,
-
-  c_A,
-  c_A11 = c_A,
-  c_A12,
-  c_A13,
-  c_A22,
-  c_A23,
-  c_A33,
-
-  c_Theta,
-
-  c_Gamma,
-  c_Gamma1 = c_Gamma,
-  c_Gamma2,
-  c_Gamma3,
-
-  c_lapse,
-
-  c_shift,
-  c_shift1 = c_shift,
-  c_shift2,
-  c_shift3,
-
-  c_B,
-  c_B1 = c_B,
-  c_B2,
-  c_B3,
-
-  c_Psi4r,
-  c_Psi4i,
-
-  c_NUM
-};
+//enum Now defined in CCZ4.cpp
+//{
+//  c_chi,
+//
+//  c_h,
+//  c_h11 = c_h,
+//  c_h12,
+//  c_h13,
+//  c_h22,
+//  c_h23,
+//  c_h33,
+//
+//  c_K,
+//
+//  c_A,
+//  c_A11 = c_A,
+//  c_A12,
+//  c_A13,
+//  c_A22,
+//  c_A23,
+//  c_A33,
+//
+//  c_Theta,
+//
+//  c_Gamma,
+//  c_Gamma1 = c_Gamma,
+//  c_Gamma2,
+//  c_Gamma3,
+//
+//  c_lapse,
+//
+//  c_shift,
+//  c_shift1 = c_shift,
+//  c_shift2,
+//  c_shift3,
+//
+//  c_B,
+//  c_B1 = c_B,
+//  c_B2,
+//  c_B3,
+//
+//  c_NUM
+//};
 
 const int
 GRChombo::s_num_comps_h = c_K-c_h;
@@ -186,7 +180,7 @@ GRChombo::s_num_comps_Gamma = c_lapse-c_Gamma;
 const int
 GRChombo::s_num_comps_shift = c_B-c_shift;
 const int
-GRChombo::s_num_comps_B = c_Psi4r-c_B;
+GRChombo::s_num_comps_B = c_NUM-c_B;
 
 
 const int
@@ -501,45 +495,11 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
     }//y
     }//z
 
-    Real centerX = (m_p.centerA[0] + m_p.centerB[0]) / 2.;
-    Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
-    Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
+    //Real centerX = (m_p.centerA[0] + m_p.centerB[0]) / 2.;
+    //Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
+    //Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
 
-    FORT_GETCCZ4CRHSF(CHF_FRA1(rhs_fab,c_chi),
-                    CHF_FRAn(rhs_fab,c_h,s_num_comps_h),
-                    CHF_FRA1(rhs_fab,c_K),
-                    CHF_FRAn(rhs_fab,c_A,s_num_comps_A),
-                    CHF_FRA1(rhs_fab,c_Theta),
-                    CHF_FRAn(rhs_fab,c_Gamma,s_num_comps_Gamma),
-                    CHF_FRA1(rhs_fab,c_lapse),
-                    CHF_FRAn(rhs_fab,c_shift,s_num_comps_shift),
-                    CHF_FRAn(rhs_fab,c_B,s_num_comps_B),
-                    CHF_CONST_FRA1(soln_fab,c_chi),
-                    CHF_CONST_FRAn(soln_fab,c_h,s_num_comps_h),
-                    CHF_CONST_FRA1(soln_fab,c_K),
-                    CHF_CONST_FRAn(soln_fab,c_A,s_num_comps_A),
-                    CHF_CONST_FRA1(soln_fab,c_Theta),
-                    CHF_CONST_FRAn(soln_fab,c_Gamma,s_num_comps_Gamma),
-                    CHF_CONST_FRA1(soln_fab,c_lapse),
-                    CHF_CONST_FRAn(soln_fab,c_shift,s_num_comps_shift),
-                    CHF_CONST_FRAn(soln_fab,c_B,s_num_comps_B),
-                    CHF_CONST_REAL(m_dx),
-                    CHF_CONST_INT(m_p.ShiftBCoeff),
-                    CHF_CONST_REAL(m_p.LapseAdvectionCoeff),
-                    CHF_CONST_REAL(m_p.ShiftAdvectionCoeff),
-                    CHF_CONST_REAL(m_p.F),
-                    CHF_CONST_REAL(m_p.eta),
-                    CHF_CONST_REAL(m_p.SpatialBetaDriverRadius),
-                    CHF_CONST_REAL(m_p.kappa1),
-                    CHF_CONST_REAL(m_p.kappa2),
-                    CHF_CONST_REAL(m_p.kappa3),
-                    CHF_CONST_INT(m_p.covariantZ4),
-                    CHF_CONST_REAL(m_p.sigma),
-                    CHF_CONST_REAL(centerX),
-                    CHF_CONST_REAL(centerY),
-                    CHF_CONST_REAL(centerZ),
-                    CHF_BOX(b));
-
+    CCZ4(m_p.ccz4Params, m_dx, m_p.sigma).execute(rhs_fab, soln_fab);
   }
   if (m_profilingInfo != NULL) m_profilingInfo->readCounters();
 }
@@ -1099,63 +1059,6 @@ void
 GRChombo::preCheckpointLevel ()
 {
   CH_TIME("GRChombo::preCheckpointLevel");
-
-  const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
-
-  // In order to compute the constraint violation we first need to fill ghosts
-  // If there is a coarser level then interpolate undefined ghost cells
-  if (m_coarser_level_ptr != NULL)
-  {
-    GRChombo* grchombo_ptr =
-      dynamic_cast<GRChombo*> (m_coarser_level_ptr);
-    if (grchombo_ptr != NULL)
-    {
-      FourthOrderFillPatch fofp(level_domain,
-                                   grchombo_ptr->m_state_new.disjointBoxLayout(),
-                                   s_num_comps,
-                                   grchombo_ptr->m_problem_domain,
-                                   grchombo_ptr->m_ref_ratio,
-                                   s_num_ghosts);
-
-      fofp.fillInterp(m_state_new,
-                     grchombo_ptr->m_state_new,
-                     0,0,s_num_comps);
-    }
-    else
-    {
-      MayDay::Error ("in GRChombo::tagCells: m_coarser_level_ptr is not castable to GRChombo*");
-    }
-  }
-
-  m_state_new.exchange(m_exchange_copier);
-
-  DataIterator dit0 = level_domain.dataIterator();
-  int nbox = dit0.size();
-  // And compute Psi4...
-//#pragma omp parallel for default(shared) schedule(guided)
-//Moved the threading into boxes
-  for(int ibox = 0; ibox < nbox; ++ibox)
-  {
-    DataIndex di = dit0[ibox];
-    const Box& b = level_domain[di];
-    FArrayBox& state_fab = m_state_new[di];
-
-    Real centerX = (m_p.centerA[0] + m_p.centerB[0]) / 2.;
-    Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
-    Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
-
-    FORT_GETPSI4(CHF_FRA1(state_fab,c_Psi4r),
-                       CHF_FRA1(state_fab,c_Psi4i),
-                       CHF_CONST_FRA1(state_fab,c_chi),
-                       CHF_CONST_FRAn(state_fab,c_h,s_num_comps_h),
-                       CHF_CONST_FRA1(state_fab,c_K),
-                       CHF_CONST_FRAn(state_fab,c_A,s_num_comps_A),
-                       CHF_CONST_REAL(m_dx),
-                       CHF_CONST_REAL(centerX),
-                       CHF_CONST_REAL(centerY),
-                       CHF_CONST_REAL(centerZ),
-                       CHF_BOX(b));
-  }
 }
 
 

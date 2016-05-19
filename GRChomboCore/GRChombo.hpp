@@ -22,9 +22,11 @@
 #include "Copier.H"
 #include "computeNorm.H"
 
-#define NUMCOMP 27
-
+#include "CCZ4.hpp"
 #include "ProfilingInfo.hpp"
+
+#define NUMCOMP 25
+
 
 
 struct SimParams
@@ -65,6 +67,15 @@ struct SimParams
 
      //Misc
      pp.get("nanCheck", nanCheck);
+
+     //Fill in he ccz4Parameters
+     ccz4Params.kappa1 = kappa1;
+     ccz4Params.kappa2 = kappa2;
+     ccz4Params.kappa3 = kappa3;
+     ccz4Params.shift_gamma_coeff = F;
+     ccz4Params.lapse_advec_coeff = LapseAdvectionCoeff;
+     ccz4Params.shift_advec_coeff = ShiftAdvectionCoeff;
+     ccz4Params.beta_driver = eta;
   }
 
   // Grid setup
@@ -86,6 +97,9 @@ struct SimParams
   std::vector<Real> momentumA, momentumB;
   //Misc
   int nanCheck;
+
+  //Collection of parameters necessary for the CCZ4 RHS
+  CCZ4::params_t ccz4Params;
 };
 
 class GRChombo : public AMRLevel
