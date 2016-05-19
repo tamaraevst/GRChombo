@@ -19,7 +19,7 @@ struct simd_traits<double>
 {
     typedef __m128d data_t;
     typedef __m128d mask_t;
-    static const int simd_len = 4;
+    static const int simd_len = 2;
 };
 
 template <>
@@ -27,7 +27,7 @@ struct simd_traits<float>
 {
     typedef __m128 data_t;
     typedef __m128 mask_t;
-    static const int simd_len = 8;
+    static const int simd_len = 4;
 };
 
 template <>
