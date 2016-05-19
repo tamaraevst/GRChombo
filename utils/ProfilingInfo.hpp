@@ -8,7 +8,7 @@ class ProfilingInfo
 {
    public:
       ProfilingInfo(){};
-      ~ProfilingInfo();
+      virtual ~ProfilingInfo(){};
 
       virtual bool isActive() = 0;
 
