@@ -499,7 +499,7 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
     //Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
     //Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
 
-    CCZ4(m_p.ccz4Params, m_dx, m_p.sigma).execute(rhs_fab, soln_fab);
+    CCZ4(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln_fab, rhs_fab);
   }
   if (m_profilingInfo != NULL) m_profilingInfo->readCounters();
 }
