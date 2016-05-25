@@ -1,7 +1,7 @@
 #define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
-#include <omp.h>
+//#include <omp.h>
 
 #include "FArrayBox.H"
 #include <iostream>
@@ -23,7 +23,7 @@
             &a.hiVect()[1],  \
             &a.hiVect()[2],  \
             &a.hiVect()[3],  \
-            &a.hiVect()[4],  \ 
+            &a.hiVect()[4],  \
             &a.hiVect()[5]), \
     &c
 
@@ -31,7 +31,7 @@
 
 int main()
 {
-    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+//    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
@@ -52,7 +52,7 @@ int main()
             {
                 const double x = xx*dx;
                 const IntVect iv(xx,yy,zz);
-                
+
                 double g[3][3];
                 double g_UU[3][3];
                 double chi;
@@ -147,6 +147,14 @@ int main()
 
     CCZ4(params, dx, sigma).execute(in_fab, out_fab);
 
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        double max_out = out_fab.norm(0, i, 1);
+        double max_in =  in_fab .norm(0, i, 1);
+        std::cout << "COMPONENT " << i << " C++ MAX VALUE (in) = " << max_in << std::endl;
+        std::cout << "COMPONENT " << i << " C++ MAX VALUE (out) = " << max_out << std::endl;
+    }
+
     gettimeofday(&end, NULL);
 
     int cxx_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
@@ -203,12 +211,14 @@ int main()
     for (int i = 0; i < c_NUM; ++i)
     {
         double max_err = out_fab.norm(0, i, 1);
+        double max_chf = out_fab_chf.norm(0,i,1);
         if (max_err > 1e-9)
         {
             std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(2, i, 1) << std::endl;
+            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
         }
     }
 
 #endif
-    
+
 }
