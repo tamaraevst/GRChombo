@@ -94,8 +94,27 @@ protected:
     int m_out_stride[3];
     
 public:
-    CCZ4(params_t params, double dx, double sigma);
+    CCZ4(params_t params, double dx, double sigma, FABDriver& driver);
     void execute(const FArrayBox& in, FArrayBox& out);
+
+    class factory
+    {
+    public:
+        params_t m_params;
+        double m_dx;
+        double m_sigma;
+
+        factory(params_t params, double dx, double sigma) :
+            m_params (params),
+            m_dx (dx),
+            m_sigma (sigma)
+        {}
+
+        CCZ4 create(FABDriver &driver)
+        {
+            return CCZ4(params, dx, sigma, driver);
+        }
+    }
 
 protected:
     template <class data_t>
@@ -129,5 +148,11 @@ protected:
              const vars_t<data_t> &advec,
              vars_t<data_t> &rhs);
 };
+
+class CCZ4Factory
+{
+
+
+}
 
 #endif /* CCZ4_HPP_ */

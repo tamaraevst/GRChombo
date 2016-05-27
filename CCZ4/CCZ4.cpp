@@ -135,54 +135,8 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 {
     const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-    data_t deth = vars.h[0][0]*vars.h[1][1]*vars.h[2][2] + 2*vars.h[0][1]*vars.h[0][2]*vars.h[1][2] - vars.h[0][0]*vars.h[1][2]*vars.h[1][2] - vars.h[1][1]*vars.h[0][2]*vars.h[0][2] - vars.h[2][2]*vars.h[0][1]*vars.h[0][1];
-    tensor<2, data_t> h_UU;
-    {
-        h_UU[0][0] = (vars.h[1][1]*vars.h[2][2] - vars.h[1][2]*vars.h[1][2]) / deth;
-        h_UU[0][1] = (vars.h[0][2]*vars.h[1][2] - vars.h[0][1]*vars.h[2][2]) / deth;
-        h_UU[0][2] = (vars.h[0][1]*vars.h[1][2] - vars.h[0][2]*vars.h[1][1]) / deth;
-        h_UU[1][1] = (vars.h[0][0]*vars.h[2][2] - vars.h[0][2]*vars.h[0][2]) / deth;
-        h_UU[1][2] = (vars.h[0][1]*vars.h[0][2] - vars.h[0][0]*vars.h[1][2]) / deth;
-        h_UU[2][2] = (vars.h[0][0]*vars.h[1][1] - vars.h[0][1]*vars.h[0][1]) / deth;
-        h_UU[1][0] = h_UU[0][1];
-        h_UU[2][0] = h_UU[0][2];
-        h_UU[2][1] = h_UU[1][2];
-    }
-
-    tensor<3, data_t> chris_LLL;
-    {
-        FOR3(i,j,k)
-        {
-            chris_LLL[i][j][k] = 0.5*(d1[k].h[j][i] + d1[j].h[k][i] - d1[i].h[j][k]);
-        }
-    }
-
-    tensor<3, data_t> chris;
-    {
-        FOR3(i,j,k)
-        {
-            chris[i][j][k] = 0;
-            FOR1(l)
-            {
-                chris[i][j][k] += h_UU[i][l]*chris_LLL[l][j][k];
-            }
-        }
-    }
-
-    // Technically we can write chrisvec[i] = h_UU[j][k]*chris[i][j][k],
-    // but this is not numerically stable: h_UU[j][k]*d1[i].h[j][k] should be zero
-    // but in practice can be > O(1).
-    tensor<1, data_t> chrisvec;
-    {
-        FOR1(i)
-        {
-            chrisvec[i] = 0;
-            FOR3(j,k,l)
-            {
-                chrisvec[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
-            }
-        }
-    }
+    auto inv = compute_inverse_metric(vars);
+    auto chris = compute_christoffel(vars, d1, inv);
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
