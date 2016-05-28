@@ -23,6 +23,8 @@ protected:
         tensor<1, data_t> B;
     };
 
+    FABDriverBase& m_driver;
+
 public:
     template <class data_t>
     struct inverse_metric_t
@@ -112,6 +114,8 @@ public:
     };
 
 protected:
+
+
     params_t m_params;
     double m_dx;
     double m_sigma;
