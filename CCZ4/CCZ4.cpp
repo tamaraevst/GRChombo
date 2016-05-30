@@ -136,7 +136,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
     auto inv = compute_inverse_metric(vars);
-    auto chris = compute_christoffel(vars, d1, inv);
+    chris_t chris(vars, d1, inv);
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
@@ -147,6 +147,9 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
             Z[i] = vars.chi*Z_over_chi[i];
         }
     }
+
+    ricciZ_t ricci(vars, d2, d1, chris, h_UU, Z_over_chi);
+
 
     data_t divshift = 0;
     data_t Z_dot_d1lapse = 0;
@@ -168,7 +171,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    tensor<2, data_t> covdtilde2chi;
     tensor<2, data_t> covdtilde2lapse;
     tensor<2, data_t> covd2lapse;
     {
@@ -197,42 +199,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    // Trick: For CCZ4, we can add Z terms to ricci by changing Gamma to chrisvec
-    tensor<2, data_t> ricci;
-    {
-        data_t boxtildechi = 0;
-        FOR2(k,l)
-        {
-            boxtildechi += h_UU[k][l]*covdtilde2chi[k][l];
-        }
-
-        FOR2(i,j)
-        {       
-            data_t ricci_tilde = 0;
-            FOR1(k)
-            {
-                ricci_tilde += 0.5*(vars.h[k][i]*d1[j].Gamma[k] + vars.h[k][j]*d1[i].Gamma[k] + chrisvec[k]*(chris_LLL[i][j][k] + chris_LLL[j][i][k]));
-                FOR1(l)
-                {
-                    ricci_tilde -= 0.5*h_UU[k][l]*d2[k][l].h[i][j];
-                    FOR1(m)
-                    {
-                        ricci_tilde += h_UU[l][m]*(chris[k][l][i]*chris_LLL[j][k][m] + chris[k][l][j]*chris_LLL[i][k][m] + chris[k][i][m]*chris_LLL[k][l][j]);
-                    }
-                }
-            }
-
-            data_t ricci_chi = 0.5*((GR_SPACEDIM-2)*covdtilde2chi[i][j] + vars.h[i][j]*boxtildechi - ((GR_SPACEDIM-2)*d1[i].chi*d1[j].chi + GR_SPACEDIM*vars.h[i][j]*dchi_dot_dchi) / (2*chi_regularised));
-
-            data_t ricci_Z = 0;
-            FOR1(k)
-            {
-                ricci_Z += Z_over_chi[k]*(vars.h[i][k]*d1[j].chi + vars.h[j][k]*d1[i].chi - vars.h[i][j]*d1[k].chi + d1[k].h[i][j]*vars.chi);
-            }
-
-            ricci[i][j] = (ricci_chi + vars.chi*ricci_tilde + ricci_Z) / vars.chi;
-        }
-    }
 
     tensor<2, data_t> A_UU;
     {
