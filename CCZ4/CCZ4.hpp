@@ -5,6 +5,7 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.H"
+#include "FABDriver.hpp"
 
 enum {
     c_chi,

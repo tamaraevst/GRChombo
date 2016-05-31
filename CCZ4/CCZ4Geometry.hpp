@@ -90,9 +90,9 @@ struct ricciZ_t
 
    ricciZ_t(const vars_t<data_t> &vars, const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
          const vars_t<data_t> (&d1)[CH_SPACEDIM],
-         const christ_t chris,
+         const christ_t& chris,
          const tensor<2, data_t>& h_UU,
-         const tensor<1, data_t> Z_over_chi)
+         const tensor<1, data_t>& Z_over_chi)
    {
       data_t boxtildechi = 0;
       FOR2(k,l)
@@ -140,16 +140,12 @@ struct ricciZ_t
 
          LL[i][j] = (ricci_chi + vars.chi*ricci_tilde + z_terms) / vars.chi;
       }
-      scalar = 0;
-      FOR2(i,j)
-      {
-         scalar += vars.chi*h_UU[i][j]*LL[i][j];
-      }
+      scalar = vars.chi*trace(LL, h_UU);
    }
 
    ricciZ_t(const vars_t<data_t> &vars, const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
             const vars_t<data_t> (&d1)[CH_SPACEDIM],
-            const christ_t chris,
+            const christ_t& chris,
             const tensor<2, data_t>& h_UU)
    {
       tensor<1,double> Z0 = {0};
@@ -162,6 +158,50 @@ struct ricci_t : ricciZ_t  //Make Z-less ricci explicit for better readibility i
 {
    ricci_t(const vars_t<data_t> &vars, const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
            const vars_t<data_t> (&d1)[CH_SPACEDIM],
-           const christ_t chris,
+           const christ_t& chris,
            const tensor<2, data_t>& h_UU) : ricciZ_t(vars, d2, d1, chris, h_UU) {}
 };
+
+template <class data_t>
+ALWAYS_INLINE
+data_t
+compute_trace(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+{
+   data_t trace = 0;
+   FOR2(i,j)
+   {
+      trace += inverse_metric[i][j]*tensor_LL[i][j];
+   }
+   return trace;
+}
+
+template <class data_t>
+ALWAYS_INLINE
+void
+make_trace_free(tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &metric, const tensor<2,data_t> &inverse_metric)
+{
+   auto trace = compute_trace(tensor_LL, inverse_metric);
+   FOR2(i,j)
+   {
+      tensor_LL[i][j] += - 1./(GR_SPACEDIM-1.) * metric[i][j] * trace;
+   }
+}
+
+template <class data_t>
+ALWAYS_INLINE
+tensor<2,data_t>
+raise(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+{
+   tensor<2, data_t> tensor_UU;
+   FOR2(i,j)
+   {
+      tensor_UU[i][j] = 0;
+      FOR2(k,l)
+      {
+         tensor_UU[i][j] += inverse_metric[i][k]*inverse_metric[j][l]*tensor_LL[k][l];
+      }
+   }
+   return tensor_UU;
+}
+
+

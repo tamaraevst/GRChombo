@@ -8,52 +8,6 @@ CCZ4::CCZ4(params_t params, double dx, double sigma) :
     m_sigma (sigma)
 {}
 
-void
-CCZ4::execute(const FArrayBox& in, FArrayBox& out)
-{
-    // dataPtr in Chombo does CH_assert bound check
-    // which we don't want to do in a loop
-    for (int i = 0; i < c_NUM; ++i)
-    {
-        m_in_ptr[i] = in.dataPtr(i);
-        m_out_ptr[i] = out.dataPtr(i);
-    }
-
-    m_in_lo = in.loVect();
-    m_in_hi = in.hiVect();
-    m_stride[0] = 1;
-    m_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
-    m_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_stride[1];
-
-    m_out_lo = out.loVect();
-    m_out_hi = out.hiVect(); 
-    m_out_stride[0] = 1;
-    m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
-    m_out_stride[2] = (m_out_hi[1]-m_out_lo[1]+1)*m_out_stride[1];
-
-#pragma omp parallel for default(shared) collapse(2)
-    for (int z = m_out_lo[2]; z <= m_out_hi[2]; ++z)
-    for (int y = m_out_lo[1]; y <= m_out_hi[1]; ++y)
-    {
-        int x_simd_max = m_out_lo[0] + simd<double>::simd_len * (((m_out_hi[0] - m_out_lo[0] + 1) / simd<double>::simd_len) - 1);
-
-        // SIMD LOOP
-        #pragma novector
-        for (int x = m_out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
-        {
-            compute<simd<double> >(x, y, z);
-        }
-
-        // REMAINDER LOOP
-        #pragma novector
-        for (int x = x_simd_max + simd<double>::simd_len; x <= m_out_hi[0]; ++x)
-        {
-            compute<double>(x, y, z);
-        }
-    }
-
-}
-
 template <class data_t>
 void
 CCZ4::compute(int x, int y, int z)
@@ -150,13 +104,12 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     ricciZ_t ricci(vars, d2, d1, chris, h_UU, Z_over_chi);
 
-
     data_t divshift = 0;
     data_t Z_dot_d1lapse = 0;
     {
         FOR1(k)
         {
-            divshift += d1[k].shift[k]; 
+            divshift += d1[k].shift[k];
             Z_dot_d1lapse += Z[k]*d1[k].lapse;
         }
     }
@@ -200,27 +153,10 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     }
 
 
-    tensor<2, data_t> A_UU;
-    {
-        FOR2(i,j)
-        {
-            A_UU[i][j] = 0;
-            FOR2(k,l)
-            {
-                A_UU[i][j] += h_UU[i][k]*h_UU[j][l]*vars.A[k][l];
-            }
-        }
-    }
+    tensor<2, data_t> A_UU = raise(vars.A, h_UU);
 
-    data_t tr_ricci = 0;
-    data_t tr_AA = 0;
-    {
-        FOR2(i,j)
-        {
-            tr_ricci += vars.chi*h_UU[i][j]*ricci[i][j];
-            tr_AA += A_UU[i][j]*vars.A[i][j];
-        }
-    }
+    //data_t tr_ricci = vars.chi*trace(ricci,h_UU);  -- absorbed into the ricci struct
+    data_t tr_AA    = trace(vars.A, A_UU);
 
     {
         rhs.chi = advec.chi + (2.0/GR_SPACEDIM)*vars.chi*(vars.lapse*vars.K - divshift);
@@ -241,11 +177,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
             Adot_TF_expr[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci[i][j];
         }
 
-        data_t Adot_TF_trace = 0;
-        FOR2(i,j)
-        {
-            Adot_TF_trace += h_UU[i][j]*Adot_TF_expr[i][j];
-        }
+        data_t Adot_TF_trace = trace(Adot_TF_expr, h_UU);
 
         tensor<2, data_t> Adot_TF;
         FOR2(i,j)
