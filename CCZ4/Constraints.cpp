@@ -3,17 +3,17 @@
 
 template <class data_t>
 void
-CCZ4::compute(int x, int y, int z)
+Constraints::compute(int x, int y, int z)
 {
-    const int idx = m_stride[2]*(z-m_in_lo[2]) + m_stride[1]*(y-m_in_lo[1]) + (x-m_in_lo[0]);
+    const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
 
     vars_t<data_t> vars;
     local_vars(idx, vars);
-    
+
     vars_t<data_t> d1[CH_SPACEDIM];
     for (int i = 0; i < 3; ++i)
     {
-        diff1(idx, m_stride[i], d1[i]);
+        diff1(idx, m_driver.m_stride[i], d1[i]);
     }
 
     vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM];
@@ -21,13 +21,13 @@ CCZ4::compute(int x, int y, int z)
     // Repeated derivatives
     for (int i = 0; i < 3; ++i)
     {
-        diff2(idx, m_stride[i], d2[i][i]);
+        diff2(idx, m_driver.m_stride[i], d2[i][i]);
     }
 
     // Mixed derivatives
-    mixed_diff2(idx, m_stride[1], m_stride[0], d2[0][1]);
-    mixed_diff2(idx, m_stride[2], m_stride[0], d2[0][2]);
-    mixed_diff2(idx, m_stride[2], m_stride[1], d2[1][2]);
+    mixed_diff2(idx, m_driver.m_stride[1], m_driver.m_stride[0], d2[0][1]);
+    mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[0], d2[0][2]);
+    mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[1], d2[1][2]);
 
     d2[1][0] = d2[0][1];
     d2[2][0] = d2[0][2];
@@ -38,7 +38,7 @@ CCZ4::compute(int x, int y, int z)
 
 template <class data_t>
 void
-CCZ4::constraint_equations(vars_t<data_t> &vars,
+Constraints::constraint_equations(vars_t<data_t> &vars,
       const vars_t<data_t> (&d1)[CH_SPACEDIM],
       const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM]
       )
@@ -46,9 +46,9 @@ CCZ4::constraint_equations(vars_t<data_t> &vars,
    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
    auto h_UU = compute_inverse_metric(vars);
-   chris_t chris(vars, d1, inv);
+   chris_t<data_t> chris(vars, d1, h_UU);
 
-   ricci_t ricci(vars, d2, d1, chris, h_UU);
+   ricci_t<data_t> ricci(vars, d2, d1, chris, h_UU);
 
    auto A_UU       = raise(vars.A, h_UU);
    data_t tr_AA    = trace(vars.A, A_UU);

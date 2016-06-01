@@ -1,71 +1,72 @@
+#include "FABDriver.hpp"
 
-template <typename... param_types>
-FABDriver::FABDriver(param_types... params) :
-    m_compute(std::forward<param_types>(params)...)
-{}
+//template <typename... param_types>
+//FABDriver::FABDriver(param_types... params) : m_compute(compute_t(std::forward<param_types>(params)..., *this)) {};
 
-    void execute(const FArrayBox& in, FArrayBox& out)
-    {
-        // dataPtr in Chombo does CH_assert bound check
-        // which we don't want to do in a loop
-        for (int i = 0; i < c_NUM; ++i)
-        {
-            m_in_ptr[i] = in.dataPtr(i);
-            m_out_ptr[i] = out.dataPtr(i);
-        }
-
-        m_in_lo = in.loVect();
-        m_in_hi = in.hiVect();
-        m_stride[0] = 1;
-        m_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
-    #if CH_SPACEDIM >= 3
-        m_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_stride[1];
-    #endif
-    #if CH_SPACEDIM >= 4
-        #error "TODO: Implement CH_SPACEDIM >= 4"
-    #endif
-
-        m_out_lo = out.loVect();
-        m_out_hi = out.hiVect(); 
-        m_out_stride[0] = 1;
-        m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
-    #if CH_SPACEDIM >= 3
-        m_out_stride[2] = (m_out_hi[1]-m_out_lo[1]+1)*m_out_stride[1];
-    #endif
-    #if CH_SPACEDIM >= 4
-        #error "TODO: Implement CH_SPACEDIM >= 4"
-    #endif
-
-    #pragma omp parallel for default(shared) collapse(CH_SPACEDIM-1)
-    #if CH_SPACEDIM >= 4
-        #error "TODO: Implement CH_SPACEDIM >= 4"
-    #endif
-    #if CH_SPACEDIM >= 3
-        for (int z = m_out_lo[2]; z <= m_out_hi[2]; ++z)
-    #endif
-        for (int y = m_out_lo[1]; y <= m_out_hi[1]; ++y)
-        {
-            int x_simd_max = m_out_lo[0] + simd<double>::simd_len * (((m_out_hi[0] - m_out_lo[0] + 1) / simd<double>::simd_len) - 1);
-
-            // SIMD LOOP
-            #pragma novector
-            for (int x = m_out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
-            {
-                m_compute.compute<simd<double> >(x, y, z);
-            }
-
-            // REMAINDER LOOP
-            #pragma novector
-            for (int x = x_simd_max + simd<double>::simd_len; x <= m_out_hi[0]; ++x)
-            {
-                m_compute.compute<double>(x, y, z);
-            }
-        }
-    }
-
-    template <class data_t>
+template <class compute_t>
 void
-CCZ4::local_vars(int idx, vars_t<data_t>& out)
+FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
+{
+   // dataPtr in Chombo does CH_assert bound check
+   // which we don't want to do in a loop
+   for (int i = 0; i < c_NUM; ++i)
+   {
+      m_in_ptr[i] = in.dataPtr(i);
+      m_out_ptr[i] = out.dataPtr(i);
+   }
+
+   m_in_lo = in.loVect();
+   m_in_hi = in.hiVect();
+   m_stride[0] = 1;
+   m_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
+#if CH_SPACEDIM >= 3
+   m_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_stride[1];
+#endif
+#if CH_SPACEDIM >= 4
+#error "TODO: Implement CH_SPACEDIM >= 4"
+#endif
+
+   m_out_lo = out.loVect();
+   m_out_hi = out.hiVect();
+   m_out_stride[0] = 1;
+   m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
+#if CH_SPACEDIM >= 3
+   m_out_stride[2] = (m_out_hi[1]-m_out_lo[1]+1)*m_out_stride[1];
+#endif
+#if CH_SPACEDIM >= 4
+#error "TODO: Implement CH_SPACEDIM >= 4"
+#endif
+
+#pragma omp parallel for default(shared) collapse(CH_SPACEDIM-1)
+#if CH_SPACEDIM >= 4
+#error "TODO: Implement CH_SPACEDIM >= 4"
+#endif
+#if CH_SPACEDIM >= 3
+   for (int z = m_out_lo[2]; z <= m_out_hi[2]; ++z)
+#endif
+      for (int y = m_out_lo[1]; y <= m_out_hi[1]; ++y)
+      {
+         int x_simd_max = m_out_lo[0] + simd<double>::simd_len * (((m_out_hi[0] - m_out_lo[0] + 1) / simd<double>::simd_len) - 1);
+
+         // SIMD LOOP
+#pragma novector
+         for (int x = m_out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
+         {
+            m_compute.template compute<simd<double> >(x, y, z);
+         }
+
+         // REMAINDER LOOP
+#pragma novector
+         for (int x = x_simd_max + simd<double>::simd_len; x <= m_out_hi[0]; ++x)
+         {
+            m_compute.template compute<double>(x, y, z);
+         }
+      }
+}
+
+template <class compute_t>
+void
+FABDriver<compute_t>::local_vars(int idx, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -77,7 +78,7 @@ CCZ4::local_vars(int idx, vars_t<data_t>& out)
 
 template <class data_t>
 void
-CCZ4::diff1(int idx, int stride, vars_t<data_t>& out)
+FABDriver::diff1(int idx, int stride, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -97,7 +98,7 @@ CCZ4::diff1(int idx, int stride, vars_t<data_t>& out)
 
 template <class data_t>
 void
-CCZ4::diff2(int idx, int stride, vars_t<data_t>& out)
+FABDriver::diff2(int idx, int stride, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -119,7 +120,7 @@ CCZ4::diff2(int idx, int stride, vars_t<data_t>& out)
 
 template <class data_t>
 void
-CCZ4::mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out)
+FABDriver::mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -155,7 +156,7 @@ CCZ4::mixed_diff2(int idx, int stride1, int stride2, vars_t<data_t>& out)
 
 template <class data_t>
 void
-CCZ4::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
+FABDriver::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -175,7 +176,7 @@ CCZ4::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
             const data_t in_left = in[idx - stride];
             const data_t in_centre = in[idx];
             const data_t in_right = in[idx + stride];
-            
+
             data_t weight_0 = -2.50000000000000000000e-1;
             data_t weight_1 = -8.33333333333333333333e-1;
             data_t weight_2 = +1.50000000000000000000e+0;
@@ -204,7 +205,7 @@ CCZ4::advection(int idx, const tensor<1, data_t>& shift, vars_t<data_t>& out)
 
 template <class data_t>
 void
-CCZ4::dissipation(int idx, vars_t<data_t>& out)
+FABDriver::dissipation(int idx, vars_t<data_t>& out)
 {
     data_t result[c_NUM];
     for (int i = 0; i < c_NUM; ++i)
@@ -234,5 +235,4 @@ CCZ4::dissipation(int idx, vars_t<data_t>& out)
         }
     }
     demarshall(result, out);
-}
 }

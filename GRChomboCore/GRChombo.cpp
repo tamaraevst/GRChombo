@@ -40,6 +40,8 @@ using std::endl;
 
 #include "FABView.H"
 
+#include "FABDriver.hpp"
+
 #ifdef USE_PAPI
 #include "PapiProfilingInfo.hpp"
 #endif
@@ -127,50 +129,7 @@ GRChombo::s_state_names[s_num_comps] =
   "B3",
 };
 
-//enum Now defined in CCZ4.cpp
-//{
-//  c_chi,
-//
-//  c_h,
-//  c_h11 = c_h,
-//  c_h12,
-//  c_h13,
-//  c_h22,
-//  c_h23,
-//  c_h33,
-//
-//  c_K,
-//
-//  c_A,
-//  c_A11 = c_A,
-//  c_A12,
-//  c_A13,
-//  c_A22,
-//  c_A23,
-//  c_A33,
-//
-//  c_Theta,
-//
-//  c_Gamma,
-//  c_Gamma1 = c_Gamma,
-//  c_Gamma2,
-//  c_Gamma3,
-//
-//  c_lapse,
-//
-//  c_shift,
-//  c_shift1 = c_shift,
-//  c_shift2,
-//  c_shift3,
-//
-//  c_B,
-//  c_B1 = c_B,
-//  c_B2,
-//  c_B3,
-//
-//  c_NUM
-//};
-
+//TODO, FIXME: Get rid of this ... it is not needed in the new c++ code
 const int
 GRChombo::s_num_comps_h = c_K-c_h;
 const int
@@ -499,7 +458,7 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
     //Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
     //Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
 
-    CCZ4(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln_fab, rhs_fab);
+    FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln_fab, rhs_fab);
   }
   if (m_profilingInfo != NULL) m_profilingInfo->readCounters();
 }
