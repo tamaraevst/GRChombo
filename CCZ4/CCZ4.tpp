@@ -1,6 +1,3 @@
-#include "CCZ4.hpp"
-#include "CCZ4Geometry.hpp"
-
 #define COVARIANTZ4
 
 CCZ4::CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver) :
@@ -19,7 +16,7 @@ CCZ4::compute(int x, int y, int z)
     vars_t<data_t> vars;
     {
        data_t varsArr[c_NUM];
-       local_vars(idx, varsArr);
+       m_driver.local_vars(idx, varsArr);
        demarshall(varsArr, vars);
     }
 
@@ -28,7 +25,7 @@ CCZ4::compute(int x, int y, int z)
     {
        {
           data_t varsArr[c_NUM];
-          diff1(idx, m_driver.m_stride[i], varsArr);
+          m_driver.diff1(idx, m_driver.m_stride[i], m_dx, varsArr);
           demarshall(varsArr, d1[i]);
        }
     }
@@ -40,7 +37,7 @@ CCZ4::compute(int x, int y, int z)
     {
        {
           data_t varsArr[c_NUM];
-          diff2(idx, m_driver.m_stride[i], varsArr);
+          m_driver.diff2(idx, m_driver.m_stride[i], m_dx, varsArr);
           demarshall(varsArr, d2[i][i]);
        }
     }
@@ -48,11 +45,11 @@ CCZ4::compute(int x, int y, int z)
     // Mixed derivatives
     {
        data_t varsArr[c_NUM];
-       mixed_diff2(idx, m_driver.m_stride[1], m_driver.m_stride[0], varsArr);
+       m_driver.mixed_diff2(idx, m_driver.m_stride[1], m_driver.m_stride[0], m_dx, varsArr);
        demarshall(varsArr, d2[0][1]);
-       mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[0], d2[0][2]);
+       m_driver.mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[0], m_dx, varsArr);
        demarshall(varsArr, d2[0][2]);
-       mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[1], d2[1][2]);
+       m_driver.mixed_diff2(idx, m_driver.m_stride[2], m_driver.m_stride[1], m_dx, varsArr);
        demarshall(varsArr, d2[1][2]);
     }
 
@@ -61,10 +58,18 @@ CCZ4::compute(int x, int y, int z)
     d2[2][1] = d2[1][2];
 
     vars_t<data_t> advec;
-    advection(idx, vars.shift, advec);
+    {
+       data_t varsArr[c_NUM];
+       m_driver.advection(idx, m_dx, vars.shift, varsArr);
+       demarshall(varsArr, advec);
+    }
 
     vars_t<data_t> dssp;
-    dissipation(idx, dssp);
+    {
+       data_t varsArr[c_NUM];
+       m_driver.dissipation(idx, m_dx, varsArr);
+       demarshall(varsArr, dssp);
+    }
 
     vars_t<data_t> rhs = {};
     rhs_equation(vars, d1, d2, advec, rhs);
@@ -170,7 +175,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     }
 
 
-    tensor<2, data_t> A_UU = raise(vars.A, h_UU);
+    tensor<2, data_t> A_UU = raiseAll(vars.A, h_UU);
 
     data_t tr_AA    = trace(vars.A, A_UU);
 
@@ -190,7 +195,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         tensor<2, data_t> Adot_TF_expr;
         FOR2(i,j)
         {
-            Adot_TF_expr[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci[i][j];
+            Adot_TF_expr[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci.LL[i][j];
         }
 
         data_t Adot_TF_trace = trace(Adot_TF_expr, h_UU);

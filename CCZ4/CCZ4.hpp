@@ -6,6 +6,8 @@
 #include "tensor.hpp"
 #include "GRUtils.H"
 #include "FABDriverBase.hpp"
+#include "TensorAlgebra.hpp"
+#include "CCZ4Geometry.hpp"
 
 #include "user_enum.hpp" //TODO: Check whether this is really necessary!
 
@@ -55,7 +57,9 @@ protected:
 //
 public:
     CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver);
-    void execute(const FArrayBox& in, FArrayBox& out);
+
+    template <class data_t>
+    void compute(int x, int y, int z);
 
 //    class factory
 //    {
@@ -80,9 +84,6 @@ protected:
     const FABDriverBase& m_driver;
 
     template <class data_t>
-    void compute(int x, int y, int z);
-
-    template <class data_t>
     void demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out);
 
     template <class data_t>
@@ -92,4 +93,7 @@ protected:
              const vars_t<data_t> &advec,
              vars_t<data_t> &rhs);
 };
+
+#include "CCZ4.tpp"
+
 #endif /* CCZ4_HPP_ */

@@ -1,7 +1,10 @@
+#ifndef TENSORALGEBRA_HPP_
+#define TENSORALGEBRA_HPP_
+
 template <class data_t>
 ALWAYS_INLINE
 data_t
-compute_trace(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+trace(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
 {
    data_t trace = 0;
    FOR2(i,j)
@@ -26,7 +29,7 @@ make_trace_free(tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &metric, con
 template <class data_t>
 ALWAYS_INLINE
 tensor<2,data_t>
-raise(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+raiseAll(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
 {
    tensor<2, data_t> tensor_UU;
    FOR2(i,j)
@@ -39,3 +42,5 @@ raise(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
    }
    return tensor_UU;
 }
+
+#endif /* TENSORALGEBRA_HPP_ */
