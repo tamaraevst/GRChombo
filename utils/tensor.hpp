@@ -3,6 +3,7 @@
 
 #include "GRUtils.H"
 #include "always_inline.hpp"
+#include <initializer_list>
 
 // C++ standard, 12.8 Copying class objects:
 // Each subobject is assigned in the manner appropriate to its type:
@@ -17,6 +18,11 @@ class tensor
 public:
     ALWAYS_INLINE
     tensor()
+    {}
+
+    ALWAYS_INLINE
+    tensor(std::initializer_list<data_t> list) :
+        arr (list)
     {}
 
     operator arr_t& ()

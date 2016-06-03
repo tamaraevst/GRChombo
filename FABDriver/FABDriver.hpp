@@ -18,7 +18,9 @@ public:
     compute_t m_compute;
 
     template <typename... param_types>
-    FABDriver(param_types... params) : m_compute(compute_t(std::forward<param_types>(params)..., *this)) {};
+    FABDriver(param_types... params) :
+        m_compute(std::forward<param_types>(params)..., *this)
+    {};
 
     void execute(const FArrayBox& in, FArrayBox& out);
 
