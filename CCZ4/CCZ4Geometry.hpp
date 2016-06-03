@@ -46,7 +46,6 @@ class CCZ4Geometry
     template <class data_t, template <typename> class vars_t>
     static chris_t<data_t>
     compute_christoffel(
-        const vars_t<data_t> &vars,
         const vars_t<data_t> (&d1)[CH_SPACEDIM],
         const tensor<2, data_t>& h_UU
     )
