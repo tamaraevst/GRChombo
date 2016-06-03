@@ -10,7 +10,7 @@ ebase := CCZ4Test
 
 LibNames := BoxTools 
 
-src_dirs := ../utils ../simd ../CCZ4
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../FABDriver
 
 include $(CHOMBO_HOME)/mk/Make.test
 

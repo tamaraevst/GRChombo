@@ -9,6 +9,7 @@
 #include <sys/time.h>
 
 #include "CCZ4.hpp"
+#include "FABDriver.hpp"
 #include "GRBSSNChomboF_F.H"
 
 #define CHF_FRAn(a, n, c) \
@@ -33,7 +34,7 @@ int main()
 {
 //    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
 
-    const int N_GRID = 64;
+    const int N_GRID = 32;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
     Box ghosted_box(IntVect(-3,-3,-3), IntVect(N_GRID+2,N_GRID+2,N_GRID+2));
     FArrayBox in_fab(ghosted_box, c_NUM);
@@ -121,9 +122,9 @@ int main()
                 in_fab(iv, c_Gamma3) = -0.42367 + 0.03891*x - 0.87898*x*x + 6.67657*x*y*y*y - 3.44662*y*z - 0.19655*z*z + 2.97524*z*z*z*z;
 
                 in_fab(iv, c_lapse)  =  0.73578 + 0.36898*x + 0.64348*x*x + 9.33487*x*y*y*y + 0.99469*y*z + 0.20515*z*z + 8.88385*z*z*z*z;
-                in_fab(iv, c_shift1) = -0.36642 + 0.18795*x - 0.52389*x*x - 4.14079*x*y*y*y + 0.73135*y*z - 0.27057*z*z + 3.24187*z*z*z*z;
-                in_fab(iv, c_shift2) =  0.40604 - 0.30316*x - 0.15184*x*x - 0.48815*x*y*y*y + 2.45991*y*z - 0.79248*z*z + 7.14007*z*z*z*z;
-                in_fab(iv, c_shift3) =  0.24959 + 0.68835*x - 0.52219*x*x - 7.50449*x*y*y*y - 2.35372*y*z - 0.21476*z*z + 4.36363*z*z*z*z;
+                in_fab(iv, c_shift1) =  0.00000 + 0.18795*x - 0.52389*x*x - 4.14079*x*y*y*y + 0.73135*y*z - 0.27057*z*z + 3.24187*z*z*z*z;
+                in_fab(iv, c_shift2) =  0.00000 - 0.30316*x - 0.15184*x*x - 0.48815*x*y*y*y + 2.45991*y*z - 0.79248*z*z + 7.14007*z*z*z*z;
+                in_fab(iv, c_shift3) =  0.00000 + 0.68835*x - 0.52219*x*x - 7.50449*x*y*y*y - 2.35372*y*z - 0.21476*z*z + 4.36363*z*z*z*z;
                 in_fab(iv, c_B1)     = -0.26928 + 0.35045*x - 0.48884*x*x + 2.72465*x*y*y*y - 2.59022*y*z - 0.27384*z*z + 0.38748*z*z*z*z;
                 in_fab(iv, c_B2)     =  0.40234 + 0.26741*x + 1.94822*x*x - 0.78276*x*y*y*y + 2.12346*y*z + 0.69086*z*z - 4.47639*z*z*z*z;
                 in_fab(iv, c_B3)     =  0.40313 + 0.00569*x - 1.12452*x*x - 5.49255*x*y*y*y - 2.21932*y*z + 0.49523*z*z + 1.29460*z*z*z*z;
@@ -145,15 +146,15 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    CCZ4(params, dx, sigma).execute(in_fab, out_fab);
+    FABDriver<CCZ4>(params, dx, sigma).execute(in_fab, out_fab);
 
-    for (int i = 0; i < c_NUM; ++i)
-    {
-        double max_out = out_fab.norm(0, i, 1);
-        double max_in =  in_fab .norm(0, i, 1);
-        std::cout << "COMPONENT " << i << " C++ MAX VALUE (in) = " << max_in << std::endl;
-        std::cout << "COMPONENT " << i << " C++ MAX VALUE (out) = " << max_out << std::endl;
-    }
+//    for (int i = 0; i < c_NUM; ++i)
+//    {
+//        double max_out = out_fab.norm(0, i, 1);
+//        double max_in =  in_fab .norm(0, i, 1);
+//        std::cout << "COMPONENT " << i << " C++ MAX VALUE (in) = " << max_in << std::endl;
+//        std::cout << "COMPONENT " << i << " C++ MAX VALUE (out) = " << max_out << std::endl;
+//    }
 
     gettimeofday(&end, NULL);
 
