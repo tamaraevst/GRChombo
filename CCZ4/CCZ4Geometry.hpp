@@ -18,10 +18,11 @@ struct ricci_t
 {
      tensor<2, data_t> LL; //Ricci with two indices down
      data_t            scalar; //Ricci scalar
-}
+};
 
 class CCZ4Geometry
 {
+    public:
     template <class data_t, template <typename> class vars_t>
     static tensor<2, data_t>
     compute_inverse_metric(const vars_t<data_t> &vars)
@@ -47,11 +48,10 @@ class CCZ4Geometry
     compute_christoffel(
         const vars_t<data_t> &vars,
         const vars_t<data_t> (&d1)[CH_SPACEDIM],
-        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
         const tensor<2, data_t>& h_UU
     )
     {
-        chris_t<data>t out;
+        chris_t<data_t> out;
 
         FOR3(i,j,k)
         {
@@ -168,17 +168,6 @@ class CCZ4Geometry
          return compute_ricci_Z(vars, d1, d2, chris, h_UU, Z0);
     }
 
-};
-
-template <class data_t>
-struct ricci_t : ricciZ_t<data_t>  //Make Z-less ricci explicit for better readibility in the main code.
-{
-     template <template <typename> class vars_t>
-     ricci_t(const vars_t<data_t> &vars,
-                     const vars_t<data_t> (&d1)[CH_SPACEDIM],
-                     const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
-                     const chris_t<data_t>& chris,
-                     const tensor<2, data_t>& h_UU);
 };
 
 #endif /* CCZ4GEOMETRY_HPP_ */

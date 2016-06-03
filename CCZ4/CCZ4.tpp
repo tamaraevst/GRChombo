@@ -115,8 +115,8 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 //    Might want to work through the code and eliminate chi derivatives where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-    auto h_UU = compute_inverse_metric(vars);
-    chris_t<data_t> chris(vars, d1, h_UU);
+    auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
+    auto chris = CCZ4Geometry::compute_christoffel(vars, d1, h_UU);
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
@@ -128,7 +128,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    ricciZ_t<data_t> ricci(vars, d2, d1, chris, h_UU, Z_over_chi);
+    auto ricci =  CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
     data_t divshift = 0;
     data_t Z_dot_d1lapse = 0;

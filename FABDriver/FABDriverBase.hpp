@@ -44,4 +44,7 @@ struct FABDriverBase
     template <class data_t>
     void dissipation(int idx, double dx, data_t (&out)[c_NUM]) const;
 };
+
+#include "FABDriverBase.tpp"
+
 #endif /* FABDRIVERBASE_HPP_ */

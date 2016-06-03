@@ -164,7 +164,7 @@ GRChombo::define (AMRLevel* a_coarser_level_ptr,
 {
   ProblemDomain physdomain(a_problem_domain);
 
-  define(a_coarser_level_ptr, a_problem_domain, a_level, a_ref_ratio);
+  define(a_coarser_level_ptr, physdomain, a_level, a_ref_ratio);
 }
 
 

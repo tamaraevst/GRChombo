@@ -3,7 +3,7 @@
 
 template <class data_t>
 void
-FABDriverBase::local_vars(int idx, data_t (&out)[c_NUM]) const const
+FABDriverBase::local_vars(int idx, data_t (&out)[c_NUM]) const
 {
     for (int i = 0; i < c_NUM; ++i)
     {
