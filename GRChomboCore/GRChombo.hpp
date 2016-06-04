@@ -22,8 +22,8 @@
 #include "Copier.H"
 #include "computeNorm.H"
 
-#include "CCZ4.hpp"
 #include "ProfilingInfo.hpp"
+#include "CCZ4.hpp"
 
 
 #define NUMCOMP 25

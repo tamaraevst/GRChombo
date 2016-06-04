@@ -41,6 +41,8 @@ using std::endl;
 #include "FABView.H"
 
 #include "FABDriver.hpp"
+//#include "Constraints.hpp"
+#include "PositiveChiAndAlpha.hpp"
 
 #ifdef USE_PAPI
 #include "PapiProfilingInfo.hpp"
@@ -405,61 +407,15 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
                          alpha,
                          0,0,s_num_comps);
   }
-
-  DataIterator dit0  = soln.dataIterator();
-  int nbox = dit0.size();
-
   //Time and count the RHS if possible
   if (m_profilingInfo != NULL) m_profilingInfo->resetCounters();
 
-  //thread parallelism moved into boxes
-//#pragma omp parallel for default(shared) schedule(guided)
-  for(int ibox = 0; ibox < nbox; ++ibox)
-  {
-    DataIndex di = dit0[ibox];
-    FArrayBox& soln_fab = soln[di];
-    FArrayBox& rhs_fab = rhs[di];
+  //Enforce positive chi and alpha
+  FABDriver<PositiveChiAndAlpha>().execute(soln, rhs);
 
-    const Box& b = rhs_fab.box ();
+  //Calculate CCZ4 right hand side
+  FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln, rhs);
 
-    const IntVect& smallEnd = b.smallEnd();
-    const IntVect& bigEnd = b.bigEnd();
-
-    const int xmin = smallEnd[0];
-    const int ymin = smallEnd[1];
-    const int zmin = smallEnd[2];
-
-    const int xmax = bigEnd[0];
-    const int ymax = bigEnd[1];
-    const int zmax = bigEnd[2];
-
-    #pragma omp parallel for collapse(3) schedule(static) default(shared)
-    for (int z = zmin; z <= zmax; ++z) {
-    for (int y = ymin; y <= ymax; ++y) {
-    for (int x = xmin; x <= xmax; ++x)
-    {
-        IntVect iv(x,y,z);
-
-    // Enforce non negative chi and alpha values
-
-       if (soln_fab(iv, c_chi) <= 1e-4) {
-                soln_fab(iv, c_chi) = 1e-4;
-       }
-
-       if (soln_fab(iv, c_lapse) <= 1e-4) {
-                soln_fab(iv, c_lapse) = 1e-4;
-       }
-
-    }//x
-    }//y
-    }//z
-
-    //Real centerX = (m_p.centerA[0] + m_p.centerB[0]) / 2.;
-    //Real centerY = (m_p.centerA[1] + m_p.centerB[1]) / 2.;
-    //Real centerZ = (m_p.centerA[2] + m_p.centerB[2]) / 2.;
-
-    FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln_fab, rhs_fab);
-  }
   if (m_profilingInfo != NULL) m_profilingInfo->readCounters();
 }
 
@@ -1017,7 +973,7 @@ GRChombo::writeCheckpointLevel (HDF5Handle& a_handle) const
 void
 GRChombo::preCheckpointLevel ()
 {
-  CH_TIME("GRChombo::preCheckpointLevel");
+//   FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new);
 }
 
 
