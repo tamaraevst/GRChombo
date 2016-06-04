@@ -43,6 +43,7 @@ using std::endl;
 #include "FABDriver.hpp"
 //#include "Constraints.hpp"
 #include "PositiveChiAndAlpha.hpp"
+#include "EnforceTfA.hpp"
 
 #ifdef USE_PAPI
 #include "PapiProfilingInfo.hpp"
@@ -409,6 +410,10 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
   }
   //Time and count the RHS if possible
   if (m_profilingInfo != NULL) m_profilingInfo->resetCounters();
+
+  //Enforce the trace free alpha condition //TODO: Make sure it's enough to enforce it here! Then delete other place
+  //where it's enforced
+  FABDriver<EnforceTfA>().execute(soln, soln);
 
   //Enforce positive chi and alpha
   FABDriver<PositiveChiAndAlpha>().execute(soln, soln);
