@@ -76,6 +76,15 @@ int main()
       }
    }
 
+   double diff = ricciZ.scalar - ricciZ_scalar_known;
+   if (diff > 1e-14)
+   {
+      std::cout << "ricci scalar wrong" << std::endl;
+      std::cout << "value: " << ricciZ.scalar << std::endl;
+      std::cout << "correct value: " << ricciZ_scalar_known << std::endl;
+      passed = -1;
+   }
+
 
    if (passed == 1) std::cout << "CCZ4Geometry test passed" << std::endl;
    else std::cout << "CCZ4Geometry test NOT passed" << std::endl;

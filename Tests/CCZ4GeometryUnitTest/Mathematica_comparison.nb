@@ -10,10 +10,10 @@
 NotebookFileLineBreakTest
 NotebookFileLineBreakTest
 NotebookDataPosition[       158,          7]
-NotebookDataLength[     26861,        769]
-NotebookOptionsPosition[     26209,        744]
-NotebookOutlinePosition[     26565,        760]
-CellTagsIndexPosition[     26522,        757]
+NotebookDataLength[     26339,        751]
+NotebookOptionsPosition[     25800,        730]
+NotebookOutlinePosition[     26156,        746]
+CellTagsIndexPosition[     26113,        743]
 WindowFrame->Normal*)
 
 (* Beginning of Notebook Content *)
@@ -691,6 +691,11 @@ Cell[BoxData[
      RowBox[{"ricBar", "+", "ricChi", "+", "zterms"}]}], " ", ";"}], 
    "\[IndentingNewLine]", 
    RowBox[{
+    RowBox[{"ricciSZ", " ", "=", " ", 
+     RowBox[{"Tr", "[", 
+      RowBox[{"\[Chi]", " ", 
+       RowBox[{"hu", ".", "ricciZ"}]}], "]"}]}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
     RowBox[{"stream", "=", 
      RowBox[{"OpenAppend", "[", 
       RowBox[{
@@ -704,6 +709,13 @@ Cell[BoxData[
         RowBox[{"ricciZ", "//", "InputForm"}], "]"}], "<>", "\"\<;\>\""}]}], 
      "]"}], ";"}], "\[IndentingNewLine]", 
    RowBox[{
+    RowBox[{"WriteLine", "[", 
+     RowBox[{"stream", ",", 
+      RowBox[{"\"\<double ricciZ_scalar_known = \>\"", "<>", 
+       RowBox[{"ToString", "[", 
+        RowBox[{"ricciSZ", "//", "InputForm"}], "]"}], "<>", "\"\<;\>\""}]}], 
+     "]"}], ";"}], "\[IndentingNewLine]", 
+   RowBox[{
     RowBox[{"Close", "[", "stream", "]"}], ";"}]}]}]], "Input",
  CellChangeTimes->{{3.6740448591918573`*^9, 3.6740450196886168`*^9}, {
    3.674045199073616*^9, 3.674045203328549*^9}, {3.6740452854850063`*^9, 
@@ -713,34 +725,8 @@ Cell[BoxData[
    3.674051253323957*^9, 3.674051257913859*^9}, 3.674051311381283*^9, {
    3.6740513535921183`*^9, 3.674051368588213*^9}, {3.674051763962434*^9, 
    3.674051764407851*^9}, {3.6740524406272697`*^9, 3.674052451969912*^9}, {
-   3.674052506812701*^9, 3.674052532169784*^9}}],
-
-Cell[CellGroupData[{
-
-Cell[BoxData["ricChi"], "Input",
- CellChangeTimes->{{3.674050925511961*^9, 3.6740509618147783`*^9}, {
-  3.6740518740824137`*^9, 3.674051874679146*^9}}],
-
-Cell[BoxData[
- RowBox[{"{", 
-  RowBox[{
-   RowBox[{"{", 
-    RowBox[{"2.9376949568841875`", ",", "2.764715904842251`", ",", 
-     RowBox[{"-", "1.541308654780841`"}]}], "}"}], ",", 
-   RowBox[{"{", 
-    RowBox[{
-    "2.764715904842251`", ",", "2.4093108108160504`", ",", 
-     "1.9404849769190953`"}], "}"}], ",", 
-   RowBox[{"{", 
-    RowBox[{
-     RowBox[{"-", "1.541308654780841`"}], ",", "1.9404849769190953`", ",", 
-     "0.9488586966486645`"}], "}"}]}], "}"}]], "Output",
- CellChangeTimes->{{3.674050929531084*^9, 3.674050962151678*^9}, 
-   3.674051273536634*^9, {3.6740513281416693`*^9, 3.674051331541115*^9}, 
-   3.674051776589562*^9, {3.674051863423521*^9, 3.6740518750631123`*^9}, 
-   3.674052456526726*^9, {3.674052514210361*^9, 3.6740525343735456`*^9}, 
-   3.674052576988922*^9}]
-}, Open  ]]
+   3.674052506812701*^9, 3.674052532169784*^9}, {3.674053161756274*^9, 
+   3.6740531828424673`*^9}, {3.674053255936688*^9, 3.674053257958578*^9}}]
 },
 WindowSize->{808, 609},
 WindowMargins->{{4, Automatic}, {Automatic, 4}},
@@ -766,11 +752,7 @@ Cell[7464, 234, 485, 14, 46, "Input"],
 Cell[7952, 250, 553, 14, 63, "Input"],
 Cell[8508, 266, 8039, 209, 437, "Input"],
 Cell[16550, 477, 2608, 68, 186, "Input"],
-Cell[19161, 547, 6062, 168, 312, "Input"],
-Cell[CellGroupData[{
-Cell[25248, 719, 151, 2, 28, "Input"],
-Cell[25402, 723, 791, 18, 28, "Output"]
-}, Open  ]]
+Cell[19161, 547, 6635, 181, 346, "Input"]
 }
 ]
 *)
