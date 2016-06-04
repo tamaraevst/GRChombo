@@ -1,6 +1,9 @@
 #ifndef TENSORALGEBRA_HPP_
 #define TENSORALGEBRA_HPP_
 
+#include "always_inline.hpp"
+#include "tensor.hpp"
+
 template <class data_t>
 ALWAYS_INLINE
 data_t

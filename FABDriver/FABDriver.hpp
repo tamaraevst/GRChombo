@@ -23,24 +23,6 @@ public:
     {};
 
     void execute(const FArrayBox& in, FArrayBox& out);
-
-//    template <class data_t>
-//    void local_vars(int idx, typename compute_t::template vars_t<data_t>& out);
-//
-//    template <class data_t>
-//    void diff1(int idx, int stride, typename compute_t::template vars_t<data_t>& out);
-//
-//    template <class data_t>
-//    void diff2(int idx, int stride, typename compute_t::template vars_t<data_t>& out);
-//
-//    template <class data_t>
-//    void mixed_diff2(int idx, int stride1, int stride2, typename compute_t::template vars_t<data_t>& out);
-//
-//    template <class data_t>
-//    void advection(int idx, const tensor<1, data_t>& vec, typename compute_t::template vars_t<data_t>& out);
-//
-//    template <class data_t>
-//    void dissipation(int idx, typename compute_t::template vars_t<data_t>& out);
 };
 
 #include "FABDriver.tpp"

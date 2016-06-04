@@ -9,7 +9,7 @@
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
 
-#include "user_enum.hpp" //TODO: Check whether this is really necessary!
+#include "user_enum.hpp" //This files needs c_NUM - total number of components
 
 class CCZ4
 {
@@ -45,40 +45,11 @@ protected:
     double m_dx;
     double m_sigma;
 
-//    const double *m_in_ptr[c_NUM];  //TODO: Delete all commented out bits once it compiles
-//    const int *m_in_lo;
-//    const int *m_in_hi;
-//    int m_stride[3];
-//
-//    double *m_out_ptr[c_NUM];
-//    const int *m_out_lo;
-//    const int *m_out_hi;
-//    int m_out_stride[3];
-//
 public:
     CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver);
 
     template <class data_t>
     void compute(int x, int y, int z);
-
-//    class factory
-//    {
-//    public:
-//        params_t m_params;
-//        double m_dx;
-//        double m_sigma;
-//
-//        factory(params_t params, double dx, double sigma) :
-//            m_params (params),
-//            m_dx (dx),
-//            m_sigma (sigma)
-//        {}
-//
-//        CCZ4 create(FABDriver &driver)
-//        {
-//            return CCZ4(params, dx, sigma, driver);
-//        }
-//    }
 
 protected:
     const FABDriverBase& m_driver;
