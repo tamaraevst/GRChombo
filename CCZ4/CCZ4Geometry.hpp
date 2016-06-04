@@ -65,16 +65,23 @@ class CCZ4Geometry
             }
         }
 
-        // Technically we can write contracted[i] = h_UU[j][k]*chris[i][j][k],
-        // but this is not numerically stable: h_UU[j][k]*d1[i].h[j][k] should be zero
-        // but in practice can be > O(1).
+        // Technically we can write out.contracted[i] += h_UU[j][k]*chris.ULL[i][j][k],
+        // but sometimes people write:
+        // out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
+        // In theory h_UU[j][k]*d1[i].h[j][k] should be zero due to det h = 1
+        // but in practice this term can deviate from zero.
+        // For PRL 116, 071102 we used the former and it seemed to work well.
         FOR1(i)
         {
             out.contracted[i] = 0;
-            FOR3(j,k,l)
+            FOR2(j,k)
             {
-                 out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
+                 out.contracted[i] += h_UU[j][k]*out.ULL[i][j][k];
             }
+            //FOR3(j,k,l)
+            //{
+            //     //out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
+            //}
         }
 
         return out;
@@ -126,7 +133,7 @@ class CCZ4Geometry
                  // Trick: For CCZ4, we can add Z terms to ricci by changing Gamma to chrisvec
                  // This way of writing it allows the user to pass Z/chi = {0};
                  ricci_tilde += 0.5*(vars.h[k][i]*d1[j].Gamma[k] + vars.h[k][j]*d1[i].Gamma[k]);
-                 ricci_tilde += (vars.Gamma[k] - 2*Z_over_chi[k])*(chris.LLL[i][j][k] + chris.LLL[j][i][k]);
+                 ricci_tilde += 0.5*(vars.Gamma[k] - 2*Z_over_chi[k])*(chris.LLL[i][j][k] + chris.LLL[j][i][k]);
                  FOR1(l)
                  {
                         ricci_tilde -= 0.5*h_UU[k][l]*d2[k][l].h[i][j];
