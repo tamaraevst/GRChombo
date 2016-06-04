@@ -155,7 +155,7 @@ class CCZ4Geometry
             out.LL[i][j] = (ricci_chi + vars.chi*ricci_tilde + z_terms) / vars.chi;
         }
 
-        out.scalar = vars.chi*trace(out.LL, h_UU);
+        out.scalar = vars.chi*compute_trace(out.LL, h_UU);
 
         return out;
     }

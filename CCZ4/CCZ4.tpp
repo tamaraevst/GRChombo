@@ -9,7 +9,7 @@ CCZ4::CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver
 
 template <class data_t>
 void
-CCZ4::compute(int x, int y, int z)
+CCZ4::compute(int x, int y, int z) //TODO: Change name to ix, iy iz etc
 {
     const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
 
@@ -177,7 +177,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     tensor<2, data_t> A_UU = raiseAll(vars.A, h_UU);
 
-    data_t tr_AA    = trace(vars.A, A_UU);
+    data_t tr_AA    = compute_trace(vars.A, A_UU);
 
     {
         rhs.chi = advec.chi + (2.0/GR_SPACEDIM)*vars.chi*(vars.lapse*vars.K - divshift);
@@ -198,7 +198,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
             Adot_TF_expr[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci.LL[i][j];
         }
 
-        data_t Adot_TF_trace = trace(Adot_TF_expr, h_UU);
+        data_t Adot_TF_trace = compute_trace(Adot_TF_expr, h_UU);
 
         tensor<2, data_t> Adot_TF;
         FOR2(i,j)

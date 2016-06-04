@@ -7,7 +7,7 @@
 template <class data_t>
 ALWAYS_INLINE
 data_t
-trace(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+compute_trace(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
 {
    data_t trace = 0;
    FOR2(i,j)
