@@ -411,7 +411,7 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
   if (m_profilingInfo != NULL) m_profilingInfo->resetCounters();
 
   //Enforce positive chi and alpha
-  FABDriver<PositiveChiAndAlpha>().execute(soln, rhs);
+  FABDriver<PositiveChiAndAlpha>().execute(soln, soln);
 
   //Calculate CCZ4 right hand side
   FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln, rhs);
