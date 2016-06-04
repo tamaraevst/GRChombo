@@ -1,6 +1,10 @@
 //This compute class enforces the positive chi and alpha condition
+#ifndef POSITIVECHIANDALPHA_HPP_
+#define POSITIVECHIANDALPHA_HPP_
+
 #include "user_enum.hpp"
 #include "simd.hpp"
+#include "FABDriverBase.hpp"
 
 class PositiveChiAndAlpha
 {
@@ -24,3 +28,5 @@ class PositiveChiAndAlpha
    protected:
       const FABDriverBase& m_driver;
 };
+
+#endif /* POSITIVECHIANDALPHA_HPP_ */
