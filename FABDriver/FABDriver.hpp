@@ -23,6 +23,8 @@ public:
     {};
 
     void execute(const FArrayBox& in, FArrayBox& out);
+
+    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out);
 };
 
 #include "FABDriver.tpp"

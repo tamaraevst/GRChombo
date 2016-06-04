@@ -65,3 +65,20 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
       }
 }
 
+template <class compute_t>
+void
+FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out)
+{
+  DataIterator dit0  = in.dataIterator();
+  int nbox = dit0.size();
+  //thread parallelism moved into boxes
+  //#pragma omp parallel for default(shared) schedule(guided)
+  for(int ibox = 0; ibox < nbox; ++ibox)
+  {
+    DataIndex di = dit0[ibox];
+    const FArrayBox& in_fab = in[di];
+    FArrayBox& out_fab = out[di];
+    execute(in_fab,out_fab);
+  }
+}
+
