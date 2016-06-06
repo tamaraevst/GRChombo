@@ -9,6 +9,7 @@
 
 #include "FABDriverBase.hpp"
 #include "FArrayBox.H"
+#include "LevelData.H"
 #include "tensor.hpp"
 
 template <class compute_t>
