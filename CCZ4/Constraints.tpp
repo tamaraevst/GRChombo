@@ -96,11 +96,11 @@ Constraints::constraint_equations(vars_t<data_t> &vars,
 
    FOR1(i)
    {
-      vars.Mom[i] = - (GR_SPACEDIM-2.)*d1[i].K/(GR_SPACEDIM-1.);
+      vars.Mom[i] = - (GR_SPACEDIM-1.)*d1[i].K/GR_SPACEDIM;
    }
    FOR3(i,j,k)
    {
-      vars.Mom[i] += h_UU[j][k]*(covd_A[k][j][i] - (GR_SPACEDIM-1.) * vars.A[i][j] * d1[k].chi / (2 * chi_regularised));
+      vars.Mom[i] += h_UU[j][k]*(covd_A[k][j][i] - GR_SPACEDIM * vars.A[i][j] * d1[k].chi / (2 * chi_regularised));
    }
 }
 

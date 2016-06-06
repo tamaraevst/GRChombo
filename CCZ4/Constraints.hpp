@@ -1,4 +1,4 @@
-//This compute class calcultates Hamiltonian and Momentum constraints
+//This compute class calculates Hamiltonian and Momentum constraints
 
 #ifndef CONSTRAINTS_HPP_
 #define CONSTRAINTS_HPP_
