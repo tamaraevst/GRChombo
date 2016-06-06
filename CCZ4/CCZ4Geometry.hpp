@@ -170,8 +170,9 @@ class CCZ4Geometry
         const chris_t<data_t>& chris
     )
     {
-         tensor<1,double> Z0 = {0};
-         return compute_ricci_Z(vars, d1, d2, chris, h_UU, Z0);
+         tensor<1,data_t> Z0;
+         FOR1(i) Z0[i] = 0; //TODO: fix the array constructor in tensor
+         return compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
     }
 
 };
