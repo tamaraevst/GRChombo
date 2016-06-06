@@ -23,6 +23,10 @@ class PositiveChiAndAlpha
 
             auto lapseTooSmall = simd_compare_lt(varsArr[c_lapse], 1e-4);
             varsArr[c_lapse] = simd_conditional(lapseTooSmall, 1e-4, varsArr[c_lapse]);
+
+            const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
+            SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = varsArr[c_chi];
+            SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx]  = varsArr[c_lapse];
          }
 
    protected:

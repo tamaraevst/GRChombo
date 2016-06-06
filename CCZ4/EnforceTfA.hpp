@@ -33,6 +33,15 @@ class EnforceTfA
          }
          auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
          make_trace_free(vars.A, vars.h, h_UU);
+
+         // TODO: I really do not like this, but cannot think of a better way to do it yet...
+         const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A11])[out_idx]    = vars.A[0][0];
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A12])[out_idx]    = vars.A[0][1];
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A13])[out_idx]    = vars.A[0][2];
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A22])[out_idx]    = vars.A[1][1];
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A23])[out_idx]    = vars.A[1][2];
+         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A33])[out_idx]    = vars.A[2][2];
       }
 
    protected:
