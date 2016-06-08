@@ -537,6 +537,9 @@ GRChombo::tagCells (IntVectSet& a_tags)
 
     //mod gradient
     FArrayBox mod_grad_fab(b,c_NUM);
+
+    pout () << mod_grad_fab.nComp() << endl;
+    pout () << state_fab.nComp() << endl;
     FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
 
     const IntVect& smallEnd = b.smallEnd();
@@ -782,12 +785,9 @@ GRChombo::initialData ()
       Real z = (iv[2] + 0.5) * m_dx;
 
       BoostedBH bh1(m_p.massA, m_p.centerA, m_p.momentumA);
-      BoostedBH bh2(m_p.massB, m_p.centerB, m_p.momentumB);
 
-      BinaryBH<BoostedBH> binary(bh1, bh2);
-
-     // Metric conformal factor
-      const Real psi = binary.psi(x, y, z);
+      // Metric conformal factor
+      const Real psi = bh1.psi(x, y, z);
       state_fab(iv, c_chi) = pow(psi, -4);
 
       // Conformal metric is flat
@@ -801,7 +801,7 @@ GRChombo::initialData ()
       // Extrinsic curvature
       Real Aij[3][3] = {{0}};
       Real BOOK2BSSN = pow(psi, -6);
-      binary.Aij(x, y, z, Aij);
+      bh1.Aij(x, y, z, Aij);
 
 
       state_fab(iv,c_A11) = BOOK2BSSN * Aij[0][0];

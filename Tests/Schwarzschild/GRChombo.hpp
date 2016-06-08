@@ -58,9 +58,6 @@ struct SimParams
      pp.get("massA", massA);
      pp.getarr("centerA", centerA, 0, SpaceDim);
      pp.getarr("momentumA", momentumA, 0, SpaceDim);
-     pp.get("massB", massB);
-     pp.getarr("centerB", centerB, 0, SpaceDim);
-     pp.getarr("momentumB", momentumB, 0, SpaceDim);
 
      //Misc
      pp.get("nanCheck", nanCheck);
@@ -89,9 +86,9 @@ struct SimParams
   //Dissipation
   Real sigma;
   //Initial data
-  Real massA, massB;
-  std::vector<Real> centerA, centerB;
-  std::vector<Real> momentumA, momentumB;
+  Real massA;
+  std::vector<Real> centerA;
+  std::vector<Real> momentumA;
   //Misc
   int nanCheck;
 
