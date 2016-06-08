@@ -10,17 +10,17 @@
 
 class EnforceTfA
 {
-   public:
-      EnforceTfA(const FABDriverBase& driver) : m_driver(driver){};
+public:
+   EnforceTfA(const FABDriverBase& driver) : m_driver(driver){};
 
-      template <class data_t>
+   template <class data_t>
       struct vars_t
       {
          tensor<2, data_t> h;
          tensor<2, data_t> A;
       };
 
-      template <class data_t>
+   template <class data_t>
       void compute(int x, int y, int z)
       {
          const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
@@ -44,10 +44,10 @@ class EnforceTfA
          SIMDIFY<data_t>(m_driver.m_out_ptr[c_A33])[out_idx]    = vars.A[2][2];
       }
 
-   protected:
-      const FABDriverBase& m_driver;
+protected:
+   const FABDriverBase& m_driver;
 
-      template <class data_t>
+   template <class data_t>
       void demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out)
       {
          out.h[0][0]  = in[c_h11];

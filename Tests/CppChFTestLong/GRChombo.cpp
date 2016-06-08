@@ -92,16 +92,16 @@ GRChombo::s_num_comps;
 const char*
 GRChombo::s_state_names[s_num_comps] =
 {
-  "chi",
+  "chi", //0
 
   "h11",
   "h12",
   "h13",
-  "h22",
+  "h22", //4
   "h23",
   "h33",
 
-  "K",
+  "K", //7
 
   "A11",
   "A12",
@@ -540,12 +540,20 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
                     CHF_BOX(b));
 
     chf_rhs_fab -= rhs_fab;
+    chf_rhs_fab.abs();
     for (int i = 0; i < c_NUM; ++i)
     {
         double max_err = chf_rhs_fab.norm(0, i, 1);
-        if (max_err > 1e-9)
+        if (max_err > 1e-6)
         {
-            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << max_err << std::endl;
+            pout() << "COMPONENT " << i << s_state_names[i] << " DOES NOT AGREE: MAX ERROR = " << max_err << std::endl;
+            //Find the location of the maximum error:
+            IntVect loc = chf_rhs_fab.maxIndex(i);
+            Real x = (loc[0] + 0.5) * m_dx;
+            Real y = (loc[1] + 0.5) * m_dx;
+            Real z = (loc[2] + 0.5) * m_dx;
+            pout() << "This occured at (x,y,z) = (" << x << "," << y << "," << z << ")" << std::endl;
+            writeFAB(&chf_rhs_fab);
         }
     }
   }

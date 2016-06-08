@@ -817,20 +817,22 @@ c     set to zero to use 4th order advection, 1 for 2nd order
       ! used instead of gamma where no derivatives of gamma are taken
       ! Zvec has index up
       gamcon = 0
-      Zvec   = ch * gamma
+     ! Zvec   = ch * gamma
       do d0 = 0, 2
         do d1 = 0, 2
           do d2 = 0, 2
-     !       gamcon(d0) = gamcon(d0) + hu(d1,d2) * cf2(d0,d1,d2)
+            gamcon(d0) = gamcon(d0) + hu(d1,d2) * cf2(d0,d1,d2)
      !       Zvec(d0)   = Zvec(d0)   + gu(d0,d1) * hh(d1,d2) * gamma(d2)
             do d3 = 0, 2
-              gamcon(d0) = gamcon(d0) + hu(d0,d1) * hu(d2,d3) * d1_hh(d1,d3,d2)
-              Zvec(d0)   = Zvec(d0) - gu(d0,d1) * hu(d2,d3) * d1_hh(d1,d3,d2)
+     !         gamcon(d0) = gamcon(d0) + hu(d0,d1) * hu(d2,d3) * d1_hh(d1,d3,d2)
+     !         Zvec(d0)   = Zvec(d0) - gu(d0,d1) * hu(d2,d3) * d1_hh(d1,d3,d2)
+     !         Zvec(d0)   = Zvec(d0) + gu(d0,d1) * ( - d1_hh(d1,d3,d2) * hu(d3,d2) )
             enddo
           enddo
         enddo
       enddo
-      Zvec = Zvec / 2
+      !Zvec = Zvec / 2
+      Zvec = ch*(gamma-gamcon)/2.d0
       !--------------------------------------------------
 
       !------------- Ricci tensor -----------------------

@@ -9,9 +9,9 @@ CCZ4::CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver
 
 template <class data_t>
 void
-CCZ4::compute(int x, int y, int z) //TODO: Change name to ix, iy iz etc
+CCZ4::compute(int ix, int iy, int iz)
 {
-    const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
+    const int idx = m_driver.m_stride[2]*(iz-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(iy-m_driver.m_in_lo[1]) + (ix-m_driver.m_in_lo[0]);
 
     vars_t<data_t> vars;
     {
@@ -75,7 +75,7 @@ CCZ4::compute(int x, int y, int z) //TODO: Change name to ix, iy iz etc
     rhs_equation(vars, d1, d2, advec, rhs);
 
     // TODO: I really do not like this, but cannot think of a better way to do it yet...
-    const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
+    const int out_idx = m_driver.m_out_stride[2]*(iz-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(iy-m_driver.m_out_lo[1]) + (ix-m_driver.m_out_lo[0]);
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = rhs.chi      + m_sigma * dssp.chi;
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_h11])[out_idx]    = rhs.h[0][0]  + m_sigma * dssp.h[0][0];
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_h12])[out_idx]    = rhs.h[0][1]  + m_sigma * dssp.h[0][1];

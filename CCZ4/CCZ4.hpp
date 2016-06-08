@@ -49,7 +49,7 @@ public:
     CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver);
 
     template <class data_t>
-    void compute(int x, int y, int z);
+    void compute(int ix, int iy, int iz);
 
 protected:
     const FABDriverBase& m_driver;

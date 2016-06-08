@@ -15,7 +15,7 @@ public:
 	BoostedBH(Real m, std::vector<Real> const& center, std::vector<Real> const& momentum);
 
 	// conformal factor
-	Real psi(Real x, Real y, Real z) const;
+	Real psi_minus_one(Real x, Real y, Real z) const;
 
 	// extrinsic curvature
 	void Aij(Real x, Real y, Real z, Real out[3][3]) const;
@@ -40,7 +40,7 @@ BoostedBH::BoostedBH(Real mass, std::vector<Real> const& center, std::vector<Rea
 }
 
 Real
-BoostedBH::psi(Real x, Real y, Real z) const
+BoostedBH::psi_minus_one(Real x, Real y, Real z) const
 {
 	const Real r = center_dist(x,y,z);
 	const Real cos_theta = (z - center[2]) / r;

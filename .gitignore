@@ -7,3 +7,6 @@ f
 .DS_Store
 log
 *.ex
+*.swp
+*.out
+*.hdf5

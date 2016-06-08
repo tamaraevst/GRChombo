@@ -29,7 +29,7 @@ template <typename T>
 Real
 BinaryBH<T>::psi(Real x, Real y, Real z) const
 {
-	return 1 + bh1.psi(x, y, z) + bh2.psi(x, y, z);
+	return 1 + bh1.psi_minus_one(x, y, z) + bh2.psi_minus_one(x, y, z);
 }
 
 template <typename T>
