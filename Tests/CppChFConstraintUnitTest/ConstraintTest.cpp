@@ -135,7 +135,7 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result);
+    FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result, box);
 
     gettimeofday(&end, NULL);
 
@@ -169,27 +169,30 @@ int main()
 
     in_fab_cpp_result -= in_fab;
 
-    int passed = 1;
+    int error = 0;
 
     for (int i = c_Ham; i < c_NUM; ++i)
     {
         BoxIterator bit(box);
         double max_err = 0;
+        IntVect location = IntVect::Zero;
         for (bit.begin(); bit.ok(); ++bit)
         {
            max_err = max(max_err, in_fab_cpp_result(bit(), i) );
+           if (max_err ==  in_fab_cpp_result(bit(), i) ) location = bit();
         }
         //double max_err = in_fab_cpp_result.norm(0, i, 1);
         if (max_err > 1e-9)
         {
-            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << max_err << std::endl;
-            passed = -1;
+            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << max_err <<
+               " AT INTVECT " << location << std::endl;
+            error = -1;
         }
     }
 
-   if (passed == 1) std::cout << "Constraint cpp ChF comparison test passed" << std::endl;
+   if (error == 0) std::cout << "Constraint cpp ChF comparison test passed" << std::endl;
    else std::cout << "Constraint cpp ChF comparison test NOT passed" << std::endl;
 
 #endif
-    return -1;
+    return error;
 }

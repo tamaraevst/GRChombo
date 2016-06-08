@@ -23,9 +23,14 @@ public:
         m_compute(std::forward<param_types>(params)..., *this)
     {};
 
-    void execute(const FArrayBox& in, FArrayBox& out);
+    //Takes input 'in', writes output into the subox 'out_box' of 'out'
+    void execute(const FArrayBox& in, FArrayBox& out, const Box & out_box);
 
-    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out);
+    void execute(const FArrayBox& in, FArrayBox& out); //Uses out.box() as out_box
+
+    //MK: Could give fillGhosts a default argument but I think it's better to force the user to make a concious decision
+    //Wrong fillGhosts can give errors that are very hard to debug
+    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts);
 };
 
 #include "FABDriver.tpp"

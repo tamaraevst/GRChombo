@@ -22,6 +22,8 @@ FABDriverBase::diff1(int idx, int stride, double dx, data_t (&out)[c_NUM]) const
         data_t weight_far  = 8.33333333333333333333e-2;
         data_t weight_near = 6.66666666666666666667e-1;
 
+        //NOTE: if you have been sent here by the debugger because of EXC_BAD_ACCESS
+        //or something similar you might be trying to take derivatives without ghost points.
         out[i] = (  weight_far  * in[idx - 2*stride]
                      - weight_near * in[idx - stride]
                      + weight_near * in[idx + stride]

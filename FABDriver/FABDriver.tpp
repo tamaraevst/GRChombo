@@ -6,8 +6,11 @@
 
 template <class compute_t>
 void
-FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
+FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& out_box)
 {
+   //Makes sure we are not requesting data outside the box of out
+   CH_assert(out.box().contains(out_box));
+
    // dataPtr in Chombo does CH_assert bound check
    // which we don't want to do in a loop
    for (int i = 0; i < c_NUM; ++i)
@@ -27,8 +30,9 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
 #error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
 
-   m_out_lo = out.loVect();
-   m_out_hi = out.hiVect();
+   m_out_lo = out_box.loVect();
+   m_out_hi = out_box.hiVect();
+
    m_out_stride[0] = 1;
    m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
 #if CH_SPACEDIM >= 3
@@ -67,18 +71,28 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
 
 template <class compute_t>
 void
-FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out)
+FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out)
+{
+   execute(in,out,out.box());
+}
+
+template <class compute_t>
+void
+FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts)
 {
   DataIterator dit0  = in.dataIterator();
   int nbox = dit0.size();
-  //thread parallelism moved into boxes
-  //#pragma omp parallel for default(shared) schedule(guided)
   for(int ibox = 0; ibox < nbox; ++ibox)
   {
     DataIndex di = dit0[ibox];
     const FArrayBox& in_fab = in[di];
     FArrayBox& out_fab = out[di];
-    execute(in_fab,out_fab);
+
+    Box out_box;
+    if (fillGhosts) out_box = out_fab.box();
+    else out_box = in.disjointBoxLayout()[di];
+
+    execute(in_fab,out_fab,out_box);
   }
 }
 

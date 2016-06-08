@@ -267,10 +267,10 @@ GRChombo::advance ()
   pout () << "Number of level " << m_level << " boxes on this rank: " << nbox << "." << endl;
 
   //Enforce the trace free alpha condition
-  FABDriver<EnforceTfA>().execute(m_state_new, m_state_new);
+  FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, true);
 
   //Enforce positive chi and alpha
-  FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new);
+  FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, true);
 
   //Check for nan's - TODO: move this out of here
   for(int ibox = 0; ibox < nbox; ++ibox)
@@ -392,13 +392,13 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
 
   //Enforce the trace free alpha condition //TODO: Make sure it's enough to enforce it here! Then delete other place
   //where it's enforced
-  FABDriver<EnforceTfA>().execute(soln, soln);
+  FABDriver<EnforceTfA>().execute(soln, soln, true);
 
   //Enforce positive chi and alpha
-  FABDriver<PositiveChiAndAlpha>().execute(soln, soln);
+  FABDriver<PositiveChiAndAlpha>().execute(soln, soln, true);
 
   //Calculate CCZ4 right hand side
-  FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln, rhs);
+  FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(soln, rhs, false);
 
   if (m_profilingInfo != NULL) m_profilingInfo->readCounters();
 }
@@ -424,7 +424,7 @@ GRChombo::updateODE(TSoln& soln,
    }
 
    //Enforce the trace free alpha condition
-   FABDriver<EnforceTfA>().execute(soln, soln);
+   FABDriver<EnforceTfA>().execute(soln, soln, true);
 }
 
 
@@ -538,8 +538,6 @@ GRChombo::tagCells (IntVectSet& a_tags)
     //mod gradient
     FArrayBox mod_grad_fab(b,c_NUM);
 
-    pout () << mod_grad_fab.nComp() << endl;
-    pout () << state_fab.nComp() << endl;
     FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
 
     const IntVect& smallEnd = b.smallEnd();
@@ -787,7 +785,7 @@ GRChombo::initialData ()
       BoostedBH bh1(m_p.massA, m_p.centerA, m_p.momentumA);
 
       // Metric conformal factor
-      const Real psi = bh1.psi(x, y, z);
+      const Real psi = 1. + bh1.psi_minus_one(x, y, z);
       state_fab(iv, c_chi) = pow(psi, -4);
 
       // Conformal metric is flat
@@ -936,7 +934,7 @@ GRChombo::writeCheckpointLevel (HDF5Handle& a_handle) const
 void
 GRChombo::preCheckpointLevel ()
 {
-   FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new);
+   FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new, false);
 }
 
 
