@@ -257,13 +257,6 @@ public:
 // periodicity information
   static const int s_periodicity[SpaceDim];
 
-  static const int s_num_comps_h;
-  static const int s_num_comps_A;
-  static const int s_num_comps_Gamma;
-  static const int s_num_comps_shift;
-  static const int s_num_comps_B;
-  static const int s_num_comps_Mom;
-
 protected:
 // state vector at old time
   LevelData<FArrayBox> m_state_old;

@@ -41,18 +41,14 @@ using std::endl;
 #include "FABView.H"
 
 #include "FABDriver.hpp"
-//#include "Constraints.hpp"
+#include "Constraints.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "EnforceTfA.hpp"
+#include "ComputeModGrad.hpp"
 
 #ifdef USE_PAPI
 #include "PapiProfilingInfo.hpp"
 #endif
-
-#ifdef SF6_USE_GU_GETGRADF
-#include "GodunovUtilitiesF_F.H"
-#endif
-#include "CCZ4F_F.H"
 
 #include <fenv.h>
 #if defined(__i386__) && defined(__SSE__)
@@ -131,19 +127,6 @@ GRChombo::s_state_names[s_num_comps] =
   "B2",
   "B3",
 };
-
-//TODO, FIXME: Get rid of this ... it is not needed in the new c++ code
-const int
-GRChombo::s_num_comps_h = c_K-c_h;
-const int
-GRChombo::s_num_comps_A = c_Theta-c_A;
-const int
-GRChombo::s_num_comps_Gamma = c_lapse-c_Gamma;
-const int
-GRChombo::s_num_comps_shift = c_B-c_shift;
-const int
-GRChombo::s_num_comps_B = c_NUM-c_B;
-
 
 const int
 GRChombo::s_num_ghosts;
@@ -278,20 +261,19 @@ GRChombo::advance ()
   //Print nBox to give information on load balancing
   pout () << "Number of level " << m_level << " boxes on this rank: " << nbox << "." << endl;
 
-//#pragma omp parallel for default(shared) schedule(guided)
-//Moved the threading into boxes
-  for(int ibox = 0; ibox < nbox; ++ibox) {
+  //Enforce the trace free alpha condition
+  FABDriver<EnforceTfA>().execute(m_state_new, m_state_new);
+
+  //Enforce positive chi and alpha
+  FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new);
+
+  //Check for nan's - TODO: move this out of here
+  for(int ibox = 0; ibox < nbox; ++ibox)
+  {
     DataIndex di = dit0[ibox];
     const Box& b = level_domain[di];
     FArrayBox& state_fab = m_state_new[di];
 
-    FORT_FIXCCZ4CONSTRF(CHF_FRAn(state_fab,c_h,s_num_comps_h),
-                       CHF_FRAn(state_fab,c_A,s_num_comps_A),
-                       CHF_BOX(b));
-
-    //Check for nan's and enforece non-negative lapse and chi
-    //BoxIterator bit (b);
-    //for (bit.begin (); bit.ok (); ++bit)
     const IntVect& smallEnd = b.smallEnd();
     const IntVect& bigEnd = b.bigEnd();
 
@@ -333,14 +315,6 @@ GRChombo::advance ()
           if (nanerror) {
              MayDay::Error("in GRChombo::advance: values have become nan");
           }
-       }
-
-       if (state_fab(iv, c_chi) <= 1e-4) {
-          state_fab(iv, c_chi) = 1e-4;
-       }
-
-       if (state_fab(iv, c_lapse) <= 1e-4) {
-          state_fab(iv, c_lapse) = 1e-4;
        }
     }//x
     }//y
@@ -428,29 +402,24 @@ GRChombo::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
 // implements soln += dt*rhs
 void
 GRChombo::updateODE(TSoln& soln,
-                     const TSoln& rhs,
-                     Real dt)
+                    const TSoln& rhs,
+                    Real dt)
 {
-  CH_TIME("GRChombo::updateODE");
+   CH_TIME("GRChombo::updateODE");
 
-  DataIterator dit0 = soln.dataIterator();
-  int nbox = dit0.size();
-  // Moved threading into boxes
-//#pragma omp parallel for default(shared) schedule(guided)
-  for(int ibox = 0; ibox < nbox; ++ibox)
-  {
-    DataIndex di = dit0[ibox];
-    FArrayBox& soln_fab = soln[di];
-    const FArrayBox& rhs_fab = rhs[di];
-    soln_fab.plus(rhs_fab, dt);
+   DataIterator dit0 = soln.dataIterator();
+   int nbox = dit0.size();
 
-    const Box& b = rhs_fab.box ();
+   for(int ibox = 0; ibox < nbox; ++ibox)
+   {
+      DataIndex di = dit0[ibox];
+      FArrayBox& soln_fab = soln[di];
+      const FArrayBox& rhs_fab = rhs[di];
+      soln_fab.plus(rhs_fab, dt);
+   }
 
-    //Fix tracefree condition
-    FORT_FIXCCZ4CONSTRF(CHF_FRAn(soln_fab,c_h,s_num_comps_h),
-                       CHF_FRAn(soln_fab,c_A,s_num_comps_A),
-                       CHF_BOX(b));
-  }
+   //Enforce the trace free alpha condition
+   FABDriver<EnforceTfA>().execute(soln, soln);
 }
 
 
@@ -555,30 +524,16 @@ GRChombo::tagCells (IntVectSet& a_tags)
   // Compute the constraint monitor
   DataIterator dit0 = level_domain.dataIterator();
   int nbox = dit0.size();
-  //thread parallelism moved into boxes
-//#pragma omp parallel for default(shared) schedule(guided)
   for(int ibox = 0; ibox < nbox; ++ibox)
   {
     DataIndex di = dit0[ibox];
     const Box& b = level_domain[di];
     const FArrayBox& state_fab = m_state_new[di];
 
-    //gradient of chi
-    FArrayBox grad_fab(b,SpaceDim);
-    for (int dir = 0; dir < SpaceDim; ++dir)
-      {
-        FORT_GETGRADCENTERF(CHF_FRA1(grad_fab,dir),
-                            CHF_CONST_FRA1(state_fab,c_chi),
-                            CHF_CONST_INT(dir),
-                            CHF_BOX(b));
-      }
+    //mod gradient
+    FArrayBox mod_grad_fab(b,c_NUM);
+    FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
 
-    FArrayBox grad_mag_fab(b,1);
-    FORT_MAGNITUDEF(CHF_FRA1(grad_mag_fab,0),
-                    CHF_CONST_FRA(grad_fab),
-                    CHF_BOX(b));
-
-    // Tag where gradient exceeds threshold - currently using chi as trigger
     const IntVect& smallEnd = b.smallEnd();
     const IntVect& bigEnd = b.bigEnd();
 
@@ -595,18 +550,16 @@ GRChombo::tagCells (IntVectSet& a_tags)
     for (int y = ymin; y <= ymax; ++y) {
     for (int x = xmin; x <= xmax; ++x)
     {
-        IntVect iv(x,y,z);
-
-//        if ((m_time >= m_p.relax_time && fabs(state_fab(iv, c_C)) >= m_p.cmax) ||
-//            grad_mag_fab(iv) >= m_p.regridmax)
-	  if (grad_mag_fab(iv)/pow(state_fab(iv,c_chi),2) >= m_p.regridmax)
-          {
-// local_tags |= is not thread safe.
+       IntVect iv(x,y,z);
+       //At the moment only base on gradient chi/chi^2
+       if (mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2) >= m_p.regridmax)
+       {
+          // local_tags |= is not thread safe.
 #pragma omp critical
-            {
-            local_tags |= iv;
-            }
+          {
+             local_tags |= iv;
           }
+       }
     }//x
     }//y
     }//z
@@ -978,7 +931,7 @@ GRChombo::writeCheckpointLevel (HDF5Handle& a_handle) const
 void
 GRChombo::preCheckpointLevel ()
 {
-//   FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new);
+   FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new);
 }
 
 
