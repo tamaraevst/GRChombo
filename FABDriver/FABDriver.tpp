@@ -6,10 +6,10 @@
 
 template <class compute_t>
 void
-FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& out_box)
+FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& loop_box)
 {
-   //Makes sure we are not requesting data outside the box of out
-   CH_assert(out.box().contains(out_box));
+   //Makes sure we are not requesting data outside the box of 'out'
+   CH_assert(out.box().contains(loop_box));
 
    // dataPtr in Chombo does CH_assert bound check
    // which we don't want to do in a loop
@@ -30,8 +30,8 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& ou
 #error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
 
-   m_out_lo = out_box.loVect();
-   m_out_hi = out_box.hiVect();
+   m_out_lo = out.loVect();
+   m_out_hi = out.hiVect();
 
    m_out_stride[0] = 1;
    m_out_stride[1] = m_out_hi[0]-m_out_lo[0]+1;
@@ -42,27 +42,30 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& ou
 #error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
 
+   const int* loop_lo = loop_box.loVect();
+   const int* loop_hi = loop_box.hiVect();
+
 #pragma omp parallel for default(shared) collapse(CH_SPACEDIM-1)
 #if CH_SPACEDIM >= 4
 #error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
 #if CH_SPACEDIM >= 3
-   for (int z = m_out_lo[2]; z <= m_out_hi[2]; ++z)
+   for (int z = loop_lo[2]; z <= loop_hi[2]; ++z)
 #endif
-      for (int y = m_out_lo[1]; y <= m_out_hi[1]; ++y)
+      for (int y = loop_lo[1]; y <= loop_hi[1]; ++y)
       {
-         int x_simd_max = m_out_lo[0] + simd<double>::simd_len * (((m_out_hi[0] - m_out_lo[0] + 1) / simd<double>::simd_len) - 1);
+         int x_simd_max = loop_lo[0] + simd<double>::simd_len * (((loop_hi[0] - loop_lo[0] + 1) / simd<double>::simd_len) - 1);
 
          // SIMD LOOP
 #pragma novector
-         for (int x = m_out_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
+         for (int x = loop_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
          {
             m_compute.template compute<simd<double> >(x, y, z);
          }
 
          // REMAINDER LOOP
 #pragma novector
-         for (int x = x_simd_max + simd<double>::simd_len; x <= m_out_hi[0]; ++x)
+         for (int x = x_simd_max + simd<double>::simd_len; x <= loop_hi[0]; ++x)
          {
             m_compute.template compute<double>(x, y, z);
          }

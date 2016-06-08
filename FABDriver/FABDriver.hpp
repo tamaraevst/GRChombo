@@ -23,8 +23,8 @@ public:
         m_compute(std::forward<param_types>(params)..., *this)
     {};
 
-    //Takes input 'in', writes output into the subox 'out_box' of 'out'
-    void execute(const FArrayBox& in, FArrayBox& out, const Box & out_box);
+    //Takes input 'in', writes output into the subox 'loop_box' of 'out'
+    void execute(const FArrayBox& in, FArrayBox& out, const Box & loop_box);
 
     void execute(const FArrayBox& in, FArrayBox& out); //Uses out.box() as out_box
 
