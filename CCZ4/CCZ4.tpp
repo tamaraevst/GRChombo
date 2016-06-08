@@ -227,10 +227,9 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 #endif
 
     {
-        data_t Thetadot = 0.5*vars.lapse*(ricci.scalar - tr_AA + ((GR_SPACEDIM-1)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
-        rhs.Theta = advec.Theta + Thetadot;
+        rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_AA + ((GR_SPACEDIM-1)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-        rhs.K = advec.K + 2*Thetadot + vars.lapse*(tr_AA + (1.0/GR_SPACEDIM)*vars.K*vars.K) + kappa1_lapse*(1-m_params.kappa2)*vars.Theta + 2*Z_dot_d1lapse - tr_covd2lapse;
+        rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
     }
 
     tensor<1, data_t> Gammadot;
@@ -260,14 +259,14 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         }
     }
 
-    const data_t eta = 1;
+    const data_t etaDecay = 1;
 
     {
         rhs.lapse = m_params.lapse_advec_coeff*advec.lapse - 2*vars.lapse*(vars.K - 2*vars.Theta);
         FOR1(i)
         {
             rhs.shift[i] = m_params.shift_advec_coeff*advec.shift[i] + m_params.shift_gamma_coeff*vars.B[i];
-            rhs.B[i] = m_params.shift_advec_coeff*advec.B[i] + (1 - m_params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - m_params.beta_driver*eta*vars.B[i];
+            rhs.B[i] = m_params.shift_advec_coeff*advec.B[i] + (1 - m_params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - m_params.beta_driver*etaDecay*vars.B[i];
         }
     }
 }
