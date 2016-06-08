@@ -114,6 +114,12 @@ struct simd<double> : public simd_base<double>
     {
         return _mm512_max_pd(a, b);
     }
+
+    friend ALWAYS_INLINE
+    simd simd_sqrt(const simd& a)
+    {
+        return _mm512_sqrt_pd(a);
+    }
 };
 
 template <>
@@ -204,6 +210,12 @@ struct simd<float> : public simd_base<float>
     simd simd_max(const simd& a, const simd& b)
     {
         return _mm512_max_ps(a, b);
+    }
+
+    friend ALWAYS_INLINE
+    simd simd_sqrt(const simd& a)
+    {
+        return _mm512_sqrt_ps(a);
     }
 };
 

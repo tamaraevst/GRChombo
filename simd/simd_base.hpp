@@ -135,6 +135,13 @@ simd_compare_gt(const t& a, const t& b)
 
 template <typename t>
 ALWAYS_INLINE
+t simd_sqrt(const t& a)
+{
+   return sqrt(a);
+}
+
+template <typename t>
+ALWAYS_INLINE
 t simd_log(const t& a)
 {
    return log(a);
