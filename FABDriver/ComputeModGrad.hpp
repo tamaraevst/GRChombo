@@ -5,45 +5,51 @@
 #include "user_enum.hpp"
 #include "tensor.hpp"
 #include "FABDriverBase.hpp"
+#include "FourthOrderDerivatives.hpp"
+
+#include <array>
 
 class ComputeModGrad
 {
+protected:
+   const FABDriverBase& m_driver;
+   const FourthOrderDerivatives m_deriv;
+
 public:
-   ComputeModGrad(double dx, const FABDriverBase& driver) : m_dx (dx), m_driver(driver){};
+   ComputeModGrad(double dx, const FABDriverBase& driver) :
+      m_driver (driver),
+      m_deriv (dx, m_driver)
+   {};
 
    template <class data_t>
       void compute(int x, int y, int z)
       {
-         const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
+         idx_t<data_t> idx = m_driver.in_idx(x, y, z);
 
-         data_t d1Arr[CH_SPACEDIM][c_NUM]; //Derivative index first
+         std::array<data_t, c_NUM> d1_arr[CH_SPACEDIM]; //Derivative index first
          for (int dir = 0; dir < CH_SPACEDIM; ++dir)
          {
-            m_driver.diff1(idx, m_driver.m_stride[dir], m_dx, d1Arr[dir]);
+            d1_arr[dir] = m_deriv.diff1(idx, dir);
          }
 
-         data_t modD1Arr[c_NUM];
+         std::array<data_t, c_NUM> mod_d1_arr = {};
          for (int comp = 0; comp < c_NUM; ++comp)
          {
-            modD1Arr[comp] = 0;
             for (int dir = 0; dir < CH_SPACEDIM; ++dir)
             {
-               modD1Arr[comp] += d1Arr[dir][comp]*d1Arr[dir][comp];
+               mod_d1_arr[comp] += d1_arr[dir][comp]*d1_arr[dir][comp];
             }
-            modD1Arr[comp] = simd_sqrt(modD1Arr[comp]);
+            mod_d1_arr[comp] = simd_sqrt(mod_d1_arr[comp]);
          }
 
          // TODO: I really do not like this, but cannot think of a better way to do it yet...
-         const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
+         idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
          for (int comp = 0; comp < c_NUM; ++comp)
          {
-            SIMDIFY<data_t>(m_driver.m_out_ptr[comp])[out_idx]    =  modD1Arr[comp];
+            SIMDIFY<data_t>(m_driver.m_out_ptr[comp])[out_idx] = mod_d1_arr[comp];
          }
       }
-
-protected:
-   const double m_dx;
-   const FABDriverBase& m_driver;
+   
 };
 
 #endif /* COMPUTEMODGRAD_HPP_ */

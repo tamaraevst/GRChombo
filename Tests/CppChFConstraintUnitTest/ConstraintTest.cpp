@@ -133,6 +133,10 @@ int main()
     }
 
     struct timeval begin, end;
+
+    // Make sure instructions are hot in cache
+    FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result, box);
+
     gettimeofday(&begin, NULL);
 
     FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result, box);
@@ -146,6 +150,17 @@ int main()
 
     int SIX = 6;
     int THREE = 3;
+
+    FORT_GETBSSNCONSTRF(
+                    CHF_FRA1(in_fab, c_Ham),
+                    CHF_FRAn(in_fab, c_Mom, THREE),
+                    CHF_CONST_FRA1(in_fab, c_chi),
+                    CHF_CONST_FRAn(in_fab, c_h, SIX),
+                    CHF_CONST_FRA1(in_fab, c_K),
+                    CHF_CONST_FRAn(in_fab, c_A, SIX),
+                    CHF_CONST_FRAn(in_fab, c_Gamma, THREE),
+                    CHF_CONST_REAL(dx),
+                    CHF_BOX(box));
 
     gettimeofday(&begin, NULL);
 

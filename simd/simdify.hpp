@@ -36,11 +36,11 @@ struct simd_proxy
         return *this;
     }
 
-    ALWAYS_INLINE
+    /*ALWAYS_INLINE
     const simd_proxy& operator=(const simd_t& rhs) const
     {
         const_cast<simd_proxy&>(*this) = rhs;
-    }
+    }*/
 
     ALWAYS_INLINE
     simd_t operator+(const simd_t& other)
@@ -88,6 +88,34 @@ struct simd_proxy
     simd_t operator/(const simd_t& a, const simd_proxy& b)
     {
         return a / static_cast<simd_t>(b);
+    }
+
+    ALWAYS_INLINE
+    simd_proxy& operator+=(const simd_t& rhs)
+    {
+        (*this) = (*this) + rhs;
+        return *this;
+    }
+
+    ALWAYS_INLINE
+    simd_proxy& operator-=(const simd_t& rhs)
+    {
+        (*this) = (*this) - rhs;
+        return *this;
+    }
+
+    ALWAYS_INLINE
+    simd_proxy& operator*=(const simd_t& rhs)
+    {
+        (*this) = (*this) * rhs;
+        return *this;
+    }
+
+    ALWAYS_INLINE
+    simd_proxy& operator/=(const simd_t& rhs)
+    {
+        (*this) = (*this) / rhs;
+        return *this;
     }
 };
 

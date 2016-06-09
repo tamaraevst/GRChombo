@@ -11,40 +11,49 @@
 //It must include c_NUM, the total number of simulation components.
 #include "user_enum.hpp"
 
+#include <array>
 
-#include "tensor.hpp"
+// This exists solely to allow the compiler to
+// perform type deduction on data_t.
+template <typename t>
+struct idx_t
+{
+    int m_idx;
+
+    ALWAYS_INLINE
+    idx_t (int idx) :
+        m_idx (idx)
+    {}
+
+    ALWAYS_INLINE
+    operator int() const
+    {
+        return m_idx;
+    }
+};
 
 struct FABDriverBase
 {
     const double *m_in_ptr[c_NUM];
     const int *m_in_lo;
     const int *m_in_hi;
-    int m_stride[3];
+    int m_in_stride[3];
 
     double *m_out_ptr[c_NUM];
     const int *m_out_lo;
     const int *m_out_hi;
     int m_out_stride[3];
 
-    template <class data_t>
-    void local_vars(int idx, data_t (&out)[c_NUM]) const;
+    ALWAYS_INLINE
+    int in_idx(int ix, int iy, int iz) const;
+    
+    ALWAYS_INLINE
+    int out_idx(int ix, int iy, int iz) const;
 
     template <class data_t>
-    void diff1(int idx, int stride, double dx, data_t (&out)[c_NUM]) const;
-
-    template <class data_t>
-    void diff2(int idx, int stride, double dx, data_t (&out)[c_NUM]) const;
-
-    template <class data_t>
-    void mixed_diff2(int idx, int stride1, int stride2, double dx, data_t (&out)[c_NUM]) const;
-
-    template <class data_t>
-    void advection(int idx, double dx, const tensor<1, data_t>& vec, data_t (&out)[c_NUM]) const;
-
-    template <class data_t>
-    void dissipation(int idx, double dx, data_t (&out)[c_NUM]) const;
+    std::array<data_t, c_NUM> local_vars(idx_t<data_t> idx) const;
 };
 
-#include "FABDriverBase.tpp"
+#include "FABDriverBase.impl.hpp"
 
 #endif /* FABDRIVERBASE_HPP_ */
