@@ -5,7 +5,6 @@ CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma
     m_dx (dx),
     m_sigma (sigma),
     m_cosmological_constant (cosmological_constant),
-    //m_matter (matter),
     m_driver (driver)
 {}
 
@@ -204,12 +203,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
                 }
             }
         }
-//        tensor<2,data_t> S_tf = m_matter.S_LL;
-//        make_trace_free(S_tf, vars.h, h_UU);
-//        FOR2(i,j)
-//        {
-//           rhs.A[i][j] += - 8*m_pi*vars.chi*vars.lapse*S_tf[i][j];
-//        }
     }
 
 #ifdef COVARIANTZ4
@@ -220,11 +213,9 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-//    rhs.Theta += - 8*m_pi*vars.lapse*m_matter.rho;
     rhs.Theta += - vars.lapse * m_cosmological_constant;
 
     rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
-//    rhs.K += 8*m_pi/(GR_SPACEDIM - 1.) * vars.lapse * (m_matter.S - GR_SPACEDIM * m_matter.rho);
 
     tensor<1, data_t> Gammadot;
     FOR1(i)
@@ -250,11 +241,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     {
         rhs.Gamma[i] = advec.Gamma[i] + Gammadot[i];
     }
-
-//    FOR2(i,j)
-//    {
-//        rhs.Gamma[i] += -16*m_pi*vars.lapse* h_UU[i][j] * m_matter.j_L[j];
-//    }
 
     const data_t etaDecay = 1;
 

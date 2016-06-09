@@ -44,7 +44,6 @@ protected:
     params_t m_params;
     double m_dx;
     double m_sigma;
-//    matter_t m_matter;
     double m_cosmological_constant;
 
 public:
