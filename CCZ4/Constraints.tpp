@@ -1,6 +1,6 @@
 #include "Constraints.hpp"
 
-Constraints::Constraints(double dx, const FABDriverBase& driver) :
+Constraints::Constraints(const FABDriverBase& driver, double dx) :
     m_dx (dx),
     m_driver (driver)
 {}

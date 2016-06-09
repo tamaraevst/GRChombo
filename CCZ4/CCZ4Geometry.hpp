@@ -41,7 +41,7 @@ class CCZ4Geometry
                 h_UU[2][1] = h_UU[1][2];
         }
         return h_UU;
-    };
+    }
 
     template <class data_t, template <typename> class vars_t>
     static chris_t<data_t>
@@ -85,7 +85,7 @@ class CCZ4Geometry
         }
 
         return out;
-    };
+    }
 
     template <class data_t, template <typename> class vars_t>
     static ricci_t<data_t>

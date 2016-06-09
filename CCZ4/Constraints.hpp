@@ -30,7 +30,7 @@ protected:
     double m_dx;
 
 public:
-    Constraints(double dx, const FABDriverBase& driver);
+    Constraints(const FABDriverBase& driver, double dx);
 
     template <class data_t>
     void compute(int x, int y, int z);

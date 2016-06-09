@@ -20,8 +20,8 @@ public:
 
     template <typename... param_types>
     FABDriver(param_types... params) :
-        m_compute(std::forward<param_types>(params)..., *this)
-    {};
+        m_compute(*this, std::forward<param_types>(params)...)
+    {}
 
     //Takes input 'in', writes output into the subox 'loop_box' of 'out'
     void execute(const FArrayBox& in, FArrayBox& out, const Box & loop_box);

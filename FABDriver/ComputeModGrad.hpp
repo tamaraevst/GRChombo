@@ -9,7 +9,7 @@
 class ComputeModGrad
 {
 public:
-   ComputeModGrad(double dx, const FABDriverBase& driver) : m_dx (dx), m_driver(driver){};
+   ComputeModGrad(const FABDriverBase& driver, double dx) : m_dx (dx), m_driver(driver){};
 
    template <class data_t>
       void compute(int x, int y, int z)

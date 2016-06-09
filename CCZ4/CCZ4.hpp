@@ -42,10 +42,13 @@ public:
 
 protected:
     params_t m_params;
+    double m_dx;
     double m_sigma;
+//    matter_t m_matter;
+    double m_cosmological_constant;
 
 public:
-    CCZ4(params_t params, double dx, double sigma, const FABDriverBase& driver);
+    CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(int ix, int iy, int iz);
