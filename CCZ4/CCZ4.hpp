@@ -6,10 +6,13 @@
 #include "tensor.hpp"
 #include "GRUtils.H"
 #include "FABDriverBase.hpp"
+#include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
 
 #include "user_enum.hpp" //This files needs c_NUM - total number of components
+
+#include <array>
 
 class CCZ4
 {
@@ -26,9 +29,13 @@ public:
         data_t lapse;
         tensor<1, data_t> shift;
         tensor<1, data_t> B;
+
+        vars_t(){};
+
+        template <class arr_t>
+        vars_t(const arr_t& in);
     };
 
-public:
     struct params_t
     {
         double kappa1;
@@ -41,10 +48,11 @@ public:
     };
 
 protected:
-    params_t m_params;
-    double m_dx;
-    double m_sigma;
+    const params_t m_params;
+    const double m_sigma;
     double m_cosmological_constant;
+    const FABDriverBase& m_driver;
+    const FourthOrderDerivatives m_deriv;
 
 public:
     CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, double cosmological_constant = 0);
@@ -53,19 +61,15 @@ public:
     void compute(int ix, int iy, int iz);
 
 protected:
-    const FABDriverBase& m_driver;
-
     template <class data_t>
-    void demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out);
-
-    template <class data_t>
-    void rhs_equation(const vars_t<data_t> &vars,
-             const vars_t<data_t> (&d1)[CH_SPACEDIM],
-             const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
-             const vars_t<data_t> &advec,
-             vars_t<data_t> &rhs);
+    vars_t<data_t> rhs_equation(
+        const vars_t<data_t> &vars,
+        const vars_t<data_t> (&d1)[CH_SPACEDIM],
+        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+        const vars_t<data_t> &advec
+    );
 };
 
-#include "CCZ4.tpp"
+#include "CCZ4.impl.hpp"
 
 #endif /* CCZ4_HPP_ */

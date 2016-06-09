@@ -4,7 +4,7 @@
 ###  variable using the libraries named in the `LibNames' variable.
 
 # included makefiles need an absolute path
-CHOMBO_HOME := $(HOME)/Documents/Chombo/Chombo-3.2/lib
+CHOMBO_HOME := $(HOME)/Documents/Chombo_threaded/lib
 
 ebase := PositiveChiAndAlphaUnitTest
 

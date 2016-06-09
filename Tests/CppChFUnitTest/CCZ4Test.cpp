@@ -9,6 +9,7 @@
 #include <sys/time.h>
 
 #include "CCZ4.hpp"
+#include "KreissOligerDissipation.hpp"
 #include "FABDriver.hpp"
 #include "GRBSSNChomboF_F.H"
 
@@ -34,7 +35,7 @@ int main()
 {
 //    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
 
-    const int N_GRID = 32;
+    const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
     Box ghosted_box(IntVect(-3,-3,-3), IntVect(N_GRID+2,N_GRID+2,N_GRID+2));
     FArrayBox in_fab(ghosted_box, c_NUM);
@@ -147,6 +148,7 @@ int main()
     gettimeofday(&begin, NULL);
 
     FABDriver<CCZ4>(params, dx, sigma).execute(in_fab, out_fab);
+    //FABDriver<KreissOligerDissipation>(sigma, dx).execute(in_fab, out_fab);
 
 //    for (int i = 0; i < c_NUM; ++i)
 //    {
@@ -215,7 +217,7 @@ int main()
         double max_chf = out_fab_chf.norm(0,i,1);
         if (max_err > 1e-9)
         {
-            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(2, i, 1) << std::endl;
+            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
         }
     }

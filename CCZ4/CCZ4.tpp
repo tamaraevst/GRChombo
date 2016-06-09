@@ -4,7 +4,6 @@ CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma
     m_params (params),
     m_dx (dx),
     m_sigma (sigma),
-    m_cosmological_constant (cosmological_constant),
     m_driver (driver)
 {}
 

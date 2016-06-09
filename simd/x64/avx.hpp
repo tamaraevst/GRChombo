@@ -34,7 +34,7 @@ struct simd<double> : public simd_base<double>
 #pragma GCC diagnostic ignored "-Wuninitialized"
     ALWAYS_INLINE
     simd() :
-        simd_base<double> (_mm256_undefined_pd())
+        simd_base<double> (_mm256_setzero_pd())
     {}
 #pragma GCC diagnostic pop
 
@@ -135,7 +135,7 @@ struct simd<float> : public simd_base<float>
 
     ALWAYS_INLINE
     simd() :
-        simd_base<float> (_mm256_undefined_ps())
+        simd_base<float> (_mm256_setzero_ps())
     {}
     
     ALWAYS_INLINE

@@ -38,7 +38,7 @@ struct simd<double> : public simd_base<double>
 
     ALWAYS_INLINE
     simd() :
-        simd_base<double> (_mm_undefined_pd())
+        simd_base<double> (_mm_setzero_pd())
     {}
 
     ALWAYS_INLINE
@@ -148,7 +148,7 @@ struct simd<float> : public simd_base<float>
 
     ALWAYS_INLINE
     simd() :
-        simd_base<float> (_mm_undefined_ps())
+        simd_base<float> (_mm_setzero_ps())
     {}
     
     ALWAYS_INLINE

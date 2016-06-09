@@ -8,70 +8,71 @@
 #include "CCZ4Geometry.hpp"
 #include "TensorAlgebra.hpp"
 
+#include <array>
+
 class EnforceTfA
 {
-public:
-   EnforceTfA(const FABDriverBase& driver) : m_driver(driver){};
-
-   template <class data_t>
-      struct vars_t
-      {
-         tensor<2, data_t> h;
-         tensor<2, data_t> A;
-      };
-
-   template <class data_t>
-      void compute(int x, int y, int z)
-      {
-         const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
-
-         vars_t<data_t> vars;
-         {
-            data_t varsArr[c_NUM];
-            m_driver.local_vars(idx, varsArr);
-            demarshall(varsArr, vars);
-         }
-         auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
-         make_trace_free(vars.A, vars.h, h_UU);
-
-         // TODO: I really do not like this, but cannot think of a better way to do it yet...
-         const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A11])[out_idx]    = vars.A[0][0];
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A12])[out_idx]    = vars.A[0][1];
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A13])[out_idx]    = vars.A[0][2];
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A22])[out_idx]    = vars.A[1][1];
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A23])[out_idx]    = vars.A[1][2];
-         SIMDIFY<data_t>(m_driver.m_out_ptr[c_A33])[out_idx]    = vars.A[2][2];
-      }
-
 protected:
    const FABDriverBase& m_driver;
 
+public:
+   EnforceTfA(const FABDriverBase& driver) :
+      m_driver (driver)
+   {}
+
    template <class data_t>
-      void demarshall(const data_t (&in)[c_NUM], vars_t<data_t>& out)
+   struct vars_t
+   {
+      tensor<2, data_t> h;
+      tensor<2, data_t> A;
+
+      vars_t(){}
+
+      template <class arr_t>
+      vars_t(const arr_t& in)
       {
-         out.h[0][0]  = in[c_h11];
-         out.h[0][1]  = in[c_h12];
-         out.h[0][2]  = in[c_h13];
-         out.h[1][1]  = in[c_h22];
-         out.h[1][2]  = in[c_h23];
-         out.h[2][2]  = in[c_h33];
+         h[0][0]  = in[c_h11];
+         h[0][1]  = in[c_h12];
+         h[0][2]  = in[c_h13];
+         h[1][1]  = in[c_h22];
+         h[1][2]  = in[c_h23];
+         h[2][2]  = in[c_h33];
 
-         out.h[1][0] = out.h[0][1];
-         out.h[2][0] = out.h[0][2];
-         out.h[2][1] = out.h[1][2];
+         h[1][0] = h[0][1];
+         h[2][0] = h[0][2];
+         h[2][1] = h[1][2];
 
-         out.A[0][0]  = in[c_A11];
-         out.A[0][1]  = in[c_A12];
-         out.A[0][2]  = in[c_A13];
-         out.A[1][1]  = in[c_A22];
-         out.A[1][2]  = in[c_A23];
-         out.A[2][2]  = in[c_A33];
+         A[0][0]  = in[c_A11];
+         A[0][1]  = in[c_A12];
+         A[0][2]  = in[c_A13];
+         A[1][1]  = in[c_A22];
+         A[1][2]  = in[c_A23];
+         A[2][2]  = in[c_A33];
 
-         out.A[1][0] = out.A[0][1];
-         out.A[2][0] = out.A[0][2];
-         out.A[2][1] = out.A[1][2];
+         A[1][0] = A[0][1];
+         A[2][0] = A[0][2];
+         A[2][1] = A[1][2];
       }
+   };
+
+   template <class data_t>
+   void compute(int x, int y, int z)
+   {
+      idx_t<data_t> idx = m_driver.in_idx(x, y, z);
+
+      vars_t<data_t> vars = m_driver.local_vars(idx);
+
+      auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
+      make_trace_free(vars.A, vars.h, h_UU);
+
+      idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A11])[out_idx] = vars.A[0][0];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A12])[out_idx] = vars.A[0][1];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A13])[out_idx] = vars.A[0][2];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A22])[out_idx] = vars.A[1][1];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A23])[out_idx] = vars.A[1][2];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_A33])[out_idx] = vars.A[2][2];
+   }
 };
 
 #endif /* FIXTFA_HPP_ */

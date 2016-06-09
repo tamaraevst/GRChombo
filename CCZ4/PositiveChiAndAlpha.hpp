@@ -8,29 +8,31 @@
 
 class PositiveChiAndAlpha
 {
-   public:
-      PositiveChiAndAlpha(const FABDriverBase& driver): m_driver (driver){};
+protected:
+   const FABDriverBase& m_driver;
 
-      template <class data_t>
-         void compute(int x, int y, int z)
-         {
-            const int idx = m_driver.m_stride[2]*(z-m_driver.m_in_lo[2]) + m_driver.m_stride[1]*(y-m_driver.m_in_lo[1]) + (x-m_driver.m_in_lo[0]);
-            data_t varsArr[c_NUM];
-            m_driver.local_vars(idx, varsArr);
+public:
+   PositiveChiAndAlpha(const FABDriverBase& driver) :
+      m_driver (driver)
+   {}
 
-            auto chiTooSmall = simd_compare_lt(varsArr[c_chi], 1e-4);
-            varsArr[c_chi] = simd_conditional(chiTooSmall, 1e-4, varsArr[c_chi]);
+   template <class data_t>
+   void compute(int x, int y, int z)
+   {
+      idx_t<data_t> idx = m_driver.in_idx(x, y, z);
 
-            auto lapseTooSmall = simd_compare_lt(varsArr[c_lapse], 1e-4);
-            varsArr[c_lapse] = simd_conditional(lapseTooSmall, 1e-4, varsArr[c_lapse]);
+      auto vars_arr = m_driver.local_vars(idx);
 
-            const int out_idx = m_driver.m_out_stride[2]*(z-m_driver.m_out_lo[2]) + m_driver.m_out_stride[1]*(y-m_driver.m_out_lo[1]) + (x-m_driver.m_out_lo[0]);
-            SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = varsArr[c_chi];
-            SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx]  = varsArr[c_lapse];
-         }
+      auto chi_is_too_small = simd_compare_lt(vars_arr[c_chi], 1e-4);
+      vars_arr[c_chi] = simd_conditional(chi_is_too_small, 1e-4, vars_arr[c_chi]);
 
-   protected:
-      const FABDriverBase& m_driver;
+      auto lapse_is_too_small = simd_compare_lt(vars_arr[c_lapse], 1e-4);
+      vars_arr[c_lapse] = simd_conditional(lapse_is_too_small, 1e-4, vars_arr[c_lapse]);
+
+      idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]   = vars_arr[c_chi];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx] = vars_arr[c_lapse];
+   }
 };
 
 #endif /* POSITIVECHIANDALPHA_HPP_ */

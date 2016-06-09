@@ -33,6 +33,6 @@ public:
     void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts);
 };
 
-#include "FABDriver.tpp"
+#include "FABDriver.impl.hpp"
 
 #endif /* FABDRIVER_HPP_ */

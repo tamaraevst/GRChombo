@@ -1,4 +1,10 @@
-#include "FABDriver.hpp"
+#if !defined(FABDRIVER_HPP_)
+#error "This file should only be included through FABDriver.hpp"
+#endif
+
+#ifndef FABDRIVER_IMPL_HPP_
+#define FABDRIVER_IMPL_HPP_
+
 #include "simd.hpp"
 
 //template <typename... param_types>
@@ -21,10 +27,10 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
 
    m_in_lo = in.loVect();
    m_in_hi = in.hiVect();
-   m_stride[0] = 1;
-   m_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
+   m_in_stride[0] = 1;
+   m_in_stride[1] = m_in_hi[0]-m_in_lo[0]+1;
 #if CH_SPACEDIM >= 3
-   m_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_stride[1];
+   m_in_stride[2] = (m_in_hi[1]-m_in_lo[1]+1)*m_in_stride[1];
 #endif
 #if CH_SPACEDIM >= 4
 #error "TODO: Implement CH_SPACEDIM >= 4"
@@ -98,4 +104,6 @@ FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBo
     execute(in_fab,out_fab,out_box);
   }
 }
+
+#endif /* FABDRIVER_IMPL_HPP_ */
 
