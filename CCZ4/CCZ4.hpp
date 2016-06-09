@@ -42,7 +42,6 @@ public:
 
 protected:
     params_t m_params;
-    double m_dx;
     double m_sigma;
 
 public:

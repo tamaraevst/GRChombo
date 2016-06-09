@@ -28,10 +28,12 @@ struct simd_base
         m_value ()
     {}
 
+#pragma GCC diagnostic ignored "-Wuninitialized"
     ALWAYS_INLINE
     simd_base(const simd_data_t& x) :
         m_value (x)
     {}
+#pragma GCC diagnostic pop
 
     ALWAYS_INLINE
     operator simd_data_t&()

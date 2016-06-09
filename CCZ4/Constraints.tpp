@@ -79,7 +79,7 @@ Constraints::constraint_equations(vars_t<data_t> &vars,
 
    auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
 
-   auto A_UU       = raiseAll(vars.A, h_UU);
+   auto A_UU       = raise_all(vars.A, h_UU);
    data_t tr_AA    = compute_trace(vars.A, A_UU);
 
    vars.Ham = ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA;

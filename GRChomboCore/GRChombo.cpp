@@ -64,23 +64,6 @@ using std::endl;
 #include "BoostedBH.hpp"
 #include "BinaryBH.hpp"
 
-#define CHF_FRAn( a, n, c ) a.dataPtr( n ) \
-                     ,D_DECL6( &a.loVect()[0] \
-                             ,&a.loVect()[1] \
-                             ,&a.loVect()[2] \
-                             ,&a.loVect()[3] \
-                             ,&a.loVect()[4] \
-                             ,&a.loVect()[5] ) \
-                     ,D_DECL6( &a.hiVect()[0] \
-                             ,&a.hiVect()[1] \
-                             ,&a.hiVect()[2] \
-                             ,&a.hiVect()[3] \
-                             ,&a.hiVect()[4] \
-                             ,&a.hiVect()[5] ) \
-                     ,&c
-
-#define CHF_CONST_FRAn( a, n, c ) CHF_FRAn(a,n,c)
-
 /// Global variables for handling output:
 static const char* pgmname = "GRChombo" ;
 static const char* indent = "   ";

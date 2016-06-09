@@ -32,7 +32,7 @@ make_trace_free(tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &metric, con
 template <class data_t>
 ALWAYS_INLINE
 tensor<2,data_t>
-raiseAll(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
+raise_all(const tensor<2,data_t> &tensor_LL, const tensor<2,data_t> &inverse_metric)
 {
    tensor<2, data_t> tensor_UU;
    FOR2(i,j)

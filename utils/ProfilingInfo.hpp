@@ -1,5 +1,5 @@
 //MK: This class implements the possibility of basic profiling info for GRChombo.
-//It works as a quick profiling hook but not much though has been put into this.
+//It worked as a quick profiling hook for PAPI but not much thought has been put into this.
 
 #ifndef _PROFILINGINFO_HPP
 #define _PROFILINGINFO_HPP
