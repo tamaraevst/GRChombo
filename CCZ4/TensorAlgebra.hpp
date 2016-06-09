@@ -25,7 +25,7 @@ make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, c
    auto trace = compute_trace(tensor_LL, inverse_metric);
    FOR2(i,j)
    {
-      tensor_LL[i][j] += - 1./(GR_SPACEDIM-1.) * metric[i][j] * trace;
+      tensor_LL[i][j] -= (1.0/GR_SPACEDIM) * metric[i][j] * trace;
    }
 }
 

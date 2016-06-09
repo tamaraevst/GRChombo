@@ -161,7 +161,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     {
         Adot_TF[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci.LL[i][j];
     }
-    make_trace_free(Adot_TF,vars.h,h_UU);
+    make_trace_free(Adot_TF, vars.h, h_UU);
 
     FOR2(i,j)
     {

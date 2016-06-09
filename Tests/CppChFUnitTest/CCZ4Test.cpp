@@ -35,7 +35,7 @@ int main()
 {
 //    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
 
-    const int N_GRID = 32;
+    const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
     Box ghosted_box(IntVect(-3,-3,-3), IntVect(N_GRID+2,N_GRID+2,N_GRID+2));
     FArrayBox in_fab(ghosted_box, c_NUM);
