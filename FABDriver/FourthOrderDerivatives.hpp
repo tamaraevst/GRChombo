@@ -149,31 +149,38 @@ struct FourthOrderDerivatives
     }
 
     template <class data_t>
+    void
+    add_dissipation(std::array<data_t,c_NUM>& out, idx_t<data_t> idx, const int direction) const
+    {
+        const int stride = m_driver.m_in_stride[direction];
+        for (int i = 0; i < c_NUM; ++i)
+        {
+            auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
+
+            data_t weight_vfar  = 1.56250e-2;
+            data_t weight_far   = 9.37500e-2;
+            data_t weight_near  = 2.34375e-1;
+            data_t weight_local = 3.12500e-1;
+
+            out[i] += ( weight_vfar   * in[idx - 3*stride]
+                        - weight_far   * in[idx - 2*stride]
+                        + weight_near  * in[idx - stride]
+                        - weight_local * in[idx]
+                        + weight_near  * in[idx + stride]
+                        - weight_far   * in[idx + 2*stride]
+                        + weight_vfar  * in[idx + 3*stride]) / m_dx;
+        }
+    }
+
+    template <class data_t>
     std::array<data_t, c_NUM>
     dissipation(idx_t<data_t> idx) const
     {
-        std::array<data_t, c_NUM> out = { };
+        std::array<data_t, c_NUM> out = {0};
 
         for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
         {
-            const int stride = m_driver.m_in_stride[dim];
-            for (int i = 0; i < c_NUM; ++i)
-            {
-                auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
-
-                data_t weight_vfar  = 1.56250e-2;
-                data_t weight_far   = 9.37500e-2;
-                data_t weight_near  = 2.34375e-1;
-                data_t weight_local = 3.12500e-1;
-
-                out[i] += ( weight_vfar   * in[idx - 3*stride]
-                              - weight_far   * in[idx - 2*stride]
-                              + weight_near  * in[idx - stride]
-                              - weight_local * in[idx]
-                              + weight_near  * in[idx + stride]
-                              - weight_far   * in[idx + 2*stride]
-                              + weight_vfar  * in[idx + 3*stride]) / m_dx;
-            }
+            add_dissipation(out, idx, dim);
         }
 
         return out;
