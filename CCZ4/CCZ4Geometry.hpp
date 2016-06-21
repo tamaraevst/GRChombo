@@ -24,26 +24,6 @@ class CCZ4Geometry
 {
     public:
     template <class data_t, template <typename> class vars_t>
-    static tensor<2, data_t>
-    compute_inverse_metric(const vars_t<data_t> &vars)
-    {
-        data_t deth = vars.h[0][0]*vars.h[1][1]*vars.h[2][2] + 2*vars.h[0][1]*vars.h[0][2]*vars.h[1][2] - vars.h[0][0]*vars.h[1][2]*vars.h[1][2] - vars.h[1][1]*vars.h[0][2]*vars.h[0][2] - vars.h[2][2]*vars.h[0][1]*vars.h[0][1];
-        tensor<2, data_t> h_UU;
-        {
-                h_UU[0][0] = (vars.h[1][1]*vars.h[2][2] - vars.h[1][2]*vars.h[1][2]) / deth;
-                h_UU[0][1] = (vars.h[0][2]*vars.h[1][2] - vars.h[0][1]*vars.h[2][2]) / deth;
-                h_UU[0][2] = (vars.h[0][1]*vars.h[1][2] - vars.h[0][2]*vars.h[1][1]) / deth;
-                h_UU[1][1] = (vars.h[0][0]*vars.h[2][2] - vars.h[0][2]*vars.h[0][2]) / deth;
-                h_UU[1][2] = (vars.h[0][1]*vars.h[0][2] - vars.h[0][0]*vars.h[1][2]) / deth;
-                h_UU[2][2] = (vars.h[0][0]*vars.h[1][1] - vars.h[0][1]*vars.h[0][1]) / deth;
-                h_UU[1][0] = h_UU[0][1];
-                h_UU[2][0] = h_UU[0][2];
-                h_UU[2][1] = h_UU[1][2];
-        }
-        return h_UU;
-    }
-
-    template <class data_t, template <typename> class vars_t>
     static chris_t<data_t>
     compute_christoffel(
         const vars_t<data_t> (&d1)[CH_SPACEDIM],
@@ -155,7 +135,7 @@ class CCZ4Geometry
             out.LL[i][j] = (ricci_chi + vars.chi*ricci_tilde + z_terms) / vars.chi;
         }
 
-        out.scalar = vars.chi*compute_trace(out.LL, h_UU);
+        out.scalar = vars.chi*TensorAlgebra::compute_trace(out.LL, h_UU);
 
         return out;
     }

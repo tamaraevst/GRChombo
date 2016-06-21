@@ -62,8 +62,8 @@ public:
 
       vars_t<data_t> vars = m_driver.local_vars(idx);
 
-      auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
-      make_trace_free(vars.A, vars.h, h_UU);
+      auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+      TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
       idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
       SIMDIFY<data_t>(m_driver.m_out_ptr[c_A11])[out_idx] = vars.A[0][0];

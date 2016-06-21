@@ -62,13 +62,13 @@ Constraints::constraint_equations(
 
    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-   auto h_UU = CCZ4Geometry::compute_inverse_metric(vars);
+   auto h_UU = TensorAlgebra::compute_inverse(vars.h);
    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
    auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
 
-   auto A_UU       = raise_all(vars.A, h_UU);
-   data_t tr_AA    = compute_trace(vars.A, A_UU);
+   auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
+   data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
    out.Ham = ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA;
 
