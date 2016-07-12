@@ -24,7 +24,7 @@ CCZ4::compute(int ix, int iy, int iz)
     vars_t<data_t> vars = m_driver.local_vars(idx);
 
     vars_t<data_t> d1[CH_SPACEDIM];
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < CH_SPACEDIM; ++i)
     {
         d1[i] = m_deriv.diff1(idx, i);
     }
@@ -32,7 +32,7 @@ CCZ4::compute(int ix, int iy, int iz)
     vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM];
 
     // Repeated derivatives
-    for (int i = 0; i < 3; ++i)
+    for (int i = 0; i < CH_SPACEDIM; ++i)
     {
        d2[i][i] = m_deriv.diff2(idx, i);
     }

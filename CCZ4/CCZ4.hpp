@@ -1,7 +1,6 @@
 #ifndef CCZ4_HPP_
 #define CCZ4_HPP_
 
-#include "FArrayBox.H"
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.H"
