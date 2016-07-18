@@ -34,7 +34,7 @@ class CCZ4Geometry
 
         FOR3(i,j,k)
         {
-            out.LLL[i][j][k] = 0.5*(d1[k].h[j][i] + d1[j].h[k][i] - d1[i].h[j][k]);
+            out.LLL[i][j][k] = 0.5*(d1.h[j][i][k] + d1.h[k][i][j] - d1.h[j][k][i]);
         }
         FOR3(i,j,k)
         {
@@ -47,8 +47,8 @@ class CCZ4Geometry
 
         // Technically we can write out.contracted[i] += h_UU[j][k]*chris.ULL[i][j][k],
         // but sometimes people write:
-        // out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
-        // In theory h_UU[j][k]*d1[i].h[j][k] should be zero due to det h = 1
+        // out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1.h[k][j][l];
+        // In theory h_UU[j][k]*d1.h[j][k][i] should be zero due to det h = 1
         // but in practice this term can deviate from zero.
         // For PRL 116, 071102 we used the former and it seemed to work well.
         FOR1(i)
@@ -60,7 +60,7 @@ class CCZ4Geometry
             }
             //FOR3(j,k,l)
             //{
-            //     //out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1[l].h[k][j];
+            //     //out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1.h[k][j][l];
             //}
         }
 
@@ -88,7 +88,7 @@ class CCZ4Geometry
             covdtilde2chi[k][l] = d2[k][l].chi;
             FOR1(m)
             {
-                 covdtilde2chi[k][l] -= chris.ULL[m][k][l]*d1[m].chi;
+                 covdtilde2chi[k][l] -= chris.ULL[m][k][l]*d1.chi[m];
             }
         }
 
@@ -101,7 +101,7 @@ class CCZ4Geometry
         {
             FOR2(m,n)
             {
-                 dchi_dot_dchi += h_UU[m][n]*d1[m].chi*d1[n].chi;
+                 dchi_dot_dchi += h_UU[m][n]*d1.chi[m]*d1.chi[n];
             }
         }
 
@@ -112,7 +112,7 @@ class CCZ4Geometry
             {
                  // Trick: For CCZ4, we can add Z terms to ricci by changing Gamma to chrisvec
                  // This way of writing it allows the user to pass Z/chi = {0};
-                 ricci_tilde += 0.5*(vars.h[k][i]*d1[j].Gamma[k] + vars.h[k][j]*d1[i].Gamma[k]);
+                 ricci_tilde += 0.5*(vars.h[k][i]*d1.Gamma[k][j] + vars.h[k][j]*d1.Gamma[k][i]);
                  ricci_tilde += 0.5*(vars.Gamma[k] - 2*Z_over_chi[k])*(chris.LLL[i][j][k] + chris.LLL[j][i][k]);
                  FOR1(l)
                  {
@@ -124,12 +124,12 @@ class CCZ4Geometry
                  }
             }
 
-            data_t ricci_chi = 0.5*((GR_SPACEDIM-2)*covdtilde2chi[i][j] + vars.h[i][j]*boxtildechi - ((GR_SPACEDIM-2)*d1[i].chi*d1[j].chi + GR_SPACEDIM*vars.h[i][j]*dchi_dot_dchi) / (2*vars.chi));
+            data_t ricci_chi = 0.5*((GR_SPACEDIM-2)*covdtilde2chi[i][j] + vars.h[i][j]*boxtildechi - ((GR_SPACEDIM-2)*d1.chi[i]*d1.chi[j] + GR_SPACEDIM*vars.h[i][j]*dchi_dot_dchi) / (2*vars.chi));
 
             data_t z_terms = 0;
             FOR1(k)
             {
-                 z_terms += Z_over_chi[k]*(vars.h[i][k]*d1[j].chi + vars.h[j][k]*d1[i].chi - vars.h[i][j]*d1[k].chi + d1[k].h[i][j]*vars.chi);
+                 z_terms += Z_over_chi[k]*(vars.h[i][k]*d1.chi[j] + vars.h[j][k]*d1.chi[i] - vars.h[i][j]*d1.chi[k] + d1.h[i][j][k]*vars.chi);
             }
 
             out.LL[i][j] = (ricci_chi + vars.chi*ricci_tilde + z_terms) / vars.chi;

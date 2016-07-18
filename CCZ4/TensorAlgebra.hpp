@@ -30,46 +30,77 @@ public:
 
 
     template <class data_t>
-        ALWAYS_INLINE
-        static data_t
-        compute_trace(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
+    ALWAYS_INLINE
+    static data_t
+    compute_trace(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
+    {
+        data_t trace = 0;
+        FOR2(i,j)
         {
-            data_t trace = 0;
-            FOR2(i,j)
-            {
-                trace += inverse_metric[i][j]*tensor_LL[i][j];
-            }
-            return trace;
+            trace += inverse_metric[i][j]*tensor_LL[i][j];
         }
+        return trace;
+    }
 
     template <class data_t>
-        ALWAYS_INLINE
-        static void
-        make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
-        {
-            auto trace = compute_trace(tensor_LL, inverse_metric);
-            FOR2(i,j)
-            {
-                tensor_LL[i][j] -= 1./( (double) GR_SPACEDIM) * metric[i][j] * trace;
-            }
-        }
+    ALWAYS_INLINE
+    static data_t
+    compute_trace(const tensor<2, data_t> &tensor_UL)
+    {
+        data_t trace = 0;
+        FOR2(i,j) trace += tensor_UL[i][j];
+        return trace;
+    }
 
     template <class data_t>
-        ALWAYS_INLINE
-        static tensor<2, data_t>
-        raise_all(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
+    ALWAYS_INLINE
+    static data_t
+    compute_dot_product(const tensor<1, data_t> &vector1, const tensor<1, data_t> &vector2)
+    {
+        data_t dot_product = 0;
+        FOR2(i,j)
         {
-            tensor<2, data_t> tensor_UU;
-            FOR2(i,j)
-            {
-                tensor_UU[i][j] = 0;
-                FOR2(k,l)
-                {
-                    tensor_UU[i][j] += inverse_metric[i][k]*inverse_metric[j][l]*tensor_LL[k][l];
-                }
-            }
-            return tensor_UU;
+            dot_product += vector1[i]*vector2[i];
         }
+        return dot_product;
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static void
+    make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
+    {
+        auto trace = compute_trace(tensor_LL, inverse_metric);
+        FOR2(i,j)
+        {
+            tensor_LL[i][j] -= 1./( (double) GR_SPACEDIM) * metric[i][j] * trace;
+        }
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static tensor<1, data_t>
+    raise_all(const tensor<1, data_t> &tensor_L, const tensor<2, data_t> &inverse_metric)
+    {
+        tensor<1, data_t> tensor_U = 0;
+        FOR1(i)
+        {
+            tensor_U[i] += inverse_metric[i][j]*tensor_L[j];
+        }
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static tensor<2, data_t>
+    raise_all(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
+    {
+        tensor<2, data_t> tensor_UU = 0;
+        FOR4(i,j,k,l)
+        {
+            tensor_UU[i][j] += inverse_metric[i][k]*inverse_metric[j][l]*tensor_LL[k][l];
+        }
+        return tensor_UU;
+    }
 };
 
 #endif /* TENSORALGEBRA_HPP_ */

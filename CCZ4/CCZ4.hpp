@@ -8,6 +8,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
+#include "VarsBase.hpp"
 
 #include "user_enum.hpp" //This files needs c_NUM - total number of components
 
@@ -17,7 +18,7 @@ class CCZ4
 {
 public:
     template <class data_t>
-    struct vars_t
+    struct vars_t : VarsBase
     {
         data_t chi;
         tensor<2, data_t> h;
@@ -29,10 +30,7 @@ public:
         tensor<1, data_t> shift;
         tensor<1, data_t> B;
 
-        vars_t(){};
-
-        template <class arr_t>
-        vars_t(const arr_t& in);
+        vars_t();
     };
 
     struct params_t
