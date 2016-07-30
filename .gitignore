@@ -10,3 +10,4 @@ log
 *.swp
 *.out
 *.hdf5
+*.dSYM

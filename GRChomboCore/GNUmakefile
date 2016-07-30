@@ -1,18 +1,15 @@
-# -*- Mode: Makefile -*- 
+# -*- Mode: Makefile -*-
 
 ### This makefile produces an executable for each name in the `ebase'
 ###  variable using the libraries named in the `LibNames' variable.
 
-# included makefiles need an absolute path
-CHOMBO_HOME := $(HOME)/Documents/Chombo/Chombo-3.2/lib
+# Included makefiles need an absolute path to the Chombo installation
+# CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
 ebase := GRChombo
 
-LibNames := AMRTimeDependent AMRTools BoxTools 
+LibNames := AMRTimeDependent AMRTools BoxTools
 
 src_dirs := ../utils ../simd ../CCZ4 ../InitialConditions ../FABDriver
 
 include $(CHOMBO_HOME)/mk/Make.test
-
-#GRBSSNChomboF.ChF: GRBSSN4ChomboF.ChF.m4
-#	m4 GRBSSNChomboF.ChF.m4 > GRBSSNChomboF.ChF
