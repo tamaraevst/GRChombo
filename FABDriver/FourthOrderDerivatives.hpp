@@ -3,83 +3,116 @@
 
 #include "user_enum.hpp"
 #include "tensor.hpp"
+#include "VarsBase.hpp"
 #include <array>
 
-struct FourthOrderDerivatives
+class FourthOrderDerivatives
 {
+public:
     const double m_dx;
+protected:
     const FABDriverBase& m_driver;
 
+public:
     FourthOrderDerivatives(double dx, const FABDriverBase& driver) :
         m_dx (dx),
         m_driver (driver)
     {}
 
     template <class data_t>
-    std::array<data_t, c_NUM>
-    diff1(idx_t<data_t> idx, int direction) const
+    ALWAYS_INLINE
+    data_t
+    diff1(const double *in_ptr, idx_t<data_t> idx, const int stride) const
     {
-        std::array<data_t, c_NUM> out;
+        auto in = SIMDIFY<data_t>(in_ptr);
+
+        data_t weight_far  = 8.33333333333333333333e-2;
+        data_t weight_near = 6.66666666666666666667e-1;
+
+        //NOTE: if you have been sent here by the debugger because of EXC_BAD_ACCESS
+        //or something similar you might be trying to take derivatives without ghost points.
+        return (  weight_far  * in[idx - 2*stride]
+                    - weight_near * in[idx - stride]
+                    + weight_near * in[idx + stride]
+                    - weight_far  * in[idx + 2*stride]) / m_dx;
+    }
+
+    //Writes directly into the vars object - use this wherever possible
+    template <class data_t>
+    void
+    diff1(VarsBase< tensor<1, data_t> >& d1, idx_t<data_t> idx, int direction) const
+    {
         int stride = m_driver.m_in_stride[direction];
-
-        for (int i = 0; i < c_NUM; ++i)
+        FORVARS(i)
         {
-            auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
-
-            data_t weight_far  = 8.33333333333333333333e-2;
-            data_t weight_near = 6.66666666666666666667e-1;
-
-            //NOTE: if you have been sent here by the debugger because of EXC_BAD_ACCESS
-            //or something similar you might be trying to take derivatives without ghost points.
-            out[i] = (  weight_far  * in[idx - 2*stride]
-                         - weight_near * in[idx - stride]
-                         + weight_near * in[idx + stride]
-                         - weight_far  * in[idx + 2*stride]) / m_dx;
+            d1.assign(diff1(m_driver.m_in_ptr[i], idx, stride), i, direction);
         }
-        return out;
     }
 
     template <class data_t>
-    std::array<data_t, c_NUM>
-    diff2(idx_t<data_t> idx, int direction) const
+    void
+    diff1(tensor<1,data_t> (&diffArray)[c_NUM], idx_t<data_t> idx, int direction) const
     {
-        std::array<data_t, c_NUM> out;
         int stride = m_driver.m_in_stride[direction];
-
-        for (int i = 0; i < c_NUM; ++i)
+        FORVARS(i)
         {
-            auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
+            diffArray[i][direction] = diff1(m_driver.m_in_ptr[i],idx,stride);
+        }
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    data_t
+    diff2(const double *in_ptr, idx_t<data_t> idx, const int stride) const
+    {
+            auto in = SIMDIFY<data_t>(in_ptr);
 
             data_t weight_far   = 8.33333333333333333333e-2;
             data_t weight_near  = 1.33333333333333333333e+0;
             data_t weight_local = 2.50000000000000000000e+0;
 
-            out[i] = (- weight_far   * in[idx - 2*stride]
+            return   (- weight_far   * in[idx - 2*stride]
                          + weight_near  * in[idx - stride]
                          - weight_local * in[idx]
                          + weight_near  * in[idx + stride]
                          - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
+    }
+
+    //Writes 2nd deriv directly into the vars object - use this wherever possible
+    template <class data_t>
+    void
+    diff2(VarsBase< tensor<2,data_t> >& d2, idx_t<data_t> idx, int direction) const
+    {
+        int stride = m_driver.m_in_stride[direction];
+        FORVARS(i)
+        {
+            d2.assign(diff2(m_driver.m_in_ptr[i], idx, stride), i, direction, direction);
         }
-        return out;
     }
 
     template <class data_t>
-    std::array<data_t, c_NUM>
-    mixed_diff2(idx_t<data_t> idx, int direction1, int direction2) const
+    void
+    diff2(tensor<2,data_t> (&diffArray)[c_NUM], idx_t<data_t> idx, int direction) const
     {
-        std::array<data_t, c_NUM> out;
-        int stride1 = m_driver.m_in_stride[direction1];
-        int stride2 = m_driver.m_in_stride[direction2];
-
-        for (int i = 0; i < c_NUM; ++i)
+        int stride = m_driver.m_in_stride[direction];
+        FORVARS(i)
         {
-            auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
+            diffArray[i][direction][direction] = diff2(m_driver.m_in_ptr[i],idx,stride);
+        }
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    data_t
+    mixed_diff2(const double *in_ptr, idx_t<data_t> idx, const int stride1, const int stride2) const
+    {
+            auto in = SIMDIFY<data_t>(in_ptr);
 
             data_t weight_far_far   = 6.94444444444444444444e-3;
             data_t weight_near_far  = 5.55555555555555555556e-2;
             data_t weight_near_near = 4.44444444444444444444e-1;
 
-            out[i] = (  weight_far_far   * in[idx - 2*stride1 - 2*stride2]
+            return (  weight_far_far   * in[idx - 2*stride1 - 2*stride2]
                          - weight_near_far  * in[idx - 2*stride1 - stride2]
                          + weight_near_far  * in[idx - 2*stride1 + stride2]
                          - weight_far_far   * in[idx - 2*stride1 + 2*stride2]
@@ -98,96 +131,136 @@ struct FourthOrderDerivatives
                          + weight_near_far  * in[idx + 2*stride1 - stride2]
                          - weight_near_far  * in[idx + 2*stride1 + stride2]
                          + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
-        }
-        return out;
     }
 
     template <class data_t>
     void
-    add_advection(std::array<data_t, c_NUM>& out,idx_t<data_t> idx, const data_t& vec, const int direction) const
+    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, idx_t<data_t> idx, int direction1, int direction2) const
     {
-        const int stride = m_driver.m_in_stride[direction];
-        const auto shift_positive = simd_compare_gt(vec, 0.0);
-
-        for (int i = 0; i < c_NUM; ++i)
+        int stride1 = m_driver.m_in_stride[direction1];
+        int stride2 = m_driver.m_in_stride[direction2];
+        FORVARS(i)
         {
-            const auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
-            const data_t in_left = in[idx - stride];
-            const data_t in_centre = in[idx];
-            const data_t in_right = in[idx + stride];
-
-            data_t weight_0 = -2.50000000000000000000e-1;
-            data_t weight_1 = -8.33333333333333333333e-1;
-            data_t weight_2 = +1.50000000000000000000e+0;
-            data_t weight_3 = -5.00000000000000000000e-1;
-            data_t weight_4 = +8.33333333333333333333e-2;
-
-            data_t upwind;
-            upwind = vec * (  weight_0 * in_left
-                                    + weight_1 * in_centre
-                                    + weight_2 * in_right
-                                    + weight_3 * in[idx + 2*stride]
-                                    + weight_4 * in[idx + 3*stride]) / m_dx;
-
-            data_t downwind;
-            downwind = vec * (- weight_4 * in[idx - 3*stride]
-                                    - weight_3 * in[idx - 2*stride]
-                                    - weight_2 * in_left
-                                    - weight_1 * in_centre
-                                    - weight_0 * in_right) / m_dx;
-
-            out[i] += simd_conditional(shift_positive, upwind , downwind);
+            //TODO: could get rid of one copy here
+            data_t tmp = mixed_diff2(m_driver.m_in_ptr[i], idx, stride1, stride2);
+            d2.assign(tmp, i, direction1, direction2);
+            d2.assign(tmp, i, direction2, direction1);
         }
-    }
-
-    template <class data_t>
-    std::array<data_t, c_NUM>
-    advection(idx_t<data_t> idx, const tensor<1, data_t>& vec) const
-    {
-        std::array<data_t, c_NUM> out = { };
-        for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
-        {
-            add_advection(out, idx, vec[dim], dim);
-        }
-        return out;
     }
 
     template <class data_t>
     void
-    add_dissipation(std::array<data_t,c_NUM>& out, idx_t<data_t> idx, const int direction) const
+    mixed_diff2(tensor<2,data_t> (&diffArray)[c_NUM], idx_t<data_t> idx, int direction1, int direction2) const
     {
-        const int stride = m_driver.m_in_stride[direction];
-        for (int i = 0; i < c_NUM; ++i)
+        int stride1 = m_driver.m_in_stride[direction1];
+        int stride2 = m_driver.m_in_stride[direction2];
+        FORVARS(i)
         {
-            auto in = SIMDIFY<data_t>(m_driver.m_in_ptr[i]);
+            data_t diff2_value = mixed_diff2(m_driver.m_in_ptr[i],idx,stride1, stride2);
+            diffArray[i][direction1][direction2] = diff2_value;
+            diffArray[i][direction2][direction1] = diff2_value;
+        }
+    }
 
-            data_t weight_vfar  = 1.56250e-2;
-            data_t weight_far   = 9.37500e-2;
-            data_t weight_near  = 2.34375e-1;
-            data_t weight_local = 3.12500e-1;
+protected: //Let's keep this protected ... we may want to change the advection calculation
+    template <class data_t>
+    ALWAYS_INLINE
+    data_t
+    advection_term(const double *in_ptr, idx_t<data_t> idx, const data_t& vec_comp, const int stride, const data_t shift_positive) const
+    {
+        const auto in = SIMDIFY<data_t>(in_ptr);
+        const data_t in_left = in[idx - stride];
+        const data_t in_centre = in[idx];
+        const data_t in_right = in[idx + stride];
 
-            out[i] += ( weight_vfar   * in[idx - 3*stride]
-                        - weight_far   * in[idx - 2*stride]
-                        + weight_near  * in[idx - stride]
-                        - weight_local * in[idx]
-                        + weight_near  * in[idx + stride]
-                        - weight_far   * in[idx + 2*stride]
-                        + weight_vfar  * in[idx + 3*stride]) / m_dx;
+        data_t weight_0 = -2.50000000000000000000e-1;
+        data_t weight_1 = -8.33333333333333333333e-1;
+        data_t weight_2 = +1.50000000000000000000e+0;
+        data_t weight_3 = -5.00000000000000000000e-1;
+        data_t weight_4 = +8.33333333333333333333e-2;
+
+        data_t upwind;
+        upwind = vec_comp * (  weight_0 * in_left
+                          + weight_1 * in_centre
+                          + weight_2 * in_right
+                          + weight_3 * in[idx + 2*stride]
+                          + weight_4 * in[idx + 3*stride]) / m_dx;
+
+        data_t downwind;
+        downwind = vec_comp * (- weight_4 * in[idx - 3*stride]
+                          - weight_3 * in[idx - 2*stride]
+                          - weight_2 * in_left
+                          - weight_1 * in_centre
+                          - weight_0 * in_right) / m_dx;
+
+        return simd_conditional(shift_positive, upwind , downwind);
+    }
+
+public:
+    template <class data_t>
+    void
+    add_advection(VarsBase<data_t>& vars, idx_t<data_t> idx, const tensor<1,data_t>& vec, const int dir) const
+    {
+        const int stride = m_driver.m_in_stride[dir];
+        const data_t shift_positive = simd_compare_gt(vec[dir], 0.0);
+        FORVARS(ivar)
+        {
+            vars.plus(advection_term(m_driver.m_in_ptr[ivar],idx, vec[dir], stride, shift_positive),ivar);
         }
     }
 
     template <class data_t>
-    std::array<data_t, c_NUM>
-    dissipation(idx_t<data_t> idx) const
+    void
+    add_advection(data_t (&out)[c_NUM], idx_t<data_t> idx, const tensor<1,data_t>& vec, const int dir) const
     {
-        std::array<data_t, c_NUM> out = {0};
-
-        for (int dim = 0; dim < IDX_SPACEDIM; ++dim)
+        const int stride = m_driver.m_in_stride[dir];
+        const data_t shift_positive = simd_compare_gt(vec[dir], 0.0);
+        FORVARS(ivar)
         {
-            add_dissipation(out, idx, dim);
+            out[ivar] += advection_term(m_driver.m_in_ptr[ivar],idx, vec[dir], stride, shift_positive);
         }
+    }
 
-        return out;
+    template <class data_t>
+    ALWAYS_INLINE
+    data_t
+    dissipation_term(const double *in_ptr, idx_t<data_t> idx, const int stride) const
+    {
+        const auto in = SIMDIFY<data_t>(in_ptr);
+        data_t weight_vfar  = 1.56250e-2;
+        data_t weight_far   = 9.37500e-2;
+        data_t weight_near  = 2.34375e-1;
+        data_t weight_local = 3.12500e-1;
+
+        return ( weight_vfar   * in[idx - 3*stride]
+                 - weight_far   * in[idx - 2*stride]
+                 + weight_near  * in[idx - stride]
+                 - weight_local * in[idx]
+                 + weight_near  * in[idx + stride]
+                 - weight_far   * in[idx + 2*stride]
+                 + weight_vfar  * in[idx + 3*stride]) / m_dx;
+    }
+
+    template <class data_t>
+    void
+    add_dissipation(VarsBase<data_t>& vars, idx_t<data_t> idx, const int direction) const
+    {
+        const int stride = m_driver.m_in_stride[direction];
+        FORVARS(ivar)
+        {
+            vars.plus(dissipation_term(m_driver.m_in_ptr[ivar], idx, stride),ivar);
+        }
+    }
+
+    template <class data_t>
+    void
+    add_dissipation(data_t (&out)[c_NUM], idx_t<data_t> idx, const int direction) const
+    {
+        const int stride = m_driver.m_in_stride[direction];
+        FORVARS(ivar)
+        {
+            out[ivar] += dissipation_term(m_driver.m_in_ptr[ivar], idx, stride);
+        }
     }
 };
 

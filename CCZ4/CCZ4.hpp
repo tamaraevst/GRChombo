@@ -18,8 +18,10 @@ class CCZ4
 {
 public:
     template <class data_t>
-    struct vars_t : VarsBase
+    struct vars_t : VarsBase<data_t>
     {
+        using VarsBase<data_t>::m_assignment_ptrs; //Saves us some writing later
+
         data_t chi;
         tensor<2, data_t> h;
         data_t K;
@@ -61,8 +63,8 @@ protected:
     template <class data_t>
     vars_t<data_t> rhs_equation(
         const vars_t<data_t> &vars,
-        const vars_t<data_t> (&d1)[CH_SPACEDIM],
-        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+        const vars_t< tensor<1,data_t> > &d1,
+        const vars_t< tensor<2,data_t> > &d2,
         const vars_t<data_t> &advec
     );
 };

@@ -9,7 +9,6 @@
 #include <sys/time.h>
 
 #include "CCZ4.hpp"
-#include "KreissOligerDissipation.hpp"
 #include "FABDriver.hpp"
 #include "GRBSSNChomboF_F.H"
 
@@ -148,15 +147,6 @@ int main()
     gettimeofday(&begin, NULL);
 
     FABDriver<CCZ4>(params, dx, sigma).execute(in_fab, out_fab);
-    //FABDriver<KreissOligerDissipation>(sigma, dx).execute(in_fab, out_fab);
-
-//    for (int i = 0; i < c_NUM; ++i)
-//    {
-//        double max_out = out_fab.norm(0, i, 1);
-//        double max_in =  in_fab .norm(0, i, 1);
-//        std::cout << "COMPONENT " << i << " C++ MAX VALUE (in) = " << max_in << std::endl;
-//        std::cout << "COMPONENT " << i << " C++ MAX VALUE (out) = " << max_out << std::endl;
-//    }
 
     gettimeofday(&end, NULL);
 

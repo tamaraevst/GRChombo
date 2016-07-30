@@ -33,4 +33,14 @@ FABDriverBase::local_vars(idx_t<data_t> idx) const
     return out;
 }
 
+template <class data_t>
+void
+FABDriverBase::local_vars(VarsBase<data_t>& vars, idx_t<data_t> idx) const
+{
+    for (int i = 0; i < c_NUM; ++i)
+    {
+        vars.assign(SIMDIFY<data_t>(m_in_ptr[i])[idx], i);
+    }
+}
+
 #endif /* FABDRIVERBASE_IMPL_HPP_ */

@@ -26,7 +26,7 @@ class CCZ4Geometry
     template <class data_t, template <typename> class vars_t>
     static chris_t<data_t>
     compute_christoffel(
-        const vars_t<data_t> (&d1)[CH_SPACEDIM],
+        const vars_t< tensor<1,data_t> >& d1,
         const tensor<2, data_t>& h_UU
     )
     {
@@ -71,8 +71,8 @@ class CCZ4Geometry
     static ricci_t<data_t>
     compute_ricci_Z(
         const vars_t<data_t> &vars,
-        const vars_t<data_t> (&d1)[CH_SPACEDIM],
-        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+        const vars_t< tensor<1,data_t> >& d1,
+        const vars_t< tensor<2,data_t> >& d2,
         const tensor<2, data_t>& h_UU,
         const chris_t<data_t>& chris,
         const tensor<1, data_t>& Z_over_chi
@@ -85,7 +85,7 @@ class CCZ4Geometry
         tensor<2, data_t> covdtilde2chi;
         FOR2(k,l)
         {
-            covdtilde2chi[k][l] = d2[k][l].chi;
+            covdtilde2chi[k][l] = d2.chi[k][l];
             FOR1(m)
             {
                  covdtilde2chi[k][l] -= chris.ULL[m][k][l]*d1.chi[m];
@@ -116,7 +116,7 @@ class CCZ4Geometry
                  ricci_tilde += 0.5*(vars.Gamma[k] - 2*Z_over_chi[k])*(chris.LLL[i][j][k] + chris.LLL[j][i][k]);
                  FOR1(l)
                  {
-                        ricci_tilde -= 0.5*h_UU[k][l]*d2[k][l].h[i][j];
+                        ricci_tilde -= 0.5*h_UU[k][l]*d2.h[i][j][k][l];
                         FOR1(m)
                         {
                              ricci_tilde += h_UU[l][m]*(chris.ULL[k][l][i]*chris.LLL[j][k][m] + chris.ULL[k][l][j]*chris.LLL[i][k][m] + chris.ULL[k][i][m]*chris.LLL[k][l][j]);

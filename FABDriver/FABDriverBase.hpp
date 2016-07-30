@@ -11,6 +11,7 @@
 //It must include c_NUM, the total number of simulation components.
 #include "user_enum.hpp"
 #include "always_inline.hpp"
+#include "VarsBase.hpp"
 
 #include <array>
 
@@ -47,12 +48,15 @@ struct FABDriverBase
 
     ALWAYS_INLINE
     int in_idx(int ix, int iy, int iz) const;
-    
+
     ALWAYS_INLINE
     int out_idx(int ix, int iy, int iz) const;
 
     template <class data_t>
     std::array<data_t, c_NUM> local_vars(idx_t<data_t> idx) const;
+
+    template <class data_t>
+    void local_vars(VarsBase<data_t>& vars, idx_t<data_t> idx) const;
 };
 
 #include "FABDriverBase.impl.hpp"

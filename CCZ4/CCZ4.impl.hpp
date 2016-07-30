@@ -21,33 +21,32 @@ CCZ4::compute(int ix, int iy, int iz)
 {
     idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz);
 
-    vars.assign(m_driver.local_vars(idx));
+    vars_t<data_t> vars;
+    m_driver.local_vars(vars,idx);
 
-    vars_t< tensor<1,data_t> > d1;
-    d1.assign(m_deriv.diff1(idx, i));
+    vars_t< tensor<1, data_t> > d1;
+    FOR1(idir) m_deriv.diff1(d1, idx, idir);
 
     vars_t< tensor<2,data_t> > d2;
-
     // Repeated derivatives
-    for (int i = 0; i < CH_SPACEDIM; ++i)
-    {
-       d2[i][i] = m_deriv.diff2(idx, i);
-    }
+    FOR1(idir) m_deriv.diff2(d2, idx, idir);
 
     // Mixed derivatives
-    d2[0][1] = m_deriv.mixed_diff2(idx, 1, 0);
-    d2[0][2] = m_deriv.mixed_diff2(idx, 2, 0);
-    d2[1][2] = m_deriv.mixed_diff2(idx, 2, 1);
+    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
+    m_deriv.mixed_diff2(d2, idx, 1, 0);
+    m_deriv.mixed_diff2(d2, idx, 2, 0);
+    m_deriv.mixed_diff2(d2, idx, 2, 1);
 
-    d2[1][0] = d2[0][1];
-    d2[2][0] = d2[0][2];
-    d2[2][1] = d2[1][2];
+    vars_t<data_t> advec;
+    advec.assign(0.);
+    FOR1(idir) m_deriv.add_advection(advec, idx, vars.shift, idir);
 
-    vars_t<data_t> advec = m_deriv.advection(idx, vars.shift);
-    vars_t<data_t> dssp = m_deriv.dissipation(idx);
+    vars_t<data_t> dssp;
+    dssp.assign(0.);
+    FOR1(idir) m_deriv.add_dissipation(dssp,idx, idir);
 
     vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
-    
+
     // TODO: I really do not like this, but cannot think of a better way to do it yet...
     idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = rhs.chi      + m_sigma * dssp.chi     ;
@@ -80,8 +79,8 @@ CCZ4::compute(int ix, int iy, int iz)
 template <class data_t>
 auto
 CCZ4::rhs_equation(const vars_t<data_t> &vars,
-          const vars_t<data_t> (&d1)[CH_SPACEDIM],
-          const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+          const vars_t< tensor<1,data_t> >& d1,
+          const vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
 ) -> vars_t<data_t>
 {
@@ -103,15 +102,15 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     auto ricci =  CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
-    data_t divshift = 0;
-    data_t Z_dot_d1lapse = 0;
+    data_t divshift = 0.;
+    data_t Z_dot_d1lapse = 0.;
     FOR1(k)
     {
         divshift += d1.shift[k][k];
         Z_dot_d1lapse += Z[k]*d1.lapse[k];
     }
 
-    data_t dlapse_dot_dchi = 0;
+    data_t dlapse_dot_dchi = 0.;
     FOR2(m,n)
     {
         dlapse_dot_dchi += h_UU[m][n]*d1.lapse[m]*d1.chi[n];
@@ -121,7 +120,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     tensor<2, data_t> covd2lapse;
     FOR2(k,l)
     {
-        covdtilde2lapse[k][l] = d2[k][l].lapse;
+        covdtilde2lapse[k][l] = d2.lapse[k][l];
         FOR1(m)
         {
             covdtilde2lapse[k][l] -= chris.ULL[m][k][l]*d1.lapse[m];
@@ -135,7 +134,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         tr_covd2lapse -= vars.chi*chris.contracted[i]*d1.lapse[i];
         FOR1(j)
         {
-            tr_covd2lapse += h_UU[i][j]*(vars.chi*d2[i][j].lapse + d1.lapse[i]*d1.chi[j]);
+            tr_covd2lapse += h_UU[i][j]*(vars.chi*d2.lapse[i][j] + d1.lapse[i]*d1.chi[j]);
         }
     }
 
@@ -200,8 +199,8 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
             FOR1(k)
             {
                 Gammadot[i] += 2*vars.lapse*chris.ULL[i][j][k]*A_UU[j][k]
-                    + h_UU[j][k]*d2[j][k].shift[i]
-                    + ((GR_SPACEDIM-2.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d2[j][k].shift[k];
+                    + h_UU[j][k]*d2.shift[i][j][k]
+                    + ((GR_SPACEDIM-2.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d2.shift[k][j][k];
             }
         }
     }
@@ -211,7 +210,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         rhs.Gamma[i] = advec.Gamma[i] + Gammadot[i];
     }
 
-    const data_t etaDecay = 1;
+    const data_t etaDecay = 1.;
 
     rhs.lapse = m_params.lapse_advec_coeff*advec.lapse - 2*vars.lapse*(vars.K - 2*vars.Theta);
     FOR1(i)
@@ -226,44 +225,44 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 template <class data_t>
 CCZ4::vars_t<data_t>::vars_t()
 {
-    m_assignement_ptrs[c_chi].push_back(&chi);
+    m_assignment_ptrs[c_chi].push_back(&chi);
 
-    m_assignement_ptrs[c_h11].push_back(&h[0][0]);
-    m_assignement_ptrs[c_h12].push_back(&h[0][1]);
-    m_assignement_ptrs[c_h12].push_back(&h[1][0]);
-    m_assignement_ptrs[c_h13].push_back(&h[0][2]);
-    m_assignement_ptrs[c_h13].push_back(&h[2][0]);
-    m_assignement_ptrs[c_h22].push_back(&h[1][1]);
-    m_assignement_ptrs[c_h23].push_back(&h[1][2]);
-    m_assignement_ptrs[c_h23].push_back(&h[2][1]);
-    m_assignement_ptrs[c_h33].push_back(&h[2][2]);
+    m_assignment_ptrs[c_h11].push_back(&h[0][0]);
+    m_assignment_ptrs[c_h12].push_back(&h[0][1]);
+    m_assignment_ptrs[c_h12].push_back(&h[1][0]);
+    m_assignment_ptrs[c_h13].push_back(&h[0][2]);
+    m_assignment_ptrs[c_h13].push_back(&h[2][0]);
+    m_assignment_ptrs[c_h22].push_back(&h[1][1]);
+    m_assignment_ptrs[c_h23].push_back(&h[1][2]);
+    m_assignment_ptrs[c_h23].push_back(&h[2][1]);
+    m_assignment_ptrs[c_h33].push_back(&h[2][2]);
 
-    m_assignement_ptrs[c_K].push_back(&K);
+    m_assignment_ptrs[c_K].push_back(&K);
 
-    m_assignement_ptrs[c_A11].push_back(&A[0][0]);
-    m_assignement_ptrs[c_A12].push_back(&A[0][1]);
-    m_assignement_ptrs[c_A12].push_back(&A[1][0]);
-    m_assignement_ptrs[c_A13].push_back(&A[0][2]);
-    m_assignement_ptrs[c_A13].push_back(&A[2][0]);
-    m_assignement_ptrs[c_A22].push_back(&A[1][1]);
-    m_assignement_ptrs[c_A23].push_back(&A[1][2]);
-    m_assignement_ptrs[c_A23].push_back(&A[2][1]);
-    m_assignement_ptrs[c_A33].push_back(&A[2][2]);
+    m_assignment_ptrs[c_A11].push_back(&A[0][0]);
+    m_assignment_ptrs[c_A12].push_back(&A[0][1]);
+    m_assignment_ptrs[c_A12].push_back(&A[1][0]);
+    m_assignment_ptrs[c_A13].push_back(&A[0][2]);
+    m_assignment_ptrs[c_A13].push_back(&A[2][0]);
+    m_assignment_ptrs[c_A22].push_back(&A[1][1]);
+    m_assignment_ptrs[c_A23].push_back(&A[1][2]);
+    m_assignment_ptrs[c_A23].push_back(&A[2][1]);
+    m_assignment_ptrs[c_A33].push_back(&A[2][2]);
 
-    m_assignement_ptrs[c_Gamma1].push_back(&Gamma[0]);
-    m_assignement_ptrs[c_Gamma2].push_back(&Gamma[1]);
-    m_assignement_ptrs[c_Gamma3].push_back(&Gamma[2]);
+    m_assignment_ptrs[c_Gamma1].push_back(&Gamma[0]);
+    m_assignment_ptrs[c_Gamma2].push_back(&Gamma[1]);
+    m_assignment_ptrs[c_Gamma3].push_back(&Gamma[2]);
 
-    m_assignement_ptrs[c_Theta].push_back(&Theta);
+    m_assignment_ptrs[c_Theta].push_back(&Theta);
 
-    m_assignement_ptrs[c_lapse].push_back(&lapse);
-    m_assignement_ptrs[c_shift1].push_back(&shift[0]);
-    m_assignement_ptrs[c_shift2].push_back(&shift[1]);
-    m_assignement_ptrs[c_shift3].push_back(&shift[2]);
+    m_assignment_ptrs[c_lapse].push_back(&lapse);
+    m_assignment_ptrs[c_shift1].push_back(&shift[0]);
+    m_assignment_ptrs[c_shift2].push_back(&shift[1]);
+    m_assignment_ptrs[c_shift3].push_back(&shift[2]);
 
-    m_assignement_ptrs[c_B1].push_back(&B[0]);
-    m_assignement_ptrs[c_B2].push_back(&B[1]);
-    m_assignement_ptrs[c_B3].push_back(&B[2]);
+    m_assignment_ptrs[c_B1].push_back(&B[0]);
+    m_assignment_ptrs[c_B2].push_back(&B[1]);
+    m_assignment_ptrs[c_B3].push_back(&B[2]);
 }
 
 #endif /* CCZ4_IMPL_HPP_ */
