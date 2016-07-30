@@ -18,18 +18,17 @@ class Constraints
 {
 protected:
     template <class data_t>
-    struct vars_t
+    struct vars_t : VarsBase<data_t>
     {
+        using VarsBase<data_t>::m_assignment_ptrs; //Saves us some writing later
+
         data_t chi;
         tensor<2, data_t> h;
         data_t K;
         tensor<2, data_t> A;
         tensor<1, data_t> Gamma;
 
-        vars_t(){}
-
-        template <class arr_t>
-        vars_t(const arr_t& in);
+        vars_t();
     };
 
     template <class data_t>
@@ -53,8 +52,8 @@ protected:
     constraints_t<data_t>
     constraint_equations(
         vars_t<data_t> &vars,
-        const vars_t<data_t> (&d1)[CH_SPACEDIM],
-        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM]
+        const vars_t< tensor<1,data_t> >& d1,
+        const vars_t< tensor<2,data_t> >& d2
     );
 };
 

@@ -141,7 +141,6 @@ public:
         int stride2 = m_driver.m_in_stride[direction2];
         FORVARS(i)
         {
-            //TODO: could get rid of one copy here
             data_t tmp = mixed_diff2(m_driver.m_in_ptr[i], idx, stride1, stride2);
             d2.assign(tmp, i, direction1, direction2);
             d2.assign(tmp, i, direction2, direction1);

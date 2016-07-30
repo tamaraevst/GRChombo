@@ -12,38 +12,28 @@ Constraints::Constraints(const FABDriverBase& driver, double dx) :
 
 template <class data_t>
 void
-Constraints::compute(int x, int y, int z)
+Constraints::compute(int ix, int iy, int iz)
 {
-    idx_t<data_t> idx = m_driver.in_idx(x, y, z);
+    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz);
 
-    vars_t<data_t> vars = m_driver.local_vars(idx);
+    vars_t<data_t> vars;
+    m_driver.local_vars(vars,idx);
 
-    vars_t<data_t> d1[CH_SPACEDIM];
-    for (int dir = 0; dir < 3; ++dir)
-    {
-      d1[dir] = m_deriv.diff1(idx, dir);
-    }
+    vars_t< tensor<1, data_t> > d1;
+    FOR1(idir) m_deriv.diff1(d1, idx, idir);
 
-    vars_t<data_t> d2[CH_SPACEDIM][CH_SPACEDIM];
-
+    vars_t< tensor<2,data_t> > d2;
     // Repeated derivatives
-    for (int dir = 0; dir < 3; ++dir)
-    {
-      d2[dir][dir] = m_deriv.diff2(idx, dir);
-    }
-
+    FOR1(idir) m_deriv.diff2(d2, idx, idir);
     // Mixed derivatives
-    d2[0][1] = m_deriv.mixed_diff2<data_t>(idx, 1, 0);
-    d2[0][2] = m_deriv.mixed_diff2<data_t>(idx, 2, 0);
-    d2[1][2] = m_deriv.mixed_diff2<data_t>(idx, 2, 1);
-
-    d2[1][0] = d2[0][1];
-    d2[2][0] = d2[0][2];
-    d2[2][1] = d2[1][2];
+    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
+    m_deriv.mixed_diff2(d2, idx, 1, 0);
+    m_deriv.mixed_diff2(d2, idx, 2, 0);
+    m_deriv.mixed_diff2(d2, idx, 2, 1);
 
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
-    idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
+    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_Ham])[out_idx]  = out.Ham;
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_Mom1])[out_idx] = out.Mom[0];
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_Mom2])[out_idx] = out.Mom[1];
@@ -54,8 +44,8 @@ template <class data_t>
 auto
 Constraints::constraint_equations(
       vars_t<data_t> &vars,
-      const vars_t<data_t> (&d1)[CH_SPACEDIM],
-      const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM]
+      const vars_t< tensor<1,data_t> >& d1,
+      const vars_t< tensor<2,data_t> >& d2
 ) -> constraints_t<data_t>
 {
    constraints_t<data_t> out;
@@ -94,36 +84,36 @@ Constraints::constraint_equations(
    return out;
 }
 
-template <class data_t> template <class arr_t>
-Constraints::vars_t<data_t>::vars_t(const arr_t& in)
+template <class data_t>
+Constraints::vars_t<data_t>::vars_t()
 {
-    chi      = in[c_chi];
-    h[0][0]  = in[c_h11];
-    h[0][1]  = in[c_h12];
-    h[0][2]  = in[c_h13];
-    h[1][1]  = in[c_h22];
-    h[1][2]  = in[c_h23];
-    h[2][2]  = in[c_h33];
+    m_assignment_ptrs[c_chi].push_back(&chi);
 
-    h[1][0] = h[0][1];
-    h[2][0] = h[0][2];
-    h[2][1] = h[1][2];
+    m_assignment_ptrs[c_h11].push_back(&h[0][0]);
+    m_assignment_ptrs[c_h12].push_back(&h[0][1]);
+    m_assignment_ptrs[c_h12].push_back(&h[1][0]);
+    m_assignment_ptrs[c_h13].push_back(&h[0][2]);
+    m_assignment_ptrs[c_h13].push_back(&h[2][0]);
+    m_assignment_ptrs[c_h22].push_back(&h[1][1]);
+    m_assignment_ptrs[c_h23].push_back(&h[1][2]);
+    m_assignment_ptrs[c_h23].push_back(&h[2][1]);
+    m_assignment_ptrs[c_h33].push_back(&h[2][2]);
 
-    K        = in[c_K];
-    A[0][0]  = in[c_A11];
-    A[0][1]  = in[c_A12];
-    A[0][2]  = in[c_A13];
-    A[1][1]  = in[c_A22];
-    A[1][2]  = in[c_A23];
-    A[2][2]  = in[c_A33];
+    m_assignment_ptrs[c_K].push_back(&K);
 
-    A[1][0] = A[0][1];
-    A[2][0] = A[0][2];
-    A[2][1] = A[1][2];
+    m_assignment_ptrs[c_A11].push_back(&A[0][0]);
+    m_assignment_ptrs[c_A12].push_back(&A[0][1]);
+    m_assignment_ptrs[c_A12].push_back(&A[1][0]);
+    m_assignment_ptrs[c_A13].push_back(&A[0][2]);
+    m_assignment_ptrs[c_A13].push_back(&A[2][0]);
+    m_assignment_ptrs[c_A22].push_back(&A[1][1]);
+    m_assignment_ptrs[c_A23].push_back(&A[1][2]);
+    m_assignment_ptrs[c_A23].push_back(&A[2][1]);
+    m_assignment_ptrs[c_A33].push_back(&A[2][2]);
 
-    Gamma[0] = in[c_Gamma1];
-    Gamma[1] = in[c_Gamma2];
-    Gamma[2] = in[c_Gamma3];
+    m_assignment_ptrs[c_Gamma1].push_back(&Gamma[0]);
+    m_assignment_ptrs[c_Gamma2].push_back(&Gamma[1]);
+    m_assignment_ptrs[c_Gamma3].push_back(&Gamma[2]);
 }
 
 #endif /* CONSTRAINTS_IMPL_HPP_ */

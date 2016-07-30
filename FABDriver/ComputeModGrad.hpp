@@ -22,34 +22,31 @@ public:
    {};
 
    template <class data_t>
-      void compute(int x, int y, int z)
-      {
-         idx_t<data_t> idx = m_driver.in_idx(x, y, z);
+   void compute(int x, int y, int z)
+   {
+       idx_t<data_t> idx = m_driver.in_idx(x, y, z);
 
-         std::array<data_t, c_NUM> d1_arr[CH_SPACEDIM]; //Derivative index first
-         for (int dir = 0; dir < CH_SPACEDIM; ++dir)
-         {
-            d1_arr[dir] = m_deriv.diff1(idx, dir);
-         }
+       tensor<1,data_t> d1_arr[c_NUM];
+       FOR1(idir) m_deriv.diff1(d1_arr,idx, idir);
 
-         std::array<data_t, c_NUM> mod_d1_arr = {};
-         for (int comp = 0; comp < c_NUM; ++comp)
-         {
-            for (int dir = 0; dir < CH_SPACEDIM; ++dir)
-            {
-               mod_d1_arr[comp] += d1_arr[dir][comp]*d1_arr[dir][comp];
-            }
-            mod_d1_arr[comp] = simd_sqrt(mod_d1_arr[comp]);
-         }
+       std::array<data_t, c_NUM> mod_d1_arr = {0.};
+       FORVARS(ivar)
+       {
+           FOR1(idir)
+           {
+               mod_d1_arr[ivar] += d1_arr[ivar][idir]*d1_arr[ivar][idir];
+           }
+           mod_d1_arr[ivar] = simd_sqrt(mod_d1_arr[ivar]);
+       }
 
-         // TODO: I really do not like this, but cannot think of a better way to do it yet...
-         idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-         for (int comp = 0; comp < c_NUM; ++comp)
-         {
-            SIMDIFY<data_t>(m_driver.m_out_ptr[comp])[out_idx] = mod_d1_arr[comp];
-         }
-      }
-   
+       // TODO: I really do not like this, but cannot think of a better way to do it yet...
+       idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
+       FORVARS(ivar)
+       {
+           SIMDIFY<data_t>(m_driver.m_out_ptr[ivar])[out_idx] = mod_d1_arr[ivar];
+       }
+   }
+
 };
 
 #endif /* COMPUTEMODGRAD_HPP_ */

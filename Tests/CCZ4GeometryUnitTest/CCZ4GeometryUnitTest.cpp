@@ -17,8 +17,8 @@ int main()
    int passed = 1;
 
    vars_t<double> vars;
-   vars_t<double> d1[3];
-   vars_t<double> d2[3][3];
+   vars_t< tensor<1,double> > d1;
+   vars_t< tensor<2,double> > d2;
    tensor<1, double>  Z_over_chi;
 
 #include "values1.hpp" //Including the auto generated file with values

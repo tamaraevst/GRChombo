@@ -144,14 +144,14 @@ class CCZ4Geometry
     static ricci_t<data_t>
     compute_ricci(
         const vars_t<data_t> &vars,
-        const vars_t<data_t> (&d1)[CH_SPACEDIM],
-        const vars_t<data_t> (&d2)[CH_SPACEDIM][CH_SPACEDIM],
+        const vars_t< tensor<1,data_t> >& d1,
+        const vars_t< tensor<2,data_t> >& d2,
         const tensor<2, data_t>& h_UU,
         const chris_t<data_t>& chris
     )
     {
-         tensor<1,data_t> Z0;
-         FOR1(i) Z0[i] = 0; //TODO: fix the array constructor in tensor
+         tensor<1,data_t> Z0 = 0.;
+         //FOR1(i) Z0[i] = 0; //TODO: fix the array constructor in tensor
          return compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
     }
 

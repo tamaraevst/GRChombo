@@ -30,7 +30,6 @@ CCZ4::compute(int ix, int iy, int iz)
     vars_t< tensor<2,data_t> > d2;
     // Repeated derivatives
     FOR1(idir) m_deriv.diff2(d2, idx, idir);
-
     // Mixed derivatives
     // Note: no need to symmetrise explicitely, this is done in mixed_diff2
     m_deriv.mixed_diff2(d2, idx, 1, 0);
