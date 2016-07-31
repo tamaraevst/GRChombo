@@ -26,6 +26,7 @@ public:
 //    {}
 
     template <typename... T>
+    ALWAYS_INLINE
     tensor(T... data) : arr {data...}
     {}
 

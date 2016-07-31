@@ -88,7 +88,9 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 //    Might want to work through the code and eliminate chi divisions where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-    auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+    using namespace TensorAlgebra;
+
+    auto h_UU = compute_inverse(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     tensor<1, data_t> Z_over_chi;
@@ -101,15 +103,10 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     auto ricci =  CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
-    data_t divshift = 0.;
-    data_t Z_dot_d1lapse = 0.;
-    FOR1(k)
-    {
-        divshift += d1.shift[k][k];
-        Z_dot_d1lapse += Z[k]*d1.lapse[k];
-    }
+    data_t divshift = compute_trace(d1.shift);
+    data_t Z_dot_d1lapse = compute_dot_product(Z,d1.lapse);
 
-    data_t dlapse_dot_dchi = 0.;
+    data_t dlapse_dot_dchi = 0;
     FOR2(m,n)
     {
         dlapse_dot_dchi += h_UU[m][n]*d1.lapse[m]*d1.chi[n];
@@ -138,10 +135,10 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     }
 
 
-    tensor<2, data_t> A_UU = TensorAlgebra::raise_all(vars.A, h_UU);
+    tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
 
     //A^{ij} A_{ij}. - Note the abuse of the compute trace function.
-    data_t tr_A2    = TensorAlgebra::compute_trace(vars.A, A_UU);
+    data_t tr_A2    = compute_trace(vars.A, A_UU);
     rhs.chi = advec.chi + (2.0/GR_SPACEDIM)*vars.chi*(vars.lapse*vars.K - divshift);
     FOR2(i,j)
     {
@@ -157,7 +154,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     {
         Adot_TF[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci.LL[i][j];
     }
-    TensorAlgebra::make_trace_free(Adot_TF, vars.h, h_UU);
+    make_trace_free(Adot_TF, vars.h, h_UU);
 
     FOR2(i,j)
     {

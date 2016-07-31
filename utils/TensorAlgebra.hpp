@@ -4,9 +4,8 @@
 #include "always_inline.hpp"
 #include "tensor.hpp"
 
-class TensorAlgebra
+namespace TensorAlgebra
 {
-public:
     template <class data_t>
     static tensor<2, data_t>
     compute_inverse(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
@@ -48,20 +47,27 @@ public:
     compute_trace(const tensor<2, data_t> &tensor_UL)
     {
         data_t trace = 0.;
-        FOR2(i,j) trace += tensor_UL[i][j];
+        FOR1(i) trace += tensor_UL[i][i];
         return trace;
     }
 
     template <class data_t>
     ALWAYS_INLINE
     static data_t
-    compute_dot_product(const tensor<1, data_t> &vector1, const tensor<1, data_t> &vector2)
+    compute_trace(const tensor<1, tensor<1,data_t> > &tensor_UL)
+    {
+        data_t trace = 0.;
+        FOR1(i) trace += tensor_UL[i][i];
+        return trace;
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static data_t
+    compute_dot_product(const tensor<1, data_t> &vector_U, const tensor<1, data_t> &covector_L)
     {
         data_t dot_product = 0.;
-        FOR2(i,j)
-        {
-            dot_product += vector1[i]*vector2[i];
-        }
+        FOR1(i) dot_product += vector_U[i]*covector_L[i];
         return dot_product;
     }
 
@@ -87,6 +93,7 @@ public:
         {
             tensor_U[i] += inverse_metric[i][j]*tensor_L[j];
         }
+        return tensor_U;
     }
 
     template <class data_t>
@@ -101,6 +108,6 @@ public:
         }
         return tensor_UU;
     }
-};
+}
 
 #endif /* TENSORALGEBRA_HPP_ */
