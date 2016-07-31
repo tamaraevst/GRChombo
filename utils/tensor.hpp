@@ -1,7 +1,7 @@
 #ifndef TENSOR_HPP_
 #define TENSOR_HPP_
 
-#include "GRUtils.H"
+#include "GRUtils.hpp"
 #include "always_inline.hpp"
 #include <initializer_list>
 

@@ -2,7 +2,7 @@
 #define KREISSOLIGERDISSIPATION_HPP_
 
 #include "simd.hpp"
-#include "GRUtils.H"
+#include "GRUtils.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 

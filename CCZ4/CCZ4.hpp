@@ -3,7 +3,7 @@
 
 #include "simd.hpp"
 #include "tensor.hpp"
-#include "GRUtils.H"
+#include "GRUtils.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"

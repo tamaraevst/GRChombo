@@ -7,6 +7,7 @@
 
 #include "StackVector.hpp"
 #include "IndexApplicator.hpp"
+#include "GRUtils.hpp"
 
 template <class var_t>
 class VarsBase
