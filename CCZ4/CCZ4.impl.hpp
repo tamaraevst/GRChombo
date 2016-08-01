@@ -38,7 +38,7 @@ CCZ4::compute(int ix, int iy, int iz)
 
     vars_t<data_t> advec;
     advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, idx, vars.shift, idir);
+    FOR1(idir) m_deriv.add_advection(advec, idx, vars.shift[idir], idir);
 
     vars_t<data_t> dssp;
     dssp.assign(0.);

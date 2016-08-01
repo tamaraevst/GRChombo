@@ -198,25 +198,25 @@ protected: //Let's keep this protected ... we may want to change the advection c
 public:
     template <class data_t>
     void
-    add_advection(VarsBase<data_t>& vars, idx_t<data_t> idx, const tensor<1,data_t>& vec, const int dir) const
+    add_advection(VarsBase<data_t>& vars, idx_t<data_t> idx, const data_t& vec_comp, const int dir) const
     {
         const int stride = m_driver.m_in_stride[dir];
-        const data_t shift_positive = simd_compare_gt(vec[dir], 0.0);
+        const data_t shift_positive = simd_compare_gt(vec_comp, 0.0);
         FORVARS(ivar)
         {
-            vars.plus(advection_term(m_driver.m_in_ptr[ivar],idx, vec[dir], stride, shift_positive),ivar);
+            vars.plus(advection_term(m_driver.m_in_ptr[ivar],idx, vec_comp, stride, shift_positive),ivar);
         }
     }
 
     template <class data_t>
     void
-    add_advection(data_t (&out)[c_NUM], idx_t<data_t> idx, const tensor<1,data_t>& vec, const int dir) const
+    add_advection(data_t (&out)[c_NUM], idx_t<data_t> idx, const data_t& vec_comp, const int dir) const
     {
         const int stride = m_driver.m_in_stride[dir];
-        const data_t shift_positive = simd_compare_gt(vec[dir], 0.0);
+        const data_t shift_positive = simd_compare_gt(vec_comp, 0.0);
         FORVARS(ivar)
         {
-            out[ivar] += advection_term(m_driver.m_in_ptr[ivar],idx, vec[dir], stride, shift_positive);
+            out[ivar] += advection_term(m_driver.m_in_ptr[ivar],idx, vec_comp, stride, shift_positive);
         }
     }
 
