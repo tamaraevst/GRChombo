@@ -4,6 +4,7 @@
 #include "user_enum.hpp"
 #include "tensor.hpp"
 #include "VarsBase.hpp"
+#include "FABDriverBase.hpp"
 #include <array>
 
 class FourthOrderDerivatives
