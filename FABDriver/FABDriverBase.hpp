@@ -53,6 +53,10 @@ struct FABDriverBase
     int out_idx(int ix, int iy, int iz) const;
 
     template <class data_t>
+    ALWAYS_INLINE
+    data_t local_vars(idx_t<data_t> idx, int icomp) const;
+
+    template <class data_t>
     std::array<data_t, c_NUM> local_vars(idx_t<data_t> idx) const;
 
     template <class data_t>

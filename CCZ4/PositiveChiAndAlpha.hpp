@@ -21,17 +21,18 @@ public:
    {
       idx_t<data_t> idx = m_driver.in_idx(x, y, z);
 
-      auto vars_arr = m_driver.local_vars(idx);
+      auto chi   = m_driver.local_vars(idx, c_chi);
+      auto lapse = m_driver.local_vars(idx, c_lapse);
 
-      auto chi_is_too_small = simd_compare_lt(vars_arr[c_chi], 1e-4);
-      vars_arr[c_chi] = simd_conditional(chi_is_too_small, 1e-4, vars_arr[c_chi]);
+      auto chi_is_too_small = simd_compare_lt(chi, 1e-4);
+      chi = simd_conditional(chi_is_too_small, 1e-4, chi);
 
-      auto lapse_is_too_small = simd_compare_lt(vars_arr[c_lapse], 1e-4);
-      vars_arr[c_lapse] = simd_conditional(lapse_is_too_small, 1e-4, vars_arr[c_lapse]);
+      auto lapse_is_too_small = simd_compare_lt(lapse, 1e-4);
+      lapse = simd_conditional(lapse_is_too_small, 1e-4, lapse);
 
       idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-      SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]   = vars_arr[c_chi];
-      SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx] = vars_arr[c_lapse];
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]   = chi;
+      SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx] = lapse;
    }
 };
 

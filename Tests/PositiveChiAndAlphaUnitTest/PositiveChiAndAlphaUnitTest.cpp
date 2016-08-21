@@ -2,7 +2,7 @@
 #include <iostream>
 #include "PositiveChiAndAlpha.hpp"
 #include "tensor.hpp"
-#include "GRutils.H"
+#include "GRutils.hpp"
 
 #include "FABDriver.hpp"
 #include "PositiveChiAndAlpha.hpp"

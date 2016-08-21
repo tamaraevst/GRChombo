@@ -22,13 +22,21 @@ FABDriverBase::out_idx(int ix, int iy, int iz) const
 }
 
 template <class data_t>
+ALWAYS_INLINE
+data_t
+FABDriverBase::local_vars(idx_t<data_t> idx, int icomp) const
+{
+    return SIMDIFY<data_t>(m_in_ptr[icomp])[idx];
+}
+
+template <class data_t>
 std::array<data_t, c_NUM>
 FABDriverBase::local_vars(idx_t<data_t> idx) const
 {
     std::array<data_t, c_NUM> out;
     for (int i = 0; i < c_NUM; ++i)
     {
-        out[i] = SIMDIFY<data_t>(m_in_ptr[i])[idx];
+        out[i] = local_vars(idx, i);
     }
     return out;
 }
