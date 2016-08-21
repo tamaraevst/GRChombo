@@ -19,16 +19,14 @@ public:
     compute_t m_compute;
 
     template <typename... param_types>
-    FABDriver(param_types... params) :
-        m_compute(*this, std::forward<param_types>(params)...)
-    {}
+    FABDriver(param_types... params);
 
     //Takes input 'in', writes output into the subox 'loop_box' of 'out'
     void execute(const FArrayBox& in, FArrayBox& out, const Box & loop_box);
 
     void execute(const FArrayBox& in, FArrayBox& out); //Uses out.box() as loop_box
 
-    //MK: Could give fillGhosts a default argument but I think it's better to force the user to make a concious decision
+    //MK: Could give the ghost treatment a default argument but I think it's better to force the user to make a concious decision
     //Wrong fillGhosts can give errors that are very hard to debug
     void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts);
 };

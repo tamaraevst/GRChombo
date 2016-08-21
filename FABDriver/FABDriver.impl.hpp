@@ -7,8 +7,40 @@
 
 #include "simd.hpp"
 
-//template <typename... param_types>
-//FABDriver::FABDriver(param_types... params) : m_compute(compute_t(std::forward<param_types>(params)..., *this)) {};
+template <class compute_t>
+template <typename... param_types>
+FABDriver<compute_t>::FABDriver(param_types... params) : m_compute(*this, std::forward<param_types>(params)...) {}
+
+//The following helpers allow the FABDriver to vectorise only if the provided compute class supports vectorisation.
+//(MK: I wrote this so that the user doesn't have to worry about which compute classes can vectorise and which can't)
+namespace SimdChecker
+{
+    template<class T, class data_t, typename... Args>
+    static auto check_simd_compute(int, T& a_compute, Args... args) //passing an int as first argument makes the compiler try this version first
+        -> decltype(std::declval<T>().template compute<data_t>(std::declval<Args>()...), std::true_type())
+    {
+        a_compute.template compute<simd<double> >(std::forward<Args>(args)...);
+        return std::true_type();
+    }
+    template<class T, class, typename... Args>
+    static auto check_simd_compute(char, T& a_compute, Args... args) //SFINAE fallback
+        -> std::false_type
+    {
+        a_compute.compute(std::forward<Args>(args)...);
+        return std::false_type();
+    }
+
+    template<class compute_t, class data_t>
+    //returns std:true_type() if compute_t accepts simd<data_t> as template argument
+    struct has_simd_compute :
+        decltype(SimdChecker::check_simd_compute<compute_t, simd<data_t>, int, int, int> (0,std::declval<compute_t&>(),0,0,0)){};
+
+    template<class data_t, class compute_t, typename... Args>
+    void call_compute(compute_t& a_compute, Args... args)
+    {
+        check_simd_compute<compute_t,data_t>(0, a_compute, std::forward<Args>(args)... );
+    }
+}
 
 template <class compute_t>
 void
@@ -60,20 +92,31 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
 #endif
       for (int y = loop_lo[1]; y <= loop_hi[1]; ++y)
       {
-         int x_simd_max = loop_lo[0] + simd<double>::simd_len * (((loop_hi[0] - loop_lo[0] + 1) / simd<double>::simd_len) - 1);
-
-         // SIMD LOOP
-#pragma novector
-         for (int x = loop_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
+         if (SimdChecker::has_simd_compute<compute_t, double>()) //If compute_t supports simd do a simd loop
          {
-            m_compute.template compute<simd<double> >(x, y, z);
+             int x_simd_max = loop_lo[0] + simd<double>::simd_len * (((loop_hi[0] - loop_lo[0] + 1) / simd<double>::simd_len) - 1);
+             // SIMD LOOP
+#pragma novector
+             for (int x = loop_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
+             {
+                 //SIMD compute must be guarded in case compute_t doesn't support it
+                 SimdChecker::call_compute<simd<double>>(m_compute,x,y,z);
+             }
+             // REMAINDER LOOP
+#pragma novector
+             for (int x = x_simd_max + simd<double>::simd_len; x <= loop_hi[0]; ++x)
+             {
+                 SimdChecker::call_compute<double>(m_compute,x,y,z);
+             }
          }
-
-         // REMAINDER LOOP
-#pragma novector
-         for (int x = x_simd_max + simd<double>::simd_len; x <= loop_hi[0]; ++x)
+         else
          {
-            m_compute.template compute<double>(x, y, z);
+             //Note:this is truly horrible code ... the calls are completely unreadable
+             //better to have two functions for the inner loop and switch them on or off
+             for (int x = loop_lo[0]; x <= loop_hi[0]; ++x)
+             {
+                 SimdChecker::call_compute<simd<double>>(m_compute,x, y, z);
+             }
          }
       }
 }
