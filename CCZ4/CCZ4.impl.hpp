@@ -19,7 +19,7 @@ template <class data_t>
 void
 CCZ4::compute(int ix, int iy, int iz)
 {
-    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz);
+    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz); //The current location in the flattened chombo box
 
     vars_t<data_t> vars;
     m_driver.local_vars(vars,idx);
@@ -47,6 +47,7 @@ CCZ4::compute(int ix, int iy, int iz)
     vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
     // TODO: I really do not like this, but cannot think of a better way to do it yet...
+#warning: MK: This can be improved significantly by giving FABDriverBase a method store_vars - we need this for initial data anyway
     idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = rhs.chi      + m_sigma * dssp.chi     ;
     SIMDIFY<data_t>(m_driver.m_out_ptr[c_h11])[out_idx]    = rhs.h[0][0]  + m_sigma * dssp.h[0][0] ;

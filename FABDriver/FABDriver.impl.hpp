@@ -15,6 +15,7 @@ FABDriver<compute_t>::FABDriver(param_types... params) : m_compute(*this, std::f
 //(MK: I wrote this so that the user doesn't have to worry about which compute classes can vectorise and which can't)
 namespace SimdChecker
 {
+#warning MK: this is truly horrible code ... the calls are completely unreadable better to have two functions for the inner loop and switch them on or off
     template<class T, class data_t, typename... Args>
     static auto check_simd_compute(int, T& a_compute, Args... args) //passing an int as first argument makes the compiler try this version first
         -> decltype(std::declval<T>().template compute<data_t>(std::declval<Args>()...), std::true_type())
@@ -111,8 +112,7 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
          }
          else
          {
-             //Note:this is truly horrible code ... the calls are completely unreadable
-             //better to have two functions for the inner loop and switch them on or off
+#warning MK: this is truly horrible code ... the calls are completely unreadable better to have two functions for the inner loop and switch them on or off
              for (int x = loop_lo[0]; x <= loop_hi[0]; ++x)
              {
                  SimdChecker::call_compute<simd<double>>(m_compute,x, y, z);

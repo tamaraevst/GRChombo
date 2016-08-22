@@ -66,6 +66,8 @@ using std::endl;
 #include "BoostedBH.hpp"
 #include "BinaryBH.hpp"
 
+#warning: GRChombo.cpp and hpp will be completely refactored and split into classes GRAMRLevel and CCZ4AMRLevel
+
 /// Global variables for handling output:
 static const char* pgmname = "GRChombo" ;
 static const char* indent = "   ";
@@ -250,67 +252,15 @@ GRChombo::advance ()
     //Print nBox to give information on load balancing
     pout () << "Number of level " << m_level << " boxes on this rank: " << nbox << "." << endl;
 
+#warning: TODO: five the FABDriver a (fake) call with one level data
     //Enforce the trace free alpha condition
     FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, true);
 
     //Enforce positive chi and alpha
     FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, true);
 
+    //Check for nan's
     FABDriver<NanCheck>().execute(m_state_new, m_state_new, true);
-
-    //Check for nan's - TODO: move this out of here
-    for(int ibox = 0; ibox < nbox; ++ibox)
-    {
-        DataIndex di = dit0[ibox];
-        const Box& b = level_domain[di];
-        FArrayBox& state_fab = m_state_new[di];
-
-        const IntVect& smallEnd = b.smallEnd();
-        const IntVect& bigEnd = b.bigEnd();
-
-        const int xmin = smallEnd[0];
-        const int ymin = smallEnd[1];
-        const int zmin = smallEnd[2];
-
-        const int xmax = bigEnd[0];
-        const int ymax = bigEnd[1];
-        const int zmax = bigEnd[2];
-
-#pragma omp parallel for collapse(3) schedule(static) default(shared)
-        for (int z = zmin; z <= zmax; ++z) {
-        for (int y = ymin; y <= ymax; ++y) {
-        for (int x = xmin; x <= xmax; ++x)
-        {
-            IntVect iv(x,y,z);
-            if (m_p.nanCheck == 1) {
-                bool nanerror = 0;
-                for (int comp = 0; comp < c_B; ++comp)
-                {
-                    Real val = state_fab (iv,comp);
-                    if (isnan(val) || isinf(val) || Abs(val)>1.e40)
-                    {
-                        pout()
-                            << " time = " << m_time
-                            D_TERM6(
-                                    << " x1 " << (iv[0] + 0.5) * m_dx,
-                                    << " x2 " << (iv[1] + 0.5) * m_dx,
-                                    << " x3 " << (iv[2] + 0.5) * m_dx,
-                                    << " x4 " << (iv[3] + 0.5) * m_dx,
-                                    << " x5 " << (iv[4] + 0.5) * m_dx,
-                                    << " x5 " << (iv[5] + 0.5) * m_dx)
-                            << " comp = " << s_state_names[comp]
-                            << " val = " << val << std::endl;
-                        nanerror = 1;
-                    }
-                }
-                if (nanerror) {
-                    MayDay::Error("in GRChombo::advance: values have become nan");
-                }
-            }
-        }//x
-        }//y
-        }//z
-    }
 
     m_time += m_dt;
     return m_dt;
@@ -730,6 +680,8 @@ GRChombo::initialData ()
     CH_TIME("GRChombo::initialData");
 
     if (verbose) pout () << "GRChombo::initialData " << m_level << endl;
+
+#warning: All the code below will go ... it should be moved to a compute class
 
     DataIterator dit0 = m_state_new.dataIterator();
     int nbox = dit0.size();

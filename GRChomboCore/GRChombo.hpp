@@ -30,6 +30,7 @@ struct SimParams
 {
   void readParams(ParmParse &pp)
   {
+#warning: this annoying piece of code will be auto-generated from a list of value, name and default-value. This way we also get proper handling of missing parameters
      //Grid setup
      pp.get("L", L);
      pp.get("regridmax", regridmax);
