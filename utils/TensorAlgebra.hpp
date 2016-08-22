@@ -73,6 +73,19 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
+    static data_t
+    compute_dot_product(const tensor<1,data_t> &covector1_L, const tensor<1, data_t> &covector2_L, const tensor<2, data_t>& inverse_metric)
+    {
+        data_t dot_product = 0.;
+        FOR2(m,n)
+        {
+            dot_product += inverse_metric[m][n]*covector1_L[m]*covector2_L[n];
+        }
+        return dot_product;
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
     static void
     make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
     {

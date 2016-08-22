@@ -106,12 +106,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     data_t divshift = compute_trace(d1.shift);
     data_t Z_dot_d1lapse = compute_dot_product(Z,d1.lapse);
-
-    data_t dlapse_dot_dchi = 0;
-    FOR2(m,n)
-    {
-        dlapse_dot_dchi += h_UU[m][n]*d1.lapse[m]*d1.chi[n];
-    }
+    data_t dlapse_dot_dchi = compute_dot_product(d1.lapse,d1.chi,h_UU);
 
     tensor<2, data_t> covdtilde2lapse;
     tensor<2, data_t> covd2lapse;
