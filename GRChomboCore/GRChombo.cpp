@@ -72,7 +72,7 @@ using std::endl;
 static const char* pgmname = "GRChombo" ;
 static const char* indent = "   ";
 static const char* indent2 = "      " ;
-static bool verbose = true ;
+static int verbose = 0 ;
 
 const int
 GRChombo::s_num_comps;
@@ -260,7 +260,7 @@ GRChombo::advance ()
     FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, true);
 
     //Check for nan's
-    FABDriver<NanCheck>().execute(m_state_new, m_state_new, true);
+    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, true);
 
     m_time += m_dt;
     return m_dt;
@@ -874,6 +874,7 @@ GRChombo::writeCheckpointLevel (HDF5Handle& a_handle) const
 void
 GRChombo::preCheckpointLevel ()
 {
+#warning should fill ghost cells here (put into convenient call)
     FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new, false);
 }
 

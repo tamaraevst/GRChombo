@@ -64,7 +64,7 @@ struct SimParams
      pp.getarr("momentumB", momentumB, 0, SpaceDim);
 
      //Misc
-     pp.get("nanCheck", nanCheck);
+     pp.get("nan_check", nan_check);
 
      //Fill in he ccz4Parameters
      ccz4Params.kappa1 = kappa1;
@@ -94,7 +94,7 @@ struct SimParams
   std::vector<Real> centerA, centerB;
   std::vector<Real> momentumA, momentumB;
   //Misc
-  int nanCheck;
+  int nan_check;
 
   //Collection of parameters necessary for the CCZ4 RHS
   CCZ4::params_t ccz4Params;
