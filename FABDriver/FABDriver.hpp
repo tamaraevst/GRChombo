@@ -23,12 +23,17 @@ public:
 
     //Takes input 'in', writes output into the subox 'loop_box' of 'out'
     void execute(const FArrayBox& in, FArrayBox& out, const Box & loop_box);
+    void execute(const FArrayBox& in, FArrayBox& out, const Box & loop_box, disable_simd);
 
-    void execute(const FArrayBox& in, FArrayBox& out); //Uses out.box() as loop_box
+    template <typename... simd_info>
+    void execute(const FArrayBox& in, FArrayBox& out, simd_info... info); //Uses out.box() as loop_box
 
     //MK: Could give the ghost treatment a default argument but I think it's better to force the user to make a concious decision
     //Wrong fillGhosts can give errors that are very hard to debug
-    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts);
+    template <typename... simd_info>
+    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts, simd_info... info);
+
+    void set_pointers(const FArrayBox& in, FArrayBox& out);
 };
 
 #include "FABDriver.impl.hpp"

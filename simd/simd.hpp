@@ -16,6 +16,9 @@ template <typename t> struct _simd_remove_cv {
 template <typename q1, typename q2, typename t> struct _simd_enable_if_same { };
 template <typename q, typename t> struct _simd_enable_if_same<q, q, t> { typedef t type; };
 
+//This struct can be used to switch between simd and non-simd versions of the same function by overloading
+struct disable_simd {};
+
 // Base template type: fallback for when there is no SIMD support for a data type
 template <typename t>
 struct simd

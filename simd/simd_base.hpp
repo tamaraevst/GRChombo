@@ -149,7 +149,7 @@ t simd_log(const t& a)
    return log(a);
 }
 
-//This function will only be enabled if we simd<t> is not the same as t, i.e. if we could potentially vectorise
+//This function will only be enabled if simd<t> is not the same as t, i.e. if we could potentially vectorise
 template <typename t>
 ALWAYS_INLINE
 typename std::enable_if<(simd_traits<t>::simd_len > 1), simd<t> >::type

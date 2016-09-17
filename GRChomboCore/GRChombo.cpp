@@ -252,7 +252,6 @@ GRChombo::advance ()
     //Print nBox to give information on load balancing
     pout () << "Number of level " << m_level << " boxes on this rank: " << nbox << "." << endl;
 
-#warning: TODO: five the FABDriver a (fake) call with one level data
     //Enforce the trace free alpha condition
     FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, true);
 
@@ -260,7 +259,7 @@ GRChombo::advance ()
     FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, true);
 
     //Check for nan's
-    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, true);
+    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, true, disable_simd());
 
     m_time += m_dt;
     return m_dt;
