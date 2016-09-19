@@ -63,6 +63,20 @@ public:
          FORVARS(ivar) assign(data[ivar], ivar);
      }
 
+     ALWAYS_INLINE
+     bool variable_defined(int ivar) const
+     {
+         return m_assignment_ptrs[ivar].get_ncomp();
+     }
 
+     template <class data_t>
+     ALWAYS_INLINE
+     const data_t& read(int ivar) const
+     {
+         CH_assert(variable_defined(ivar));
+         //the assignement pointer points to several variables with the same value e.g. symmetric matrix components.
+         //The 0 component must exists so just take this one.
+         return *m_assignment_ptrs[ivar][0];
+     }
 };
 #endif /* VARSBASE_HPP_ */

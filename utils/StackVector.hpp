@@ -28,8 +28,13 @@ public:
         return m_data[i];
     }
 
+    const T& operator [](int i) const
+    {
+        return m_data[i];
+    }
+
     int
-    get_ncomp()
+    get_ncomp() const
     {
         return m_ncomp;
     }

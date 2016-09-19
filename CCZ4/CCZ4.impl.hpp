@@ -19,7 +19,7 @@ template <class data_t>
 void
 CCZ4::compute(int ix, int iy, int iz)
 {
-    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz); //The current location in the flattened chombo box
+    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz); //The current location in the flattened input FArrayBox
 
     vars_t<data_t> vars;
     m_driver.local_vars(vars,idx);
@@ -40,40 +40,13 @@ CCZ4::compute(int ix, int iy, int iz)
     advec.assign(0.);
     FOR1(idir) m_deriv.add_advection(advec, idx, vars.shift[idir], idir);
 
-    vars_t<data_t> dssp;
-    dssp.assign(0.);
-    FOR1(idir) m_deriv.add_dissipation(dssp,idx, idir);
-
     vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
-    // TODO: I really do not like this, but cannot think of a better way to do it yet...
-#warning: MK: This can be improved significantly by giving FABDriverBase a method store_vars - we need this for initial data anyway
-    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]    = rhs.chi      + m_sigma * dssp.chi     ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h11])[out_idx]    = rhs.h[0][0]  + m_sigma * dssp.h[0][0] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h12])[out_idx]    = rhs.h[0][1]  + m_sigma * dssp.h[0][1] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h13])[out_idx]    = rhs.h[0][2]  + m_sigma * dssp.h[0][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h22])[out_idx]    = rhs.h[1][1]  + m_sigma * dssp.h[1][1] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h23])[out_idx]    = rhs.h[1][2]  + m_sigma * dssp.h[1][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_h33])[out_idx]    = rhs.h[2][2]  + m_sigma * dssp.h[2][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_K])[out_idx]      = rhs.K        + m_sigma * dssp.K       ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A11])[out_idx]    = rhs.A[0][0]  + m_sigma * dssp.A[0][0] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A12])[out_idx]    = rhs.A[0][1]  + m_sigma * dssp.A[0][1] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A13])[out_idx]    = rhs.A[0][2]  + m_sigma * dssp.A[0][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A22])[out_idx]    = rhs.A[1][1]  + m_sigma * dssp.A[1][1] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A23])[out_idx]    = rhs.A[1][2]  + m_sigma * dssp.A[1][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_A33])[out_idx]    = rhs.A[2][2]  + m_sigma * dssp.A[2][2] ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Gamma1])[out_idx] = rhs.Gamma[0] + m_sigma * dssp.Gamma[0];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Gamma2])[out_idx] = rhs.Gamma[1] + m_sigma * dssp.Gamma[1];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Gamma3])[out_idx] = rhs.Gamma[2] + m_sigma * dssp.Gamma[2];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Theta])[out_idx]  = rhs.Theta    + m_sigma * dssp.Theta   ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx]  = rhs.lapse    + m_sigma * dssp.lapse   ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_shift1])[out_idx] = rhs.shift[0] + m_sigma * dssp.shift[0];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_shift2])[out_idx] = rhs.shift[1] + m_sigma * dssp.shift[1];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_shift3])[out_idx] = rhs.shift[2] + m_sigma * dssp.shift[2];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_B1])[out_idx]     = rhs.B[0]     + m_sigma * dssp.B[0]    ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_B2])[out_idx]     = rhs.B[1]     + m_sigma * dssp.B[1]    ;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_B3])[out_idx]     = rhs.B[2]     + m_sigma * dssp.B[2]    ;
+    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idx,idir);
+
+    //Write the rhs into the output FArrayBox
+    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox
+    m_driver.store_vars(rhs, out_idx);
 }
 
 template <class data_t>

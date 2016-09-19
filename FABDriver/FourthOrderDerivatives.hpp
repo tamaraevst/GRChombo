@@ -243,23 +243,23 @@ public:
 
     template <class data_t>
     void
-    add_dissipation(VarsBase<data_t>& vars, idx_t<data_t> idx, const int direction) const
+    add_dissipation(VarsBase<data_t>& vars, const double factor, idx_t<data_t> idx, const int direction) const
     {
         const int stride = m_driver.m_in_stride[direction];
         FORVARS(ivar)
         {
-            vars.plus(dissipation_term(m_driver.m_in_ptr[ivar], idx, stride),ivar);
+            vars.plus(factor*dissipation_term(m_driver.m_in_ptr[ivar], idx, stride), ivar);
         }
     }
 
     template <class data_t>
     void
-    add_dissipation(data_t (&out)[c_NUM], idx_t<data_t> idx, const int direction) const
+    add_dissipation(data_t (&out)[c_NUM], const double factor, idx_t<data_t> idx, const int direction) const
     {
         const int stride = m_driver.m_in_stride[direction];
         FORVARS(ivar)
         {
-            out[ivar] += dissipation_term(m_driver.m_in_ptr[ivar], idx, stride);
+            out[ivar] += factor*dissipation_term(m_driver.m_in_ptr[ivar], idx, stride);
         }
     }
 };
