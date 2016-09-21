@@ -2,7 +2,7 @@
 #ifndef FIXTFA_HPP_
 #define FIXTFA_HPP_
 
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "tensor.hpp"
 #include "FABDriverBase.hpp"
 #include "CCZ4Geometry.hpp"

@@ -2,7 +2,7 @@
 #ifndef COMPUTEMODGRAD_HPP_
 #define COMPUTEMODGRAD_HPP_
 
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "tensor.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"

@@ -2,7 +2,7 @@
 #ifndef POSITIVECHIANDALPHA_HPP_
 #define POSITIVECHIANDALPHA_HPP_
 
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "simd.hpp"
 #include "FABDriverBase.hpp"
 

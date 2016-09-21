@@ -15,9 +15,6 @@ template <class compute_t>
 void
 FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& loop_box)
 {
-    //Note: this function can only be called if the compute class supports vectorisation.
-    //i.e. it must be templated over the data type and allow double and simd<double> as data type.
-
     //Makes sure we are not requesting data outside the box of 'out'
     CH_assert(out.box().contains(loop_box));
 
@@ -40,6 +37,9 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
 #pragma novector
             for (int x = loop_lo[0]; x <= x_simd_max; x += simd<double>::simd_len)
             {
+                //If you were sent here by a compile error of no matching function call make sure that
+                //the compute class you are using allows for vectorisation (is templated over the data type)
+                //To switch vectorisation off, pass disable_simd() as last parameter to the execute function.
                 m_compute.template compute<simd<double> >(x,y,z);
             }
             // REMAINDER LOOP

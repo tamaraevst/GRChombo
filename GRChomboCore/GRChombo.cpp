@@ -77,49 +77,6 @@ static int verbose = 0 ;
 const int
 GRChombo::s_num_comps;
 
-const char*
-GRChombo::s_state_names[s_num_comps] =
-{
-    "chi",
-
-    "h11",
-    "h12",
-    "h13",
-    "h22",
-    "h23",
-    "h33",
-
-    "K",
-
-    "A11",
-    "A12",
-    "A13",
-    "A22",
-    "A23",
-    "A33",
-
-    "Theta",
-
-    "Gamma1",
-    "Gamma2",
-    "Gamma3",
-
-    "lapse",
-
-    "shift1",
-    "shift2",
-    "shift3",
-
-    "B1",
-    "B2",
-    "B3",
-
-    "Ham",
-    "Mom1",
-    "Mom2",
-    "Mom3"
-};
-
 const int
 GRChombo::s_num_ghosts;
 
@@ -680,80 +637,92 @@ GRChombo::initialData ()
 
     if (verbose) pout () << "GRChombo::initialData " << m_level << endl;
 
+//    DataIterator dit0  = m_state_new.dataIterator();
+//    int nbox = dit0.size();
+//    for(int ibox = 0; ibox < nbox; ++ibox)
+//    {
+//        DataIndex di = dit0[ibox];
+//        FArrayBox& fab = m_state_new[di];
+//        fab.setVal(0.);
+//    }
+
+
+    FABDriver<BinaryBH>(m_p.bh1_params, m_p.bh2_params, m_dx).execute(m_state_new, m_state_new, true, disable_simd());
+
 #warning: All the code below will go ... it should be moved to a compute class
 
-    DataIterator dit0 = m_state_new.dataIterator();
-    int nbox = dit0.size();
-    //#pragma omp parallel for default(shared) schedule(guided)
-    for(int ibox = 0; ibox < nbox; ++ibox)
-    {
-        DataIndex di = dit0[ibox];
-        FArrayBox& state_fab = m_state_new[di];
-        Box b = state_fab.box ();
-        const IntVect& smallEnd = b.smallEnd();
-        const IntVect& bigEnd = b.bigEnd();
+    //DataIterator dit0 = m_state_new.dataIterator();
+    //int nbox = dit0.size();
+    ////#pragma omp parallel for default(shared) schedule(guided)
+    //for(int ibox = 0; ibox < nbox; ++ibox)
+    //{
+    //    DataIndex di = dit0[ibox];
+    //    FArrayBox& state_fab = m_state_new[di];
+    //    Box b = state_fab.box ();
+    //    const IntVect& smallEnd = b.smallEnd();
+    //    const IntVect& bigEnd = b.bigEnd();
 
-        const int xmin = smallEnd[0];
-        const int ymin = smallEnd[1];
-        const int zmin = smallEnd[2];
+    //    const int xmin = smallEnd[0];
+    //    const int ymin = smallEnd[1];
+    //    const int zmin = smallEnd[2];
 
-        const int xmax = bigEnd[0];
-        const int ymax = bigEnd[1];
-        const int zmax = bigEnd[2];
+    //    const int xmax = bigEnd[0];
+    //    const int ymax = bigEnd[1];
+    //    const int zmax = bigEnd[2];
 
-#pragma omp parallel for collapse(3) schedule(static) default(shared)
-        for (int ivz = zmin; ivz <= zmax; ++ivz) {
-            for (int ivy = ymin; ivy <= ymax; ++ivy) {
-                for (int ivx = xmin; ivx <= xmax; ++ivx)
-                {
-                    IntVect iv(ivx,ivy,ivz);
+//#pragma omp parallel for collapse(3) schedule(static) default(shared)
+    //    for (int ivz = zmin; ivz <= zmax; ++ivz) {
+    //        for (int ivy = ymin; ivy <= ymax; ++ivy) {
+    //            for (int ivx = xmin; ivx <= xmax; ++ivx)
+    //            {
+    //                IntVect iv(ivx,ivy,ivz);
 
-                    for (int comp = 0; comp < m_state_new.nComp (); ++comp)
-                    {
-                        state_fab (iv,comp) = 0;
-                    }
+    //                for (int comp = 0; comp < m_state_new.nComp (); ++comp)
+    //                {
+    //                    state_fab (iv,comp) = 0;
+    //                }
 
-                    //Note: Cell centred!
-                    Real x = (iv[0] + 0.5) * m_dx;
-                    Real y = (iv[1] + 0.5) * m_dx;
-                    Real z = (iv[2] + 0.5) * m_dx;
+    //                //Note: Cell centred!
+    //                Real x = (iv[0] + 0.5) * m_dx;
+    //                Real y = (iv[1] + 0.5) * m_dx;
+    //                Real z = (iv[2] + 0.5) * m_dx;
 
-                    BoostedBH bh1(m_p.massA, m_p.centerA, m_p.momentumA);
-                    BoostedBH bh2(m_p.massB, m_p.centerB, m_p.momentumB);
+    //                BoostedBH bh1(m_p.massA, m_p.centerA, m_p.momentumA);
+    //                BoostedBH bh2(m_p.massB, m_p.centerB, m_p.momentumB);
 
-                    BinaryBH<BoostedBH> binary(bh1, bh2);
+    //                BinaryBH<BoostedBH> binary(bh1, bh2);
 
-                    // Metric conformal factor
-                    const Real psi = binary.psi(x, y, z);
-                    state_fab(iv, c_chi) = pow(psi, -4);
+    //                // Metric conformal factor
+    //                const Real psi = binary.psi(x, y, z);
+    //                state_fab(iv, c_chi) = pow(psi, -4);
 
-                    // Conformal metric is flat
-                    state_fab(iv,c_h11) = 1;
-                    state_fab(iv,c_h22) = 1;
-                    state_fab(iv,c_h33) = 1;
+    //                // Conformal metric is flat
+    //                state_fab(iv,c_h11) = 1;
+    //                state_fab(iv,c_h22) = 1;
+    //                state_fab(iv,c_h33) = 1;
 
-                    // Maximal slicing
-                    state_fab(iv,c_K) = 0;
+    //                // Maximal slicing
+    //                state_fab(iv,c_K) = 0;
 
-                    // Extrinsic curvature
-                    Real Aij[3][3] = {{0}};
-                    Real BOOK2BSSN = pow(psi, -6);
-                    binary.Aij(x, y, z, Aij);
+    //                // Extrinsic curvature
+    //                Real Aij[3][3] = {{0}};
+    //                Real BOOK2BSSN = pow(psi, -6);
+    //                binary.Aij(x, y, z, Aij);
 
 
-                    state_fab(iv,c_A11) = BOOK2BSSN * Aij[0][0];
-                    state_fab(iv,c_A12) = BOOK2BSSN * Aij[0][1];
-                    state_fab(iv,c_A13) = BOOK2BSSN * Aij[0][2];
-                    state_fab(iv,c_A22) = BOOK2BSSN * Aij[1][1];
-                    state_fab(iv,c_A23) = BOOK2BSSN * Aij[1][2];
-                    state_fab(iv,c_A33) = BOOK2BSSN * Aij[2][2];
+    //                state_fab(iv,c_A11) = BOOK2BSSN * Aij[0][0];
+    //                state_fab(iv,c_A12) = BOOK2BSSN * Aij[0][1];
+    //                state_fab(iv,c_A13) = BOOK2BSSN * Aij[0][2];
+    //                state_fab(iv,c_A22) = BOOK2BSSN * Aij[1][1];
+    //                state_fab(iv,c_A23) = BOOK2BSSN * Aij[1][2];
+    //                state_fab(iv,c_A33) = BOOK2BSSN * Aij[2][2];
 
-                    // Lapse
-                    state_fab(iv,c_lapse) = 1;
-                }//ivx
-            }//ivy
-        }//ivz
-    }
+    //                // Lapse
+    //                state_fab(iv,c_lapse) = 1;
+    //            }//ivx
+    //        }//ivy
+    //    }//ivz
+    //}
 }
 
 
@@ -778,7 +747,7 @@ GRChombo::writeCheckpointHeader (HDF5Handle& a_handle) const
     for (int comp = 0; comp < s_num_comps; ++comp)
     {
         sprintf (comp_str, "component_%d", comp);
-        header.m_string[comp_str] = s_state_names[comp];
+        header.m_string[comp_str] = UserVariables::variable_names[comp];
     }
     header.writeToFile(a_handle);
 
@@ -913,7 +882,7 @@ GRChombo::readCheckpointHeader  (HDF5Handle& a_handle)
             MayDay::Error ("GRChombo::readCheckpointHeader: checkpoint file does not have enough component names");
         }
         state_name = header.m_string [comp_str];
-        if (state_name != s_state_names[comp])
+        if (state_name != UserVariables::variable_names[comp])
         {
 //            if (m_p.ignoreNameMismatch)
 //                MayDay::Warning

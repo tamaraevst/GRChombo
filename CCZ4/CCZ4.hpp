@@ -10,7 +10,7 @@
 #include "CCZ4Geometry.hpp"
 #include "VarsBase.hpp"
 
-#include "user_enum.hpp" //This files needs c_NUM - total number of components
+#include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
 #include <array>
 

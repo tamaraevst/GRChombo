@@ -1,7 +1,7 @@
 #ifndef FOURTHORDERDERIVATIVES_HPP_
 #define FOURTHORDERDERIVATIVES_HPP_
 
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "tensor.hpp"
 #include "VarsBase.hpp"
 #include "FABDriverBase.hpp"

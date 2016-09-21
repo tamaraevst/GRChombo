@@ -3,7 +3,7 @@
 
 //This class offers a nan-check including debugging information when it happens
 
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "FABDriverBase.hpp"
 
 class NanCheck
@@ -35,7 +35,7 @@ public:
           pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
           FORVARS(i)
           {
-              pout() << i << ": " << m_driver.local_vars(idx,i) << endl;
+              pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars(idx,i) << endl;
           }
           pout() << "ix: " << ix << " iy: " << iy << " iz: " << iz << endl;
           MayDay::Error("Values have become nan.");

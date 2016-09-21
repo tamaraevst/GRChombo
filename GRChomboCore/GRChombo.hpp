@@ -24,6 +24,7 @@
 
 #include "ProfilingInfo.hpp"
 #include "CCZ4.hpp"
+#include "BinaryBH.hpp"
 
 
 struct SimParams
@@ -63,6 +64,14 @@ struct SimParams
      pp.getarr("centerB", centerB, 0, SpaceDim);
      pp.getarr("momentumB", momentumB, 0, SpaceDim);
 
+     //Fill in BinaryBHParameters
+     bh1_params.mass = massA;
+     bh1_params.center = centerA;
+     bh1_params.momentum = momentumA;
+     bh2_params.mass = massB;
+     bh2_params.center = centerB;
+     bh2_params.momentum = momentumB;
+
      //Misc
      pp.get("nan_check", nan_check);
 
@@ -98,6 +107,8 @@ struct SimParams
 
   //Collection of parameters necessary for the CCZ4 RHS
   CCZ4::params_t ccz4Params;
+  BoostedBH::params_t bh2_params;
+  BoostedBH::params_t bh1_params;
 };
 
 class GRChombo : public AMRLevel
@@ -247,8 +258,6 @@ protected:
 public:
 // number of components of m_state
   static const int s_num_comps = c_NUM;
-// names of components
-  static const char* s_state_names[s_num_comps];
 // number of ghost cells
   static const int s_num_ghosts = 3;
 // periodicity information

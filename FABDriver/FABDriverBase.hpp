@@ -11,7 +11,7 @@
 
 //The following file has to be provided by the user.
 //It must include c_NUM, the total number of simulation components.
-#include "user_enum.hpp"
+#include "UserVariables.hpp"
 #include "always_inline.hpp"
 #include "VarsBase.hpp"
 

@@ -6,7 +6,7 @@
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 
-#include "user_enum.hpp" //This files needs c_NUM - total number of components
+#include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
 class KreissOligerDissipation
 {
