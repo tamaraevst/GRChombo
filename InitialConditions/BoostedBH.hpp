@@ -1,3 +1,5 @@
+#ifndef BOOSTEDBH_HPP_
+#define BOOSTEDBH_HPP_
 /**
   * BOOSTED SCHWARZSCHILD BLACK HOLE
   * Baumgarte & Shapiro, pp. 73-74
@@ -8,17 +10,22 @@ class BoostedBH
 {
 
 public:
-	const Real mass;
- 	const std::vector<Real> center;
- 	const std::vector<Real> momentum;
+    struct params_t
+    {
+        Real mass;
+        std::vector<Real> center;
+        std::vector<Real> momentum;
+    };
 
-	BoostedBH(Real m, std::vector<Real> const& center, std::vector<Real> const& momentum);
+    const params_t m_params;
+
+	BoostedBH(params_t a_params);
 
 	// conformal factor
 	Real psi_minus_one(Real x, Real y, Real z) const;
 
 	// extrinsic curvature
-	void Aij(Real x, Real y, Real z, Real out[3][3]) const;
+	tensor<2, double> Aij(Real x, Real y, Real z) const;
 
 private:
 	Real center_dist(Real x, Real y, Real z) const;
@@ -31,38 +38,32 @@ private:
 
 /* PUBLIC */
 
-BoostedBH::BoostedBH(Real mass, std::vector<Real> const& center, std::vector<Real> const& momentum) :
-	mass (mass),
-	center (center),
-	momentum (momentum)
-{
-	
-}
+BoostedBH::BoostedBH(params_t a_params) : m_params (a_params){}
 
 Real
 BoostedBH::psi_minus_one(Real x, Real y, Real z) const
 {
 	const Real r = center_dist(x,y,z);
-	const Real cos_theta = (z - center[2]) / r;
-	const Real P_squared = momentum[0] * momentum[0] + momentum[1] * momentum[1] + momentum[2] * momentum[2];
-	return psi0(r) + P_squared * psi2(r, cos_theta) / (mass * mass);
+	const Real cos_theta = (z - m_params.center[2]) / r;
+	const Real P_squared = pow(m_params.momentum[0],2) + pow(m_params.momentum[1],2) + pow(m_params.momentum[2],2);
+	return psi0(r) + P_squared * psi2(r, cos_theta) / (m_params.mass * m_params.mass);
 }
 
-void
-BoostedBH::Aij(Real x, Real y, Real z, Real out[3][3]) const
+tensor<2,double>
+BoostedBH::Aij(Real x, Real y, Real z) const
 {
 	const Real r = center_dist(x,y,z);
-	const Real l[3] = { (x - center[0]) / r, (y - center[1]) / r, (z - center[2]) / r };
-	const Real l_dot_p = l[0] * momentum[0] + l[1] * momentum[1] + l[2] * momentum[2];
+	const Real l[3] = { (x - m_params.center[0]) / r, (y - m_params.center[1]) / r, (z - m_params.center[2]) / r };
+	const Real l_dot_p = l[0] * m_params.momentum[0] + l[1] * m_params.momentum[1] + l[2] * m_params.momentum[2];
 
-	for (int i = 0; i < 3; ++i)
-	{
-		for (int j = i; j < 3; ++j)
-		{
+    tensor<2, double> out;
+
+    FOR2(i,j)
+    {
 			const Real delta = (i == j) ? 1 : 0;
-			out[i][j] = 1.5 * (momentum[i] * l[j] + momentum[j] * l[i] - (delta - l[i] * l[j]) * l_dot_p) / (r * r);
-		}
+			out[i][j] = 1.5 * (m_params.momentum[i] * l[j] + m_params.momentum[j] * l[i] - (delta - l[i] * l[j]) * l_dot_p) / (r * r);
 	}
+    return out;
 }
 
 /* PRIVATE */
@@ -70,7 +71,7 @@ BoostedBH::Aij(Real x, Real y, Real z, Real out[3][3]) const
 Real
 BoostedBH::center_dist(Real x, Real y, Real z) const
 {
-	Real r = std::sqrt((x - center[0]) * (x - center[0]) + (y - center[1]) * (y - center[1]) + (z - center[2]) * (z - center[2]));
+	Real r = std::sqrt(pow(x - m_params.center[0],2) + pow(y - m_params.center[1],2) + pow(z - m_params.center[2],2));
 	if (std::fabs(r) < 1e-6)
 	{
 		return 1e-6;
@@ -84,7 +85,7 @@ BoostedBH::center_dist(Real x, Real y, Real z) const
 Real
 BoostedBH::psi0(Real r) const
 {
-	return mass / (2 * r);
+	return m_params.mass / (2 * r);
 }
 
 Real
@@ -109,4 +110,4 @@ BoostedBH::psi2_2(Real r) const
 	return 0.05 * std::pow(1 + F, -5) * FF * (84 * F * FF * FF + 378 * FF * FF + 658 * F * FF
 		+ 539 * FF + 192 * F + 15) + 4.2 * F * FF * std::log(F / (1 + F));
 }
-
+#endif /*BOOSTEDBH_HPP_*/
