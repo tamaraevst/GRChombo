@@ -16,8 +16,8 @@ namespace Lapse
     enum
     {
         ONE,
-            PRE_COLLAPSED,
-            CHI
+        PRE_COLLAPSED,
+        CHI
     };
 }
 
@@ -74,7 +74,7 @@ void BinaryBH::compute(int ix, int iy, int iz)
             vars.lapse = vars.chi;
             break;
         default:
-            MayDay::Error("BinaryBH::Initial lapse not recognised.");
+            MayDay::Error("BinaryBH::Supplied initial lapse not supported.");
     }
 
     idx_t<double> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox

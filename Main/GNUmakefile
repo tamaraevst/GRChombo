@@ -6,10 +6,10 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
-ebase := GRChombo
+ebase := main
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
-src_dirs := ../utils ../simd ../CCZ4 ../InitialConditions ../FABDriver
+src_dirs := ../utils ../simd ../CCZ4 ../InitialConditions ../FABDriver ../GRChomboCore
 
 include $(CHOMBO_HOME)/mk/Make.test
