@@ -32,4 +32,6 @@ class CCZ4Level : public GRAMRLevel
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
 };
 
+#include "CCZ4Level.impl.hpp"
+
 #endif /* CCZ4LEVEL_HPP_ */

@@ -19,6 +19,8 @@
 using std::endl;
 #include "AMR.H"
 
+#include "SetupFunctions.hpp"
+
 //Problem specific includes:
 #include "CCZ4LevelFactory.hpp"
 
@@ -35,12 +37,12 @@ using std::endl;
 #endif
 
 int
-runGRChombo ()
+runGRChombo (ParmParse& pp)
 {
     //The line below selects the problem that is simulated
     //(every problem must have a child of AMRLevel which is produced
     //in a child of AMRLevelFactory)
-    CCZ4LevelFactory ccz4_level_fact;
+    CCZ4LevelFactory ccz4_level_fact(pp);
     AMR amr;
     setupAMRObject(amr, ccz4_level_fact);
 
@@ -61,10 +63,13 @@ main(int argc ,char* argv[])
 {
     mainSetup(argc, argv);
 
-    int status = runGRChombo();
+    char* in_file = argv[1];
+ //TODO: this whole ParmParse business is annoying. Read the parameters then pass SimulationParamters around
+    ParmParse  pp(argc-2,argv+2,NULL,in_file);
+    int status = runGRChombo(pp);
 
-    if ( status == 0 ) pout() << indent << pgmname << " finished." << endl ;
-    else pout() << indent << pgmname << " failed with return code " << status << endl ;
+    if ( status == 0 ) pout() << "GRChombo finished." << endl ;
+    else pout() << "GRChombo failed with return code " << status << endl ;
 
     mainFinalize();
     return status ;

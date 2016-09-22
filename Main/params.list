@@ -1,0 +1,3 @@
+L, type=int, default=2
+regridmax, type=double
+somevar, numComp=3, type int, 

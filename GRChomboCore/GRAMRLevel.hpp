@@ -12,7 +12,7 @@
 class GRAMRLevel : public AMRLevel
 {
 protected:
-    GRAMRLevel(const SimulationParameters& a_p, int a_tagBufferSize, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
+    GRAMRLevel(const SimulationParameters& a_p, int a_num_ghosts, int a_tag_buffer_size, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
 
     virtual
     ~GRAMRLevel();
@@ -153,8 +153,7 @@ protected:
 
 
 public:
-    // number of ghost cells
-    //  static const int s_num_ghosts = 3;
+    const int m_num_ghosts;
     // periodicity information
     //  static const int s_periodicity[SpaceDim];
 
@@ -186,5 +185,7 @@ protected:
     FourthOrderFineInterp m_fine_interp;
     DisjointBoxLayout m_grids;
 };
+
+#include "GRAMRLevel.impl.hpp"
 
 #endif /* GRAMRLEVEL_HPP_ */

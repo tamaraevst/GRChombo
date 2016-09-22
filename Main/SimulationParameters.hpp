@@ -17,6 +17,7 @@ struct SimulationParameters
      pp.get("L", L);
      pp.get("regridmax", regridmax);
      pp.getarr("isPeriodic", isPeriodic,0, SpaceDim);
+     pp.get("num_ghosts", num_ghosts);
 
      // Lapse evolution
      pp.get("LapseAdvectionCoeff",LapseAdvectionCoeff);
@@ -55,6 +56,7 @@ struct SimulationParameters
 
      //Misc
      pp.get("nan_check", nan_check);
+     pp.get("ignore_name_mismatch", ignore_name_mismatch);
 
      //Fill in he ccz4Parameters
      ccz4Params.kappa1 = kappa1;
@@ -68,6 +70,7 @@ struct SimulationParameters
 
   // Grid setup
   Real L, regridmax;
+  int num_ghosts;
   std::vector<bool> isPeriodic;
   //Lapse evolution
   Real LapseAdvectionCoeff;
@@ -85,6 +88,7 @@ struct SimulationParameters
   std::vector<Real> momentumA, momentumB;
   //Misc
   int nan_check;
+  bool ignore_name_mismatch;
 
   //Collection of parameters necessary for the CCZ4 RHS
   CCZ4::params_t ccz4Params;
