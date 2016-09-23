@@ -47,8 +47,8 @@ runGRChombo (int argc, char* argv[])
     SimulationParameters sim_params(pp);
 
     //The line below selects the problem that is simulated
-    //(every problem must have a child of AMRLevel which is produced
-    //in a child of AMRLevelFactory)
+    //(To simulate a different problem, define a new child of AMRLevel
+    //and an associated LevelFactory)
     CCZ4LevelFactory ccz4_level_fact(sim_params);
     AMR amr;
     setupAMRObject(amr, ccz4_level_fact);
