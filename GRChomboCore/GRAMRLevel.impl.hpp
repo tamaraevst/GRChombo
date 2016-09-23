@@ -5,10 +5,8 @@
 #include "FABDriver.hpp"
 #include "ComputeModGrad.hpp"
 
-GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_num_ghosts, int a_tag_buffer_size,
-                        int a_verbosity, ProfilingInfo * a_profilingInfo)
-: m_num_ghosts (a_num_ghosts), m_tagBufferSize(a_tag_buffer_size), m_p(a_p),
-    m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
+GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
+: m_num_ghosts (a_p.num_ghosts), m_p(a_p), m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
 {
     if ( m_verbosity ) pout () << "GRAMRLevel default constructor" << endl;
 }
@@ -81,9 +79,11 @@ GRAMRLevel::advance ()
     // The level classes take flux-register parameters, use dummy ones here
     LevelFluxRegister* coarser_fr = nullptr;
     LevelFluxRegister* finer_fr   = nullptr;
-    // Default coarser level pointers to nullptr
-    const GRLevelData* coarser_data_old = nullptr;
-    const GRLevelData* coarser_data_new = nullptr;
+    // Default coarser level pointers to an empty LevelData
+    // (Chombo usually checks isDefined() rather than != nullptr so we shouldn't use the nullptr)
+    const GRLevelData null_gr_level_data;
+    const GRLevelData* coarser_data_old = &null_gr_level_data;
+    const GRLevelData* coarser_data_new = &null_gr_level_data;
 
     Real t_coarser_old = 0.0;
     Real t_coarser_new = 0.0;
@@ -182,7 +182,7 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         {
             IntVect iv(x,y,z);
             //At the moment only base on gradient chi/chi^2
-            if (mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2) >= m_p.regridmax)
+            if (mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2) >= m_p.regrid_threshold)
             {
                 // local_tags |= is not thread safe.
 #pragma omp critical
@@ -193,7 +193,7 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         }
     }
 
-    local_tags.grow(m_tagBufferSize);
+    local_tags.grow(m_p.tag_buffer_size);
 
     // Need to do this in two steps unless a IntVectSet::operator &=
     // (ProblemDomain) operator is defined
@@ -369,7 +369,7 @@ GRAMRLevel::writeCheckpointLevel (HDF5Handle& a_handle) const
     HDF5HeaderData header;
 
     header.m_int  ["ref_ratio"]   = m_ref_ratio;
-    header.m_int  ["tag_buffer_size"] = m_tagBufferSize;
+    header.m_int  ["tag_buffer_size"] = m_p.tag_buffer_size;
     header.m_real ["dx"]          = m_dx;
     header.m_real ["dt"]          = m_dt;
     header.m_real ["time"]        = m_time;
@@ -429,7 +429,7 @@ GRAMRLevel::readCheckpointHeader  (HDF5Handle& a_handle)
         state_name = header.m_string [comp_str];
         if (state_name != UserVariables::variable_names[comp])
         {
-            if (m_p.ignore_name_mismatch)
+            if (m_p.ignore_checkpoint_name_mismatch)
             {
                 MayDay::Warning("GRAMRLevel::readCheckpointHeader: state_name mismatch error silenced by user.");
             }

@@ -11,10 +11,13 @@ using std::cerr;
 #include "AMR.H"
 #include "AMRLevelFactory.H"
 
+//This function calls MPI_Init, makes sure a parameter file is supplied etc...
 void mainSetup(int argc ,char* argv[]);
 
+//This function calls all finalisations
 void mainFinalize();
 
+//Sets up the grid parameters, problem domain and AMR object
 void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory);
 
 //TODO (MK): There is a lot of clutter still in this file ... get rid of everything that's not necessary
@@ -82,12 +85,15 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
 
     ParmParse pp;
 
+    //TODO: All the parameter loading code in this function is really verbose and ugly.
+    //Could consider moving it to some base form of SimulationParameters.
+
     IntVect ivN = IntVect::Unit;
     // Setup the grid size
     for (int dir=0; dir<SpaceDim; ++dir)
     {
         char dir_str[20];
-        sprintf (dir_str, "N%d", dir);
+        sprintf (dir_str, "N%d", dir+1);
         int N;
         pp.get(dir_str, N);
         ivN[dir] = N-1;

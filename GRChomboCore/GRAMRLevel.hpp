@@ -12,7 +12,7 @@
 class GRAMRLevel : public AMRLevel
 {
 protected:
-    GRAMRLevel(const SimulationParameters& a_p, int a_num_ghosts, int a_tag_buffer_size, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
+    GRAMRLevel(const SimulationParameters& a_p, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
 
     virtual
     ~GRAMRLevel();
@@ -164,13 +164,10 @@ protected:
     GRLevelData m_state_new;
     // grid spacing
     Real m_dx;
-    // tag buffer size
-    int m_tagBufferSize;
-
-    int m_verbosity;
 
     // params
     SimulationParameters m_p;
+    int m_verbosity;
 
     //Profiling info
     ProfilingInfo * m_profilingInfo;

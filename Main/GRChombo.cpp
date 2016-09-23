@@ -20,6 +20,7 @@ using std::endl;
 #include "AMR.H"
 
 #include "SetupFunctions.hpp"
+#include "SimulationParameters.hpp"
 
 //Problem specific includes:
 #include "CCZ4LevelFactory.hpp"
@@ -37,12 +38,18 @@ using std::endl;
 #endif
 
 int
-runGRChombo (ParmParse& pp)
+runGRChombo (int argc, char* argv[])
 {
+    //Load the parameter file and construct the SimulationParameter class
+    //To add more parameters edit the SimulationParameters file.
+    char* in_file = argv[1];
+    ParmParse  pp(argc-2,argv+2,NULL,in_file);
+    SimulationParameters sim_params(pp);
+
     //The line below selects the problem that is simulated
     //(every problem must have a child of AMRLevel which is produced
     //in a child of AMRLevelFactory)
-    CCZ4LevelFactory ccz4_level_fact(pp);
+    CCZ4LevelFactory ccz4_level_fact(sim_params);
     AMR amr;
     setupAMRObject(amr, ccz4_level_fact);
 
@@ -63,10 +70,7 @@ main(int argc ,char* argv[])
 {
     mainSetup(argc, argv);
 
-    char* in_file = argv[1];
- //TODO: this whole ParmParse business is annoying. Read the parameters then pass SimulationParamters around
-    ParmParse  pp(argc-2,argv+2,NULL,in_file);
-    int status = runGRChombo(pp);
+    int status = runGRChombo(argc, argv);
 
     if ( status == 0 ) pout() << "GRChombo finished." << endl ;
     else pout() << "GRChombo failed with return code " << status << endl ;

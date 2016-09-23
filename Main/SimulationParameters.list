@@ -1,0 +1,4 @@
+#The idea is to use a file of this sort of type to autogenerate the SimulationParameters file...
+L, type=int, default=2
+regridmax, type=double
+somevar, numComp=3, type int, 
