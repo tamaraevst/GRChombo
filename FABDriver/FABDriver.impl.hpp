@@ -127,7 +127,7 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, simd_info... 
 template <class compute_t>
 template <typename... simd_info>
 void
-FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts, simd_info... info)
+FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
     DataIterator dit0  = in.dataIterator();
     int nbox = dit0.size();
@@ -138,7 +138,7 @@ FABDriver<compute_t>::execute(const LevelData<FArrayBox>& in, LevelData<FArrayBo
         FArrayBox& out_fab = out[di];
 
         Box out_box;
-        if (fillGhosts) out_box = out_fab.box();
+        if (fill_ghosts) out_box = out_fab.box();
         else out_box = in.disjointBoxLayout()[di];
 
         execute(in_fab,out_fab,out_box, std::forward<simd_info>(info)...);

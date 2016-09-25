@@ -10,7 +10,7 @@ namespace TensorAlgebra
     static tensor<2, data_t>
     compute_inverse(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
     {
-        //TODO, FIXME: this function currently assumes a symmetic tensor ... change this?
+        //FIXME: this function currently assumes a symmetic tensor ... change this?
         data_t deth = matrix[0][0]*matrix[1][1]*matrix[2][2] + 2*matrix[0][1]*matrix[0][2]*matrix[1][2] - matrix[0][0]*matrix[1][2]*matrix[1][2] - matrix[1][1]*matrix[0][2]*matrix[0][2] - matrix[2][2]*matrix[0][1]*matrix[0][1];
         tensor<2, data_t> h_UU;
         {

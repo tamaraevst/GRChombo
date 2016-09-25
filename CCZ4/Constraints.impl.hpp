@@ -33,11 +33,12 @@ Constraints::compute(int ix, int iy, int iz)
 
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
-    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Ham])[out_idx]  = out.Ham;
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Mom1])[out_idx] = out.Mom[0];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Mom2])[out_idx] = out.Mom[1];
-    SIMDIFY<data_t>(m_driver.m_out_ptr[c_Mom3])[out_idx] = out.Mom[2];
+    //Write the rhs into the output FArrayBox
+    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox
+    m_driver.store_vars(out.Ham, out_idx, c_Ham);
+    m_driver.store_vars(out.Mom[0], out_idx, c_Mom1);
+    m_driver.store_vars(out.Mom[1], out_idx, c_Mom2);
+    m_driver.store_vars(out.Mom[2], out_idx, c_Mom3);
 }
 
 template <class data_t>

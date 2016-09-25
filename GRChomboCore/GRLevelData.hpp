@@ -13,7 +13,6 @@ public:
         for(dit.begin(); dit.ok(); ++dit)
         {
             FArrayBox& fab = (*this)[dit];
-#warning: make sure the setVal function in Chombo is threaded!
             fab.setVal(a_val); //TODO: Make sure these functions are threaded in Chombo!
         }
     }

@@ -63,6 +63,14 @@ FABDriverBase::store_vars(const std::array<data_t, c_NUM>& values, const idx_t<d
 
 template <class data_t>
 void
+FABDriverBase::store_vars(const VarsBase<data_t>& vars, const idx_t<data_t> out_idx, int icomp) const
+{
+    CH_assert(vars.variable_defined(icomp));
+    store_vars(vars.template read<data_t>(icomp), out_idx, icomp);
+}
+
+template <class data_t>
+void
 //This function stores all variables that have a corresponding value in a VarsBase object.
 //It will cycle through all components and check whether they have been assigned in the vars object.
 //Avoid use for vars objects that only contain few components.

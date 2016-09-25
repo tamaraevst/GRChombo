@@ -23,7 +23,7 @@ using std::endl;
 #include "SimulationParameters.hpp"
 
 //Problem specific includes:
-#include "CCZ4LevelFactory.hpp"
+#include "BinaryBHLevelFactory.hpp"
 
 //TODO (MK): There is a lot of clutter still in this file ... get rid of everything that's not necessary
 //and comment on the rest (so that we don't carry around useless code forever
@@ -49,9 +49,9 @@ runGRChombo (int argc, char* argv[])
     //The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
     //and an associated LevelFactory)
-    CCZ4LevelFactory ccz4_level_fact(sim_params);
+    BinaryBHLevelFactory binary_bh_level_fact(sim_params);
     AMR amr;
-    setupAMRObject(amr, ccz4_level_fact);
+    setupAMRObject(amr, binary_bh_level_fact);
 
     Real stop_time;
     pp.get("stop_time", stop_time);

@@ -151,7 +151,6 @@ class CCZ4Geometry
     )
     {
          tensor<1,data_t> Z0 = 0.;
-         //FOR1(i) Z0[i] = 0; //TODO: fix the array constructor in tensor
          return compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
     }
 

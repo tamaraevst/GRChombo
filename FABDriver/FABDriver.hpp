@@ -12,6 +12,12 @@
 #include "LevelData.H"
 #include "tensor.hpp"
 
+enum
+{
+    SKIP_GHOST_CELLS,
+    FILL_GHOST_CELLS
+};
+
 template <class compute_t>
 class FABDriver : public FABDriverBase
 {
@@ -29,9 +35,9 @@ public:
     void execute(const FArrayBox& in, FArrayBox& out, simd_info... info); //Uses out.box() as loop_box
 
     //MK: Could give the ghost treatment a default argument but I think it's better to force the user to make a concious decision
-    //Wrong fillGhosts can give errors that are very hard to debug
+    //Wrong fill_ghosts can give errors that are very hard to debug
     template <typename... simd_info>
-    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fillGhosts, simd_info... info);
+    void execute(const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info);
 
     void set_pointers(const FArrayBox& in, FArrayBox& out);
 };

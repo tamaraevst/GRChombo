@@ -7,7 +7,6 @@
 //then the templating of the FABDriver with class compute_t becomes a problem when constructing the objects.
 //FABDriverBase gives us all we need on the side of the computer but isn't templated.
 //TODO: actually FABDriver doesn't need to be template over compute_t, only it's member functions
-#warning: get rid of the FABDriver/FABDriverBase split. It is not necessary.
 
 //The following file has to be provided by the user.
 //It must include c_NUM, the total number of simulation components.
@@ -69,6 +68,9 @@ struct FABDriverBase
 
     template <class data_t>
     void store_vars(const std::array<data_t, c_NUM>& values, const idx_t<data_t> out_idx) const;
+
+    template <class data_t>
+    void store_vars(const VarsBase<data_t>& vars, const idx_t<data_t> out_idx, int icomp) const;
 
     template <class data_t>
     void store_vars(const VarsBase<data_t>& vars, const idx_t<data_t> out_idx) const;

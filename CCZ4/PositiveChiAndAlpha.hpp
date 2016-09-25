@@ -31,8 +31,8 @@ public:
       lapse = simd_conditional(lapse_is_too_small, 1e-4, lapse);
 
       idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-      SIMDIFY<data_t>(m_driver.m_out_ptr[c_chi])[out_idx]   = chi;
-      SIMDIFY<data_t>(m_driver.m_out_ptr[c_lapse])[out_idx] = lapse;
+      m_driver.store_vars(chi, out_idx, c_chi);
+      m_driver.store_vars(lapse, out_idx, c_lapse);
    }
 };
 

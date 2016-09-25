@@ -42,7 +42,6 @@ void mainSetup(int argc ,char* argv[])
 #endif
 
     int rank, number_procs;
-
 #ifdef CH_MPI
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
     MPI_Comm_size(Chombo_MPI::comm, &number_procs);
@@ -102,7 +101,7 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
     Box problem_domain (IntVect::Zero, ivN);
     ProblemDomain physdomain(problem_domain);
 
-    // set periodic in all directions
+    // set periodicity
     std::vector<bool> isPeriodic;
     pp.getarr("isPeriodic", isPeriodic, 0, SpaceDim);
     for (int dir=0; dir<SpaceDim; dir++)

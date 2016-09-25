@@ -39,12 +39,9 @@ public:
            mod_d1_arr[ivar] = simd_sqrt(mod_d1_arr[ivar]);
        }
 
-       // TODO: I really do not like this, but cannot think of a better way to do it yet...
+       // Write back into the flattened Chombo box
        idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-       FORVARS(ivar)
-       {
-           SIMDIFY<data_t>(m_driver.m_out_ptr[ivar])[out_idx] = mod_d1_arr[ivar];
-       }
+       m_driver.store_vars(mod_d1_arr, out_idx);
    }
 
 };
