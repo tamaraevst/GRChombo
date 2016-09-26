@@ -1,3 +1,5 @@
+- WORK THROUGH COMPILE ERRORS ON COSMOS
+
 - Compute classes should be changed to take SimulationParameters directly, not parameters. This might not seem like a
 good idea at first sight but it makes it much easier to pass down parameters and thus makes it less tempting to hard code parameter values.
 
