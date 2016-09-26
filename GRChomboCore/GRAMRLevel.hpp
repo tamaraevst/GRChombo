@@ -119,30 +119,30 @@ public:
     /// copy data in src into dest
     void copySolnData(TSoln& dest, const TSoln& src);
 
-    //Pure virtual functions for the specific implementation
+    //(Pure) virtual functions for the specific implementation
     virtual
-    void specificAdvance() = 0;
+    void specificAdvance() {}
 
     virtual
-    void specificPostTimeStep() = 0;
+    void specificPostTimeStep() {}
 
     // initialize data
     virtual
     void initialData() = 0;
 
     virtual
-    void fillBdyGhosts() = 0;
+    void fillBdyGhosts() {}
 
 #ifdef CH_USE_HDF5
     virtual
-    void preCheckpointLevel() = 0;
+    void preCheckpointLevel() {}
 #endif
 
     virtual
     void specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time) = 0;
 
     virtual
-    void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt) = 0;
+    void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt) {}
 
 protected:
     virtual

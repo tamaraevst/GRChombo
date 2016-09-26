@@ -1,9 +1,17 @@
+#if !defined(BINARYBHLEVEL_HPP_)
+#error "This file should only be included through BinaryBHLevel.hpp"
+#endif
+
+#ifndef BINARYBHLEVEL_IMPL_HPP_
+#define BINARYBHLEVEL_IMPL_HPP_
+
 #include "BinaryBHLevel.hpp"
 #include "FABDriver.hpp"
 #include "EnforceTfA.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
 #include "Constraints.hpp"
+#include "CCZ4.hpp"
 
 //Initial data
 #include "BinaryBH.hpp"
@@ -20,10 +28,6 @@ void BinaryBHLevel::specificAdvance()
     if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, SKIP_GHOST_CELLS, disable_simd());
 }
 
-void BinaryBHLevel::specificPostTimeStep()
-{
-}
-
 void BinaryBHLevel::initialData()
 {
     CH_TIME("BinaryBHLevel::initialData");
@@ -33,10 +37,6 @@ void BinaryBHLevel::initialData()
     m_state_new.setVal(0.);
 
     FABDriver<BinaryBH>(m_p.bh1_params, m_p.bh2_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
-}
-
-void BinaryBHLevel::fillBdyGhosts()
-{
 }
 
 void BinaryBHLevel::preCheckpointLevel()
@@ -64,3 +64,5 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_
     //Enforce the trace free alpha condition
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
+
+#endif

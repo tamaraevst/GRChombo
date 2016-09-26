@@ -1,5 +1,5 @@
-#ifndef CCZ4LEVEL_HPP_
-#define CCZ4LEVEL_HPP_
+#ifndef BINARYBHLEVEL_HPP_
+#define BINARYBHLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
 
@@ -12,15 +12,9 @@ class BinaryBHLevel : public GRAMRLevel
     virtual
     void specificAdvance();
 
-    virtual
-    void specificPostTimeStep();
-
     // initialize data
     virtual
     void initialData();
-
-    virtual
-    void fillBdyGhosts();
 
     virtual
     void preCheckpointLevel();
@@ -34,4 +28,4 @@ class BinaryBHLevel : public GRAMRLevel
 
 #include "BinaryBHLevel.impl.hpp"
 
-#endif /* CCZ4LEVEL_HPP_ */
+#endif /* BINARYBHLEVEL_HPP_ */
