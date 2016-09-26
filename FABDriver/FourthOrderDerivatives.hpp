@@ -32,10 +32,10 @@ public:
 
         //NOTE: if you have been sent here by the debugger because of EXC_BAD_ACCESS
         //or something similar you might be trying to take derivatives without ghost points.
-        return (  weight_far  * in[idx - 2*stride]
-                    - weight_near * in[idx - stride]
-                    + weight_near * in[idx + stride]
-                    - weight_far  * in[idx + 2*stride]) / m_dx;
+        return (    weight_far  * in[idx - 2*stride]
+                  - weight_near * in[idx -   stride]
+                  + weight_near * in[idx +   stride]
+                  - weight_far  * in[idx + 2*stride]) / m_dx;
     }
 
     //Writes directly into the vars object - use this wherever possible
@@ -73,10 +73,10 @@ public:
             data_t weight_local = 2.50000000000000000000e+0;
 
             return   (- weight_far   * in[idx - 2*stride]
-                         + weight_near  * in[idx - stride]
-                         - weight_local * in[idx]
-                         + weight_near  * in[idx + stride]
-                         - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
+                      + weight_near  * in[idx - stride]
+                      - weight_local * in[idx]
+                      + weight_near  * in[idx + stride]
+                      - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
     }
 
     //Writes 2nd deriv directly into the vars object - use this wherever possible
@@ -113,25 +113,25 @@ public:
             data_t weight_near_far  = 5.55555555555555555556e-2;
             data_t weight_near_near = 4.44444444444444444444e-1;
 
-            return (  weight_far_far   * in[idx - 2*stride1 - 2*stride2]
-                         - weight_near_far  * in[idx - 2*stride1 - stride2]
-                         + weight_near_far  * in[idx - 2*stride1 + stride2]
-                         - weight_far_far   * in[idx - 2*stride1 + 2*stride2]
+            return (    weight_far_far   * in[idx - 2*stride1 - 2*stride2]
+                      - weight_near_far  * in[idx - 2*stride1 - stride2]
+                      + weight_near_far  * in[idx - 2*stride1 + stride2]
+                      - weight_far_far   * in[idx - 2*stride1 + 2*stride2]
 
-                         - weight_near_far  * in[idx - stride1 - 2*stride2]
-                         + weight_near_near * in[idx - stride1 - stride2]
-                         - weight_near_near * in[idx - stride1 + stride2]
-                         + weight_near_far  * in[idx - stride1 + 2*stride2]
+                      - weight_near_far  * in[idx - stride1 - 2*stride2]
+                      + weight_near_near * in[idx - stride1 - stride2]
+                      - weight_near_near * in[idx - stride1 + stride2]
+                      + weight_near_far  * in[idx - stride1 + 2*stride2]
 
-                         + weight_near_far  * in[idx + stride1 - 2*stride2]
-                         - weight_near_near * in[idx + stride1 - stride2]
-                         + weight_near_near * in[idx + stride1 + stride2]
-                         - weight_near_far  * in[idx + stride1 + 2*stride2]
+                      + weight_near_far  * in[idx + stride1 - 2*stride2]
+                      - weight_near_near * in[idx + stride1 - stride2]
+                      + weight_near_near * in[idx + stride1 + stride2]
+                      - weight_near_far  * in[idx + stride1 + 2*stride2]
 
-                         - weight_far_far   * in[idx + 2*stride1 - 2*stride2]
-                         + weight_near_far  * in[idx + 2*stride1 - stride2]
-                         - weight_near_far  * in[idx + 2*stride1 + stride2]
-                         + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
+                      - weight_far_far   * in[idx + 2*stride1 - 2*stride2]
+                      + weight_near_far  * in[idx + 2*stride1 - stride2]
+                      - weight_near_far  * in[idx + 2*stride1 + stride2]
+                      + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
     }
 
     template <class data_t>
@@ -232,7 +232,7 @@ public:
         data_t weight_near  = 2.34375e-1;
         data_t weight_local = 3.12500e-1;
 
-        return ( weight_vfar   * in[idx - 3*stride]
+        return (   weight_vfar  * in[idx - 3*stride]
                  - weight_far   * in[idx - 2*stride]
                  + weight_near  * in[idx - stride]
                  - weight_local * in[idx]

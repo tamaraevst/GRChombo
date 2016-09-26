@@ -55,7 +55,7 @@ GRAMRLevel* GRAMRLevel::gr_cast(AMRLevel* const amr_level_ptr)
     GRAMRLevel* gr_amr_level_ptr = dynamic_cast<GRAMRLevel*> (amr_level_ptr);
     if (gr_amr_level_ptr == nullptr)
     {
-        MayDay::Error ("in GRAMRLevel::gr_cast: m_finer_level_ptr is not castable to GRAMRLevel*");
+        MayDay::Error ("in GRAMRLevel::gr_cast: amr_level_ptr is not castable to GRAMRLevel*");
     }
     return gr_amr_level_ptr;
 }

@@ -67,10 +67,10 @@ Constraints::constraint_equations(
    FOR3(i,j,k)
    {
       covd_A[i][j][k] = d1.A[j][k][i];
-   }
-   FOR4(i,j,k,l)
-   {
-      covd_A[i][j][k] += - chris.ULL[l][i][j]*vars.A[l][k] - chris.ULL[l][i][k]*vars.A[l][j];
+      FOR1(l)
+      {
+          covd_A[i][j][k] += - chris.ULL[l][i][j]*vars.A[l][k] - chris.ULL[l][i][k]*vars.A[l][j];
+      }
    }
 
    FOR1(i)
