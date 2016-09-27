@@ -28,7 +28,7 @@ public:
       FORVARS(i)
       {
           const double val = m_driver.local_vars(idx,i);
-          if ( isnan(val) || abs(val) > m_max_abs) stop = true;
+          if ( std::isnan(val) || abs(val) > m_max_abs) stop = true;
       }
       if (stop)
       {

@@ -21,7 +21,7 @@ public:
     template <typename data_t>
     static ALWAYS_INLINE auto //Always inlined so this iteration trick doesn't ruin performance
     apply(data_t& obj, t dir0, Ts... dirs)
-    -> decltype(IndexApplicator<Ts...>::apply(obj[dir0], dirs...))&
+//    -> decltype(IndexApplicator<Ts...>::apply(obj[dir0], dirs...))&
     {
         //Let the compiler iterate until there are no indices left (at which point we go to the
         //specialisation below).
