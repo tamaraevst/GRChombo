@@ -100,7 +100,7 @@ template <typename t> struct simd_compare { typedef bool type; };
 template <typename t> struct simd_compare<simd<t> > { typedef typename simd_traits<t>::mask_t type; };
 
 template <typename t>
-t simd_conditional(typename simd_compare<t>::type cond, const t& true_value, const t& false_value)
+t simd_conditional(const typename simd_compare<t>::type cond, const t& true_value, const t& false_value)
 {
     return cond ? true_value : false_value;
 }

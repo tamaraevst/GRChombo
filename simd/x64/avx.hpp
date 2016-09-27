@@ -91,7 +91,7 @@ struct simd<double> : public simd_base<double>
     }
 
     friend ALWAYS_INLINE
-    simd simd_conditional(mask_t cond, const simd& true_value, const simd& false_value)
+    simd simd_conditional(const mask_t cond, const simd& true_value, const simd& false_value)
     {
         return _mm256_blendv_pd(false_value, true_value, cond);
     }
@@ -191,7 +191,7 @@ struct simd<float> : public simd_base<float>
     }
 
     friend ALWAYS_INLINE
-    simd simd_conditional(mask_t cond, const simd& true_value, const simd& false_value)
+    simd simd_conditional(const mask_t cond, const simd& true_value, const simd& false_value)
     {
         return _mm256_blendv_ps(false_value, true_value, cond);
     }
