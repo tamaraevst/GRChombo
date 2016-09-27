@@ -163,10 +163,10 @@ public:
     }
 
 protected: //Let's keep this protected ... we may want to change the advection calculation
-    template <class data_t>
+    template <class data_t, class mask_t>
     ALWAYS_INLINE
     data_t
-    advection_term(const double *in_ptr, idx_t<data_t> idx, const data_t& vec_comp, const int stride, const data_t shift_positive) const
+    advection_term(const double *in_ptr, idx_t<data_t> idx, const data_t& vec_comp, const int stride, const mask_t shift_positive) const
     {
         const auto in = SIMDIFY<data_t>(in_ptr);
         const data_t in_left = in[idx - stride];
@@ -202,7 +202,7 @@ public:
     add_advection(VarsBase<data_t>& vars, idx_t<data_t> idx, const data_t& vec_comp, const int dir) const
     {
         const int stride = m_driver.m_in_stride[dir];
-        const data_t shift_positive = simd_compare_gt(vec_comp, 0.0);
+        auto shift_positive = simd_compare_gt(vec_comp, 0.0);
         FORVARS(ivar)
         {
             vars.plus(advection_term(m_driver.m_in_ptr[ivar],idx, vec_comp, stride, shift_positive),ivar);
@@ -214,7 +214,7 @@ public:
     add_advection(data_t (&out)[c_NUM], idx_t<data_t> idx, const data_t& vec_comp, const int dir) const
     {
         const int stride = m_driver.m_in_stride[dir];
-        const data_t shift_positive = simd_compare_gt(vec_comp, 0.0);
+        auto shift_positive = simd_compare_gt(vec_comp, 0.0);
         FORVARS(ivar)
         {
             out[ivar] += advection_term(m_driver.m_in_ptr[ivar],idx, vec_comp, stride, shift_positive);
