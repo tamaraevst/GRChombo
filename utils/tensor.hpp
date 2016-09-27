@@ -3,7 +3,7 @@
 
 #include "GRUtils.hpp"
 #include "always_inline.hpp"
-#include <initializer_list>
+//#include <initializer_list>
 
 // C++ standard, 12.8 Copying class objects:
 // Each subobject is assigned in the manner appropriate to its type:

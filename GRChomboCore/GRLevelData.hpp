@@ -7,6 +7,8 @@
 class GRLevelData : public LevelData<FArrayBox>
 {
 public:
+    GRLevelData() : LevelData<FArrayBox>() {}
+
     void setVal(const double a_val)
     {
         DataIterator dit = m_disjointBoxLayout.dataIterator();
