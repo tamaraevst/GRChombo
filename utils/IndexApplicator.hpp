@@ -19,7 +19,7 @@ class IndexApplicator<t, Ts...>
 {
 public:
     template <typename data_t>
-    static ALWAYS_INLINE auto //Always inlined so this iteration trick doesn't ruin performance
+    static ALWAYS_INLINE auto & //Always inlined so this iteration trick doesn't ruin performance
     apply(data_t& obj, t dir0, Ts... dirs)
 //    -> decltype(IndexApplicator<Ts...>::apply(obj[dir0], dirs...))&
     {
