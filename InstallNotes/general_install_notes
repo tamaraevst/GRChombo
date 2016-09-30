@@ -1,0 +1,12 @@
+GRChombo has been compiled and tested with gcc-4.9 and higher and
+intel icc-16.0.3 and higher. For icc note that the gcc compatibility has to be set to gcc-4.9 or higher.
+
+GRChombo requires c++ standard 11 or higher so the compiler should be invoked with -std=c++11 (or higher)
+
+This folder also contains specific install notes for a collection of machines GRChombo has been run on.
+
+To compile:
+Export CHOMBO_HOME (the path to the Chombo installation) and compile whathever example or test you want to
+run by invoking make all DIM=3 (or 2,4,5... if you are thus inclined) -j 32 (compiles in parallel ... any number
+will work but some are faster than others) in the relevant directory.
+In addition, follow any other specific instructions for your machine in this folder.
