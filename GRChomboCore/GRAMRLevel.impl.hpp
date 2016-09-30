@@ -144,6 +144,8 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
     CH_TIME("GRAMRLevel::tagCells");
     if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;
 
+    fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
+
     // Create tags based on undivided gradient of phi
     IntVectSet local_tags;
 
