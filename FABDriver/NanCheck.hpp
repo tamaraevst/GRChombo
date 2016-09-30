@@ -32,12 +32,15 @@ public:
       }
       if (stop)
       {
-          pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
-          FORVARS(i)
+#pragma omp single
           {
-              pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars(idx,i) << endl;
+              pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
+              FORVARS(i)
+              {
+                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars(idx,i) << endl;
+              }
+              pout() << "ix: " << ix << " iy: " << iy << " iz: " << iz << endl;
           }
-          pout() << "ix: " << ix << " iy: " << iy << " iz: " << iz << endl;
           MayDay::Error("Values have become nan.");
       }
    }
