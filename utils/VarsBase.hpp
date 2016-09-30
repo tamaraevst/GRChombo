@@ -18,6 +18,15 @@ protected:
      StackVector<var_t*,2> m_assignment_ptrs[c_NUM];
 
 public:
+     //This function assigns a mapping from a chombo grid variable to a local
+     //variable (i.e. a variable that only exists for the current cell).
+     //This can be used up to two times (e.g. for
+     //symmetric tensor h12 would map to both vars.h[0][1] and vars.h[1][0])
+     void define_enum_mapping(int a_enum_component, var_t& a_var)
+     {
+         m_assignment_ptrs[a_enum_component].push_back(&a_var);
+     }
+
      //Writes data directly into the variable corresponding to ivar
      //if this variables has multiple components (e.g. if it is an array of derivatives)
      //the data can be written directly into these components by specifying

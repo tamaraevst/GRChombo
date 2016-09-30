@@ -19,6 +19,7 @@ template <class data_t>
 void
 CCZ4::compute(int ix, int iy, int iz)
 {
+    //TODO: Think about getting rid of idx
     idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz); //The current location in the flattened input FArrayBox
 
     vars_t<data_t> vars;
@@ -190,44 +191,47 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 template <class data_t>
 CCZ4::vars_t<data_t>::vars_t()
 {
-    m_assignment_ptrs[c_chi].push_back(&chi);
+    //Define the mapping from components of chombo grid to elements in vars_t.
+    //This allows to read/write data from the chombo grid into local
+    //variables in vars_t (which only exist for the current cell).
+    define_enum_mapping(c_chi, chi);
 
-    m_assignment_ptrs[c_h11].push_back(&h[0][0]);
-    m_assignment_ptrs[c_h12].push_back(&h[0][1]);
-    m_assignment_ptrs[c_h12].push_back(&h[1][0]);
-    m_assignment_ptrs[c_h13].push_back(&h[0][2]);
-    m_assignment_ptrs[c_h13].push_back(&h[2][0]);
-    m_assignment_ptrs[c_h22].push_back(&h[1][1]);
-    m_assignment_ptrs[c_h23].push_back(&h[1][2]);
-    m_assignment_ptrs[c_h23].push_back(&h[2][1]);
-    m_assignment_ptrs[c_h33].push_back(&h[2][2]);
+    define_enum_mapping(c_h11, h[0][0]);
+    define_enum_mapping(c_h12, h[0][1]);
+    define_enum_mapping(c_h12, h[1][0]);
+    define_enum_mapping(c_h13, h[0][2]);
+    define_enum_mapping(c_h13, h[2][0]);
+    define_enum_mapping(c_h22, h[1][1]);
+    define_enum_mapping(c_h23, h[1][2]);
+    define_enum_mapping(c_h23, h[2][1]);
+    define_enum_mapping(c_h33, h[2][2]);
 
-    m_assignment_ptrs[c_K].push_back(&K);
+    define_enum_mapping(c_K, K);
 
-    m_assignment_ptrs[c_A11].push_back(&A[0][0]);
-    m_assignment_ptrs[c_A12].push_back(&A[0][1]);
-    m_assignment_ptrs[c_A12].push_back(&A[1][0]);
-    m_assignment_ptrs[c_A13].push_back(&A[0][2]);
-    m_assignment_ptrs[c_A13].push_back(&A[2][0]);
-    m_assignment_ptrs[c_A22].push_back(&A[1][1]);
-    m_assignment_ptrs[c_A23].push_back(&A[1][2]);
-    m_assignment_ptrs[c_A23].push_back(&A[2][1]);
-    m_assignment_ptrs[c_A33].push_back(&A[2][2]);
+    define_enum_mapping(c_A11, A[0][0]);
+    define_enum_mapping(c_A12, A[0][1]);
+    define_enum_mapping(c_A12, A[1][0]);
+    define_enum_mapping(c_A13, A[0][2]);
+    define_enum_mapping(c_A13, A[2][0]);
+    define_enum_mapping(c_A22, A[1][1]);
+    define_enum_mapping(c_A23, A[1][2]);
+    define_enum_mapping(c_A23, A[2][1]);
+    define_enum_mapping(c_A33, A[2][2]);
 
-    m_assignment_ptrs[c_Gamma1].push_back(&Gamma[0]);
-    m_assignment_ptrs[c_Gamma2].push_back(&Gamma[1]);
-    m_assignment_ptrs[c_Gamma3].push_back(&Gamma[2]);
+    define_enum_mapping(c_Gamma1, Gamma[0]);
+    define_enum_mapping(c_Gamma2, Gamma[1]);
+    define_enum_mapping(c_Gamma3, Gamma[2]);
 
-    m_assignment_ptrs[c_Theta].push_back(&Theta);
+    define_enum_mapping(c_Theta, Theta);
 
-    m_assignment_ptrs[c_lapse].push_back(&lapse);
-    m_assignment_ptrs[c_shift1].push_back(&shift[0]);
-    m_assignment_ptrs[c_shift2].push_back(&shift[1]);
-    m_assignment_ptrs[c_shift3].push_back(&shift[2]);
+    define_enum_mapping(c_lapse, lapse);
+    define_enum_mapping(c_shift1, shift[0]);
+    define_enum_mapping(c_shift2, shift[1]);
+    define_enum_mapping(c_shift3, shift[2]);
 
-    m_assignment_ptrs[c_B1].push_back(&B[0]);
-    m_assignment_ptrs[c_B2].push_back(&B[1]);
-    m_assignment_ptrs[c_B3].push_back(&B[2]);
+    define_enum_mapping(c_B1, B[0]);
+    define_enum_mapping(c_B2, B[1]);
+    define_enum_mapping(c_B3, B[2]);
 }
 
 #endif /* CCZ4_IMPL_HPP_ */
