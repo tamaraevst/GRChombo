@@ -50,7 +50,7 @@ public:
         for(dit.begin(); dit.ok(); ++dit)
         {
             FArrayBox& fab           = (*this)[dit];
-            const FArrayBox& src_fab = (*this)[dit];
+            const FArrayBox& src_fab = a_src[dit];
             fab.plus(src_fab, a_scale);
         }
     }
