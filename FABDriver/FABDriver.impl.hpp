@@ -77,6 +77,7 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
 #pragma novector
             for (int x = loop_lo[0]; x <= loop_hi[0]; ++x)
             {
+                set_idx(x,y,z);
                 m_compute.compute(x,y,z);
             }
         }

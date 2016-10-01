@@ -13,6 +13,7 @@
 #include "UserVariables.hpp"
 #include "always_inline.hpp"
 #include "VarsBase.hpp"
+#include "Interval.H"
 
 #include <array>
 

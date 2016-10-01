@@ -8,6 +8,7 @@
 #include "StackVector.hpp"
 #include "IndexApplicator.hpp"
 #include "GRUtils.hpp"
+#include "CH_assert.H"
 
 template <class var_t>
 class VarsBase

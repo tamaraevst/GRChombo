@@ -16,23 +16,6 @@ centerA = 6 8 8
 massB = 0.82
 centerB = 10 8 8
 
-
-#Go off to infinity
-#momentumA = 0. -0.142476 0.0
-#momentumB = 0. 0.142476 0.0
-#
-#momentumA = 0. -0.142 0.0
-#momentumB = 0. 0.142 0.0
-#
-#momentumA = 0. -0.141 0.0
-#momentumB = 0. 0.141 0.0
-#
-#Merges:
-#momentumA = 0. -0.140 0.0
-#momentumB = 0. 0.140 0.0
-
-
-#Current attempt
 momentumA = 0. -0.14025 0.0
 momentumB = 0. 0.14025 0.0
 
