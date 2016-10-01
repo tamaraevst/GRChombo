@@ -144,6 +144,12 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
     CH_TIME("GRAMRLevel::tagCells");
     if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;
 
+    //TODO: Need to think about how to do the tagging nicely.
+    //One possibility would be to pass a BaseFAB<bool> to the specific implementation
+    //but for local tagging criteria this wastes memory as we save a whole BaseFAB.
+    //In the meantime the user must override tagCells (it's virtual) with code similar
+    //to the one below.
+
     fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
 
     // Create tags based on undivided gradient of phi
@@ -173,16 +179,12 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         const int ymax = bigEnd[1];
         const int zmax = bigEnd[2];
 
-        //TODO: Need to think about how to do the tagging nicely.
-        //One possibility would be to pass a BaseFAB<bool> to the specific implementation
-        //but for local tagging criteria this wastes memory as we save a whole BaseFAB
-
 #pragma omp parallel for collapse(3) schedule(static) default(shared)
-        for (int z = zmin; z <= zmax; ++z)
-        for (int y = ymin; y <= ymax; ++y)
-        for (int x = xmin; x <= xmax; ++x)
+        for (int iz = zmin; iz <= zmax; ++iz)
+        for (int iy = ymin; iy <= ymax; ++iy)
+        for (int ix = xmin; ix <= xmax; ++ix)
         {
-            IntVect iv(x,y,z);
+            IntVect iv(ix,iy,iz);
             //At the moment only base on gradient chi/chi^2
             if (mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2) >= m_p.regrid_threshold)
             {
