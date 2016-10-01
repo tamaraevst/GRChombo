@@ -2,6 +2,8 @@
 
 - Merge FABDriver and FABDriverBase. One doesn't need both!
 
+- Add some check to the FABDriver to make sure that pointers are defined before reading values
+
 - Tidy up the SetupAMRObject function by making a class BaseParameters and loading the variables there.
 
 - Get rid of unneccessary clutter in the main file and the first function calls
