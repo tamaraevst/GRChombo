@@ -1,7 +1,7 @@
 #include <iostream>
 #include "CCZ4Geometry.hpp"
 #include "tensor.hpp"
-#include "GRutils.H"
+#include "GRUtils.hpp"
 
 template <class data_t>
 struct vars_t
