@@ -19,10 +19,9 @@ public:
    template <class data_t>
    void compute(int x, int y, int z)
    {
-      idx_t<data_t> idx = m_driver.in_idx(x, y, z);
-
-      auto chi   = m_driver.local_vars(idx, c_chi);
-      auto lapse = m_driver.local_vars(idx, c_lapse);
+      data_t chi, lapse;
+      m_driver.local_vars(chi, c_chi);
+      m_driver.local_vars(lapse, c_lapse);
 
       auto chi_is_too_small = simd_compare_lt(chi, 1e-4);
       chi = simd_conditional(chi_is_too_small, 1e-4, chi);
@@ -30,9 +29,8 @@ public:
       auto lapse_is_too_small = simd_compare_lt(lapse, 1e-4);
       lapse = simd_conditional(lapse_is_too_small, 1e-4, lapse);
 
-      idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-      m_driver.store_vars(chi, out_idx, c_chi);
-      m_driver.store_vars(lapse, out_idx, c_lapse);
+      m_driver.store_vars(chi, c_chi);
+      m_driver.store_vars(lapse, c_lapse);
    }
 };
 

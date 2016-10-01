@@ -77,8 +77,7 @@ void BinaryBH::compute(int ix, int iy, int iz)
             MayDay::Error("BinaryBH::Supplied initial lapse not supported.");
     }
 
-    idx_t<double> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox
-    m_driver.store_vars(vars, out_idx);
+    m_driver.store_vars(vars);
 }
 
 double BinaryBH::compute_chi(double x, double y, double z)

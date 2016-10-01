@@ -1,11 +1,3 @@
-- Make the m_assignment_ptrs code nicer
-
-- WORK THROUGH COMPILE ERRORS ON COSMOS
-
-- Compute classes should be changed to take SimulationParameters directly, not parameters. This might not seem like a good idea at first sight but it makes it much easier to pass down parameters and thus makes it less tempting to hard code parameter values.
-
-- Make calls virtual not pure virtual
-
 - Write the autogeneration of the SimulationParameters code
 
 - Merge FABDriver and FABDriverBase. One doesn't need both!
@@ -14,8 +6,6 @@
 
 - Get rid of unneccessary clutter in the main file and the first function calls
 
-- Fix the =0 constructor for a 2 tensor
-
 - Think about and sort out tagCells!
 
 - Make sure the FArrayBox::setVal functions are threaded in Chombo
@@ -23,3 +13,5 @@
 - Add SIMD functions like cos and exp
 
 - Write unit test for EnforceTfA
+
+- Compute classes should be changed to take SimulationParameters directly, not parameters. This might not seem like a good idea at first sight but it makes it much easier to pass down parameters and thus makes it less tempting to hard code parameter values.

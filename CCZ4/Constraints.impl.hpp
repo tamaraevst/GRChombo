@@ -14,31 +14,28 @@ template <class data_t>
 void
 Constraints::compute(int ix, int iy, int iz)
 {
-    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz);
-
     vars_t<data_t> vars;
-    m_driver.local_vars(vars,idx);
+    m_driver.local_vars(vars);
 
     vars_t< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, idx, idir);
+    FOR1(idir) m_deriv.diff1(d1, idir);
 
     vars_t< tensor<2,data_t> > d2;
     // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, idx, idir);
+    FOR1(idir) m_deriv.diff2(d2, idir);
     // Mixed derivatives
     // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, idx, 1, 0);
-    m_deriv.mixed_diff2(d2, idx, 2, 0);
-    m_deriv.mixed_diff2(d2, idx, 2, 1);
+    m_deriv.mixed_diff2(d2, 1, 0);
+    m_deriv.mixed_diff2(d2, 2, 0);
+    m_deriv.mixed_diff2(d2, 2, 1);
 
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
     //Write the rhs into the output FArrayBox
-    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox
-    m_driver.store_vars(out.Ham, out_idx, c_Ham);
-    m_driver.store_vars(out.Mom[0], out_idx, c_Mom1);
-    m_driver.store_vars(out.Mom[1], out_idx, c_Mom2);
-    m_driver.store_vars(out.Mom[2], out_idx, c_Mom3);
+    m_driver.store_vars(out.Ham, c_Ham);
+    m_driver.store_vars(out.Mom[0], c_Mom1);
+    m_driver.store_vars(out.Mom[1], c_Mom2);
+    m_driver.store_vars(out.Mom[2], c_Mom3);
 }
 
 template <class data_t>

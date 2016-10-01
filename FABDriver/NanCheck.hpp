@@ -23,11 +23,11 @@ public:
 
    void compute(int ix, int iy, int iz)
    {
-      idx_t<double> idx = m_driver.in_idx(ix, iy, iz);
       bool stop = false;
       FORVARS(i)
       {
-          const double val = m_driver.local_vars(idx,i);
+          double val;
+          m_driver.local_vars(val,i);
           if ( std::isnan(val) || abs(val) > m_max_abs) stop = true;
       }
       if (stop)
@@ -37,7 +37,7 @@ public:
               pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
               FORVARS(i)
               {
-                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars(idx,i) << endl;
+                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars<double>(i) << endl;
               }
               pout() << "ix: " << ix << " iy: " << iy << " iz: " << iz << endl;
           }

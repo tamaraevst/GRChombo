@@ -16,27 +16,9 @@
 
 #include <array>
 
-// This exists solely to allow the compiler to
-// perform type deduction on data_t.
-template <typename t>
-struct idx_t
+class FABDriverBase
 {
-    int m_idx;
-
-    ALWAYS_INLINE
-    idx_t (int idx) :
-        m_idx (idx)
-    {}
-
-    ALWAYS_INLINE
-    operator int() const
-    {
-        return m_idx;
-    }
-};
-
-struct FABDriverBase
-{
+public: //TODO: these shouldn't be public ...
     const double *m_in_ptr[c_NUM];
     const int *m_in_lo;
     const int *m_in_hi;
@@ -47,33 +29,48 @@ struct FABDriverBase
     const int *m_out_hi;
     int m_out_stride[3];
 
+protected:
+    int m_in_idx;
+    int m_out_idx;
+
+public:
+    //Some setters:
     ALWAYS_INLINE
-    int in_idx(int ix, int iy, int iz) const;
+    void set_idx(int ix, int iy, int iz);
+
+    //Some getters:
+    ALWAYS_INLINE
+    int get_in_idx() const;
 
     ALWAYS_INLINE
-    int out_idx(int ix, int iy, int iz) const;
+    int get_out_idx() const;
+
+    //The rest:
+    template <class data_t>
+    ALWAYS_INLINE
+    data_t local_vars(int icomp) const;
 
     template <class data_t>
     ALWAYS_INLINE
-    data_t local_vars(idx_t<data_t> idx, int icomp) const;
+    void local_vars(data_t& out, int icomp) const;
 
     template <class data_t>
-    std::array<data_t, c_NUM> local_vars(idx_t<data_t> idx) const;
+    void local_vars(data_t (&out)[c_NUM]) const;
 
     template <class data_t>
-    void local_vars(VarsBase<data_t>& vars, idx_t<data_t> idx) const;
+    void local_vars(VarsBase<data_t>& vars) const;
 
     template <class data_t>
-    void store_vars(const data_t& value, const idx_t<data_t> out_idx, const int icomp) const;
+    void store_vars(const data_t& value, const int icomp) const;
 
     template <class data_t>
-    void store_vars(const std::array<data_t, c_NUM>& values, const idx_t<data_t> out_idx) const;
+    void store_vars(const std::array<data_t, c_NUM>& values) const;
 
     template <class data_t>
-    void store_vars(const VarsBase<data_t>& vars, const idx_t<data_t> out_idx, int icomp) const;
+    void store_vars(const VarsBase<data_t>& vars, const Interval a_comps) const;
 
     template <class data_t>
-    void store_vars(const VarsBase<data_t>& vars, const idx_t<data_t> out_idx) const;
+    void store_vars(const VarsBase<data_t>& vars) const;
 };
 
 #include "FABDriverBase.impl.hpp"

@@ -24,10 +24,8 @@ public:
    template <class data_t>
    void compute(int x, int y, int z)
    {
-       idx_t<data_t> idx = m_driver.in_idx(x, y, z);
-
        tensor<1,data_t> d1_arr[c_NUM];
-       FOR1(idir) m_deriv.diff1(d1_arr,idx, idir);
+       FOR1(idir) m_deriv.diff1(d1_arr, idir);
 
        std::array<data_t, c_NUM> mod_d1_arr = {0.};
        FORVARS(ivar)
@@ -40,8 +38,7 @@ public:
        }
 
        // Write back into the flattened Chombo box
-       idx_t<data_t> out_idx = m_driver.out_idx(x, y, z);
-       m_driver.store_vars(mod_d1_arr, out_idx);
+       m_driver.store_vars(mod_d1_arr);
    }
 
 };

@@ -25,13 +25,6 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory);
 
 void mainSetup(int argc ,char* argv[])
 {
-#if defined(FE_NOMASK_ENV) && !defined(__INTEL_COMPILER)
-    fesetenv(FE_NOMASK_ENV);
-    fedisableexcept(/* FE_OVERFLOW | */ FE_UNDERFLOW | FE_INEXACT);
-#elif defined(__i386__) && defined(__SSE__)
-    _MM_SET_EXCEPTION_MASK(_MM_GET_EXCEPTION_MASK() & ~(_MM_MASK_OVERFLOW|_MM_MASK_INVALID|_MM_MASK_DIV_ZERO));
-#endif
-
 #ifdef CH_MPI
     // Start MPI
     MPI_Init(&argc,&argv);

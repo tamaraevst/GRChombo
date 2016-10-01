@@ -7,6 +7,7 @@
 #include "FABDriverBase.hpp"
 #include "CCZ4Geometry.hpp"
 #include "TensorAlgebra.hpp"
+#include "Interval.H"
 
 #include <array>
 
@@ -33,19 +34,13 @@ public:
     template <class data_t>
     void compute(int ix, int iy, int iz)
     {
-        idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz);
-
         vars_t<data_t> vars;
-        m_driver.local_vars(vars,idx);
+        m_driver.local_vars(vars);
 
         auto h_UU = TensorAlgebra::compute_inverse(vars.h);
         TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
-        idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz);
-        for (int icomp=c_A11; icomp<=c_A33; ++icomp)
-        {
-            m_driver.store_vars(vars, out_idx, icomp);
-        }
+        m_driver.store_vars(vars, Interval(c_A11, c_A33));
     }
 };
 

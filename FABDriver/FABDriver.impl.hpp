@@ -40,12 +40,14 @@ FABDriver<compute_t>::execute(const FArrayBox& in, FArrayBox& out, const Box& lo
                 //If you were sent here by a compile error of no matching function call make sure that
                 //the compute class you are using allows for vectorisation (is templated over the data type)
                 //To switch vectorisation off, pass disable_simd() as last parameter to the execute function.
+                set_idx(x,y,z);
                 m_compute.template compute<simd<double> >(x,y,z);
             }
             // REMAINDER LOOP
 #pragma novector
             for (int x = x_simd_max + simd<double>::simd_len; x <= loop_hi[0]; ++x)
             {
+                set_idx(x,y,z);
                 m_compute.template compute<double>(x,y,z);
             }
         }

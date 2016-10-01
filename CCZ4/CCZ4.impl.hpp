@@ -19,35 +19,31 @@ template <class data_t>
 void
 CCZ4::compute(int ix, int iy, int iz)
 {
-    //TODO: Think about getting rid of idx
-    idx_t<data_t> idx = m_driver.in_idx(ix, iy, iz); //The current location in the flattened input FArrayBox
-
     vars_t<data_t> vars;
-    m_driver.local_vars(vars,idx);
+    m_driver.local_vars(vars);
 
     vars_t< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, idx, idir);
+    FOR1(idir) m_deriv.diff1(d1, idir);
 
     vars_t< tensor<2,data_t> > d2;
     // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, idx, idir);
+    FOR1(idir) m_deriv.diff2(d2, idir);
     // Mixed derivatives
     // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, idx, 1, 0);
-    m_deriv.mixed_diff2(d2, idx, 2, 0);
-    m_deriv.mixed_diff2(d2, idx, 2, 1);
+    m_deriv.mixed_diff2(d2, 1, 0);
+    m_deriv.mixed_diff2(d2, 2, 0);
+    m_deriv.mixed_diff2(d2, 2, 1);
 
     vars_t<data_t> advec;
     advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, idx, vars.shift[idir], idir);
+    FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
     vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
-    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idx,idir);
+    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma,idir);
 
     //Write the rhs into the output FArrayBox
-    idx_t<data_t> out_idx = m_driver.out_idx(ix, iy, iz); //The current location in the flattened output FArraBox
-    m_driver.store_vars(rhs, out_idx);
+    m_driver.store_vars(rhs);
 }
 
 template <class data_t>

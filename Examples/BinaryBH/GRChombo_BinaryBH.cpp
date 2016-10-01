@@ -25,10 +25,8 @@ using std::endl;
 //Problem specific includes:
 #include "BinaryBHLevelFactory.hpp"
 
-//TODO (MK): There is a lot of clutter still in this file ... get rid of everything that's not necessary
-//and comment on the rest (so that we don't carry around useless code forever
 
-#include <fenv.h>
+//TODO: Remove the below three lines if they aren't necessary
 #if defined(__i386__) && defined(__SSE__)
 #include <xmmintrin.h>
 #endif
