@@ -1,6 +1,29 @@
 #ifndef INDEX_APPLICATOR_HPP
 #define INDEX_APPLICATOR_HPP
 
+#include <utility>
+
+
+//The whole purpose of GetIndexTraits is to get around a limitation in c++ whereby
+//variadic templates weren't allowed to be used inside decltype.
+//We could have gone to c++14 and removed the return type specification altogether but
+//GetIndexTraits allows one to get the return type of IndexApplicator::apply within c++11
+
+template <typename data_t, typename... Ts>
+struct GetIndexTraits;
+
+template <typename data_t>
+struct GetIndexTraits<data_t>
+{
+    using type = data_t;
+};
+
+template <typename data_t, typename T, typename... Ts>
+struct GetIndexTraits<data_t, T, Ts...>
+{
+    using type = typename GetIndexTraits<decltype(std::declval<data_t>()[std::declval<T>()]), Ts...>::type;
+};
+
 //This class allows one to apply an arbitrary number of indices to an object
 //of an arbitrary number of indices.
 //This is useful for example in VarsBase where the IndexApplicator allows us to write general
@@ -19,9 +42,9 @@ class IndexApplicator<t, Ts...>
 {
 public:
     template <typename data_t>
-    static ALWAYS_INLINE auto & //Always inlined so this iteration trick doesn't ruin performance
+    static ALWAYS_INLINE //Always inlined so this iteration trick doesn't ruin performance
+    typename GetIndexTraits<data_t&, t, Ts...>::type
     apply(data_t& obj, t dir0, Ts... dirs)
-//    -> decltype(IndexApplicator<Ts...>::apply(obj[dir0], dirs...))&
     {
         //Let the compiler iterate until there are no indices left (at which point we go to the
         //specialisation below).
@@ -35,7 +58,8 @@ class IndexApplicator<>
 {
 public:
     template <typename data_t>
-    static ALWAYS_INLINE data_t&
+    static ALWAYS_INLINE
+    typename GetIndexTraits<data_t&>::type
     apply(data_t& obj)
     {
         return obj;
