@@ -5,6 +5,7 @@
 #ifndef CONSTRAINTS_IMPL_HPP_
 #define CONSTRAINTS_IMPL_HPP_
 
+inline
 Constraints::Constraints(const FABDriverBase& driver, double dx, double cosmological_constant /*defaulted*/) :
     m_driver (driver),
     m_deriv (dx, m_driver),
