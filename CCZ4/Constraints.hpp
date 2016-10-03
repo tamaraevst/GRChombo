@@ -41,9 +41,10 @@ protected:
 
     const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
+    double m_cosmological_constant;
 
 public:
-    Constraints(const FABDriverBase& driver, double dx);
+    Constraints(const FABDriverBase& driver, double dx, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(int x, int y, int z);

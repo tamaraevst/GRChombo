@@ -5,9 +5,10 @@
 #ifndef CONSTRAINTS_IMPL_HPP_
 #define CONSTRAINTS_IMPL_HPP_
 
-Constraints::Constraints(const FABDriverBase& driver, double dx) :
+Constraints::Constraints(const FABDriverBase& driver, double dx, double cosmological_constant /*defaulted*/) :
     m_driver (driver),
-    m_deriv (dx, m_driver)
+    m_deriv (dx, m_driver),
+    m_cosmological_constant (cosmological_constant)
 {}
 
 template <class data_t>
@@ -59,6 +60,7 @@ Constraints::constraint_equations(
    data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
    out.Ham = ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA;
+   out.Ham -= 2*m_cosmological_constant;
 
    tensor<2,data_t> covd_A[CH_SPACEDIM];
    FOR3(i,j,k)
