@@ -1,3 +1,6 @@
+- Come up with a way to make the symmetric tensor allocation in the UserVariable enum error-proof (see comment in
+Examples/Binary_BH/UserVariables.hpp)
+
 - Write the autogeneration of the SimulationParameters code
 
 - Merge FABDriver and FABDriverBase. One doesn't need both!

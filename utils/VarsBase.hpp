@@ -28,6 +28,41 @@ public:
          m_assignment_ptrs[a_enum_component].push_back(&a_var);
      }
 
+     void define_enum_mapping(Interval a_enum_vector_components, tensor<1, var_t>& a_var)
+     {
+         CH_assert (a_enum_vector_components.size() == IDX_SPACEDIM);
+         int icomp = 0;
+         for (int i=a_enum_vector_components.begin(); i<=a_enum_vector_components.end(); ++i)
+         {
+             m_assignment_ptrs[i].push_back(&(a_var[icomp]));
+             ++icomp;
+         }
+     }
+
+     void define_symmetric_enum_mapping(Interval a_enum_tensor_components, tensor<2, var_t>& a_var)
+     {
+         CH_assert (a_enum_tensor_components.size() == IDX_SPACEDIM*(IDX_SPACEDIM+1)/2.);
+         int start_comp = a_enum_tensor_components.begin();
+#if IDX_SPACEDIM == 3
+         m_assignment_ptrs[start_comp  ].push_back(&(a_var[0][0]));
+
+         m_assignment_ptrs[start_comp+1].push_back(&(a_var[0][1]));
+         m_assignment_ptrs[start_comp+1].push_back(&(a_var[1][0]));
+
+         m_assignment_ptrs[start_comp+2].push_back(&(a_var[0][2]));
+         m_assignment_ptrs[start_comp+2].push_back(&(a_var[2][0]));
+
+         m_assignment_ptrs[start_comp+3].push_back(&(a_var[1][1]));
+
+         m_assignment_ptrs[start_comp+4].push_back(&(a_var[1][2]));
+         m_assignment_ptrs[start_comp+4].push_back(&(a_var[2][1]));
+
+         m_assignment_ptrs[start_comp+5].push_back(&(a_var[2][2]));
+#else
+#error IDX_SPACEDIM not equal to three not implemented yet...
+#endif
+     }
+
      //Writes data directly into the variable corresponding to ivar
      //if this variables has multiple components (e.g. if it is an array of derivatives)
      //the data can be written directly into these components by specifying

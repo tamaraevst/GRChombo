@@ -21,6 +21,7 @@ protected:
     struct vars_t : VarsBase<data_t>
     {
         using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
+        using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
 
         data_t chi;
         tensor<2, data_t> h;
