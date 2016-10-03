@@ -7,6 +7,7 @@
 
 #define COVARIANTZ4
 
+inline
 CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, double cosmological_constant) :
     m_params (params),
     m_sigma (sigma),

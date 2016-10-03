@@ -183,6 +183,4 @@ protected:
     DisjointBoxLayout m_grids;
 };
 
-#include "GRAMRLevel.impl.hpp"
-
 #endif /* GRAMRLEVEL_HPP_ */

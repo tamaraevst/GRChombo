@@ -9,6 +9,9 @@
 #include "IndexApplicator.hpp"
 #include "GRUtils.hpp"
 #include "CH_assert.H"
+#include "Interval.H"
+#include "UserVariables.hpp"
+#include "tensor.hpp"
 
 template <class var_t>
 class VarsBase
