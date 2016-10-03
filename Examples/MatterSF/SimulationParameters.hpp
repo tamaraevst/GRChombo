@@ -6,7 +6,7 @@
 
 //Problem specific includes:
 #include "CCZ4.hpp"
-#include "BoostedBH.hpp"
+#include "BubbleSF.hpp"
 
 class SimulationParameters
 {
@@ -21,15 +21,12 @@ public:
         //The automatically generated read parameters code defined in SimulationParameters.inc
         auto_read_params(pp);
 
-        //Fill in BinaryBHParameters
-        bh1_params.mass = massA;
-        bh1_params.center = centerA;
-        bh1_params.momentum = momentumA;
-        bh2_params.mass = massB;
-        bh2_params.center = centerB;
-        bh2_params.momentum = momentumB;
+        //Fill in the SFMatterParamters
+        sfm_params.amplitudeSF = amplitudeSF;
+        sfm_params.centerSF = centerSF;
+        sfm_params.widthSF = widthSF;
 
-        //Fill in he ccz4Parameters
+        //Fill in the ccz4Parameters
         ccz4Params.kappa1 = kappa1;
         ccz4Params.kappa2 = kappa2;
         ccz4Params.kappa3 = kappa3;
@@ -44,8 +41,8 @@ public:
 
     //Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4Params;
-    BoostedBH::params_t bh2_params;
-    BoostedBH::params_t bh1_params;
+    BubbleSF::params_t sfm_params;
+  
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

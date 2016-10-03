@@ -14,7 +14,7 @@
 #include "CCZ4.hpp"
 
 //Initial data
-#include "BinaryBH.hpp"
+#include "BubbleSF.hpp"
 
 void MatterSFLevel::specificAdvance()
 {
@@ -36,7 +36,9 @@ void MatterSFLevel::initialData()
     //First set everything to zero ... we don't want undefined values in constraints etc
     m_state_new.setVal(0.);
 
-    FABDriver<BinaryBH>(m_p.bh1_params, m_p.bh2_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
+    //Initial conditions for scalar field - here a bubble
+    FABDriver<BubbleSF>(m_p.sfm_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
+
 }
 
 void MatterSFLevel::preCheckpointLevel()
@@ -47,6 +49,20 @@ void MatterSFLevel::preCheckpointLevel()
 
 void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
 {
+
+    /*if (m_time < m_p.relaxtime) {
+
+      //New relaxation function for chi - this will eventually be done separately with hdf5 as input
+
+       //Calculate chi relaxation right hand side
+       FABDriver<RelaxChiOnly>(m_dx, m_p.relaxspeed).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+
+       //No evolution in other variables
+       a_rhs.setVal(0., Interval(c_h11,c_Mom3));
+
+      } 
+      else {do the below} */
+
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
     //Enforce positive chi and alpha
@@ -54,6 +70,10 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
 
     //Calculate CCZ4 right hand side
     FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+
+    //Add matter terms to CCZ4 variables RHS and do SF RHS evolution, zero for now
+    //FABDriver<CCZ4AddSFMatter>(m_dx).execute(a_soln, a_rhs, a_rhs, SKIP_GHOST_CELLS);
+    a_rhs.setVal(0., Interval(c_phi,c_PiM));
 
     //We don't want undefined values floating around in the constraints
     a_rhs.setVal(0., Interval(c_Ham,c_Mom3));

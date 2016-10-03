@@ -34,20 +34,13 @@ void auto_read_params(ParmParse& pp)
     pp.get("sigma",sigma);
 
     //Initial data
-    pp.get("massA", massA);
-    pp.getarr("centerA", centerA, 0, SpaceDim);
-    pp.getarr("momentumA", momentumA, 0, SpaceDim);
-    pp.get("massB", massB);
-    pp.getarr("centerB", centerB, 0, SpaceDim);
-    pp.getarr("momentumB", momentumB, 0, SpaceDim);
+    pp.get("amplitudeSF", amplitudeSF);
+    pp.getarr("centerSF", centerSF, 0, SpaceDim);
+    pp.get("widthSF", widthSF);
 
-    //Fill in BinaryBHParameters
-    bh1_params.mass = massA;
-    bh1_params.center = centerA;
-    bh1_params.momentum = momentumA;
-    bh2_params.mass = massB;
-    bh2_params.center = centerB;
-    bh2_params.momentum = momentumB;
+    //Relaxation params
+    pp.get("relaxtime", relaxtime);
+    pp.get("relaxspeed", relaxspeed);
 
     //Misc
     pp.get("nan_check", nan_check);
@@ -77,6 +70,7 @@ Real kappa1, kappa2, kappa3;
 int covariantZ4;
 Real sigma; //Dissipation
 //Initial data
-Real massA, massB;
-std::vector<Real> centerA, centerB;
-std::vector<Real> momentumA, momentumB;
+Real amplitudeSF, widthSF;
+std::vector<Real> centerSF;
+//Relaxation params
+Real relaxtime, relaxspeed;
