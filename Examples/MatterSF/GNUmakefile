@@ -6,7 +6,7 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
-ebase := GRChombo_BinaryBH
+ebase := GRChombo_MatterSF
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 

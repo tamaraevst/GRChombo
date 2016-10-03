@@ -1,11 +1,11 @@
-#ifndef BINARYBHLEVEL_HPP_
-#define BINARYBHLEVEL_HPP_
+#ifndef MATTERSFLEVEL_HPP_
+#define MATTERSFLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
 
-class BinaryBHLevel : public GRAMRLevel
+class MatterSFLevel : public GRAMRLevel
 {
-    friend class BinaryBHLevelFactory;
+    friend class MatterSFLevelFactory;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
@@ -26,6 +26,6 @@ class BinaryBHLevel : public GRAMRLevel
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
 };
 
-#include "BinaryBHLevel.impl.hpp"
+#include "MatterSFLevel.impl.hpp"
 
-#endif /* BINARYBHLEVEL_HPP_ */
+#endif /* MATTERSFLEVEL_HPP_ */
