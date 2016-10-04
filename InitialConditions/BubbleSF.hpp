@@ -40,23 +40,21 @@ protected:
 
 void BubbleSF::compute(int ix, int iy, int iz)
 {
-    CCZ4::vars_t<double> vars;
+    CCZ4SFMatter::vars_t<double> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
     Coordinates<double> coords(ix,iy,iz,m_dx);
     double x = coords.x; //TODO: change functions to accept coords rather than x,y,z
     double y = coords.y;
     double z = coords.z;
 
-    double phi = compute_phi(x,y,z);
-    double PiM = 0;
+    vars.phi = compute_phi(x,y,z);
+    vars.PiM = 0;
 
     vars.chi = 1;
     //Conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;
 
     m_driver.store_vars(vars);
-    m_driver.store_vars(phi, c_phi);
-    m_driver.store_vars(PiM, c_PiM);
 
 }
 
@@ -69,7 +67,7 @@ double BubbleSF::compute_phi(double x, double y, double z)
 	 	  rr2 = 1e-6;
   	}
 
-    const double phiout = m_params.amplitudeSF*rr2*exp(-rr2/m_params.widthSF);
+    const double phiout = m_params.amplitudeSF*exp(-rr2/m_params.widthSF);
     return phiout;
 }
 

@@ -5,6 +5,7 @@
 #include "ParmParse.H"
 
 //Problem specific includes:
+#include "CCZ4SFMatter.hpp"
 #include "CCZ4.hpp"
 #include "BubbleSF.hpp"
 
@@ -40,7 +41,7 @@ public:
 #include "SimulationParameters.inc"
 
     //Collection of parameters necessary for the CCZ4 RHS
-    CCZ4::params_t ccz4Params;
+    CCZ4SFMatter::params_t ccz4Params;
     BubbleSF::params_t sfm_params;
   
 };

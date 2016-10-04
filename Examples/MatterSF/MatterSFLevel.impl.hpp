@@ -11,6 +11,7 @@
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
 #include "Constraints.hpp"
+#include "CCZ4SFMatter.hpp"
 #include "CCZ4.hpp"
 
 //Initial data
@@ -57,7 +58,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
        //Calculate chi relaxation right hand side
        FABDriver<RelaxChiOnly>(m_dx, m_p.relaxspeed).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
-       //No evolution in other variables
+       //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
        a_rhs.setVal(0., Interval(c_h11,c_Mom3));
 
       } 
@@ -68,12 +69,8 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     //Enforce positive chi and alpha
     FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-    //Calculate CCZ4 right hand side
-    FABDriver<CCZ4>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
-
-    //Add matter terms to CCZ4 variables RHS and do SF RHS evolution, zero for now
-    //FABDriver<CCZ4AddSFMatter>(m_dx).execute(a_soln, a_rhs, a_rhs, SKIP_GHOST_CELLS);
-    a_rhs.setVal(0., Interval(c_phi,c_PiM));
+    //Calculate CCZ4 right hand side with SF matter
+    FABDriver<CCZ4SFMatter>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
     //We don't want undefined values floating around in the constraints
     a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
