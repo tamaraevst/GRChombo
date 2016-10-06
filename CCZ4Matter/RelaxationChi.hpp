@@ -1,5 +1,5 @@
-#ifndef CCZ4SFMATTER_HPP_
-#define CCZ4SFMATTER_HPP_
+#ifndef RELAXATIONCHI_HPP_
+#define RELAXATIONCHI_HPP_
 
 #include "simd.hpp"
 #include "tensor.hpp"
@@ -15,7 +15,7 @@
 
 #include <array>
 
-class CCZ4SFMatter
+class RelaxationChi
 {
 public:
     template <class data_t>
@@ -38,25 +38,13 @@ public:
         vars_t();
     };
 
-    struct params_t
-    {
-        double kappa1;
-        double kappa2;
-        double kappa3;
-        double shift_gamma_coeff;
-        double lapse_advec_coeff;
-        double shift_advec_coeff;
-        double beta_driver;
-    };
-
 protected:
-    const params_t m_params;
-    const double m_sigma;
+    const double m_relaxspeed;
     const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
 
 public:
-    CCZ4SFMatter(const FABDriverBase& driver, params_t params, double dx, double sigma);
+    RelaxationChi(const FABDriverBase& driver, double dx, double relaxspeed);
 
     template <class data_t>
     void compute(int ix, int iy, int iz);
@@ -72,6 +60,6 @@ protected:
 
 };
 
-#include "CCZ4SFMatter.impl.hpp"
+#include "RelaxationChi.impl.hpp"
 
-#endif /* CCZ4SFMATTER_HPP_ */
+#endif /* RELAXATIONCHI_HPP_ */

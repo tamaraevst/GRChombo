@@ -1,5 +1,5 @@
 #if !defined(CCZ4SFMATTER_HPP_)
-#error "This file should only be included through CCZ4.hpp"
+#error "This file should only be included through CCZ4SFMatter.hpp"
 #endif
 
 #ifndef CCZ4SFMATTER_IMPL_HPP_

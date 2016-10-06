@@ -12,7 +12,7 @@
 #include "NanCheck.hpp"
 #include "ConstraintsMatter.hpp"
 #include "CCZ4SFMatter.hpp"
-//#include "CCZ4.hpp"
+#include "RelaxationChi.hpp"
 
 //Initial data
 #include "BubbleSF.hpp"
@@ -51,29 +51,32 @@ void MatterSFLevel::preCheckpointLevel()
 void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
 {
 
-    /*if (m_time < m_p.relaxtime) {
-
-      //New relaxation function for chi - this will eventually be done separately with hdf5 as input
+    //Relaxation function for chi - this will eventually be done separately with hdf5 as input
+    if (m_time < m_p.relaxtime) {
 
        //Calculate chi relaxation right hand side
-       FABDriver<RelaxChiOnly>(m_dx, m_p.relaxspeed).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+       //Note that this assumes conformal chi and that the momentum constraint is trivially satisfied
+       FABDriver<RelaxationChi>(m_dx, m_p.relaxspeed).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
        a_rhs.setVal(0., Interval(c_h11,c_Mom3));
+    } 
 
-      } 
-      else {do the below} */
+    //Else do normal CCZ4 evolution
+    else {
 
-    FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+    	FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-    //Enforce positive chi and alpha
-    FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+   	 	//Enforce positive chi and alpha
+    	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-    //Calculate CCZ4 right hand side with SF matter
-    FABDriver<CCZ4SFMatter>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    	//Calculate CCZ4 right hand side with SF matter
+    	FABDriver<CCZ4SFMatter>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
-    //We don't want undefined values floating around in the constraints
-    a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
+    	//We don't want undefined values floating around in the constraints
+    	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
+
+    }
 }
 
 void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
