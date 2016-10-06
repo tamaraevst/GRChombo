@@ -63,6 +63,11 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     auto h_UU = compute_inverse(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
+    //Calculate elements of the decomposed stress energy tensor
+    auto emtensor =  CCZ4EMTensorSF::compute_emtensor_SF(vars, d1, h_UU, chris.ULL, advec.phi);
+
+
+    //Other geomtric quantities
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
     FOR1(i)
@@ -104,60 +109,6 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     //A^{ij} A_{ij}. - Note the abuse of the compute trace function.
     data_t tr_A2    = compute_trace(vars.A, A_UU);
 
-    // Calculate the stress energy tensor elements
-
-    //perhaps make these function calls or specify in setup?
-    data_t VofPhi = vars.phi*vars.phi;
-    data_t dVdphi = 2.0*vars.phi;
-
-    //components of stress energy tensor - move to new function?
-    data_t Vt = -vars.PiM * vars.PiM + 2.0*Vofphi;
-    FOR2(i,j)
-    {
-        Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j];
-    }
-
-    data_t dphidt2 = (vars.lapse * vars.PiM + advec.phi)*(vars.lapse * vars.PiM + advec.phi);
-
-    tensor<2, data_t> Sij; // is also T_ij
-    FOR2(i,j)
-		{ 
-    		Sij[i][j] = -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
-		}
-    
-    data_t TrS = vars.chi * compute_trace(Sij,h_UU);
-
-    tensor<1, data_t> T_i; // The T(i,3) components of the 4d stress energy tensor
-    FOR1(i)
-    {
-     T_i[i] = (d1.phi[i] * (vars.PiM*vars.lapse + advec.phi));
-
-      FOR1(j)
-      {
-   			T_i[i] += -0.5*Vt*vars.h[i][j]*vars.beta[j]/vars.chi;
-      }
-    }
-
-    tensor<1, data_t> S_i; // S_i = T_ia * n^a where a goes from 0 to 3, 3 being time index
-    FOR1(i)
-    {
-     S_i[i] = - T_i[i]/vars.lapse;
-
-      FOR1(j)
-      {
-   			S_i[i] += vars.beta[j]/vars.lapse * Sij[i][j];
-      }
-    }
-
-    data_t rho = dphidt2/vars.lapse/vars.lapse + 0.5*Vt; // = T_ab * n^a n^b
-    FOR2(i,j)
-    {
-    	rho += (-0.5*Vt*vars.h[i][j]/vars.chi + Sij[i][j]) * vars.beta[i] * vars.beta[j]/vars.lapse/vars.lapse;
-    }
-    FOR1(i)
-    {
-			rho += - 2.0 * T_i[i]*vars.beta[i]/vars.lapse/vars.lapse;
-    }
 
     //RHS equations begin here
     rhs.chi = advec.chi + (2.0/GR_SPACEDIM)*vars.chi*(vars.lapse*vars.K - divshift);
@@ -173,9 +124,9 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     tensor<2, data_t> Adot_TF;
     FOR2(i,j)
     {
-        Adot_TF[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*ricci.LL[i][j];
+        Adot_TF[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*(ricci.LL[i][j] - 8.0*M_PI*vars.lapse*emtensor.Sij[i][j]);
     }
-    make_trace_free(Adot_TF, vars.h, h_UU);
+    make_trace_free(Adot_TF, vars.h, h_UU);  
 
     FOR2(i,j)
     {
@@ -198,9 +149,10 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
 
     rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-    rhs.Theta += - vars.lapse * rho * 8.0 * M_PI;
+    rhs.Theta += - 8.0*M_PI * vars.lapse * emtensor.rho;
 
-    rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+    rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) + 4.0*M_PI*(emtensor.S - 3.0*emtensor.rho) ) 
+						- kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse ;
 
     tensor<1, data_t> Gammadot;
     FOR1(i)
@@ -212,7 +164,8 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
                 - 2*A_UU[i][j]*d1.lapse[j]
                 - vars.lapse*((2*(GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d1.K[j] 
                 + GR_SPACEDIM*A_UU[i][j]*d1.chi[j]/vars.chi)
-                - (chris.contracted[j] + 2*m_params.kappa3*Z_over_chi[j])*d1.shift[i][j];
+                - (chris.contracted[j] + 2*m_params.kappa3*Z_over_chi[j])*d1.shift[i][j]
+                - 16.0*M_PI * vars.lapse * h_UU[i][j] * emtensor.Si[j];
 
             FOR1(k)
             {
@@ -240,10 +193,15 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     //evolution equations for scalar field and its conjugate momentum (minus)
     rhs.phi = vars.lapse * vars.PiM + advec.phi;
 
-    rhs.PiM = vars.lapse*(vars.K * vars.PiM - dVdphi);
+    rhs.PiM = vars.lapse*(vars.K * vars.PiM - emtensor.dVdphi) + advec.PiM;
     FOR3(i,j,k)
     {
-        rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris[k][i][j] * d1.phi[k]; //!!NEEDS TO BE chrisspatial
+        rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
+    }
+
+    FOR2(i,j)
+		{
+        rhs.PiM += - 0.5 * h_UU[i][j] * d1.chi[j]  * vars.lapse * d1.phi[i]; //Add components for non conformal part of christoffel symbol
     }
 
     return rhs;

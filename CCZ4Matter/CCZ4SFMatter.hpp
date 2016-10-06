@@ -8,6 +8,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
+#include "CCZ4EMTensorSF.hpp"
 #include "VarsBase.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components

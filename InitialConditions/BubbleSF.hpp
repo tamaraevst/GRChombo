@@ -50,6 +50,8 @@ void BubbleSF::compute(int ix, int iy, int iz)
     vars.phi = compute_phi(x,y,z);
     vars.PiM = 0;
 
+    vars.lapse = 1;
+
     vars.chi = 1;
     //Conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;

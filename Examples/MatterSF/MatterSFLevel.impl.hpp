@@ -10,9 +10,9 @@
 #include "EnforceTfA.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
-#include "Constraints.hpp"
+#include "ConstraintsMatter.hpp"
 #include "CCZ4SFMatter.hpp"
-#include "CCZ4.hpp"
+//#include "CCZ4.hpp"
 
 //Initial data
 #include "BubbleSF.hpp"
@@ -45,7 +45,7 @@ void MatterSFLevel::initialData()
 void MatterSFLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<Constraints>(m_dx).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    FABDriver<ConstraintsMatter>(m_dx).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
