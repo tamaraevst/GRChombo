@@ -1,4 +1,5 @@
 To do:
+0. Check git works on laptop
 1. Add a relaxation class which relaxes for chi during the relax time
 2. Test this with an example
 3. Write a BSSN class which can be used instead of the CCZ4 class, make a second SF example with this instead
