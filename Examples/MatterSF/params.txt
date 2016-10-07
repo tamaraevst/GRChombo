@@ -58,5 +58,5 @@ widthSF = 1.0
 centerSF = 8 8 8
 
 # Relaxation paramters - to be implemented
-relaxtime = 1.0
-relaxspeed = 0.1
+relaxtime = 0.0
+relaxspeed = 0.01
