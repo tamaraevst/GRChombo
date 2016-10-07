@@ -1,1 +1,14 @@
-Add a README file?
+-Scalar Field Matter example
+ ----------------------------
+ -
+ -This code takes an initial scalar field configuration at a moment of time symmetry, such that
+ -the momentum constraint is trivially satisfied. It relaxes the value of the conformal factor chi 
+ -in order to satisfy the Hamiltonian Constraint.
+ -
+ -phi is the field value
+ -PiM is (minus) the conjugate momentum
+ -
+ -The initial conditions are specified in ../../InitialConditions/BubbleSF.hpp
+ -The form of the potential is specified in ../../CCZ4Matter/EMTensorSF.hpp
+ -The eoms are the CCZ4 formulation for the gravity sector, and the KG eqns in curved space for the field.
+ -These can be found in ../../CCZ4Matter/CCZ4MatterSF.impl.hpp
