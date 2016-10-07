@@ -24,6 +24,10 @@ class MatterSFLevel : public GRAMRLevel
 
     virtual
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
+
+    virtual
+    void tagCells(IntVectSet& a_tags);
+
 };
 
 #include "MatterSFLevel.impl.hpp"

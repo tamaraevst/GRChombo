@@ -36,8 +36,8 @@ class CCZ4EMTensorSF
 
         // Find the potential and its gradient in terms of phi
     		// do we want to specify in setup or always adjust here?
-    		data_t Vofphi = vars.phi*vars.phi;		//WOULD LIKE TO BE ABLE TO USE SINE, COSINE, EXP ETC HERE 
-    		out.dVdphi = 2.0*vars.phi;						//AND HERE
+    		data_t Vofphi = 0.0;// vars.phi*vars.phi;		//WOULD LIKE TO BE ABLE TO USE SINE, COSINE, EXP ETC HERE 
+    		out.dVdphi = 0.0; //2.0*vars.phi;						//AND HERE
 
     		//components of stress energy tensor
     		data_t Vt = -vars.PiM * vars.PiM + 2.0*Vofphi;

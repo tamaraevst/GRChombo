@@ -1,6 +1,6 @@
-verbosity = 1
+verbosity = 0
 chk_prefix = outMatterSF_
-#restart_file = MatterSF_000360.3d.hdf5
+#restart_file = outMatterSF_000026.3d.hdf5
 
 # Set up grid spacings and regrid params 
 # NB - the N values need to be multiples of block_factor
@@ -8,33 +8,36 @@ chk_prefix = outMatterSF_
 N1 = 32
 N2 = 32
 N3 = 32
-L =  16 
+L =  32 
 
 regrid_threshold = 0.3
+regrid_threshold_chi = 0.1
+regrid_threshold_phi = 0.005
 num_ghosts = 3
-max_level = 1
-regrid_interval = 1 1 1 1 0 0 0 0 0
-ref_ratio = 2 2 2 2 2 2 2 2 2
+max_level = 6
+regrid_interval = 5 5 5 5 5 5 5
+ref_ratio = 2 2 2 2 2 2 2
 isPeriodic = 1 1 1
 
 #Max and min box sizes
-max_grid_size = 8
-block_factor = 8
+max_grid_size = 16
+block_factor = 16
 tag_buffer_size = 3
+fill_ratio = 0.75
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
 
-checkpoint_interval = 1
+checkpoint_interval = 10
 dt_multiplier = 0.25
-stop_time = 2.0
+stop_time = 30.0
 max_steps = 10000000
 
 nan_check = 1
 
 #Lapse evolution
-LapseAdvectionCoeff = 0
+LapseAdvectionCoeff = 1
 
 # Shift evolution
 ShiftBCoeff = 1
@@ -53,10 +56,11 @@ covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
 sigma = 0.3
 
 # SF Initial data
-amplitudeSF = 1.0
+amplitudeSF = 0.0025
 widthSF = 1.0
-centerSF = 8 8 8
+centerSF = 16 16 16
 
-# Relaxation paramters - to be implemented
-relaxtime = 0.0
+# Relaxation paramters
+# how long and how fast to relax
+relaxtime = 10.0
 relaxspeed = 0.01

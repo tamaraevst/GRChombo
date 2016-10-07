@@ -85,4 +85,69 @@ void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
+// override virtual tagcells function for chi and phi gradients 
+void MatterSFLevel::tagCells (IntVectSet& a_tags)
+{
+    CH_TIME("GRAMRLevel::tagCells");
+    if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;
+
+    fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
+
+    // Create tags based on undivided gradient of phi and chi
+    IntVectSet local_tags;
+
+    const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
+    DataIterator dit0 = level_domain.dataIterator();
+    int nbox = dit0.size();
+    for(int ibox = 0; ibox < nbox; ++ibox)
+    {
+        DataIndex di = dit0[ibox];
+        const Box& b = level_domain[di];
+        const FArrayBox& state_fab = m_state_new[di];
+
+        //mod gradient
+        FArrayBox mod_grad_fab(b,c_NUM);
+        FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
+
+        const IntVect& smallEnd = b.smallEnd();
+        const IntVect& bigEnd = b.bigEnd();
+
+        const int xmin = smallEnd[0];
+        const int ymin = smallEnd[1];
+        const int zmin = smallEnd[2];
+
+        const int xmax = bigEnd[0];
+        const int ymax = bigEnd[1];
+        const int zmax = bigEnd[2];
+
+#pragma omp parallel for collapse(3) schedule(static) default(shared)
+        for (int iz = zmin; iz <= zmax; ++iz)
+        for (int iy = ymin; iy <= ymax; ++iy)
+        for (int ix = xmin; ix <= xmax; ++ix)
+        {
+            IntVect iv(ix,iy,iz);
+            //At the moment only base on gradient chi/chi^2
+            if ((mod_grad_fab(iv,c_chi) >= m_p.regrid_threshold_chi)
+            || (mod_grad_fab(iv,c_phi) >= m_p.regrid_threshold_phi))
+            {
+                // local_tags |= is not thread safe.
+#pragma omp critical
+                {
+                    local_tags |= iv;
+                }
+            }
+        }
+    }
+
+    local_tags.grow(m_p.tag_buffer_size);
+
+    // Need to do this in two steps unless a IntVectSet::operator &=
+    // (ProblemDomain) operator is defined
+    Box local_tags_box = local_tags.minBox();
+    local_tags_box &= m_problem_domain;
+    local_tags &= local_tags_box;
+
+    a_tags = local_tags;
+}
+
 #endif

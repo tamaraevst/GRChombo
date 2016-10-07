@@ -69,7 +69,10 @@ double BubbleSF::compute_phi(double x, double y, double z)
 	 	  rr2 = 1e-6;
   	}
 
-    const double phiout = m_params.amplitudeSF*exp(-rr2/m_params.widthSF);
+    Real rr = sqrt(rr2);
+    Real R0 = 5.0;
+
+    const double phiout = m_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_params.widthSF);
     return phiout;
 }
 
