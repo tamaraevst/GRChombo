@@ -8,7 +8,11 @@
 # Resource specifications - please be as accurate as possible 
 # 
 #PBS -l nodes=8:ppn=8     # No. processors required 
+<<<<<<< HEAD
+#PBS -l walltime=12:00:00  # wall clock time required 
+=======
 #PBS -l walltime=4:00:00  # wall clock time required 
+>>>>>>> e35718f7204c50f5d173a1f8ceafde6e6e79f65a
  
 # Get the number of allocated CPUs 
 NP=64

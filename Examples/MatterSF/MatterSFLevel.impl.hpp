@@ -126,9 +126,15 @@ void MatterSFLevel::tagCells (IntVectSet& a_tags)
         for (int ix = xmin; ix <= xmax; ++ix)
         {
             IntVect iv(ix,iy,iz);
+<<<<<<< HEAD
+            //At the moment only base on gradient chi and phi
+            if ((mod_grad_fab(iv,c_chi)* m_dx >= m_p.regrid_threshold_chi)
+            || (mod_grad_fab(iv,c_phi) * m_dx >= m_p.regrid_threshold_phi))
+=======
             //At the moment only base on gradient chi/chi^2
             if ((mod_grad_fab(iv,c_chi) >= m_p.regrid_threshold_chi)
             || (mod_grad_fab(iv,c_phi) >= m_p.regrid_threshold_phi))
+>>>>>>> e35718f7204c50f5d173a1f8ceafde6e6e79f65a
             {
                 // local_tags |= is not thread safe.
 #pragma omp critical

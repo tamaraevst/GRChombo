@@ -11,8 +11,13 @@ N3 = 32
 L =  32 
 
 regrid_threshold = 0.3
+<<<<<<< HEAD
+regrid_threshold_chi = 0.05
+regrid_threshold_phi = 0.01
+=======
 regrid_threshold_chi = 0.1
 regrid_threshold_phi = 0.005
+>>>>>>> e35718f7204c50f5d173a1f8ceafde6e6e79f65a
 num_ghosts = 3
 max_level = 6
 regrid_interval = 5 5 5 5 5 5 5
@@ -23,7 +28,11 @@ isPeriodic = 1 1 1
 max_grid_size = 16
 block_factor = 16
 tag_buffer_size = 3
+<<<<<<< HEAD
+#fill_ratio = 0.75
+=======
 fill_ratio = 0.75
+>>>>>>> e35718f7204c50f5d173a1f8ceafde6e6e79f65a
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
@@ -43,7 +52,7 @@ LapseAdvectionCoeff = 1
 ShiftBCoeff = 1
 ShiftAdvectionCoeff = 0
 F = 0.75
-eta = 1.82
+eta = 1.0
 SpatialBetaDriverRadius = 1e12
 
 # CCZ4 parameters
