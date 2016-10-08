@@ -194,16 +194,18 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     rhs.phi = vars.lapse * vars.PiM + advec.phi;
 
     rhs.PiM = vars.lapse*(vars.K * vars.PiM - emtensor.dVdphi) + advec.PiM;
-    FOR3(i,j,k)
-    {
-        rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
-    }
 
     FOR2(i,j)
 		{
-        rhs.PiM += - 0.5 * h_UU[i][j] * d1.chi[j]  * vars.lapse * d1.phi[i]; //Add components for non conformal part of christoffel symbol
+        //includes non conformal parts of chris not included in chris_ULL
+        rhs.PiM += *h_UU[i][j]( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
+																+ vars.chi*vars.lapse*d2.phi[i][j] 
+																+ vars.chi*d1.lapse[i]*d1.phi[j]);
+				FOR1(k)
+				{
+        	rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
+				}
     }
-
     return rhs;
 }
 
