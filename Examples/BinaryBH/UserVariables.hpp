@@ -8,7 +8,7 @@ enum
 {
     c_chi,
 
-    c_h11,
+    c_h11, //Symmetric tensor must be declared in this order TODO: make this error proof by autogeneration or a macro.
     c_h12,
     c_h13,
     c_h22,

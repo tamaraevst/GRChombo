@@ -21,6 +21,7 @@ protected:
     struct vars_t : VarsBase<data_t>
     {
         using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
+        using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
 
         data_t chi;
         tensor<2, data_t> h;
@@ -40,9 +41,10 @@ protected:
 
     const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
+    double m_cosmological_constant;
 
 public:
-    Constraints(const FABDriverBase& driver, double dx);
+    Constraints(const FABDriverBase& driver, double dx, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(int x, int y, int z);

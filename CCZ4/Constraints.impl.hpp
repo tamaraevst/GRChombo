@@ -5,9 +5,11 @@
 #ifndef CONSTRAINTS_IMPL_HPP_
 #define CONSTRAINTS_IMPL_HPP_
 
-Constraints::Constraints(const FABDriverBase& driver, double dx) :
+inline
+Constraints::Constraints(const FABDriverBase& driver, double dx, double cosmological_constant /*defaulted*/) :
     m_driver (driver),
-    m_deriv (dx, m_driver)
+    m_deriv (dx, m_driver),
+    m_cosmological_constant (cosmological_constant)
 {}
 
 template <class data_t>
@@ -59,6 +61,7 @@ Constraints::constraint_equations(
    data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
    out.Ham = ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA;
+   out.Ham -= 2*m_cosmological_constant;
 
    tensor<2,data_t> covd_A[CH_SPACEDIM];
    FOR3(i,j,k)
@@ -85,33 +88,16 @@ Constraints::constraint_equations(
 template <class data_t>
 Constraints::vars_t<data_t>::vars_t()
 {
+    //Scalars
     define_enum_mapping(c_chi, chi);
-
-    define_enum_mapping(c_h11, h[0][0]);
-    define_enum_mapping(c_h12, h[0][1]);
-    define_enum_mapping(c_h12, h[1][0]);
-    define_enum_mapping(c_h13, h[0][2]);
-    define_enum_mapping(c_h13, h[2][0]);
-    define_enum_mapping(c_h22, h[1][1]);
-    define_enum_mapping(c_h23, h[1][2]);
-    define_enum_mapping(c_h23, h[2][1]);
-    define_enum_mapping(c_h33, h[2][2]);
-
     define_enum_mapping(c_K, K);
 
-    define_enum_mapping(c_A11, A[0][0]);
-    define_enum_mapping(c_A12, A[0][1]);
-    define_enum_mapping(c_A12, A[1][0]);
-    define_enum_mapping(c_A13, A[0][2]);
-    define_enum_mapping(c_A13, A[2][0]);
-    define_enum_mapping(c_A22, A[1][1]);
-    define_enum_mapping(c_A23, A[1][2]);
-    define_enum_mapping(c_A23, A[2][1]);
-    define_enum_mapping(c_A33, A[2][2]);
+    //Vectors
+    define_enum_mapping(Interval(c_Gamma1,c_Gamma3), Gamma);
 
-    define_enum_mapping(c_Gamma1, Gamma[0]);
-    define_enum_mapping(c_Gamma2, Gamma[1]);
-    define_enum_mapping(c_Gamma3, Gamma[2]);
+    //Symmetric 2-tensors
+    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
+    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
 }
 
 #endif /* CONSTRAINTS_IMPL_HPP_ */

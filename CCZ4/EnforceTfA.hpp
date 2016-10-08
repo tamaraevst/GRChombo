@@ -24,7 +24,7 @@ public:
     template <class data_t>
     struct vars_t : VarsBase<data_t>
     {
-        using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
+        using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
         vars_t();
 
         tensor<2, data_t> h;
@@ -48,25 +48,9 @@ public:
 template <class data_t>
 EnforceTfA::vars_t<data_t>::vars_t()
 {
-    define_enum_mapping(c_h11, h[0][0]);
-    define_enum_mapping(c_h12, h[0][1]);
-    define_enum_mapping(c_h12, h[1][0]);
-    define_enum_mapping(c_h13, h[0][2]);
-    define_enum_mapping(c_h13, h[2][0]);
-    define_enum_mapping(c_h22, h[1][1]);
-    define_enum_mapping(c_h23, h[1][2]);
-    define_enum_mapping(c_h23, h[2][1]);
-    define_enum_mapping(c_h33, h[2][2]);
-
-    define_enum_mapping(c_A11, A[0][0]);
-    define_enum_mapping(c_A12, A[0][1]);
-    define_enum_mapping(c_A12, A[1][0]);
-    define_enum_mapping(c_A13, A[0][2]);
-    define_enum_mapping(c_A13, A[2][0]);
-    define_enum_mapping(c_A22, A[1][1]);
-    define_enum_mapping(c_A23, A[1][2]);
-    define_enum_mapping(c_A23, A[2][1]);
-    define_enum_mapping(c_A33, A[2][2]);
+    //Symmetric 2-tensors
+    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
+    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
 }
 
 #endif /* FIXTFA_HPP_ */

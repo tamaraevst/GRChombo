@@ -4,6 +4,7 @@
 //TODO: Remove this once tagCells is sorted out!
 #include "FABDriver.hpp"
 #include "ComputeModGrad.hpp"
+#include "GRAMRLevel.hpp"
 
 GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
 : m_num_ghosts (a_p.num_ghosts), m_p(a_p), m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
