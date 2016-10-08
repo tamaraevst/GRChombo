@@ -7,6 +7,8 @@
 
 #define COVARIANTZ4
 
+inline
+
 CCZ4SFMatter::CCZ4SFMatter(const FABDriverBase& driver, params_t params, double dx, double sigma) :
     m_params (params),
     m_sigma (sigma),
