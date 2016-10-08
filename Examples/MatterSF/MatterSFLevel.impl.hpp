@@ -13,6 +13,7 @@
 #include "ConstraintsMatter.hpp"
 #include "CCZ4SFMatter.hpp"
 #include "RelaxationChi.hpp"
+#include "ComputeModGrad.hpp"
 
 //Initial data
 #include "BubbleSF.hpp"
