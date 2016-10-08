@@ -198,9 +198,9 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     FOR2(i,j)
 		{
         //includes non conformal parts of chris not included in chris_ULL
-        rhs.PiM += *h_UU[i][j]( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
+        rhs.PiM += h_UU[i][j]*( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
 																+ vars.chi*vars.lapse*d2.phi[i][j] 
-																+ vars.chi*d1.lapse[i]*d1.phi[j]);
+																+ vars.chi*d1.lapse[i]*d1.phi[j]     );
 				FOR1(k)
 				{
         	rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 

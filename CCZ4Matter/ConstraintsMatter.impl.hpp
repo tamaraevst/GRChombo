@@ -64,7 +64,7 @@ ConstraintsMatter::constraint_equations(
    auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
    data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
-   out.Ham = ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA - 16.0*M_PI*emtensor.rho;
+   out.Ham = ricci.scalar + (GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM - tr_AA - 16.0*M_PI*emtensor.rho;
 
    tensor<2,data_t> covd_A[CH_SPACEDIM];
    FOR3(i,j,k)

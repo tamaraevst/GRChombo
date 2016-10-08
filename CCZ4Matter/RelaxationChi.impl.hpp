@@ -69,7 +69,7 @@ RelaxationChi::rhs_equation(const vars_t<data_t> &vars,
     auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
     data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
-    rhs.chi =  m_relaxspeed*(ricci.scalar + (GR_SPACEDIM-2.)*vars.K*vars.K/(GR_SPACEDIM-1.) - tr_AA - 16.0*M_PI*emtensor.rho);
+    rhs.chi =  m_relaxspeed*(ricci.scalar + (GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM - tr_AA - 16.0*M_PI*emtensor.rho);
 
     return rhs;
 }

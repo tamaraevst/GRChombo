@@ -40,7 +40,7 @@ class CCZ4EMTensorSF
     		out.dVdphi = 0.0; //2.0*vars.phi;						//AND HERE
 
     		//components of stress energy tensor
-    		data_t Vt = -vars.PiM * vars.PiM + 2.0*Vofphi;
+    		data_t Vt = - vars.PiM * vars.PiM + 2.0*Vofphi;
     		FOR2(i,j)
     		{
         		Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j];
@@ -81,6 +81,10 @@ class CCZ4EMTensorSF
     		{
     			out.rho += (-0.5*Vt*vars.h[i][j]/vars.chi + out.Sij[i][j])*vars.shift[i]*vars.shift[j]/vars.lapse/vars.lapse;
     		}
+				FOR1(i)
+				{
+					out.rho += - 2.0*vars.shift[i]/vars.lapse/vars.lapse*T_i[i];
+				}
 
         return out;
     }
