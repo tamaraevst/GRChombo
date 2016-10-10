@@ -505,7 +505,7 @@ GRAMRLevel::readCheckpointLevel (HDF5Handle& a_handle)
     {
         char dir_str[20];
         sprintf (dir_str, "%d", dir);
-        const std::string periodic_label = std::string ("isPeriodic_") + dir_str;
+        const std::string periodic_label = std::string ("is_periodic_") + dir_str;
         if (!(header.m_int.find(periodic_label) == header.m_int.end()))
         {
             isPeriodic[dir] = (header.m_int[periodic_label] == true);
