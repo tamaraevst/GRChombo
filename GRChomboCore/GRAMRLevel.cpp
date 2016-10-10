@@ -187,7 +187,8 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         {
             IntVect iv(ix,iy,iz);
             //At the moment only base on gradient chi/chi^2
-            if (mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2) >= m_p.regrid_threshold)
+            if (m_dx * mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2)
+                >= m_p.regrid_threshold)
             {
                 // local_tags |= is not thread safe.
 #pragma omp critical
