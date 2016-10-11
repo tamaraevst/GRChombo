@@ -52,6 +52,7 @@ F = 0.75
 eta = 1.82
 SpatialBetaDriverRadius = 1e12
 
+
 # CCZ4 parameters
 kappa1 = 0.1
 kappa2 = 0

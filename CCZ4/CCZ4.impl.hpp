@@ -61,6 +61,15 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 //    Might want to work through the code and eliminate chi divisions where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
+    if (m_formulation == USE_BSSN) 
+		{
+		  // check whether the CCZ4 damping constants are set to zero, else error
+			if ((m_params.kappa1 != 0.0) || (m_params.kappa1 != 0.0)||(m_params.kappa1 != 0.0));
+		  {
+          MayDay::Error("BSSN formulation is selected - CCZ4 kappa values should be set to zero in params");
+      }	
+    }
+
     using namespace TensorAlgebra;
 
     auto h_UU = compute_inverse(vars.h);
@@ -143,11 +152,28 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     data_t kappa1_lapse = m_params.kappa1 * vars.lapse;
 #endif
 
-    rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-    rhs.Theta += - vars.lapse * m_cosmological_constant;
+    if (m_formulation == USE_BSSN) 
+		{
+		  // ensure the Theta of CCZ4 remains at zero
+     	rhs.Theta = 0;
+    }
+    else 
+    {
+       rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-    rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+  	   rhs.Theta += - vars.lapse * m_cosmological_constant;
+		}
+
+    if (m_formulation == USE_BSSN) 
+    {
+			// Use hamiltonian constraint to remove ricci.scalar for BSSN update
+     	rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K/GR_SPACEDIM) - tr_covd2lapse;
+    }
+    else 
+    {
+    	rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+    }
 
     tensor<1, data_t> Gammadot;
     FOR1(i)
