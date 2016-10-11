@@ -9,7 +9,7 @@ void auto_read_params(ParmParse& pp)
     //Grid setup
     pp.get("L", L);
     pp.get("regrid_threshold", regrid_threshold);
-    pp.get("regrid_threshold_chi", regrid_threshold_chi);
+    pp.get("regrid_threshold_K", regrid_threshold_K);
     pp.get("regrid_threshold_phi", regrid_threshold_phi);
     pp.getarr("isPeriodic", isPeriodic,0, SpaceDim);
     pp.get("num_ghosts", num_ghosts);
@@ -61,7 +61,7 @@ bool ignore_checkpoint_name_mismatch; //ignore mismatch of variable names betwee
 Real dt_multiplier;
 
 ///// Problem specific parameters
-Real regrid_threshold_chi, regrid_threshold_phi, regrid_threshold;
+Real regrid_threshold_K, regrid_threshold_phi, regrid_threshold;
 //Lapse evolution
 Real LapseAdvectionCoeff;
 //ShiftEvolution

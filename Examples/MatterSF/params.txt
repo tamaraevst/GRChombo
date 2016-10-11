@@ -12,8 +12,8 @@ L =  32
 
 regrid_threshold = 0.3
 
-regrid_threshold_chi = 0.05
-regrid_threshold_phi = 0.01
+regrid_threshold_K = 0.02
+regrid_threshold_phi = 0.0175
 
 num_ghosts = 3
 max_level = 6

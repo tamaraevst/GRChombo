@@ -86,7 +86,7 @@ void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
-// override virtual tagcells function for chi and phi gradients 
+// override virtual tagcells function for K and phi gradients 
 void MatterSFLevel::tagCells (IntVectSet& a_tags)
 {
     CH_TIME("GRAMRLevel::tagCells");
@@ -94,7 +94,7 @@ void MatterSFLevel::tagCells (IntVectSet& a_tags)
 
     fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
 
-    // Create tags based on undivided gradient of phi and chi
+    // Create tags based on undivided gradient of phi and K
     IntVectSet local_tags;
 
     const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
@@ -128,8 +128,8 @@ void MatterSFLevel::tagCells (IntVectSet& a_tags)
         {
             IntVect iv(ix,iy,iz);
 
-            //At the moment only base on gradient chi and phi
-            if ((mod_grad_fab(iv,c_chi)* m_dx >= m_p.regrid_threshold_chi)
+            //At the moment only base on gradient K and phi
+            if ((mod_grad_fab(iv,c_K)* m_dx >= m_p.regrid_threshold_K)
             || (mod_grad_fab(iv,c_phi) * m_dx >= m_p.regrid_threshold_phi))
             {
                 // local_tags |= is not thread safe.

@@ -205,7 +205,7 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
 																+ vars.chi*d1.lapse[i]*d1.phi[j]     );
 				FOR1(k)
 				{
-        	rhs.PiM += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
+        	rhs.PiM += - vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
 				}
     }
     return rhs;
