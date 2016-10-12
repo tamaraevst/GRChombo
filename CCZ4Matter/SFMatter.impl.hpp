@@ -8,78 +8,25 @@
 #define COVARIANTZ4
 
 //inline
-template <class data_t>
-auto
-SFMatter::calc_matter_rhs(
-        const vars_t<data_t> &bare_rhs,
-        const vars_t<data_t> &CCZ4_matter_rhs,
-        const vars_t<data_t> &vars,
-        const vars_t< tensor<1,data_t> >& d1,
-        const vars_t< tensor<2,data_t> >& d2,
-        const vars_t<data_t> &advec
-				)-> vars_t<data_t>
-{
-      //Set all RHS to zero, then add the CCZ4 non zero terms
-      vars_t<data_t> total_rhs;
-      total_rhs.assign(0.);
-
-      total_rhs.chi = bare_rhs.chi + CCZ4_matter_rhs.chi;
-      total_rhs.K = bare_rhs.K + CCZ4_matter_rhs.K;
-      total_rhs.h = bare_rhs.h + CCZ4_matter_rhs.h;
-      total_rhs.A = bare_rhs.A + CCZ4_matter_rhs.A;
-//      total_rhs.Gamma = bare_rhs.Gamma + CCZ4_matter_rhs.Gamma;
-      total_rhs.Theta = bare_rhs.Theta + CCZ4_matter_rhs.Theta;
-      total_rhs.lapse = bare_rhs.lapse + CCZ4_matter_rhs.lapse;
-//      total_rhs.shift = bare_rhs.shift + CCZ4_matter_rhs.shift;
-//      total_rhs.B = bare_rhs.B + CCZ4_matter_rhs.B;
-
-      using namespace TensorAlgebra;
-
-      auto h_UU = compute_inverse(vars.h);
-      auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
-
-      emtensor_t<data_t> emtensor = calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
-			potential_t<data_t> potential = calc_potential(vars.phi);
-
-      //evolution equations for scalar field and (minus) its conjugate momentum
-      total_rhs.phi = vars.lapse * vars.Pi + advec.phi;
-
-      total_rhs.Pi = vars.lapse*(vars.K * vars.Pi - potential.dVdphi) + advec.Pi;
-
-      FOR2(i,j)
-      {
-          //includes non conformal parts of chris not included in chris_ULL
-          total_rhs.Pi += h_UU[i][j]*( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
-                                  + vars.chi*vars.lapse*d2.phi[i][j]
-                                  + vars.chi*d1.lapse[i]*d1.phi[j]     );
-          FOR1(k)
-          {
-            total_rhs.Pi += - vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k];
-          }
-      }
-
-      return total_rhs;
-}
 
 template <class data_t>
 auto
 SFMatter::calc_emtensor(
-         const vars_t<data_t> &vars,
-         const vars_t< tensor<1,data_t> >& d1,
-         const tensor<2, data_t> &h_UU,
-         const tensor<3, data_t> &chris,
-         const vars_t<data_t> &advec
-         )-> emtensor_t<data_t>
+        const vars_t<data_t> &vars,
+        const vars_t< tensor<1,data_t> >& d1,
+        const tensor<2, data_t> &h_UU,
+        const tensor<3, data_t> &chris,
+        const vars_t<data_t> &advec
+        )-> emtensor_t<data_t>
 {
         emtensor_t<data_t> out;
 
     		// Calculate the stress energy tensor elements
 
         // Find the potential and its gradient in terms of phi
-    		// do we want to specify in setup or always adjust here?
     		potential_t<data_t> potential = calc_potential(vars.phi);// vars.phi*vars.phi;
 
-    		//components of stress energy tensor
+        // Some useful quantities
     		data_t Vt = - vars.Pi * vars.Pi + 2.0*potential.V_of_phi;
     		FOR2(i,j)
     		{
@@ -87,13 +34,6 @@ SFMatter::calc_emtensor(
     		}
 
     		data_t dphidt2 = (vars.lapse * vars.Pi + advec.phi)*(vars.lapse * vars.Pi + advec.phi);
-
-    		FOR2(i,j)
-				{
-    				out.Sij[i][j] = -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
-				}
-
-    		out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij , h_UU);
 
     		tensor<1, data_t> T_i; // The T(i,3) components of the 4d stress energy tensor
     		FOR1(i)
@@ -105,6 +45,14 @@ SFMatter::calc_emtensor(
    						T_i[i] += -0.5*Vt*vars.h[i][j]*vars.shift[j]/vars.chi;
       		}
     		}
+
+        // Calculate components of EM Tensor
+    		FOR2(i,j)
+				{
+    				out.Sij[i][j] = -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
+				}
+
+    		out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij , h_UU);
 
     		FOR1(i)
     		{
@@ -133,11 +81,71 @@ SFMatter::calc_potential(const data_t phi) -> potential_t<data_t>
 {
 				potential_t<data_t> out;
 
-        out.V_of_phi = 0*phi*phi; // e.g. m^2 phi^2 WOULD POTENTIALLY LIKE COSINES HERE
+        out.V_of_phi = 0*phi*phi; // e.g. m^2 phi^2 NB:WOULD POTENTIALLY LIKE COSINES HERE
         out.dVdphi = 0*2*phi;  //  e.g. 2 m^2 phi
 
         return out;
+}
 
+template <class data_t>
+auto
+SFMatter::calc_total_rhs(
+        const CCZ4::vars_t<data_t> &CCZ4_rhs,
+        const vars_t<data_t> &matter_rhs,
+        const vars_t<data_t> &vars,
+        const vars_t< tensor<1,data_t> >& d1,
+        const vars_t< tensor<2,data_t> >& d2,
+        const vars_t<data_t> &advec
+				)-> vars_t<data_t>
+{
+        //Set all RHS to zero, then add the CCZ4 non zero terms
+        vars_t<data_t> total_rhs;
+        total_rhs.assign(0.);
+
+        // Need to add CCZ4 terms separately as their data structure excludes the matter terms
+        total_rhs.chi   += CCZ4_rhs.chi    + matter_rhs.chi;
+        total_rhs.K     += CCZ4_rhs.K   	 + matter_rhs.K;
+        total_rhs.Theta += CCZ4_rhs.Theta  + matter_rhs.Theta;
+        total_rhs.lapse += CCZ4_rhs.lapse  + matter_rhs.lapse;
+        FOR1(i)
+        {
+	        total_rhs.Gamma[i] += CCZ4_rhs.Gamma[i] + matter_rhs.Gamma[i];
+  	      total_rhs.shift[i] += CCZ4_rhs.shift[i] + matter_rhs.shift[i];
+    	    total_rhs.B[i]     += CCZ4_rhs.B[i]     + matter_rhs.B[i];
+
+          FOR1(j)
+          {
+        		total_rhs.h[i][j]   += CCZ4_rhs.h[i][j] + matter_rhs.h[i][j];
+        		total_rhs.A[i][j]   += CCZ4_rhs.A[i][j] + matter_rhs.A[i][j];
+					}
+				}
+
+        using namespace TensorAlgebra;
+
+        auto h_UU = compute_inverse(vars.h);
+        auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+
+        emtensor_t<data_t> emtensor = calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
+			  potential_t<data_t> potential = calc_potential(vars.phi);
+
+        //evolution equations for scalar field and (minus) its conjugate momentum
+        total_rhs.phi = vars.lapse * vars.Pi + advec.phi;
+
+        total_rhs.Pi = vars.lapse*(vars.K * vars.Pi - potential.dVdphi) + advec.Pi;
+
+        FOR2(i,j)
+        {
+          //includes non conformal parts of chris not included in chris_ULL
+          total_rhs.Pi += h_UU[i][j]*( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
+                                  + vars.chi*vars.lapse*d2.phi[i][j]
+                                  + vars.chi*d1.lapse[i]*d1.phi[j]     );
+          FOR1(k)
+          {
+            total_rhs.Pi += - vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k];
+          }
+        }
+
+        return total_rhs;
 }
 
 template <class data_t>

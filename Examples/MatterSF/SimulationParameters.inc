@@ -27,6 +27,7 @@ void auto_read_params(ParmParse& pp)
     pp.get("SpatialBetaDriverRadius",SpatialBetaDriverRadius);
 
     //CCZ4 parameters
+    pp.get("formulation", formulation);
     pp.get("kappa1",kappa1);
     pp.get("kappa2",kappa2);
     pp.get("kappa3",kappa3);
@@ -36,6 +37,7 @@ void auto_read_params(ParmParse& pp)
     pp.get("sigma",sigma);
 
     //Initial data
+    pp.get("G_Newton", G_Newton);
     pp.get("amplitudeSF", amplitudeSF);
     pp.getarr("centerSF", centerSF, 0, SpaceDim);
     pp.get("widthSF", widthSF);
@@ -68,10 +70,12 @@ Real LapseAdvectionCoeff;
 Real ShiftAdvectionCoeff, F, eta, SpatialBetaDriverRadius;
 int ShiftBCoeff;
 //CCZ4 parameters
+int formulation;
 Real kappa1, kappa2, kappa3;
 int covariantZ4;
 Real sigma; //Dissipation
 //Initial data
+double G_Newton;
 Real amplitudeSF, widthSF;
 std::vector<Real> centerSF;
 //Relaxation params

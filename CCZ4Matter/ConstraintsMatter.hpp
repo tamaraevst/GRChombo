@@ -9,9 +9,7 @@
 #include "GRUtils.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
-
 #include "CCZ4Geometry.hpp"
-#include "CCZ4EMTensorSF.hpp"
 #include "SFMatter.hpp"
 
 #include "Constraints.hpp"
@@ -24,10 +22,14 @@ class ConstraintsMatter : public Constraints
 
 public:
 
-		using Constraints::Constraints;
+    ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton);
 
     template <class data_t>
     void compute(int x, int y, int z);
+
+protected:
+
+    double m_G_Newton;
 
 };
 

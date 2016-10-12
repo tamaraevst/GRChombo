@@ -6,8 +6,9 @@
 #define RELAXATIONCHI_IMPL_HPP_
 
 template <class matter_t>
-RelaxationChi<matter_t>::RelaxationChi(const FABDriverBase& driver, double dx, double relaxspeed) :
+RelaxationChi<matter_t>::RelaxationChi(const FABDriverBase& driver, double dx, double relaxspeed, double G_Newton) :
     m_relaxspeed (relaxspeed),
+    m_G_Newton (G_Newton),
     m_driver (driver),
     m_deriv (dx, m_driver)
 {}
@@ -71,7 +72,7 @@ RelaxationChi<matter_t>::rhs_equation(
     data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
     rhs.chi =  m_relaxspeed*(ricci.scalar + (GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM
-																			- tr_AA - 16.0*M_PI*emtensor.rho);
+																			- tr_AA - 16.0*M_PI*m_G_Newton*emtensor.rho);
 
     return rhs;
 }

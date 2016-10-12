@@ -6,6 +6,12 @@
 #define CONSTRAINTSMATTER_IMPL_HPP_
 
 template <class matter_t>
+ConstraintsMatter<matter_t>::ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton) :
+							Constraints(driver, dx, 0.0), //Explicitly set cosmological constant to zero
+							m_G_Newton (G_Newton)
+{}
+
+template <class matter_t>
 template <class data_t>
 void
 ConstraintsMatter<matter_t>::compute(int x, int y, int z)
@@ -50,11 +56,11 @@ ConstraintsMatter<matter_t>::compute(int x, int y, int z)
     typename matter_t::emtensor_t<data_t> emtensor =
 					my_matter.calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
-    out.Ham += -16.0*M_PI*emtensor.rho;
+    out.Ham += -16.0*M_PI*m_G_Newton*emtensor.rho;
 
     FOR1(i)
 		{
-			out.Mom[i] += -8.0*M_PI*emtensor.Si[i];
+			out.Mom[i] += -8.0*M_PI*m_G_Newton*emtensor.Si[i];
 		}
 
     //Write the rhs into the output FArrayBox

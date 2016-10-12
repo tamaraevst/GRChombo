@@ -9,6 +9,7 @@
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
 #include "VarsBase.hpp"
+#include "CCZ4.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
@@ -43,12 +44,12 @@ public:
         vars_t();
     };
 
-    template <class data_t>
-    struct matter_vars_t
-    {
-				data_t matter_phi;
-        data_t matter_Pi;
-    };
+//    template <class data_t>
+//    struct matter_vars_t
+//    {
+//				data_t matter_phi;
+//        data_t matter_Pi;
+//    };
 
     template <class data_t>
 		struct emtensor_t
@@ -66,16 +67,6 @@ public:
       data_t            dVdphi; // Gradient of V(\phi)
 		};
 
-		template <class data_t>
-		vars_t<data_t> calc_matter_rhs(
-        const vars_t<data_t> &bare_rhs,
-        const vars_t<data_t> &CCZ4_matter_rhs,
-        const vars_t<data_t> &vars,
-        const vars_t< tensor<1,data_t> >& d1,
-        const vars_t< tensor<2,data_t> >& d2,
-        const vars_t<data_t> &advec
-    );
-
     template <class data_t>
     emtensor_t<data_t> calc_emtensor(
          const vars_t<data_t> &vars,
@@ -88,6 +79,16 @@ public:
     template <class data_t>
     potential_t<data_t> calc_potential(
 				 const data_t phi
+    );
+
+		template <class data_t>
+		vars_t<data_t> calc_total_rhs(
+        const CCZ4::vars_t<data_t> &CCZ4_rhs,
+        const vars_t<data_t> &matter_rhs,
+        const vars_t<data_t> &vars,
+        const vars_t< tensor<1,data_t> >& d1,
+        const vars_t< tensor<2,data_t> >& d2,
+        const vars_t<data_t> &advec
     );
 
 };

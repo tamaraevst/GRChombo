@@ -11,10 +11,11 @@
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
 #include "ConstraintsMatter.hpp"
-#include "CCZ4SFMatter.hpp"
+#include "CCZ4Matter.hpp"
 #include "RelaxationChi.hpp"
 #include "ComputeModGrad.hpp"
 #include "SFMatter.hpp"
+#include "CCZ4.hpp"
 
 //Initial data
 #include "BubbleSF.hpp"
@@ -47,7 +48,7 @@ void MatterSFLevel::initialData()
 void MatterSFLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<SFMatter> >(m_dx).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    FABDriver<ConstraintsMatter<SFMatter> >(m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
@@ -58,7 +59,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
 
        //Calculate chi relaxation right hand side
        //Note that this assumes conformal chi and that the momentum constraint is trivially satisfied
-       FABDriver<RelaxationChi<SFMatter> >(m_dx, m_p.relaxspeed).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+       FABDriver<RelaxationChi<SFMatter> >(m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
        a_rhs.setVal(0., Interval(c_h11,c_Mom3));
@@ -73,7 +74,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
     	//Calculate CCZ4 right hand side with SF matter
-    	FABDriver<CCZ4SFMatter>(m_p.ccz4Params, m_dx, m_p.sigma).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_dx, m_p.sigma, CCZ4::USE_BSSN, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
     	//We don't want undefined values floating around in the constraints
     	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
