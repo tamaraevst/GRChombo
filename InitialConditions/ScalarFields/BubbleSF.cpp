@@ -1,10 +1,10 @@
 #include "BubbleSF.hpp"
-#include "CCZ4SFMatter.hpp"
+#include "SFMatter.hpp"
 #include <cmath>
 
 void BubbleSF::compute(int ix, int iy, int iz)
 {
-    CCZ4SFMatter::vars_t<double> vars;
+    SFMatter::vars_t<double> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
     Coordinates<double> coords(ix,iy,iz,m_dx);
     double x = coords.x; //TODO: change functions to accept coords rather than x,y,z
@@ -12,7 +12,7 @@ void BubbleSF::compute(int ix, int iy, int iz)
     double z = coords.z;
 
     vars.phi = compute_phi(x,y,z);
-    vars.PiM = 0;
+    vars.Pi = 0;
 
     vars.lapse = 1;
 
@@ -36,6 +36,6 @@ double BubbleSF::compute_phi(double x, double y, double z)
     double rr = sqrt(rr2);
     double R0 = 5.0;
 
-    const double phiout = m_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_params.widthSF);
+    double phiout = m_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_params.widthSF);
     return phiout;
 }

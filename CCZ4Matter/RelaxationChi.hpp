@@ -8,36 +8,16 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "CCZ4EMTensorSF.hpp"
+#include "SFMatter.hpp"
 #include "VarsBase.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
 #include <array>
 
+template <class matter_t>
 class RelaxationChi
 {
-public:
-    template <class data_t>
-    struct vars_t : VarsBase<data_t>
-    {
-        using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
-
-        data_t chi;
-        tensor<2, data_t> h;
-        data_t K;
-        tensor<2, data_t> A;
-        tensor<1, data_t> Gamma;
-        data_t Theta;
-        data_t lapse;
-        tensor<1, data_t> shift;
-        tensor<1, data_t> B;
-        data_t phi;
-        data_t PiM;
-
-        vars_t();
-    };
-
 protected:
     const double m_relaxspeed;
     const FABDriverBase& m_driver;
@@ -51,11 +31,11 @@ public:
 
 protected:
     template <class data_t>
-    vars_t<data_t> rhs_equation(
-        const vars_t<data_t> &vars,
-        const vars_t< tensor<1,data_t> > &d1,
-        const vars_t< tensor<2,data_t> > &d2,
-        const vars_t<data_t> &advec
+    typename matter_t::vars_t<data_t> rhs_equation(
+        const typename matter_t::vars_t<data_t> &vars,
+        const typename matter_t::vars_t< tensor<1,data_t> > &d1,
+        const typename matter_t::vars_t< tensor<2,data_t> > &d2,
+        const typename matter_t::vars_t<data_t> &advec
     );
 
 };

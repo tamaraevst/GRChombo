@@ -33,7 +33,7 @@ public:
         tensor<1, data_t> shift;
         tensor<1, data_t> B;
         data_t phi;
-        data_t PiM;
+        data_t Pi;
 
         vars_t();
     };

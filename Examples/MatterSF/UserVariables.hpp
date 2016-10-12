@@ -41,7 +41,7 @@ enum
     c_B3,
 
     c_phi,
-    c_PiM,
+    c_Pi,
 
     c_Ham,
 
@@ -91,7 +91,7 @@ namespace UserVariables
         "B3",
 
         "phi",
-        "PiM",
+        "Pi",
 
         "Ham",
         "Mom1",

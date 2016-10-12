@@ -128,7 +128,7 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     {
         Adot_TF[i][j] = -covd2lapse[i][j] + vars.chi*vars.lapse*(ricci.LL[i][j] - 8.0*M_PI*vars.lapse*emtensor.Sij[i][j]);
     }
-    make_trace_free(Adot_TF, vars.h, h_UU);  
+    make_trace_free(Adot_TF, vars.h, h_UU);
 
     FOR2(i,j)
     {
@@ -153,7 +153,7 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
 
     rhs.Theta += - 8.0*M_PI * vars.lapse * emtensor.rho;
 
-    rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) + 4.0*M_PI*(emtensor.S - 3.0*emtensor.rho) ) 
+    rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) + 4.0*M_PI*(emtensor.S - 3.0*emtensor.rho) )
 						- kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse ;
 
     tensor<1, data_t> Gammadot;
@@ -164,7 +164,7 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
         {
             Gammadot[i] += 2*h_UU[i][j]*(vars.lapse*d1.Theta[j] - vars.Theta*d1.lapse[j])
                 - 2*A_UU[i][j]*d1.lapse[j]
-                - vars.lapse*((2*(GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d1.K[j] 
+                - vars.lapse*((2*(GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d1.K[j]
                 + GR_SPACEDIM*A_UU[i][j]*d1.chi[j]/vars.chi)
                 - (chris.contracted[j] + 2*m_params.kappa3*Z_over_chi[j])*d1.shift[i][j]
                 - 16.0*M_PI * vars.lapse * h_UU[i][j] * emtensor.Si[j];
@@ -193,19 +193,19 @@ CCZ4SFMatter::rhs_equation(const vars_t<data_t> &vars,
     }
 
     //evolution equations for scalar field and its conjugate momentum (minus)
-    rhs.phi = vars.lapse * vars.PiM + advec.phi;
+    rhs.phi = vars.lapse * vars.Pi + advec.phi;
 
-    rhs.PiM = vars.lapse*(vars.K * vars.PiM - emtensor.dVdphi) + advec.PiM;
+    rhs.Pi = vars.lapse*(vars.K * vars.Pi - emtensor.dVdphi) + advec.Pi;
 
     FOR2(i,j)
 		{
         //includes non conformal parts of chris not included in chris_ULL
-        rhs.PiM += h_UU[i][j]*( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
-																+ vars.chi*vars.lapse*d2.phi[i][j] 
+        rhs.Pi += h_UU[i][j]*( - 0.5*d1.chi[j]*vars.lapse*d1.phi[i]
+																+ vars.chi*vars.lapse*d2.phi[i][j]
 																+ vars.chi*d1.lapse[i]*d1.phi[j]     );
 				FOR1(k)
 				{
-        	rhs.PiM += - vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k]; 
+        	rhs.Pi += - vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] * d1.phi[k];
 				}
     }
     return rhs;
@@ -257,7 +257,7 @@ CCZ4SFMatter::vars_t<data_t>::vars_t()
     define_enum_mapping(c_B3, B[2]);
 
     define_enum_mapping(c_phi, phi);
-    define_enum_mapping(c_PiM, PiM);
+    define_enum_mapping(c_Pi, Pi);
 
 
 }

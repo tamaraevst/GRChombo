@@ -36,29 +36,29 @@ class CCZ4EMTensorSF
 
         // Find the potential and its gradient in terms of phi
     		// do we want to specify in setup or always adjust here?
-    		data_t Vofphi = 0.0;// vars.phi*vars.phi;		//WOULD LIKE TO BE ABLE TO USE SINE, COSINE, EXP ETC HERE 
+    		data_t Vofphi = 0.0;// vars.phi*vars.phi;		//WOULD LIKE TO BE ABLE TO USE SINE, COSINE, EXP ETC HERE
     		out.dVdphi = 0.0; //2.0*vars.phi;						//AND HERE
 
     		//components of stress energy tensor
-    		data_t Vt = - vars.PiM * vars.PiM + 2.0*Vofphi;
+    		data_t Vt = - vars.Pi * vars.Pi + 2.0*Vofphi;
     		FOR2(i,j)
     		{
         		Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j];
     		}
 
-    		data_t dphidt2 = (vars.lapse * vars.PiM + advecphi)*(vars.lapse * vars.PiM + advecphi);
+    		data_t dphidt2 = (vars.lapse * vars.Pi + advecphi)*(vars.lapse * vars.Pi + advecphi);
 
     		FOR2(i,j)
-				{ 
+				{
     				out.Sij[i][j] = -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
 				}
-    
+
     		out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij , h_UU);
 
     		tensor<1, data_t> T_i; // The T(i,3) components of the 4d stress energy tensor
     		FOR1(i)
     		{
-     				T_i[i] = (d1.phi[i] * (vars.PiM*vars.lapse + advecphi));
+     				T_i[i] = (d1.phi[i] * (vars.Pi*vars.lapse + advecphi));
 
       		FOR1(j)
       		{

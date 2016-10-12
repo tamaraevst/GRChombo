@@ -1,7 +1,0 @@
-To do:
-
-1. Boundary conditions - put in Sommerfeld? Omega calc for BH finder?
-2. Write a BSSN class which can be used instead of the CCZ4 class, make a second SF example with this instead
-3. Compare to some existing results - same?
-4. Make some notes on how to update things which may be useful for others (but not for public consumption)
-5. Add Inflation example
