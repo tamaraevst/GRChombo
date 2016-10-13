@@ -17,27 +17,24 @@
 #include <array>
 
 template <class matter_t>
-class CCZ4Matter : public CCZ4
-{
-public:
+class CCZ4Matter : public CCZ4 {
+ public:
+  CCZ4Matter(const FABDriverBase& driver, params_t params, double dx,
+             double sigma, int formulation = CCZ4::USE_CCZ4,
+             double G_Newton = 1.0);
 
-    CCZ4Matter(const FABDriverBase& driver, params_t params, double dx, double sigma,
-		int formulation = CCZ4::USE_CCZ4, double G_Newton = 1.0);
+  template <class data_t>
+  void compute(int ix, int iy, int iz);
 
-    template <class data_t>
-    void compute(int ix, int iy, int iz);
+ protected:
+  template <class data_t>
+  typename matter_t::vars_t<data_t> matter_rhs_equation(
+      const typename matter_t::vars_t<data_t> &vars,
+      const typename matter_t::vars_t< tensor<1,data_t> > &d1,
+      const typename matter_t::vars_t< tensor<2,data_t> > &d2,
+      const typename matter_t::vars_t<data_t> &advec);
 
-protected:
-    template <class data_t>
-    typename matter_t::vars_t<data_t> matter_rhs_equation(
-        const typename matter_t::vars_t<data_t> &vars,
-        const typename matter_t::vars_t< tensor<1,data_t> > &d1,
-        const typename matter_t::vars_t< tensor<2,data_t> > &d2,
-        const typename matter_t::vars_t<data_t> &advec
-    );
-
-    double m_G_Newton;
-
+  double m_G_Newton;
 };
 
 #include "CCZ4Matter.impl.hpp"

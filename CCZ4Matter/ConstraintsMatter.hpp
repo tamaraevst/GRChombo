@@ -11,25 +11,19 @@
 #include "FourthOrderDerivatives.hpp"
 #include "CCZ4Geometry.hpp"
 #include "SFMatter.hpp"
-
 #include "Constraints.hpp"
-
 #include <array>
 
 template <class matter_t>
-class ConstraintsMatter : public Constraints
-{
+class ConstraintsMatter : public Constraints {
+ public:
+  ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton);
 
-public:
+  template <class data_t>
+  void compute(int x, int y, int z);
 
-    ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton);
-
-    template <class data_t>
-    void compute(int x, int y, int z);
-
-protected:
-
-    double m_G_Newton;
+ protected:
+  double m_G_Newton;
 
 };
 

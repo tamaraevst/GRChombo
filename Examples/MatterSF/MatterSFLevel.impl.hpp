@@ -56,17 +56,13 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
 
     //Relaxation function for chi - this will eventually be done separately with hdf5 as input
     if (m_time < m_p.relaxtime) {
-
-       //Calculate chi relaxation right hand side
-       //Note that this assumes conformal chi and that the momentum constraint is trivially satisfied
-       FABDriver<RelaxationChi<SFMatter> >(m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+      //Calculate chi relaxation right hand side
+      //Note this assumes conformal chi and Mom constraint trivially satisfied
+      FABDriver<RelaxationChi<SFMatter> >(m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
-       a_rhs.setVal(0., Interval(c_h11,c_Mom3));
-    }
-
-    //Else do normal CCZ4 evolution
-    else {
+      a_rhs.setVal(0., Interval(c_h11,c_Mom3));
+    } else {
 
     	FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
