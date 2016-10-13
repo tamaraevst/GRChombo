@@ -16,8 +16,9 @@ CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     double sigma,
     int formulation,
     double G_Newton)
-    : CCZ4(driver, params, dx, sigma, formulation, 0.0), //No cosmological const
-      m_G_Newton (G_Newton) {}
+    : CCZ4(driver, params, dx, 0.0, formulation, 0.0), //No cosmological const or dissipation
+      m_G_Newton (G_Newton),
+      m_sigma_all (sigma) {}
 
 //TODO Do I need to inline here??
 //inline
@@ -48,7 +49,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   CCZ4_advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(CCZ4_advec, CCZ4_vars.shift[idir], idir);
 
-  // Call CCZ4 RHS - work out RHS without matter
+  // Call CCZ4 RHS - work out RHS without matter, NB have specified no dissipation
   vars_t<data_t> CCZ4_rhs = rhs_equation(CCZ4_vars, CCZ4_d1, CCZ4_d2, CCZ4_advec);
 
   // Rework variables to include matter
@@ -86,7 +87,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   rhs_total = my_matter.calc_total_rhs(CCZ4_rhs, matter_rhs, vars, d1, d2, advec);
 
   //Add dissipation to all terms
-  FOR1(idir) m_deriv.add_dissipation(rhs_total, m_sigma, idir);
+//  FOR1(idir) m_deriv.add_dissipation(rhs_total, m_sigma_all, idir);
 
   //Write the rhs into the output FArrayBox
   m_driver.store_vars(rhs_total);

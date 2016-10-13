@@ -152,7 +152,7 @@ int main()
 
     int formulation = 1; //BSSN
     double G_Newton = 1.0;
-    double sigma = 0.2;
+    double sigma = 0.0;
 
     struct timeval begin, end;
     gettimeofday(&begin, NULL);

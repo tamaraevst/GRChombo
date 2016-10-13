@@ -35,6 +35,7 @@ class CCZ4Matter : public CCZ4 {
       const typename matter_t::vars_t<data_t> &advec);
 
   double m_G_Newton;
+  double m_sigma_all;
 };
 
 #include "CCZ4Matter.impl.hpp"
