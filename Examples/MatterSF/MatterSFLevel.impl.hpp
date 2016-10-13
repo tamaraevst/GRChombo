@@ -74,7 +74,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
     	//Calculate CCZ4 right hand side with SF matter
-    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_dx, m_p.sigma, CCZ4::USE_BSSN, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
     	//We don't want undefined values floating around in the constraints
     	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));

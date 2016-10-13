@@ -71,7 +71,7 @@ Real ShiftAdvectionCoeff, F, eta, SpatialBetaDriverRadius;
 int ShiftBCoeff;
 //CCZ4 parameters
 int formulation;
-Real kappa1, kappa2, kappa3;
+double kappa1, kappa2, kappa3;
 int covariantZ4;
 Real sigma; //Dissipation
 //Initial data
