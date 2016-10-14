@@ -16,9 +16,8 @@ CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     double sigma,
     int formulation,
     double G_Newton)
-    : CCZ4(driver, params, dx, 0.0, formulation, 0.0), //No cosmological const or dissipation
-      m_G_Newton (G_Newton),
-      m_sigma_all (sigma) {}
+    : CCZ4(driver, params, dx, sigma, formulation, 0.0), //No cosmological const
+      m_G_Newton (G_Newton) {}
 
 //TODO Do I need to inline here??
 //inline
@@ -87,7 +86,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   rhs_total = my_matter.calc_total_rhs(CCZ4_rhs, matter_rhs, vars, d1, d2, advec);
 
   //Add dissipation to all terms
-//  FOR1(idir) m_deriv.add_dissipation(rhs_total, m_sigma_all, idir);
+  FOR1(idir) m_deriv.add_dissipation(rhs_total, m_sigma, idir);
 
   //Write the rhs into the output FArrayBox
   m_driver.store_vars(rhs_total);
@@ -130,17 +129,21 @@ typename matter_t::vars_t<data_t> CCZ4Matter<matter_t>::matter_rhs_equation(
   FOR2(i,j)
   {
     add_rhs.A[i][j] =
-        - 8.0*M_PI*m_G_Newton*vars.chi*vars.lapse*vars.lapse*Sij_TF[i][j];
+        - 8.0*M_PI*m_G_Newton*vars.chi*vars.lapse*Sij_TF[i][j];
   }
 
   FOR1(i)
   {
     add_rhs.Gamma[i] = 0.0;
+    add_rhs.B[i] = 0.0;
     FOR1(j)
     {
       add_rhs.Gamma[i] +=
           - 16.0*M_PI*m_G_Newton*vars.lapse*h_UU[i][j]*emtensor.Si[j];
     }
+
+    add_rhs.B[i] += add_rhs.Gamma[i];
+
   }
 
   return add_rhs;

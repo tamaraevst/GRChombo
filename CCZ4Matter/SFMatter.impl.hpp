@@ -69,6 +69,11 @@ auto SFMatter::calc_emtensor(
     out.rho += (-0.5*Vt*vars.h[i][j]/vars.chi + out.Sij[i][j])
               * vars.shift[i]*vars.shift[j]/vars.lapse/vars.lapse;
   }
+  FOR1(i)
+  {
+    out.rho += - 2.0*vars.shift[i]*T_i[i]/vars.lapse/vars.lapse;
+  }
+
 
   return out;
 }
@@ -79,8 +84,8 @@ auto SFMatter::calc_potential(const data_t phi) -> potential_t<data_t> {
 
   potential_t<data_t> out;
 
-  out.V_of_phi = 0*phi*phi; // e.g. m^2 phi^2 NB:WOULD LIKE COSINES HERE
-  out.dVdphi = 0*2*phi;  //  e.g. 2 m^2 phi
+	out.V_of_phi = 0.001*phi*phi; // e.g. m^2 phi^2 NB:WOULD LIKE COSINES HERE
+	out.dVdphi = 0.002*phi;  //  e.g. 2 m^2 phi
 
   return out;
 }
@@ -126,9 +131,9 @@ auto SFMatter::calc_total_rhs(
   potential_t<data_t> potential = calc_potential(vars.phi);
 
   //evolution equations for scalar field and (minus) its conjugate momentum
-  total_rhs.phi = vars.lapse * vars.Pi + advec.phi;
-
-  total_rhs.Pi = vars.lapse*(vars.K * vars.Pi - potential.dVdphi) + advec.Pi;
+  total_rhs.phi = vars.lapse*vars.Pi + advec.phi;
+  double DEBUG = 0.0;
+  total_rhs.Pi = vars.lapse*(vars.K*vars.Pi - potential.dVdphi) + advec.Pi;
 
   FOR2(i,j)
   {

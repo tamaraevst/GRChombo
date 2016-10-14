@@ -79,8 +79,14 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     tensor<1, data_t> Z;
     FOR1(i)
     {
-       Z_over_chi[i] = 0.5*(vars.Gamma[i] - chris.contracted[i]);
-       Z[i] = vars.chi*Z_over_chi[i];
+      if (m_formulation == USE_BSSN) {
+        // NB this should be true anyway if setup is correct for BSSN, but we enforce it
+        Z_over_chi[i] = 0.0;
+        Z[i] = 0.0;
+      } else {
+        Z_over_chi[i] = 0.5*(vars.Gamma[i] - chris.contracted[i]);
+        Z[i] = vars.chi*Z_over_chi[i];
+      }
     }
 
     auto ricci =  CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
@@ -168,7 +174,7 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
     if (m_formulation == USE_BSSN)
     {
 			// Use hamiltonian constraint to remove ricci.scalar for BSSN update
-     	rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K/GR_SPACEDIM) - tr_covd2lapse;
+     	rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
     }
     else
     {

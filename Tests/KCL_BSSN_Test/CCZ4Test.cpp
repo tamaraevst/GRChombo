@@ -134,8 +134,8 @@ int main()
                 in_fab(iv, c_B2)     =  0.40234 + 0.26741*x + 1.94822*x*x - 0.78276*x*y*y*y + 2.12346*y*z + 0.69086*z*z - 4.47639*z*z*z*z;
                 in_fab(iv, c_B3)     =  0.40313 + 0.00569*x - 1.12452*x*x - 5.49255*x*y*y*y - 2.21932*y*z + 0.49523*z*z + 1.29460*z*z*z*z;
 
-                in_fab(iv, c_phi)  = 0.0 ;// 0.34578 + 0.26898*x + 0.54348*x*x + 8.33487*x*y*y*y + 0.79469*y*z + 0.30515*z*z + 6.88385*z*z*z*z;
-                in_fab(iv, c_Pi)  =  0.0; //0.65668 + 0.20188*x + 0.34348*x*x + 4.31787*x*y*y*y + 0.88469*y*z + 0.10515*z*z + 2.88385*z*z*z*z;
+                in_fab(iv, c_phi)  = 0.0; //0.34578 + 0.26898*x + 0.54348*x*x + 0.33487*x*y*y*y + 0.79469*y*z + 0.30515*z*z + 1.88385*z*z*z*z;
+                in_fab(iv, c_Pi)  = 0.0; //0.65668 + 0.20188*x + 0.34348*x*x + 0.31787*x*y*y*y + 0.88469*y*z + 0.10515*z*z + 1.88385*z*z*z*z;
 
             }
         }
@@ -152,7 +152,7 @@ int main()
 
     int formulation = 1; //BSSN
     double G_Newton = 1.0;
-    double sigma = 0.0;
+    double sigma = 0.1;
 
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
@@ -171,6 +171,12 @@ int main()
     int THREE = 3;
 
     gettimeofday(&begin, NULL);
+
+    // NB I had to fudge the chi derivatives in the ChF code to get the same result
+    // because of the use of chi^2 rather than chi as conformal factor. Also in the
+    // calculation of R(d0,d1) the conformal Ricci tensor, we used to use the calculated
+    // Gamma^i, not the evolved one. In theory they would be the same, but in this test
+    // The Gamma^i data is random, so it won't work, so I changed it to match the new form
 
     FORT_GETBSSNCRHSF(
                     CHF_FRA1(out_fab_chf, c_chi),

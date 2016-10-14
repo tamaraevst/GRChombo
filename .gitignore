@@ -7,7 +7,7 @@ p
 f
 *_F.H
 .DS_Store
-log
+log*
 *.ex
 *.swp
 *.out

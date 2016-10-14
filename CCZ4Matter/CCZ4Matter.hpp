@@ -11,9 +11,7 @@
 #include "SFMatter.hpp"
 #include "VarsBase.hpp"
 #include "CCZ4.hpp"
-
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
-
 #include <array>
 
 template <class matter_t>
@@ -35,7 +33,6 @@ class CCZ4Matter : public CCZ4 {
       const typename matter_t::vars_t<data_t> &advec);
 
   double m_G_Newton;
-  double m_sigma_all;
 };
 
 #include "CCZ4Matter.impl.hpp"
