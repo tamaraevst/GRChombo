@@ -46,7 +46,7 @@ void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
   //work out RHS including advection
   typename matter_t::vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
-  //    No dissipation in relaxation
+  //    No dissipation in relaxation for now but may add it
   //    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idir);
 
   //Write the rhs into the output FArrayBox
@@ -62,20 +62,21 @@ typename matter_t::vars_t<data_t> RelaxationChi<matter_t>::rhs_equation(
     const typename matter_t::vars_t<data_t> &advec) {
 
   typename matter_t::vars_t<data_t> rhs;
+  rhs.assign(0);
 
   using namespace TensorAlgebra;
 
-  rhs.assign(0);
   auto h_UU = compute_inverse(vars.h);
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
   //Calculate elements of the decomposed stress energy tensor and ricci tensor
   matter_t my_matter;
-  auto emtensor =  my_matter.calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
+  auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
   auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
   auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
   data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
+  //Calculate the relaxation RHS for chi, all other vars RHS zero
   rhs.chi =  m_relaxspeed*(ricci.scalar+(GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM
                            - tr_AA - 16.0*M_PI*m_G_Newton*emtensor.rho);
 

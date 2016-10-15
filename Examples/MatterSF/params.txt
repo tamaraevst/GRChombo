@@ -13,7 +13,6 @@ L =  64
 centerSF = 32 32 32
 
 regrid_threshold = 0.3
-
 regrid_threshold_K = 0.02
 regrid_threshold_phi = 0.0175
 

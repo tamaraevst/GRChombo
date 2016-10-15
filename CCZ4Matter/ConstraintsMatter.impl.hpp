@@ -54,7 +54,7 @@ void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
   typename matter_t::emtensor_t<data_t> emtensor =
-      my_matter.calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
+      my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
   out.Ham += -16.0*M_PI*m_G_Newton*emtensor.rho;
 

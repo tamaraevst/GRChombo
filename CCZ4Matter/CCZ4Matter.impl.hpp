@@ -34,9 +34,9 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   vars_t< tensor<1, data_t> > CCZ4_d1;
   FOR1(idir) m_deriv.diff1(CCZ4_d1, idir);
 
-  vars_t< tensor<2,data_t> > CCZ4_d2;
   // Repeated derivatives
   // Work out second derivatives of variables on grid
+  vars_t< tensor<2,data_t> > CCZ4_d2;
   FOR1(idir) m_deriv.diff2(CCZ4_d2, idir);
   // Mixed derivatives
   // Note: no need to symmetrise explicitely, this is done in mixed_diff2
@@ -44,15 +44,17 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   m_deriv.mixed_diff2(CCZ4_d2, 2, 0);
   m_deriv.mixed_diff2(CCZ4_d2, 2, 1);
 
+  // Calculate advection terms
   vars_t<data_t> CCZ4_advec;
   CCZ4_advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(CCZ4_advec, CCZ4_vars.shift[idir], idir);
 
-  // Call CCZ4 RHS - work out RHS without matter, NB have specified no dissipation
+  // Call CCZ4 RHS - work out RHS without matter, no dissipation
   vars_t<data_t> CCZ4_rhs = rhs_equation(CCZ4_vars, CCZ4_d1, CCZ4_d2, CCZ4_advec);
 
-  // Rework variables to include matter
-  // TODO: Make this less clunky - should be able to extract CCZ4 ones
+  // Rework RHS of variables to include matter
+  // TODO: Once CCZ4 is templated, won't need the two vars_t types, and so
+  // won't need to calcu;ate derivs twice
 
   //copy data from chombo gridpoint into local variables
   typename matter_t::vars_t<data_t> vars;
@@ -62,9 +64,9 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   typename matter_t::vars_t< tensor<1, data_t> > d1;
   FOR1(idir) m_deriv.diff1(d1, idir);
 
-  typename matter_t::vars_t< tensor<2,data_t> > d2;
   // Repeated derivatives
   // work out second derivatives of variables on grid
+  typename matter_t::vars_t< tensor<2,data_t> > d2;
   FOR1(idir) m_deriv.diff2(d2, idir);
   // Mixed derivatives
   // Note: no need to symmetrise explicitely, this is done in mixed_diff2
@@ -72,6 +74,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   m_deriv.mixed_diff2(d2, 2, 0);
   m_deriv.mixed_diff2(d2, 2, 1);
 
+  // Calculate advection terms
   typename matter_t::vars_t<data_t> advec;
   advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
@@ -83,7 +86,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   // Combine the RHS terms and add matter evolution
   typename matter_t::vars_t<data_t> rhs_total;
   matter_t my_matter;
-  rhs_total = my_matter.calc_total_rhs(CCZ4_rhs, matter_rhs, vars, d1, d2, advec);
+  rhs_total = my_matter.compute_total_rhs(CCZ4_rhs, matter_rhs, vars, d1, d2, advec);
 
   //Add dissipation to all terms
   FOR1(idir) m_deriv.add_dissipation(rhs_total, m_sigma, idir);
@@ -93,6 +96,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
 
 }
 
+// Function to add in matter terms to CCZ4, those depending on EM tensor
 template <class matter_t>
 template <class data_t>
 typename matter_t::vars_t<data_t> CCZ4Matter<matter_t>::matter_rhs_equation(
@@ -113,8 +117,9 @@ typename matter_t::vars_t<data_t> CCZ4Matter<matter_t>::matter_rhs_equation(
 
   //Calculate elements of the decomposed stress energy tensor
   matter_t my_matter;
-  auto emtensor =  my_matter.calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
+  auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
+  // Update RHS
   if (m_formulation == USE_BSSN) {
     add_rhs.K = 4.0*M_PI*m_G_Newton*vars.lapse*(emtensor.S + emtensor.rho);
     add_rhs.Theta = 0.0;

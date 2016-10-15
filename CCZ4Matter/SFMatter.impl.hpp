@@ -7,10 +7,12 @@
 
 #define COVARIANTZ4
 
-//inline
+//TODO
+// Should I inline here?
 
+// Calculate the stress energy tensor elements
 template <class data_t>
-auto SFMatter::calc_emtensor(
+auto SFMatter::compute_emtensor(
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
@@ -19,10 +21,8 @@ auto SFMatter::calc_emtensor(
 
   emtensor_t<data_t> out;
 
-  // Calculate the stress energy tensor elements
-
   // Find the potential and its gradient in terms of phi
-  potential_t<data_t> potential = calc_potential(vars.phi);// vars.phi*vars.phi;
+  potential_t<data_t> potential = compute_potential(vars.phi);//
 
   // Some useful quantities
   data_t Vt = - vars.Pi * vars.Pi + 2.0*potential.V_of_phi;
@@ -46,13 +46,16 @@ auto SFMatter::calc_emtensor(
   }
 
   // Calculate components of EM Tensor
+  // S_ij = T_ij
   FOR2(i,j)
   {
     out.Sij[i][j] = -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
   }
 
+  // S = Tr_S_ij
   out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij , h_UU);
 
+  // S_i (note lower index) = n^a T_a0
   FOR1(i)
   {
     out.Si[i] = - T_i[i]/vars.lapse;
@@ -63,7 +66,8 @@ auto SFMatter::calc_emtensor(
     }
   }
 
-  out.rho = dphidt2/vars.lapse/vars.lapse + 0.5*Vt; // = T_ab * n^a n^b
+  // rho = n^a n^b T_ab
+  out.rho = dphidt2/vars.lapse/vars.lapse + 0.5*Vt;
   FOR2(i,j)
   {
     out.rho += (-0.5*Vt*vars.h[i][j]/vars.chi + out.Sij[i][j])
@@ -74,24 +78,27 @@ auto SFMatter::calc_emtensor(
     out.rho += - 2.0*vars.shift[i]*T_i[i]/vars.lapse/vars.lapse;
   }
 
-
   return out;
 }
 
 /// Set the potential function for the scalar field here
 template <class data_t>
-auto SFMatter::calc_potential(const data_t phi) -> potential_t<data_t> {
+auto SFMatter::compute_potential(const data_t phi) -> potential_t<data_t> {
 
   potential_t<data_t> out;
 
-	out.V_of_phi = 0.001*phi*phi; // e.g. m^2 phi^2 NB:WOULD LIKE COSINES HERE
-	out.dVdphi = 0.002*phi;  //  e.g. 2 m^2 phi
+  //The potential value at phi
+  out.V_of_phi = 0.001*phi*phi; // e.g. m^2 phi^2 NB:WOULD LIKE COSINES HERE
+
+  //The potential gradient at phi
+  out.dVdphi = 0.001*2.0*phi;  //  e.g. 2 m^2 phi
 
   return out;
 }
 
+// Sums all contributions the the RHS, including matter terms
 template <class data_t>
-auto SFMatter::calc_total_rhs(
+auto SFMatter::compute_total_rhs(
     const CCZ4::vars_t<data_t> &CCZ4_rhs,
     const vars_t<data_t> &matter_rhs,
     const vars_t<data_t> &vars,
@@ -104,6 +111,8 @@ auto SFMatter::calc_total_rhs(
   total_rhs.assign(0.);
 
   // Need to add CCZ4 terms separately as data structure excludes the matter terms
+  // TODO Will probably do this in CCZ4Matter once CCZ4 is templated, so we won't
+  // need such a clunky addition of terms
   total_rhs.chi   += CCZ4_rhs.chi    + matter_rhs.chi;
   total_rhs.K     += CCZ4_rhs.K      + matter_rhs.K;
   total_rhs.Theta += CCZ4_rhs.Theta  + matter_rhs.Theta;
@@ -127,12 +136,12 @@ auto SFMatter::calc_total_rhs(
   auto h_UU = compute_inverse(vars.h);
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
-  emtensor_t<data_t> emtensor = calc_emtensor(vars, d1, h_UU, chris.ULL, advec);
-  potential_t<data_t> potential = calc_potential(vars.phi);
+  emtensor_t<data_t> emtensor = compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
+  potential_t<data_t> potential = compute_potential(vars.phi);
 
   //evolution equations for scalar field and (minus) its conjugate momentum
   total_rhs.phi = vars.lapse*vars.Pi + advec.phi;
-  double DEBUG = 0.0;
+
   total_rhs.Pi = vars.lapse*(vars.K*vars.Pi - potential.dVdphi) + advec.Pi;
 
   FOR2(i,j)
