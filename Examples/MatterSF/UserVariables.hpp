@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
@@ -40,8 +42,8 @@ enum
     c_B2,
     c_B3,
 
-    c_phi,
-    c_Pi,
+    c_phi, // matter field added
+    c_Pi,  //(minus) conjugate momentum
 
     c_Ham,
 

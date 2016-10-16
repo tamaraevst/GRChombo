@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #ifndef SIMULATIONPARAMETERS_HPP_
 #error  "This file must only be included through SimulationParameters.hpp"
 #endif
@@ -74,7 +76,7 @@ int formulation;
 double kappa1, kappa2, kappa3;
 int covariantZ4;
 Real sigma; //Dissipation
-//Initial data
+//Initial data for matter
 double G_Newton;
 Real amplitudeSF, widthSF;
 std::vector<Real> centerSF;

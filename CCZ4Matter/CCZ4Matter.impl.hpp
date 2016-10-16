@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #if !defined(CCZ4MATTER_HPP_)
 #error "This file should only be included through CCZ4Matter.hpp"
 #endif
@@ -8,7 +10,7 @@
 
 #define COVARIANTZ4
 
-//inline
+//TODO KClough: inline??
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     params_t params,
@@ -19,8 +21,6 @@ CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     : CCZ4(driver, params, dx, sigma, formulation, 0.0), //No cosmological const
       m_G_Newton (G_Newton) {}
 
-//TODO Do I need to inline here??
-//inline
 
 template <class matter_t>
 template <class data_t>
@@ -53,8 +53,9 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   vars_t<data_t> CCZ4_rhs = rhs_equation(CCZ4_vars, CCZ4_d1, CCZ4_d2, CCZ4_advec);
 
   // Rework RHS of variables to include matter
-  // TODO: Once CCZ4 is templated, won't need the two vars_t types, and so
-  // won't need to calcu;ate derivs twice
+  // TODO KClough: Once CCZ4 is templated, won't need the two vars_t types, and so
+  // won't need to calculate derivs twice. Will also add RHS terms here and
+  // not in the matter_t class
 
   //copy data from chombo gridpoint into local variables
   typename matter_t::vars_t<data_t> vars;

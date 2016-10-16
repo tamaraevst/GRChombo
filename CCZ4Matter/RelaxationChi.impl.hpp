@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #if !defined(RELAXATIONCHI_HPP_)
 #error "This file should only be included through RelaxationChi.hpp"
 #endif
@@ -5,6 +7,7 @@
 #ifndef RELAXATIONCHI_IMPL_HPP_
 #define RELAXATIONCHI_IMPL_HPP_
 
+//TODO KClough: inline??
 template <class matter_t>
 RelaxationChi<matter_t>::RelaxationChi(
     const FABDriverBase& driver,
@@ -77,6 +80,7 @@ typename matter_t::vars_t<data_t> RelaxationChi<matter_t>::rhs_equation(
   data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
   //Calculate the relaxation RHS for chi, all other vars RHS zero
+  //Could have called ConstraintsMatter here, but it is hardly worth it
   rhs.chi =  m_relaxspeed*(ricci.scalar+(GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM
                            - tr_AA - 16.0*M_PI*m_G_Newton*emtensor.rho);
 

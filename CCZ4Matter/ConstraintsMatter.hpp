@@ -1,4 +1,4 @@
-//This compute class calculates Hamiltonian and Momentum constraints
+// Last edited K Clough 16.10.16
 
 #ifndef CONSTRAINTSMATTER_HPP_
 #define CONSTRAINTSMATTER_HPP_
@@ -14,15 +14,37 @@
 #include "Constraints.hpp"
 #include <array>
 
+//!  Calculates the Hamiltonain and Momentum constraints with matter fields
+/*!
+     The class calculates the Hamiltonian and Momentum constraints at each point in a
+     box. It inherits from the Constraints class which calculates the constraints without
+     the matter terms. It adds in the matter terms for a given matter class matter_t, which
+     must provide it with the Energy Momentum tensor. For an example of a matter_t class
+     see SFMatter.
+     \sa Constraints(), SFMatter()
+*/
 template <class matter_t>
 class ConstraintsMatter : public Constraints {
  public:
-  ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton);
+  //! Constructor of class ConstraintsMatter
+  /*!
+       Takes in the box driver and the grid spacing, plus optionally the
+       value of Newton's constant, which is set to one by default.
+  */
+  ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton = 1.0);
 
+  //! The compute member which calculates the constraints at each point in the box
+  /*!
+       \param ix the x index of the point on the level.
+       \param iy the y index of the point on the level.
+       \param iz the z index of the point on the level.
+       \return is void - the constraints are written directly to the grid in the function.
+  */
   template <class data_t>
   void compute(int x, int y, int z);
 
  protected:
+  //! Newton's constant, set to one by default.
   double m_G_Newton;
 
 };

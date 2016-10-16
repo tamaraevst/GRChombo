@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #ifndef RELAXATIONCHI_HPP_
 #define RELAXATIONCHI_HPP_
 

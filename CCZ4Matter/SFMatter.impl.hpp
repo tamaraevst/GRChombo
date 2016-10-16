@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #if !defined(SFMATTER_HPP_)
 #error "This file should only be included through SFMatter.hpp"
 #endif
@@ -7,16 +9,13 @@
 
 #define COVARIANTZ4
 
-//TODO
-// Should I inline here?
-
 // Calculate the stress energy tensor elements
 template <class data_t>
 auto SFMatter::compute_emtensor(
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
-    const tensor<3, data_t> &chris,
+    const tensor<3, data_t> &chris_ULL,
     const vars_t<data_t> &advec) -> emtensor_t<data_t> {
 
   emtensor_t<data_t> out;
@@ -83,15 +82,17 @@ auto SFMatter::compute_emtensor(
 
 /// Set the potential function for the scalar field here
 template <class data_t>
-auto SFMatter::compute_potential(const data_t phi) -> potential_t<data_t> {
+auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
 
   potential_t<data_t> out;
 
+  //TODO KClough: Would like templated cosines and sines etc here
+
   //The potential value at phi
-  out.V_of_phi = 0.001*phi*phi; // e.g. m^2 phi^2 NB:WOULD LIKE COSINES HERE
+  out.V_of_phi = 0.001*phi_here*phi_here; // e.g. m^2 phi^2
 
   //The potential gradient at phi
-  out.dVdphi = 0.001*2.0*phi;  //  e.g. 2 m^2 phi
+  out.dVdphi = 0.001*2.0*phi_here;  //  e.g. 2 m^2 phi
 
   return out;
 }
@@ -111,7 +112,7 @@ auto SFMatter::compute_total_rhs(
   total_rhs.assign(0.);
 
   // Need to add CCZ4 terms separately as data structure excludes the matter terms
-  // TODO Will probably do this in CCZ4Matter once CCZ4 is templated, so we won't
+  // TODO KClough: Will do this in CCZ4Matter once CCZ4 is templated, so we won't
   // need such a clunky addition of terms
   total_rhs.chi   += CCZ4_rhs.chi    + matter_rhs.chi;
   total_rhs.K     += CCZ4_rhs.K      + matter_rhs.K;

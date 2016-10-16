@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #ifndef CCZ4MATTER_HPP_
 #define CCZ4MATTER_HPP_
 

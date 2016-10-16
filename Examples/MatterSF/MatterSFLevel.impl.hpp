@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #if !defined(MATTERSFLEVEL_HPP_)
 #error "This file should only be included through MatterSFLevel.hpp"
 #endif
@@ -5,24 +7,32 @@
 #ifndef MATTERSFLEVEL_IMPL_HPP_
 #define MATTERSFLEVEL_IMPL_HPP_
 
+//General includes common to most GR problems
 #include "MatterSFLevel.hpp"
 #include "FABDriver.hpp"
 #include "EnforceTfA.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
-#include "ConstraintsMatter.hpp"
+
+//For RHS update
+//#include "CCZ4.hpp"
 #include "CCZ4Matter.hpp"
-#include "RelaxationChi.hpp"
+
+//For constraints calculation
+#include "ConstraintsMatter.hpp"
+
+//For tag cells
 #include "ComputeModGrad.hpp"
-#include "SFMatter.hpp"
-#include "CCZ4.hpp"
 
-//Initial data
+//Problem specific includes
 #include "BubbleSF.hpp"
+#include "SFMatter.hpp"
+#include "RelaxationChi.hpp"
 
+// Things to do at each advance step, after the RK4 is calculated
 void MatterSFLevel::specificAdvance()
 {
-    //Enforce the trace free alpha condition
+    //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Enforce positive chi and alpha
@@ -32,6 +42,7 @@ void MatterSFLevel::specificAdvance()
     if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, SKIP_GHOST_CELLS, disable_simd());
 }
 
+// Initial data for field and metric variables
 void MatterSFLevel::initialData()
 {
     CH_TIME("MatterSFLevel::initialData");
@@ -45,12 +56,14 @@ void MatterSFLevel::initialData()
 
 }
 
+// Things to do before outputting a checkpoint file
 void MatterSFLevel::preCheckpointLevel()
 {
     fillAllGhosts();
     FABDriver<ConstraintsMatter<SFMatter> >(m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
+// Things to do in RHS update, at each RK4 step
 void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
 {
 
@@ -78,13 +91,18 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     }
 }
 
+// Things to do at ODE update, after soln + rhs
 void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
 {
-    //Enforce the trace free alpha condition
+    //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
-// override virtual tagcells function for K and phi gradients 
+// Tell Chombo when to mark cells for regridding
+// override virtual tagcells function for tagging based on K and phi gradients
+// TODO KClough: It is a bit ugly to have all this here, may want to create a hook
+// in the main routine and then just put the conditional here - but tagging is very
+// problem specific, so it is hard to have a "general" routine
 void MatterSFLevel::tagCells (IntVectSet& a_tags)
 {
     CH_TIME("GRAMRLevel::tagCells");
@@ -127,6 +145,8 @@ void MatterSFLevel::tagCells (IntVectSet& a_tags)
             IntVect iv(ix,iy,iz);
 
             //At the moment only base on gradient K and phi
+            //NB the mod_grad_fab is the true gradient, but we want the change
+            //across the cell, so multiply by dx (otherwise you regrid forever...)
             if ((mod_grad_fab(iv,c_K)* m_dx >= m_p.regrid_threshold_K)
             || (mod_grad_fab(iv,c_phi) * m_dx >= m_p.regrid_threshold_phi))
             {

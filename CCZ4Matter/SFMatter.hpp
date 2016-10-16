@@ -1,3 +1,5 @@
+// Last edited K Clough 16.10.16
+
 #ifndef SFMATTER_HPP_
 #define SFMATTER_HPP_
 
