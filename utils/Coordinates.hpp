@@ -1,4 +1,5 @@
-
+#ifndef COORDINATES_HPP_
+#define COORDINATES_HPP_
 
 template <class data_t>
 class Coordinates
@@ -49,3 +50,4 @@ public:
         out = simd<double>::load(out_arr);
     }
 };
+#endif /* COORDINATES_HPP_ */
