@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <type_traits>
+#include <functional>
 
 template <typename t>
 struct simd_traits
@@ -94,6 +95,45 @@ struct simd_base
         out /= static_cast<const simd<t>&>(b);
         return out;
     }
+
+    ALWAYS_INLINE
+    t operator[] ( int index ) const { return m_value[index]; }
+    
+    template <typename op_t>
+    ALWAYS_INLINE
+    simd<t> foreach (op_t op) const
+    {
+        t in_arr[simd_traits<t>::simd_len];
+        t out_arr[simd_traits<t>::simd_len];
+        simd<t>::store(in_arr, m_value);
+
+        #pragma simd vectorlengthfor(t)
+        for (int i = 0; i < simd_traits<t>::simd_len; ++i)
+        {
+            out_arr[i] = op(in_arr[i]);
+        }
+
+        return simd<t>::load(out_arr);
+    }
+    
+    template <typename op_t>
+    ALWAYS_INLINE
+    simd<t> foreach (op_t op, simd<t> arg) const
+    {
+        t in_arr[simd_traits<t>::simd_len];
+        t arg_arr[simd_traits<t>::simd_len];
+        t out_arr[simd_traits<t>::simd_len];
+        simd<t>::store(in_arr, m_value);
+        simd<t>::store(arg_arr, arg);
+
+        #pragma simd vectorlengthfor(t)
+        for (int i = 0; i < simd_traits<t>::simd_len; ++i)
+        {
+            out_arr[i] = op(in_arr[i],arg_arr[i]);
+        }
+
+        return simd<t>::load(out_arr);
+    }
 };
 
 template <typename t> struct simd_compare { typedef bool type; };
@@ -135,38 +175,5 @@ simd_compare_gt(const t& a, const t& b)
     return a > b;
 }
 
-template <typename t>
-ALWAYS_INLINE
-t simd_sqrt(const t& a)
-{
-   return sqrt(a);
-}
-
-template <typename t>
-ALWAYS_INLINE
-t simd_log(const t& a)
-{
-   return log(a);
-}
-
-//This function will only be enabled if simd<t> is not the same as t, i.e. if we could potentially vectorise
-template <typename t>
-ALWAYS_INLINE
-typename std::enable_if<(simd_traits<t>::simd_len > 1), simd<t> >::type
-simd_log(const simd<t>& a)
-{
-   //For log we just let the compiler auto-vectorise
-   t in_arr[simd_traits<t>::simd_len];
-   t out_arr[simd_traits<t>::simd_len];
-   simd<t>::store(in_arr, a);
-
-   #pragma simd vectorlengthfor(t)
-   for (int i = 0; i < simd_traits<t>::simd_len; ++i)
-   {
-      out_arr[i] = log(in_arr[i]);
-   }
-
-   return simd<t>::load(out_arr);
-}
 
 #endif /* SIMD_BASE_HPP_ */

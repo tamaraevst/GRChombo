@@ -1,6 +1,7 @@
 #ifndef SIMD_HPP_
 #define SIMD_HPP_
 
+#include <cmath>
 #include "always_inline.hpp"
 
 template <typename t> struct _simd_remove_const { typedef t type; };
@@ -89,7 +90,54 @@ struct simd
         m_value /= a.m_value;
         return *this;
     }
+    
+    ALWAYS_INLINE
+    t operator[] (int index) const { return m_value; }
+    
+    template <typename op_t>
+    ALWAYS_INLINE
+    simd foreach(op_t op) const
+    {
+        return simd(op(m_value));
+    }
+    
+    template <typename op_t>
+    ALWAYS_INLINE
+    simd foreach(op_t op, t arg) const
+    {
+        return simd(op(m_value,arg));
+    }
 };
+
+#define define_simd_overload(op) \
+template <typename t> \
+ALWAYS_INLINE \
+simd<t> op(const simd<t>& a)\
+{\
+   return a.foreach(([&](t x) { return op(x);}));\
+}
+
+#define define_binary_simd_overload(op) \
+template <typename t> \
+ALWAYS_INLINE \
+simd<t> op(const simd<t>& a, const simd<t>&b)\
+{\
+   return a.foreach(([&](t x, t arg) { return op(x,arg);}),b);\
+}
+
+/* Trascendental support:                               */
+/* exp, sin, cos, log, sqrt, pow, tanh, tan, sinh, cosh */
+
+define_simd_overload(exp)
+define_simd_overload(sin)
+define_simd_overload(cos)
+define_simd_overload(log)
+define_simd_overload(sqrt)
+define_binary_simd_overload(pow)
+define_simd_overload(tanh)
+define_simd_overload(tan)
+define_simd_overload(sinh)
+define_simd_overload(cosh)
 
 #include "simd_base.hpp"
 
