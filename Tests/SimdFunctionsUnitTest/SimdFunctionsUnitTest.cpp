@@ -4,6 +4,8 @@
 #include <cmath>
 #include "simd.hpp"
 
+#define DEBUG 1
+
 template<class t>
 bool similar ( t a, t b, t *error, t *tolerance )
 {
@@ -28,7 +30,15 @@ bool sv_test ( const char *name, sop_t sop, vop_t vop )
     for ( int i = 0; i < simd_length; i++ ) {
         t error,tolerance;
         if ( !similar(simd_out[i],vals[i],&error,&tolerance) ) {
-            //printf("%s input=%d scalar=%.17g vector=%.17g error=%.17g / %.17g\n", name, i+1, vals[i], simd_out[i], error, tolerance);
+#if DEBUG            
+            std::cout.precision( std::numeric_limits<t>::max_digits10 + 1);
+            std::cout << name << " input=" << i+1 
+                      << " scalar=" << vals[i]
+                      << " vector=" << simd_out[i]
+                      << " error=" << error
+                      << " tolerance=" << tolerance
+                      << std::endl;
+#endif                      
             return true;
         }
     }
@@ -48,11 +58,18 @@ bool rv_test ( const char *name, op_t op, rev_op_t rev_op )
     auto simd_in = simd<t>::load(vals);
     auto simd_out = rev_op(simd_in);
     
-    #pragma novector
     for ( int i = 0; i < simd_length; i++ ) {
         t error,tolerance;
         if ( !similar(simd_out[i],((t)i+1),&error,&tolerance) ) {
-            //printf("%s input=%.17g output=%.17g error=%.17g / %.17g\n", name, (t)i+1, simd_out[i],error, tolerance);
+#if DEBUG                
+            std::cout.precision( std::numeric_limits<t>::max_digits10 + 1);
+            std::cout << name << " input=" << i+1 
+                      << " input=" << i+1
+                      << " output=" << simd_out[i]
+                      << " error=" << error
+                      << " tolerance=" << tolerance
+                      << std::endl;
+#endif                      
             return true;
         }
     }
@@ -64,7 +81,7 @@ bool rv_test ( const char *name, op_t op, rev_op_t rev_op )
    do { \
    const char *name = "sv::"#type"::"#op;\
    if ( sv_test<type>( name, ([&](auto x) { return op;}), ([&](auto x) { return op;}) ) ) { \
-       std::cout << name << "test FAILED" << std::endl; \
+       std::cout << name << " test FAILED" << std::endl; \
        error |= true;\
    }\
    } while (0);
