@@ -116,11 +116,11 @@ struct simd<double> : public simd_base<double>
     }
 
     friend ALWAYS_INLINE
-    simd exp(const simd& a)
+    simd exp2(const simd& a)
     {
         return _mm512_exp2a23_pd(a);
     }
-    
+
     friend ALWAYS_INLINE
     simd sqrt(const simd& a)
     {
@@ -217,11 +217,12 @@ struct simd<float> : public simd_base<float>
     {
         return _mm512_max_ps(a, b);
     }
+
     friend ALWAYS_INLINE
-    simd exp(const simd& a)
+    simd exp2(const simd& a)
     {
         return _mm512_exp2a23_ps(a);
-    }
+    }   
     
     friend ALWAYS_INLINE
     simd sqrt(const simd& a)

@@ -1,31 +1,115 @@
 #include <iostream>
+#include <limits>
+#include <iomanip> 
+#include <cmath>
 #include "simd.hpp"
 
+template<class t>
+bool similar ( t a, t b, t *error, t *tolerance )
+{
+    *error = std::abs( a - b );
+    *tolerance = 2*std::numeric_limits<t>::epsilon() * std::max(std::abs(a), std::abs(a));
+    return *error <= *tolerance;
+}
+
+template< class t, class sop_t, class vop_t >
+bool sv_test ( const char *name, sop_t sop, vop_t vop )
+{
+    int simd_length = simd_traits<t>::simd_len;
+    t vals[simd_length];
+    
+    for ( int i = 0; i < simd_length; i++ ) vals[i] = i+1;
+    auto simd_in = simd<t>::load(vals);
+    auto simd_out = vop(simd_in);
+    
+    #pragma novector
+    for ( int i = 0; i < simd_length; i++ ) vals[i] = sop(i+1);
+    
+    for ( int i = 0; i < simd_length; i++ ) {
+        t error,tolerance;
+        if ( !similar(simd_out[i],vals[i],&error,&tolerance) ) {
+            //printf("%s input=%d scalar=%.17g vector=%.17g error=%.17g / %.17g\n", name, i+1, vals[i], simd_out[i], error, tolerance);
+            return true;
+        }
+    }
+    
+    return false;
+    
+}
+
+template< class t, class op_t, class rev_op_t >
+bool rv_test ( const char *name, op_t op, rev_op_t rev_op )
+{
+    int simd_length = simd_traits<t>::simd_len;
+    t vals[simd_length];
+    
+    #pragma novector
+    for ( int i = 0; i < simd_length; i++ ) vals[i] = op(i+1);
+    auto simd_in = simd<t>::load(vals);
+    auto simd_out = rev_op(simd_in);
+    
+    #pragma novector
+    for ( int i = 0; i < simd_length; i++ ) {
+        t error,tolerance;
+        if ( !similar(simd_out[i],((t)i+1),&error,&tolerance) ) {
+            //printf("%s input=%.17g output=%.17g error=%.17g / %.17g\n", name, (t)i+1, simd_out[i],error, tolerance);
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+#define SV_TEST_T(type,op)\
+   do { \
+   const char *name = "sv::"#type"::"#op;\
+   if ( sv_test<type>( name, ([&](auto x) { return op;}), ([&](auto x) { return op;}) ) ) { \
+       std::cout << name << "test FAILED" << std::endl; \
+       error |= true;\
+   }\
+   } while (0);
+
+#define RV_TEST_T( type, op , rev_op ) \
+   do { \
+   const char *name = "rv::"#type"::"#rev_op;\
+   if ( rv_test<type>( name, ([&](auto x) { return op;}), ([&](auto x) { return rev_op;}) ) ) { \
+       std::cout << name << " test FAILED" << std::endl; \
+       error |= true;\
+   }\
+   } while (0);
+
+   
+#define SV_TEST(op) \
+    SV_TEST_T(double,op);\
+    SV_TEST_T(float,op);
+    
+#define RV_TEST(op,rev_op) \
+    RV_TEST_T(double,op,rev_op);\
+    RV_TEST_T(float,op,rev_op);\
+    RV_TEST_T(double,rev_op,op);\
+    RV_TEST_T(float,rev_op,op);
+       
 int main()
 {
-   int error = 0;
+   bool error = false;
 
-   int simd_length = simd_traits<double>::simd_len;
-
-   //Test the log
-   double* xLog = new double[simd_length];
-   for (int i = 0; i < simd_length; ++i) xLog[i] = exp(i+1);
-   auto simd_in = simd<double>::load(xLog);
-   auto simd_out = simd_log(simd_in);
-   simd<double>::store(xLog, simd_out);
-   for (int i = 0; i < simd_length; ++i) if (xLog[i] != i+1) error = -1;
-   delete[] xLog;
-
-   //Test the sqrt
-   double* xSqrt = new double[simd_length];
-   for (int i = 0; i < simd_length; ++i) xSqrt[i] = pow(i+1,2);
-   simd_in = simd<double>::load(xSqrt);
-   simd_out = simd_sqrt(simd_in);
-   simd<double>::store(xSqrt, simd_out);
-   for (int i = 0; i < simd_length; ++i) if (xSqrt[i] != i+1) error = -2;
-   delete[] xSqrt;
-
-   if (error == 0) std::cout << "Simd functions unit test passed" << std::endl;
+   SV_TEST(exp2(x));
+   SV_TEST(exp(x));
+   SV_TEST(log(x));
+   SV_TEST(log2(x));
+   SV_TEST(pow(x,(decltype(x))2));
+   SV_TEST(sqrt(x));
+   SV_TEST(sin(x));
+   SV_TEST(cos(x));
+   SV_TEST(tan(x));
+   SV_TEST(sinh(x));
+   SV_TEST(cosh(x));
+   SV_TEST(tanh(x));
+   
+   RV_TEST(exp(x),log(x));
+   RV_TEST(pow(x,(decltype(x))2),sqrt(x));
+       
+   if ( !error ) std::cout << "Simd functions unit test passed" << std::endl;
    else std::cout << "Simd functions unit test NOT passed" << std::endl;
 
    return error;

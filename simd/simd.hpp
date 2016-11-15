@@ -129,15 +129,26 @@ simd<t> op(const simd<t>& a, const simd<t>&b)\
 /* exp, sin, cos, log, sqrt, pow, tanh, tan, sinh, cosh */
 
 define_simd_overload(exp)
+define_simd_overload(exp2)
 define_simd_overload(sin)
 define_simd_overload(cos)
 define_simd_overload(log)
+define_simd_overload(log2)
 define_simd_overload(sqrt)
 define_binary_simd_overload(pow)
 define_simd_overload(tanh)
 define_simd_overload(tan)
 define_simd_overload(sinh)
 define_simd_overload(cosh)
+
+/* Extra pow overloads */
+template <typename t> 
+ALWAYS_INLINE 
+simd<t> pow(const simd<t>& a, const t b)\
+{
+   simd<t> simd_b(b);
+   return pow(a,simd_b);\
+}
 
 #include "simd_base.hpp"
 
