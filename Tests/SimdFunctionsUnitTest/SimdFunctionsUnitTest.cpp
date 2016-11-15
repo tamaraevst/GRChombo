@@ -4,7 +4,7 @@
 #include <cmath>
 #include "simd.hpp"
 
-#define DEBUG 1
+//#define DEBUG 1
 
 template<class t>
 bool similar ( t a, t b, t *error, t *tolerance )
