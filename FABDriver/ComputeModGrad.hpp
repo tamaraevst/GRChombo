@@ -34,7 +34,7 @@ public:
            {
                mod_d1_arr[ivar] += d1_arr[ivar][idir]*d1_arr[ivar][idir];
            }
-           mod_d1_arr[ivar] = simd_sqrt(mod_d1_arr[ivar]);
+           mod_d1_arr[ivar] = sqrt(mod_d1_arr[ivar]);
        }
 
        // Write back into the flattened Chombo box
