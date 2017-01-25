@@ -15,5 +15,5 @@ thing to do once but subsequently it is faster to only compile the library by in
 
 To compile GRChombo:
 Export CHOMBO_HOME (the path to the Chombo installation) and compile whathever example or test you want to
-run by invoking make all DIM=3 (or 2,4,5... if you are thus inclined) -j 32 (compiles in parallel on 32 ranks)
+run by invoking make all DIM=3 (or 2,4,5... if you are thus inclined. This is the number of spatial dimensions) -j 32 (compiles in parallel on 32 ranks)
 in the relevant directory.  In addition, follow any other specific instructions for your machine in this folder.
