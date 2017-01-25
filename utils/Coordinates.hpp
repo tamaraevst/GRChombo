@@ -1,6 +1,8 @@
 #ifndef COORDINATES_HPP_
 #define COORDINATES_HPP_
 
+#include "simd.hpp"
+
 template <class data_t>
 class Coordinates
 {
