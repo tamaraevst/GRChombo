@@ -1,5 +1,5 @@
 #if !defined(BINARYBH_HPP_)
-#error "This file should only be included through CCZ4.hpp"
+#error "This file should only be included through BinaryBH.hpp"
 #endif
 
 #ifndef BINARYBH_IMPL_HPP_
