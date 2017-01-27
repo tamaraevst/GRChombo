@@ -1,21 +1,27 @@
+#if !defined(BINARYBH_HPP_)
+#error "This file should only be included through CCZ4.hpp"
+#endif
+
+#ifndef BINARYBH_IMPL_HPP_
+#define BINARYBH_IMPL_HPP_
+
 #include "BinaryBH.hpp"
 #include "CCZ4.hpp"
+#include "simd.hpp"
 
+template <class data_t>
 void BinaryBH::compute(int ix, int iy, int iz)
 {
-    CCZ4::vars_t<double> vars;
+    CCZ4::vars_t<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
-    Coordinates<double> coords(ix,iy,iz,m_dx);
-    double x = coords.x; //TODO: change functions to accept coords rather than x,y,z
-    double y = coords.y;
-    double z = coords.z;
+    Coordinates<data_t> coords(ix,iy,iz,m_dx);
 
-    vars.chi = compute_chi(x,y,z);
+    vars.chi = compute_chi(coords);
 
     //Conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;
 
-    vars.A = compute_A(vars.chi,x,y,z);
+    vars.A = compute_A(vars.chi,coords);
 
     switch (m_initial_lapse)
     {
@@ -35,21 +41,25 @@ void BinaryBH::compute(int ix, int iy, int iz)
     m_driver.store_vars(vars);
 }
 
-double BinaryBH::compute_chi(double x, double y, double z)
+template <class data_t>
+data_t BinaryBH::compute_chi(Coordinates<data_t> coords)
 {
-    const double psi = 1. + bh1.psi_minus_one(x, y, z) + bh2.psi_minus_one(x, y, z);
-    return pow(psi, -4);
+    const data_t psi = 1. + bh1.psi_minus_one(coords) + bh2.psi_minus_one(coords);
+    return pow(psi, (decltype(psi))-4);
 }
 
-tensor<2,double> BinaryBH::compute_A(double chi, double x, double y, double z)
+template <class data_t>
+tensor<2,data_t> BinaryBH::compute_A(data_t chi, Coordinates<data_t> coords)
 {
 
-    tensor<2,double> Aij1 = bh1.Aij(x,y,z);
-    tensor<2,double> Aij2 = bh2.Aij(x,y,z);
-    tensor<2, double> out;
+    tensor<2,data_t> Aij1 = bh1.Aij(coords);
+    tensor<2,data_t> Aij2 = bh2.Aij(coords);
+    tensor<2, data_t> out;
 
     //Aij(CCZ4) = psi^(-6) * Aij(Baumgarte&Shapiro book)
     FOR2(i,j) out[i][j] = pow(chi, 3/2.) * (Aij1[i][j] + Aij2[i][j]);
 
     return out;
 }
+
+#endif /* BINARYBH_IMPL_HPP_ */

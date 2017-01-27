@@ -8,6 +8,7 @@
 
 #include <vector>
 #include "tensor.hpp"
+#include "Coordinates.hpp"
 
 class BoostedBH
 {
@@ -25,17 +26,31 @@ public:
 	BoostedBH(params_t a_params);
 
 	// conformal factor
-	double psi_minus_one(double x, double y, double z) const;
+    template <class data_t>
+	data_t psi_minus_one(Coordinates<data_t> coords) const;
 
 	// extrinsic curvature
-	tensor<2, double> Aij(double x, double y, double z) const;
+    template <class data_t>
+	tensor<2, data_t> Aij(Coordinates<data_t> coords) const;
 
 private:
-	double center_dist(double x, double y, double z) const;
-	double psi0(double r) const;
-	double psi2(double r, double cos_theta) const;
-	double psi2_0(double r) const;
-	double psi2_2(double r) const;
+    template <class data_t>
+	data_t center_dist(Coordinates<data_t> coords) const;
+
+    template <class data_t>
+	data_t psi0(data_t r) const;
+
+    template <class data_t>
+	data_t psi2(data_t r, data_t cos_theta) const;
+
+    template <class data_t>
+	data_t psi2_0(data_t r) const;
+
+    template <class data_t>
+	data_t psi2_2(data_t r) const;
 
 };
+
+#include "BoostedBH.impl.hpp"
+
 #endif /*BOOSTEDBH_HPP_*/

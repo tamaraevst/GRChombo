@@ -37,14 +37,18 @@ public:
         m_driver (a_driver), m_dx (a_dx), bh1 (a_bh1_params), bh2 (a_bh2_params),
         m_initial_lapse (a_initial_lapse) {}
 
-    //Not currently vectorised (it is only done once so it's hardly worth adding all the special functions to simd)
+    template <class data_t>
     void compute(int ix, int iy, int iz);
 
 protected:
-    double compute_chi(double x, double y, double z);
+    template <class data_t>
+    data_t compute_chi(Coordinates<data_t> coords);
 
-    tensor<2,double> compute_A(double chi, double x, double y, double z);
+    template <class data_t>
+    tensor<2,data_t> compute_A(data_t chi, Coordinates<data_t> coords);
 
 };
+
+#include "BinaryBH.impl.hpp"
 
 #endif /* BINARYBH_HPP_ */
