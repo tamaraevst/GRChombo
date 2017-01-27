@@ -5,3 +5,4 @@ Install notes for cosmos/universe/cosmos2 etc at DAMTP, University of Cambridge 
    module load gcc/4.9 (to get the correct intel compiler compatibility)
    module load icomp/16.0.3
    module load hdf5
+   (Note: you may need to run "module unload" on already loaded versions)
