@@ -19,14 +19,18 @@ class BubbleSF {
   BubbleSF(const FABDriverBase& a_driver, SFMatter::matter_params_t a_matter_params, double a_dx)
         : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params) {}
 
-  //Not currently vectorised (it is only done once so it's hardly worth adding all the special functions to simd)
+  template <class data_t>
   void compute(int ix, int iy, int iz);
 
  protected:
   const FABDriverBase& m_driver;
   double m_dx;
-  double compute_phi(double x, double y, double z);
+
+  template<class data_t>
+  data_t compute_phi(Coordinates<data_t> coords);
 
 };
+
+#include "BubbleSF.impl.hpp" 
 
 #endif /* BUBBLESF_HPP_ */

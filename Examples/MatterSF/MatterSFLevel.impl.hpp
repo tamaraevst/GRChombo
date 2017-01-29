@@ -52,7 +52,7 @@ void MatterSFLevel::initialData()
     m_state_new.setVal(0.);
 
     //Initial conditions for scalar field - here a bubble
-    FABDriver<BubbleSF>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
+    FABDriver<BubbleSF>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 
 }
 
