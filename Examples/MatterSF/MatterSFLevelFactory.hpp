@@ -1,5 +1,5 @@
-#ifndef CCZ4LEVELFACTORY_HPP_
-#define CCZ4LEVELFACTORY_HPP_
+#ifndef MATTERSFLEVELFACTORY_HPP_
+#define MATTERSFLEVELFACTORY_HPP_
 
 //General includes:
 #include "AMRLevelFactory.H"
@@ -44,4 +44,4 @@ MatterSFLevelFactory::new_amrlevel() const
     matter_sf_level_ptr->initialDtMultiplier(m_p.dt_multiplier);
     return (static_cast <AMRLevel*> (matter_sf_level_ptr));
 }
-#endif /* CCZ4LEVELFACTORY_HPP_ */
+#endif /* MATTERSFLEVELFACTORY_HPP_ */
