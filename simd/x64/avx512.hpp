@@ -116,7 +116,23 @@ struct simd<double> : public simd_base<double>
     }
 
     friend ALWAYS_INLINE
-    simd simd_sqrt(const simd& a)
+    simd exp2(const simd& a)
+    {
+        return _mm512_exp2a23_pd(a);
+    }
+
+#ifdef LOW_PRECISION
+    // This approximation has really low precision. Leaving it here mostly for reference
+    friend ALWAYS_INLINE
+    simd exp(const simd& a)
+    {
+        //e^x = 2^(x * log2 (e))
+        return exp2(a * simd(1.44269504088896340736));
+    }
+#endif    
+    
+    friend ALWAYS_INLINE
+    simd sqrt(const simd& a)
     {
         return _mm512_sqrt_pd(a);
     }
@@ -213,7 +229,23 @@ struct simd<float> : public simd_base<float>
     }
 
     friend ALWAYS_INLINE
-    simd simd_sqrt(const simd& a)
+    simd exp2(const simd& a)
+    {
+        return _mm512_exp2a23_ps(a);
+    }   
+    
+#ifdef LOW_PRECISION
+    // This approximation has really low precision. Leaving it here mostly for reference
+    friend ALWAYS_INLINE
+    simd exp(const simd& a)
+    {
+        //e^x = 2^(x * log2 (e))
+        return exp2(a * simd(1.44269504088896340736f));
+    }
+#endif        
+    
+    friend ALWAYS_INLINE
+    simd sqrt(const simd& a)
     {
         return _mm512_sqrt_ps(a);
     }

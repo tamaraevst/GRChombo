@@ -36,7 +36,7 @@ void BinaryBHLevel::initialData()
     //First set everything to zero ... we don't want undefined values in constraints etc
     m_state_new.setVal(0.);
 
-    FABDriver<BinaryBH>(m_p.bh1_params, m_p.bh2_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
+    FABDriver<BinaryBH>(m_p.bh1_params, m_p.bh2_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 void BinaryBHLevel::preCheckpointLevel()
