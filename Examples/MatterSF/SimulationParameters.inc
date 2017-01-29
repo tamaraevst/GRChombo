@@ -38,11 +38,12 @@ void auto_read_params(ParmParse& pp)
     //Dissipation
     pp.get("sigma",sigma);
 
-    //Initial data
+    //Initial and SF data
     pp.get("G_Newton", G_Newton);
     pp.get("amplitudeSF", amplitudeSF);
     pp.getarr("centerSF", centerSF, 0, SpaceDim);
     pp.get("widthSF", widthSF);
+    pp.get("scalar_mass", scalar_mass);
 
     //Relaxation params
     pp.get("relaxtime", relaxtime);
@@ -78,7 +79,7 @@ int covariantZ4;
 Real sigma; //Dissipation
 //Initial data for matter
 double G_Newton;
-Real amplitudeSF, widthSF;
+Real amplitudeSF, widthSF, scalar_mass;
 std::vector<Real> centerSF;
 //Relaxation params
 Real relaxtime, relaxspeed;

@@ -89,10 +89,10 @@ auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
   //TODO KClough: Would like templated cosines and sines etc here
 
   //The potential value at phi
-  out.V_of_phi = 0.001*phi_here*phi_here; // e.g. m^2 phi^2
+  out.V_of_phi = m_matter_params.scalar_mass*phi_here*phi_here; // e.g. m^2 phi^2
 
   //The potential gradient at phi
-  out.dVdphi = 0.001*2.0*phi_here;  //  e.g. 2 m^2 phi
+  out.dVdphi = m_matter_params.scalar_mass*2.0*phi_here;  //  e.g. 2 m^2 phi
 
   return out;
 }

@@ -1,0 +1,18 @@
+#!/bin/sh
+#BSUB -q mpi
+#BSUB -n 32 
+#BSUB -R scratch
+#BSUB -W 2:00
+#BSUB -a intelmpi
+#BSUB -o output
+#BSUB -R span[ptile='!']
+#BSUB -R same[model]
+
+module load intel/compiler
+module load intel-mpi
+module load hdf5/parallel
+module load intel/mkl
+
+export OMP_NUM_THREADS=1
+
+mpirun ./GRChombo_BinaryBH3d.Linux.64.mpiicpc.ifort.DEBUG.OPT.MPI.OPENMPCC.ex params.txt

@@ -25,15 +25,15 @@ void BubbleSF::compute(int ix, int iy, int iz) {
 
 double BubbleSF::compute_phi(double x, double y, double z) {
 
-  double rr2 = pow(x - m_params.centerSF[0],2)
-                 + pow(y - m_params.centerSF[1],2)
-                 + pow(z - m_params.centerSF[2],2);
+  double rr2 = pow(x - m_matter_params.centerSF[0],2)
+                 + pow(y - m_matter_params.centerSF[1],2)
+                 + pow(z - m_matter_params.centerSF[2],2);
 
   if (std::fabs(rr2) < 1e-6) rr2 = 1e-6;
 
   double rr = sqrt(rr2);
   double R0 = 5.0;
-  double phiout = m_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_params.widthSF);
+  double phiout = m_matter_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_matter_params.widthSF);
 
   return phiout;
 

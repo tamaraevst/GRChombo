@@ -31,7 +31,9 @@ class ConstraintsMatter : public Constraints {
        Takes in the box driver and the grid spacing, plus optionally the
        value of Newton's constant, which is set to one by default.
   */
-  ConstraintsMatter(const FABDriverBase& driver, double dx, double G_Newton = 1.0);
+  ConstraintsMatter(const FABDriverBase& driver, 
+                    const typename matter_t::matter_params_t matter_params,
+                    double dx, double G_Newton = 1.0);
 
   //! The compute member which calculates the constraints at each point in the box
   /*!
@@ -44,6 +46,8 @@ class ConstraintsMatter : public Constraints {
   void compute(int x, int y, int z);
 
  protected:
+  //! The matter params
+  const typename matter_t::matter_params_t m_matter_params;
   //! Newton's constant, set to one by default.
   double m_G_Newton;
 

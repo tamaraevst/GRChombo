@@ -11,10 +11,12 @@
 template <class matter_t>
 RelaxationChi<matter_t>::RelaxationChi(
     const FABDriverBase& driver,
+    SFMatter::matter_params_t matter_params,
     double dx,
     double relaxspeed,
     double G_Newton)
-    : m_relaxspeed (relaxspeed),
+    : m_matter_params (matter_params),
+      m_relaxspeed (relaxspeed),
       m_G_Newton (G_Newton),
       m_driver (driver),
       m_deriv (dx, m_driver) {}
@@ -73,7 +75,7 @@ typename matter_t::vars_t<data_t> RelaxationChi<matter_t>::rhs_equation(
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
   //Calculate elements of the decomposed stress energy tensor and ricci tensor
-  matter_t my_matter;
+  matter_t my_matter(m_matter_params);
   auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
   auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
   auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);

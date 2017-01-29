@@ -8,7 +8,7 @@
 
 //Problem specific includes:
 #include "CCZ4.hpp"
-#include "BubbleSF.hpp"
+#include "SFMatter.hpp"
 
 class SimulationParameters
 {
@@ -23,10 +23,11 @@ public:
         //The automatically generated read parameters code defined in SimulationParameters.inc
         auto_read_params(pp);
 
-        //Fill in the SFMatterParamters
-        sfm_params.amplitudeSF = amplitudeSF;
-        sfm_params.centerSF = centerSF;
-        sfm_params.widthSF = widthSF;
+        //Fill in the Matter Parameters
+        matter_params.amplitudeSF = amplitudeSF;
+        matter_params.centerSF = centerSF;
+        matter_params.widthSF = widthSF;
+        matter_params.scalar_mass = scalar_mass;
 
         //Fill in the ccz4Parameters
         ccz4Params.kappa1 = kappa1;
@@ -43,7 +44,7 @@ public:
 
     //Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4Params;
-    BubbleSF::params_t sfm_params;
+    SFMatter::matter_params_t matter_params;
 
 };
 

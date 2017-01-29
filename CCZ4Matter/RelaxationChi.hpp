@@ -35,7 +35,7 @@ class RelaxationChi {
       Takes in the box driver and the grid spacing, plus the relaxation speed and
       value of Newton's constant, which is set to one by default.
   */
-  RelaxationChi(const FABDriverBase& driver, double dx, double relaxspeed,
+  RelaxationChi(const FABDriverBase& driver, SFMatter::matter_params_t matter_params, double dx, double relaxspeed,
     double G_Newton = 1.0);
 
   //! The compute member which calculates the RHS at each point in the box
@@ -50,6 +50,8 @@ class RelaxationChi {
   void compute(int ix, int iy, int iz);
 
  protected:
+  //! The matter params
+  SFMatter::matter_params_t m_matter_params;
   //! The coefficient of the Hamiltonian used to determine relaxation speed.
   const double m_relaxspeed;
   //! Newton's constant, set to one by default.

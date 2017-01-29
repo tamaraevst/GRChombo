@@ -11,9 +11,11 @@
 template <class matter_t>
 ConstraintsMatter<matter_t>::ConstraintsMatter(
     const FABDriverBase& driver,
+    const typename matter_t::matter_params_t matter_params,
     double dx,
     double G_Newton)
     : Constraints(driver, dx, 0.0), //Cosmological constant set to zero
+      m_matter_params (matter_params),
       m_G_Newton (G_Newton) {}
 
 
@@ -45,7 +47,7 @@ void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
   //Calculate EM Tensor and add matter terms, need advection and geometric objects
   //TODO K Clough: Once we template the Constraints class we won't need to calculate
   // d1 twice (or advec) as we can use the same vars_t object for both.
-  matter_t my_matter;
+  matter_t my_matter(m_matter_params);
   typename matter_t::vars_t<data_t> vars;
   m_driver.local_vars(vars);
 

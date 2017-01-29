@@ -52,7 +52,7 @@ void MatterSFLevel::initialData()
     m_state_new.setVal(0.);
 
     //Initial conditions for scalar field - here a bubble
-    FABDriver<BubbleSF>(m_p.sfm_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
+    FABDriver<BubbleSF>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS, disable_simd());
 
 }
 
@@ -60,7 +60,7 @@ void MatterSFLevel::initialData()
 void MatterSFLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<SFMatter> >(m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    FABDriver<ConstraintsMatter<SFMatter> >(m_p.matter_params, m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
@@ -71,7 +71,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     if (m_time < m_p.relaxtime) {
       //Calculate chi relaxation right hand side
       //Note this assumes conformal chi and Mom constraint trivially satisfied
-      FABDriver<RelaxationChi<SFMatter> >(m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+      FABDriver<RelaxationChi<SFMatter> >(m_p.matter_params, m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
       a_rhs.setVal(0., Interval(c_h11,c_Mom3));
@@ -83,7 +83,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
     	//Calculate CCZ4 right hand side with SF matter
-    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
     	//We don't want undefined values floating around in the constraints
     	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));

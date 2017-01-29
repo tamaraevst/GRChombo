@@ -18,11 +18,11 @@ class CCZ4
 {
 public:
 
-		enum
-		{
-    	USE_CCZ4,
-    	USE_BSSN
-		};
+    enum
+    {
+     USE_CCZ4,
+     USE_BSSN
+    };
 
     template <class data_t>
     struct vars_t : VarsBase<data_t>

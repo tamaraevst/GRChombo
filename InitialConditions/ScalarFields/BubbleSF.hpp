@@ -10,19 +10,14 @@
 #include "tensor.hpp"
 #include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
+#include "SFMatter.hpp"
 
 class BubbleSF {
  public:
-  struct params_t {
-      double amplitudeSF;
-      std::vector<double> centerSF;
-      double widthSF;
-  };
+  const SFMatter::matter_params_t m_matter_params;
 
-  const params_t m_params;
-
-  BubbleSF(const FABDriverBase& a_driver, params_t a_params, double a_dx)
-        : m_driver (a_driver), m_dx (a_dx), m_params (a_params) {}
+  BubbleSF(const FABDriverBase& a_driver, SFMatter::matter_params_t a_matter_params, double a_dx)
+        : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params) {}
 
   //Not currently vectorised (it is only done once so it's hardly worth adding all the special functions to simd)
   void compute(int ix, int iy, int iz);

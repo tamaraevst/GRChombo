@@ -14,12 +14,13 @@
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     params_t params,
+    const typename matter_t::matter_params_t matter_params,
     double dx,
     double sigma,
     int formulation,
     double G_Newton)
     : CCZ4(driver, params, dx, sigma, formulation, 0.0), //No cosmological const
-      m_G_Newton (G_Newton) {}
+      m_matter_params (matter_params) , m_G_Newton (G_Newton) {}
 
 
 template <class matter_t>
@@ -86,7 +87,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
 
   // Combine the RHS terms and add matter evolution
   typename matter_t::vars_t<data_t> rhs_total;
-  matter_t my_matter;
+  matter_t my_matter(m_matter_params);
   rhs_total = my_matter.compute_total_rhs(CCZ4_rhs, matter_rhs, vars, d1, d2, advec);
 
   //Add dissipation to all terms
@@ -117,7 +118,7 @@ typename matter_t::vars_t<data_t> CCZ4Matter<matter_t>::matter_rhs_equation(
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
   //Calculate elements of the decomposed stress energy tensor
-  matter_t my_matter;
+  matter_t my_matter(m_matter_params);
   auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
   // Update RHS

@@ -32,13 +32,14 @@ class CCZ4Matter : public CCZ4 {
  public:
   //!  Constructor of class CCZ4Matter
   /*!
-       Inputs are the box driver and grid spacing, plus the CCZ4 evolution parameters.
+       Inputs are the box driver and grid spacing, plus the CCZ4 evolution parameters and
+       the matter parameters.
        It also takes the dissipation parameter sigma, and allows the formulation to be
        toggled between CCZ4 and BSSN. The default is CCZ4. It allows the user to set
        the value of Newton's constant, which is set to one by default.
   */
-  CCZ4Matter(const FABDriverBase& driver, params_t params, double dx,
-             double sigma, int formulation = CCZ4::USE_CCZ4,
+  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params, 
+             double dx, double sigma, int formulation = CCZ4::USE_CCZ4,
              double G_Newton = 1.0);
 
   //!  The compute member which calculates the RHS at each point in the box
@@ -72,6 +73,10 @@ class CCZ4Matter : public CCZ4 {
 
   //! Newton's constant, set to one by default.
   double m_G_Newton;
+
+  //! The matter params
+  const typename matter_t::matter_params_t m_matter_params;
+
 };
 
 #include "CCZ4Matter.impl.hpp"

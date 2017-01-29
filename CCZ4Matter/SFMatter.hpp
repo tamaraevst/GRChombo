@@ -27,7 +27,24 @@
 
 class SFMatter {
  public:
-  SFMatter(void) {};
+  //! A structure for the input params for SF properties and initial conditions
+  struct matter_params_t {
+      double amplitudeSF;
+      std::vector<double> centerSF;
+      double widthSF;
+      double scalar_mass;
+  };
+
+ protected:
+  //! The local copy of the matter params
+  matter_params_t m_matter_params;
+
+ public:
+  //!  Constructor of class SFMatter
+  /*!
+       Inputs are the matter parameters.
+  */
+  SFMatter(matter_params_t matter_params) : m_matter_params (matter_params) {}
 
   // May not be needed after templating vars_t
   template <class data_t>

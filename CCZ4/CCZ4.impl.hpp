@@ -62,12 +62,12 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
     if (m_formulation == USE_BSSN)
-		{
- 			if ((abs(m_params.kappa1) > 1e-6) || (abs(m_params.kappa2) > 1e-6)||(abs(m_params.kappa3) > 1e-6))
- 		  {
-		  //  check whether the CCZ4 damping constants are set to zero, else error
-       MayDay::Error("BSSN formulation is selected - CCZ4 kappa values should be set to zero in params");
-      }
+    {
+     if ((abs(m_params.kappa1) > 1e-6) || (abs(m_params.kappa2) > 1e-6)||(abs(m_params.kappa3) > 1e-6))
+     {
+      //  check whether the CCZ4 damping constants are set to zero, else error
+      MayDay::Error("BSSN formulation is selected - CCZ4 kappa values should be set to zero in params");
+     }
     }
 
     using namespace TensorAlgebra;
@@ -160,25 +160,25 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
 
     if (m_formulation == USE_BSSN)
-		{
-		  // ensure the Theta of CCZ4 remains at zero
-     	rhs.Theta = 0;
+    {
+     // ensure the Theta of CCZ4 remains at zero
+     rhs.Theta = 0;
     }
     else
     {
-       rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
+     rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-  	   rhs.Theta += - vars.lapse * m_cosmological_constant;
-		}
+     rhs.Theta += - vars.lapse * m_cosmological_constant;
+    }
 
     if (m_formulation == USE_BSSN)
     {
-			// Use hamiltonian constraint to remove ricci.scalar for BSSN update
-     	rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
+     // Use hamiltonian constraint to remove ricci.scalar for BSSN update
+     rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
     }
     else
     {
-    	rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+     rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
     }
 
     tensor<1, data_t> Gammadot;
