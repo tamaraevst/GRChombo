@@ -33,10 +33,12 @@ public:
         ccz4Params.kappa1 = kappa1;
         ccz4Params.kappa2 = kappa2;
         ccz4Params.kappa3 = kappa3;
-        ccz4Params.shift_gamma_coeff = F;
-        ccz4Params.lapse_advec_coeff = LapseAdvectionCoeff;
-        ccz4Params.shift_advec_coeff = ShiftAdvectionCoeff;
-        ccz4Params.beta_driver = eta;
+        ccz4Params.shift_Gamma_coeff = shift_Gamma_coeff;
+        ccz4Params.shift_advec_coeff = shift_advec_coeff;
+        ccz4Params.eta = eta;
+        ccz4Params.lapse_advec_coeff = lapse_advec_coeff;
+        ccz4Params.lapse_power = lapse_power;
+        ccz4Params.lapse_coeff = lapse_coeff;
     }
 
     //SimulationParameters.inc declares all variables and defines auto_read_params(ParmParse& pp)
