@@ -22,10 +22,10 @@ public:
     {}
 
     template <class data_t>
-    struct vars_t : VarsBase<data_t>
+    struct Vars : VarsBase<data_t>
     {
         using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
-        vars_t();
+        Vars();
 
         tensor<2, data_t> h;
         tensor<2, data_t> A;
@@ -34,7 +34,7 @@ public:
     template <class data_t>
     void compute(int ix, int iy, int iz)
     {
-        vars_t<data_t> vars;
+        Vars<data_t> vars;
         m_driver.local_vars(vars);
 
         auto h_UU = TensorAlgebra::compute_inverse(vars.h);
@@ -46,7 +46,7 @@ public:
 
 
 template <class data_t>
-EnforceTfA::vars_t<data_t>::vars_t()
+EnforceTfA::Vars<data_t>::Vars()
 {
     //Symmetric 2-tensors
     define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
