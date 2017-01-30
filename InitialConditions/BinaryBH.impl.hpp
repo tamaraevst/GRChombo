@@ -12,7 +12,7 @@
 template <class data_t>
 void BinaryBH::compute(int ix, int iy, int iz)
 {
-    CCZ4::vars_t<data_t> vars;
+    CCZ4::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
     Coordinates<data_t> coords(ix,iy,iz,m_dx);
 

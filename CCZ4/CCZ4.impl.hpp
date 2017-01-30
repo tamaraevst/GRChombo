@@ -20,13 +20,13 @@ template <class data_t>
 void
 CCZ4::compute(int ix, int iy, int iz)
 {
-    vars_t<data_t> vars;
+    Vars<data_t> vars;
     m_driver.local_vars(vars);
 
-    vars_t< tensor<1, data_t> > d1;
+    Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, idir);
 
-    vars_t< tensor<2,data_t> > d2;
+    Vars< tensor<2,data_t> > d2;
     // Repeated derivatives
     FOR1(idir) m_deriv.diff2(d2, idir);
     // Mixed derivatives
@@ -35,11 +35,11 @@ CCZ4::compute(int ix, int iy, int iz)
     m_deriv.mixed_diff2(d2, 2, 0);
     m_deriv.mixed_diff2(d2, 2, 1);
 
-    vars_t<data_t> advec;
+    Vars<data_t> advec;
     advec.assign(0.);
     FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
-    vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
+    Vars<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
     FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma,idir);
 
@@ -47,7 +47,19 @@ CCZ4::compute(int ix, int iy, int iz)
     m_driver.store_vars(rhs);
 }
 
-template <class data_t>
+/// Calculates the rhs for CCZ4
+/*
+ * Calculates the right hand side for CCZ4 with slicing - n \alpha^m (K - 2\Theta)
+ * and Gamma-Driver shift condition.
+ * The variables (the template argument vars_t) must contain at least the members:
+ * chi, h[i][j], Gamma[i], A[i][j], Theta, lapse and shift[i].
+ *
+ * @param vars The values of the current variables
+ * @param d1 First derivative of the variables
+ * @param d2 The second derivative the variables
+ * @param advec The advection derivatives of the variables
+*/
+template <class data_t, template<typename> class vars_t>
 auto
 CCZ4::rhs_equation(const vars_t<data_t> &vars,
           const vars_t< tensor<1,data_t> >& d1,
@@ -186,11 +198,11 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 }
 
 template <class data_t>
-CCZ4::vars_t<data_t>::vars_t()
+CCZ4::Vars<data_t>::Vars()
 {
-    //Define the mapping from components of chombo grid to elements in vars_t.
+    //Define the mapping from components of chombo grid to elements in Vars.
     //This allows to read/write data from the chombo grid into local
-    //variables in vars_t (which only exist for the current cell).
+    //variables in Vars (which only exist for the current cell).
 
     //Scalars
     define_enum_mapping(c_chi, chi);
