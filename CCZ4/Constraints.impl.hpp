@@ -16,13 +16,13 @@ template <class data_t>
 void
 Constraints::compute(int ix, int iy, int iz)
 {
-    vars_t<data_t> vars;
+    Vars<data_t> vars;
     m_driver.local_vars(vars);
 
-    vars_t< tensor<1, data_t> > d1;
+    Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, idir);
 
-    vars_t< tensor<2,data_t> > d2;
+    Vars< tensor<2,data_t> > d2;
     // Repeated derivatives
     FOR1(idir) m_deriv.diff2(d2, idir);
     // Mixed derivatives
@@ -40,7 +40,7 @@ Constraints::compute(int ix, int iy, int iz)
     m_driver.store_vars(out.Mom[2], c_Mom3);
 }
 
-template <class data_t>
+template <class data_t, template<typename> class vars_t>
 auto
 Constraints::constraint_equations(
       vars_t<data_t> &vars,
@@ -86,7 +86,7 @@ Constraints::constraint_equations(
 }
 
 template <class data_t>
-Constraints::vars_t<data_t>::vars_t()
+Constraints::Vars<data_t>::Vars()
 {
     //Scalars
     define_enum_mapping(c_chi, chi);

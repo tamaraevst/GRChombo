@@ -18,7 +18,7 @@ class Constraints
 {
 protected:
     template <class data_t>
-    struct vars_t : VarsBase<data_t>
+    struct Vars : VarsBase<data_t>
     {
         using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
         using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
@@ -29,7 +29,7 @@ protected:
         tensor<2, data_t> A;
         tensor<1, data_t> Gamma;
 
-        vars_t();
+        Vars();
     };
 
     template <class data_t>
@@ -50,7 +50,7 @@ public:
     void compute(int x, int y, int z);
 
 protected:
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     constraints_t<data_t>
     constraint_equations(
         vars_t<data_t> &vars,

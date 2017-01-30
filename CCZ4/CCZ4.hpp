@@ -18,7 +18,7 @@ class CCZ4
 {
 public:
     template <class data_t>
-    struct vars_t : VarsBase<data_t>
+    struct Vars : VarsBase<data_t>
     {
         using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
         using VarsBase<data_t>::define_symmetric_enum_mapping;
@@ -33,7 +33,7 @@ public:
         tensor<1, data_t> shift;
         tensor<1, data_t> B;
 
-        vars_t();
+        Vars();
     };
 
     struct params_t
@@ -61,7 +61,7 @@ public:
     void compute(int ix, int iy, int iz);
 
 protected:
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     vars_t<data_t> rhs_equation(
         const vars_t<data_t> &vars,
         const vars_t< tensor<1,data_t> > &d1,

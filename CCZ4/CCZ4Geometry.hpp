@@ -1,5 +1,4 @@
-//This file calculates CCZ4 geometric quantities (or a similar 3+1 split.
-//It assume input in terms of the struct CCZ4::vars_t defined in CCZ4.hpp
+//This file calculates CCZ4 geometric quantities (or a similar 3+1 split).
 #ifndef CCZ4GEOMETRY_HPP_
 #define CCZ4GEOMETRY_HPP_
 
