@@ -136,10 +136,10 @@ int main()
     params.kappa1 = 0.1;
     params.kappa2 = 0;
     params.kappa3 = 1;
-    params.shift_gamma_coeff = 0.75;
+    params.shift_Gamma_coeff = 0.75;
     params.lapse_advec_coeff = 0;
     params.shift_advec_coeff = 0;
-    params.beta_driver = 1.82;
+    params.eta = 1.82;
 
     double sigma = 0.3;
 
@@ -183,8 +183,8 @@ int main()
                     CHF_CONST_REAL(dx),
                     CHF_CONST_REAL(params.lapse_advec_coeff),
                     CHF_CONST_REAL(params.shift_advec_coeff),
-                    CHF_CONST_REAL(params.shift_gamma_coeff),
-                    CHF_CONST_REAL(params.beta_driver),
+                    CHF_CONST_REAL(params.shift_Gamma_coeff),
+                    CHF_CONST_REAL(params.eta),
                     CHF_CONST_REAL(params.kappa1),
                     CHF_CONST_REAL(params.kappa2),
                     CHF_CONST_REAL(params.kappa3),
