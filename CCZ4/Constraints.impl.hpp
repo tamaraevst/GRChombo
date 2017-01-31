@@ -58,9 +58,9 @@ Constraints::constraint_equations(
    auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
 
    auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
-   data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
+   data_t tr_A2    = TensorAlgebra::compute_trace(vars.A, A_UU);
 
-   out.Ham = ricci.scalar + (GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM - tr_AA;
+   out.Ham = ricci.scalar + (GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM - tr_A2;
    out.Ham -= 2*m_cosmological_constant;
 
    tensor<2,data_t> covd_A[CH_SPACEDIM];

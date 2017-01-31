@@ -48,10 +48,12 @@ public:
         double kappa1;
         double kappa2;
         double kappa3;
-        double shift_gamma_coeff;
-        double lapse_advec_coeff;
-        double shift_advec_coeff;
-        double beta_driver;
+        double shift_Gamma_coeff = 0.75;
+        double lapse_advec_coeff = 0.;
+        double shift_advec_coeff = 0.;
+        double eta = 1.;
+        double lapse_power = 1.;
+        double lapse_coeff = 2.;
     };
 
 protected:
