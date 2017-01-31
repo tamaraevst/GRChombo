@@ -71,11 +71,11 @@ class RelaxationChi {
       \sa compute()
   */
   template <class data_t>
-  typename matter_t::vars_t<data_t> rhs_equation(
-      const typename matter_t::vars_t<data_t> &vars,
-      const typename matter_t::vars_t< tensor<1,data_t> > &d1,
-      const typename matter_t::vars_t< tensor<2,data_t> > &d2,
-      const typename matter_t::vars_t<data_t> &advec);
+  typename matter_t::Vars<data_t> rhs_equation(
+      const typename matter_t::Vars<data_t> &vars,
+      const typename matter_t::Vars< tensor<1,data_t> > &d1,
+      const typename matter_t::Vars< tensor<2,data_t> > &d2,
+      const typename matter_t::Vars<data_t> &advec);
 
 };
 

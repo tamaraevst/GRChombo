@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 31.01.17
 
 #if !defined(SFMATTER_HPP_)
 #error "This file should only be included through SFMatter.hpp"
@@ -12,11 +12,11 @@
 // Calculate the stress energy tensor elements
 template <class data_t>
 auto SFMatter::compute_emtensor(
-    const vars_t<data_t> &vars,
-    const vars_t< tensor<1,data_t> >& d1,
+    const Vars<data_t> &vars,
+    const Vars< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
     const tensor<3, data_t> &chris_ULL,
-    const vars_t<data_t> &advec) -> emtensor_t<data_t> {
+    const Vars<data_t> &advec) -> emtensor_t<data_t> {
 
   emtensor_t<data_t> out;
 
@@ -86,8 +86,6 @@ auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
 
   potential_t<data_t> out;
 
-  //TODO KClough: Would like templated cosines and sines etc here
-
   //The potential value at phi
   out.V_of_phi = m_matter_params.scalar_mass*phi_here*phi_here; // e.g. m^2 phi^2
 
@@ -99,36 +97,31 @@ auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
 
 // Sums all contributions the the RHS, including matter terms
 template <class data_t>
-auto SFMatter::compute_total_rhs(
-    const CCZ4::vars_t<data_t> &CCZ4_rhs,
-    const vars_t<data_t> &matter_rhs,
-    const vars_t<data_t> &vars,
-    const vars_t< tensor<1,data_t> >& d1,
-    const vars_t< tensor<2,data_t> >& d2,
-    const vars_t<data_t> &advec) -> vars_t<data_t> {
+auto SFMatter::add_matter_rhs(
+    Vars<data_t> &matter_rhs,
+    const Vars<data_t> &vars,
+    const Vars< tensor<1,data_t> >& d1,
+    const Vars< tensor<2,data_t> >& d2,
+    const Vars<data_t> &advec) -> Vars<data_t> {
 
-  //Set all RHS to zero, then add the CCZ4 non zero terms
-  vars_t<data_t> total_rhs;
+  Vars<data_t> total_rhs;
   total_rhs.assign(0.);
 
-  // Need to add CCZ4 terms separately as data structure excludes the matter terms
-  // TODO KClough: Will do this in CCZ4Matter once CCZ4 is templated, so we won't
-  // need such a clunky addition of terms
-  total_rhs.chi   += CCZ4_rhs.chi    + matter_rhs.chi;
-  total_rhs.K     += CCZ4_rhs.K      + matter_rhs.K;
-  total_rhs.Theta += CCZ4_rhs.Theta  + matter_rhs.Theta;
-  total_rhs.lapse += CCZ4_rhs.lapse  + matter_rhs.lapse;
+  total_rhs.chi = matter_rhs.chi;
+  total_rhs.K = matter_rhs.K;
+  total_rhs.Theta = matter_rhs.Theta;
+  total_rhs.lapse = matter_rhs.lapse;
 
   FOR1(i)
   {
-    total_rhs.Gamma[i] += CCZ4_rhs.Gamma[i] + matter_rhs.Gamma[i];
-    total_rhs.shift[i] += CCZ4_rhs.shift[i] + matter_rhs.shift[i];
-    total_rhs.B[i]     += CCZ4_rhs.B[i]     + matter_rhs.B[i];
+    total_rhs.Gamma[i] = matter_rhs.Gamma[i];
+    total_rhs.shift[i] = matter_rhs.shift[i];
+    total_rhs.B[i]     = matter_rhs.B[i];
 
     FOR1(j)
     {
-      total_rhs.h[i][j]   += CCZ4_rhs.h[i][j] + matter_rhs.h[i][j];
-      total_rhs.A[i][j]   += CCZ4_rhs.A[i][j] + matter_rhs.A[i][j];
+      total_rhs.h[i][j]   =  matter_rhs.h[i][j];
+      total_rhs.A[i][j]   =  matter_rhs.A[i][j];
     }
   }
 
@@ -159,14 +152,15 @@ auto SFMatter::compute_total_rhs(
   }
 
   return total_rhs;
+
 }
 
 template <class data_t>
-SFMatter::vars_t<data_t>::vars_t()
+SFMatter::Vars<data_t>::Vars()
 {
-  //Define the mapping from components of chombo grid to elements in vars_t.
+  //Define the mapping from components of chombo grid to elements in Vars.
   //This allows to read/write data from the chombo grid into local
-  //variables in vars_t (which only exist for the current cell).
+  //variables in Vars (which only exist for the current cell).
 
   //Scalars
   define_enum_mapping(c_chi, chi);

@@ -34,7 +34,7 @@
 
 int main()
 {
-//    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
@@ -150,6 +150,11 @@ int main()
     params.shift_advec_coeff = 0;
     params.beta_driver = 1.0;
 
+    SFMatter::matter_params_t matter_params;
+    matter_params.scalar_mass = 0.0;
+    matter_params.amplitudeSF = 0.0025;
+    matter_params.widthSF = 1.0;
+
     int formulation = 1; //BSSN
     double G_Newton = 1.0;
     double sigma = 0.1;
@@ -157,7 +162,7 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    FABDriver<CCZ4Matter<SFMatter> >(params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
+    FABDriver<CCZ4Matter<SFMatter> >(params, matter_params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 

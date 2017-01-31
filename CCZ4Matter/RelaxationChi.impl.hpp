@@ -26,15 +26,15 @@ template <class data_t>
 void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
 
   //copy data from chombo gridpoint into local variables
-  typename matter_t::vars_t<data_t> vars;
+  typename matter_t::Vars<data_t> vars;
   m_driver.local_vars(vars);
 
   //work out first derivatives of variables on grid
-  typename matter_t::vars_t< tensor<1, data_t> > d1;
+  typename matter_t::Vars< tensor<1, data_t> > d1;
   FOR1(idir) m_deriv.diff1(d1, idir);
 
   //work out second derivatives of variables on grid
-  typename matter_t::vars_t< tensor<2,data_t> > d2;
+  typename matter_t::Vars< tensor<2,data_t> > d2;
   // Repeated derivatives
   FOR1(idir) m_deriv.diff2(d2, idir);
   // Mixed derivatives
@@ -44,12 +44,12 @@ void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
   m_deriv.mixed_diff2(d2, 2, 1);
 
   // Calculate advection components
-  typename matter_t::vars_t<data_t> advec;
+  typename matter_t::Vars<data_t> advec;
   advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
   //work out RHS including advection
-  typename matter_t::vars_t<data_t> rhs = rhs_equation(vars, d1, d2, advec);
+  typename matter_t::Vars<data_t> rhs = rhs_equation(vars, d1, d2, advec);
 
   //    No dissipation in relaxation for now but may add it
   //    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idir);
@@ -60,13 +60,13 @@ void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
 
 template <class matter_t>
 template <class data_t>
-typename matter_t::vars_t<data_t> RelaxationChi<matter_t>::rhs_equation(
-    const typename matter_t::vars_t<data_t> &vars,
-    const typename matter_t::vars_t< tensor<1,data_t> >& d1,
-    const typename matter_t::vars_t< tensor<2,data_t> >& d2,
-    const typename matter_t::vars_t<data_t> &advec) {
+typename matter_t::Vars<data_t> RelaxationChi<matter_t>::rhs_equation(
+    const typename matter_t::Vars<data_t> &vars,
+    const typename matter_t::Vars< tensor<1,data_t> >& d1,
+    const typename matter_t::Vars< tensor<2,data_t> >& d2,
+    const typename matter_t::Vars<data_t> &advec) {
 
-  typename matter_t::vars_t<data_t> rhs;
+  typename matter_t::Vars<data_t> rhs;
   rhs.assign(0);
 
   using namespace TensorAlgebra;

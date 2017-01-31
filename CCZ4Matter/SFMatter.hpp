@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 31.01.17
 
 #ifndef SFMATTER_HPP_
 #define SFMATTER_HPP_
@@ -46,9 +46,9 @@ class SFMatter {
   */
   SFMatter(matter_params_t matter_params) : m_matter_params (matter_params) {}
 
-  // May not be needed after templating vars_t
+  //! Structure containing all the rhs variables for the gravity and matter fields
   template <class data_t>
-  struct vars_t : VarsBase<data_t> {
+  struct Vars : VarsBase<data_t> {
 
     using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
     using VarsBase<data_t>::define_symmetric_enum_mapping;
@@ -65,7 +65,7 @@ class SFMatter {
     data_t phi;
     data_t Pi;
 
-    vars_t();
+    Vars();
   };
 
   //! A structure for the decomposed elements of the Energy Momentum Tensor in 3+1D
@@ -96,11 +96,11 @@ class SFMatter {
   */
   template <class data_t>
   emtensor_t<data_t> compute_emtensor(
-      const vars_t<data_t> &vars,
-      const vars_t< tensor<1,data_t> >& d1,
+      const Vars<data_t> &vars,
+      const Vars< tensor<1,data_t> >& d1,
       const tensor<2, data_t>& h_UU,
       const tensor<3, data_t>& chris_ULL,
-      const vars_t<data_t> &advec
+      const Vars<data_t> &advec
   );
 
   //! The function which calculates the potential function, given the field value
@@ -112,25 +112,22 @@ class SFMatter {
   template <class data_t>
   potential_t<data_t> compute_potential(const data_t phi);
 
-  //! The function which calculates the total RHS, given the CCZ4 RHSs, vars and derivatives
+  //! The function which adds in the matter field RHS, given the vars and derivatives
   /*!
-      \param CCZ4_rhs the value of the RHS terms calculated by the CCZ4 class.
-      \param vars matter_rhs the value of the RHS terms in the CCZ4 evolution due to matter.
+      \param matter_rhs contains the value of the RHS terms for all vars.
       \param vars the value of the variables at the point.
       \param d1 the value of the first derivatives of the variables.
       \param d2 the value of the second derivatives of the variables.
       \param advec the value of the advection terms beta^i d_i(var).
-      \return is the RHS data for each variable at that point.
       \sa compute_potential()
   */
   template <class data_t>
-  vars_t<data_t> compute_total_rhs(
-      const CCZ4::vars_t<data_t> &CCZ4_rhs,
-      const vars_t<data_t> &matter_rhs,
-      const vars_t<data_t> &vars,
-      const vars_t< tensor<1,data_t> >& d1,
-      const vars_t< tensor<2,data_t> >& d2,
-      const vars_t<data_t> &advec);
+  Vars<data_t> add_matter_rhs(
+      Vars<data_t> &matter_rhs,
+      const Vars<data_t> &vars,
+      const Vars< tensor<1,data_t> >& d1,
+      const Vars< tensor<2,data_t> >& d2,
+      const Vars<data_t> &advec);
 
 };
 

@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 31.01.17
 
 #ifndef CONSTRAINTSMATTER_HPP_
 #define CONSTRAINTSMATTER_HPP_

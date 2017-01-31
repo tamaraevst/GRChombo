@@ -12,7 +12,7 @@
 template <class data_t>
 void BubbleSF::compute(int ix, int iy, int iz) {
 
-  SFMatter::vars_t<data_t> vars;
+  SFMatter::Vars<data_t> vars;
   vars.assign(0.); //Set only the non-zero components explicitly below
   Coordinates<data_t> coords(ix,iy,iz,m_dx);
 

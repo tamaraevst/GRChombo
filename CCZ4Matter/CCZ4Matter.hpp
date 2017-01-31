@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 31.01.17
 
 #ifndef CCZ4MATTER_HPP_
 #define CCZ4MATTER_HPP_
@@ -65,14 +65,15 @@ class CCZ4Matter : public CCZ4 {
        \sa compute()
   */
   template <class data_t>
-  typename matter_t::vars_t<data_t> matter_rhs_equation(
-      const typename matter_t::vars_t<data_t> &vars,
-      const typename matter_t::vars_t< tensor<1,data_t> > &d1,
-      const typename matter_t::vars_t< tensor<2,data_t> > &d2,
-      const typename matter_t::vars_t<data_t> &advec);
+  void matter_rhs_equation(
+      typename matter_t::Vars<data_t> &matter_rhs,
+      const typename matter_t::Vars<data_t> &vars,
+      const typename matter_t::Vars< tensor<1,data_t> > &d1,
+      const typename matter_t::Vars< tensor<2,data_t> > &d2,
+      const typename matter_t::Vars<data_t> &advec);
 
   //! Newton's constant, set to one by default.
-  double m_G_Newton;
+  const double m_G_Newton;
 
   //! The matter params
   const typename matter_t::matter_params_t m_matter_params;

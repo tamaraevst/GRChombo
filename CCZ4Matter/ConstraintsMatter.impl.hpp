@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 31.01.17
 
 #if !defined(CONSTRAINTSMATTER_HPP_)
 #error "This file should only be included through ConstraintsMatter.hpp"
@@ -24,37 +24,30 @@ template <class data_t>
 void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
 {
   //Calculate non matter contributions to Constraints
-  vars_t<data_t> CCZ4_vars;
-  m_driver.local_vars(CCZ4_vars);
-
-  //Calculate first derivatives
-  vars_t< tensor<1, data_t> > CCZ4_d1;
-  FOR1(idir) m_deriv.diff1(CCZ4_d1, idir);
-
-  //Calculate second derivatives
-  vars_t< tensor<2,data_t> > CCZ4_d2;
-  // Repeated derivatives
-  FOR1(idir) m_deriv.diff2(CCZ4_d2, idir);
-  // Mixed derivatives
-  // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-  m_deriv.mixed_diff2(CCZ4_d2, 1, 0);
-  m_deriv.mixed_diff2(CCZ4_d2, 2, 0);
-  m_deriv.mixed_diff2(CCZ4_d2, 2, 1);
-
-  // Get the non matter terms
-  constraints_t<data_t> out = constraint_equations(CCZ4_vars, CCZ4_d1, CCZ4_d2);
-
-  //Calculate EM Tensor and add matter terms, need advection and geometric objects
-  //TODO K Clough: Once we template the Constraints class we won't need to calculate
-  // d1 twice (or advec) as we can use the same vars_t object for both.
-  matter_t my_matter(m_matter_params);
-  typename matter_t::vars_t<data_t> vars;
+  typename matter_t::Vars<data_t> vars;
   m_driver.local_vars(vars);
 
-  typename matter_t::vars_t< tensor<1, data_t> > d1;
+  //Calculate first derivatives
+  typename matter_t::Vars< tensor<1, data_t> > d1;
   FOR1(idir) m_deriv.diff1(d1, idir);
 
-  typename matter_t::vars_t<data_t> advec;
+  //Calculate second derivatives
+  typename matter_t::Vars< tensor<2,data_t> > d2;
+  // Repeated derivatives
+  FOR1(idir) m_deriv.diff2(d2, idir);
+  // Mixed derivatives
+  // Note: no need to symmetrise explicitely, this is done in mixed_diff2
+  m_deriv.mixed_diff2(d2, 1, 0);
+  m_deriv.mixed_diff2(d2, 2, 0);
+  m_deriv.mixed_diff2(d2, 2, 1);
+
+  // Get the non matter terms
+  constraints_t<data_t> out = constraint_equations(vars, d1, d2);
+
+  //Calculate EM Tensor and add matter terms, need advection and geometric objects
+  matter_t my_matter(m_matter_params);
+
+  typename matter_t::Vars<data_t> advec;
   advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
