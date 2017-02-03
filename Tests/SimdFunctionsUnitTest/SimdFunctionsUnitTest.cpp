@@ -114,7 +114,8 @@ int main()
    SV_TEST(exp(x));
    SV_TEST(log(x));
    SV_TEST(log2(x));
-   SV_TEST(pow(x,(decltype(x))2));
+   //SV_TEST(pow(x,(decltype(x))2));
+   SV_TEST(pow(x,2));
    SV_TEST(sqrt(x));
    SV_TEST(sin(x));
    SV_TEST(cos(x));
@@ -124,7 +125,8 @@ int main()
    SV_TEST(tanh(x));
    
    RV_TEST(exp(x),log(x));
-   RV_TEST(pow(x,(decltype(x))2),sqrt(x));
+   //RV_TEST(pow(x,(decltype(x))2),sqrt(x));
+   RV_TEST(pow(x,2),sqrt(x));
        
    if ( !error ) std::cout << "Simd functions unit test passed" << std::endl;
    else std::cout << "Simd functions unit test NOT passed" << std::endl;
