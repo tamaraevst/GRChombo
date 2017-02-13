@@ -10,9 +10,6 @@
 
 #define COVARIANTZ4
 
-#include <iomanip>
-#include <iostream>
-
 //TODO KClough: inline??
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
@@ -122,7 +119,7 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     matter_rhs.Theta += 0.0;
   } else {
     matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
-    matter_rhs.Theta += 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
+    matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
   }
 
   // Update RHS for other variables
