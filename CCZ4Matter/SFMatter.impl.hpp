@@ -87,55 +87,31 @@ auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
   potential_t<data_t> out;
 
   //The potential value at phi
-  out.V_of_phi = m_matter_params.scalar_mass*phi_here*phi_here; // e.g. m^2 phi^2
+  out.V_of_phi = m_matter_params.scalar_mass*phi_here; // e.g. m^2 phi^2
 
   //The potential gradient at phi
-  out.dVdphi = m_matter_params.scalar_mass*2.0*phi_here;  //  e.g. 2 m^2 phi
+  out.dVdphi = m_matter_params.scalar_mass;  //  e.g. 2 m^2 phi
 
   return out;
 }
 
 // Sums all contributions the the RHS, including matter terms
 template <class data_t>
-auto SFMatter::add_matter_rhs(
-    Vars<data_t> &matter_rhs,
+void SFMatter::add_matter_rhs(
+    Vars<data_t> &total_rhs,
     const Vars<data_t> &vars,
     const Vars< tensor<1,data_t> >& d1,
     const Vars< tensor<2,data_t> >& d2,
-    const Vars<data_t> &advec) -> Vars<data_t> {
-
-  Vars<data_t> total_rhs;
-  total_rhs.assign(0.);
-
-  total_rhs.chi = matter_rhs.chi;
-  total_rhs.K = matter_rhs.K;
-  total_rhs.Theta = matter_rhs.Theta;
-  total_rhs.lapse = matter_rhs.lapse;
-
-  FOR1(i)
-  {
-    total_rhs.Gamma[i] = matter_rhs.Gamma[i];
-    total_rhs.shift[i] = matter_rhs.shift[i];
-    total_rhs.B[i]     = matter_rhs.B[i];
-
-    FOR1(j)
-    {
-      total_rhs.h[i][j]   =  matter_rhs.h[i][j];
-      total_rhs.A[i][j]   =  matter_rhs.A[i][j];
-    }
-  }
+    const Vars<data_t> &advec) {
 
   using namespace TensorAlgebra;
 
   auto h_UU = compute_inverse(vars.h);
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
-
-  emtensor_t<data_t> emtensor = compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
   potential_t<data_t> potential = compute_potential(vars.phi);
 
   //evolution equations for scalar field and (minus) its conjugate momentum
   total_rhs.phi = vars.lapse*vars.Pi + advec.phi;
-
   total_rhs.Pi = vars.lapse*(vars.K*vars.Pi - potential.dVdphi) + advec.Pi;
 
   FOR2(i,j)
@@ -151,8 +127,6 @@ auto SFMatter::add_matter_rhs(
     }
   }
 
-  return total_rhs;
-
 }
 
 template <class data_t>
@@ -167,8 +141,6 @@ SFMatter::Vars<data_t>::Vars()
   define_enum_mapping(c_K, K);
   define_enum_mapping(c_Theta, Theta);
   define_enum_mapping(c_lapse, lapse);
-  define_enum_mapping(c_phi, phi);   //Note that the matter fields are added here
-  define_enum_mapping(c_Pi, Pi);
 
   //Vectors
   define_enum_mapping(Interval(c_Gamma1,c_Gamma3), Gamma);
@@ -178,6 +150,11 @@ SFMatter::Vars<data_t>::Vars()
   //Symmetric 2-tensors
   define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
   define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
+
+  //Scalars - matter
+  define_enum_mapping(c_phi, phi);   //Note that the matter fields are added here
+  define_enum_mapping(c_Pi, Pi);
+
 }
 
 #endif /* SFMATTER_IMPL_HPP_ */

@@ -10,6 +10,9 @@
 
 #define COVARIANTZ4
 
+#include <iomanip>
+#include <iostream>
+
 //TODO KClough: inline??
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
@@ -55,10 +58,54 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   matter_rhs.assign(0.);
   matter_rhs = rhs_equation(matter_vars, d1, d2, advec);
 
-  //add RHS matter terms from EM tensor and for matter fields
-  //
-  //  matter_rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
-  //  function begins
+  //add RHS matter terms from EM tensor for matter fields
+  add_EMTensor_rhs(matter_rhs, matter_vars, d1, d2, advec);
+
+  //TODO: K Clough
+  //It is necessary to reassign the rhs to a new var here
+  //but I do not know why, for now it doesn't cost much, so ok.
+  typename matter_t::Vars<data_t> total_rhs;
+  total_rhs.assign(0.);
+
+  total_rhs.chi = matter_rhs.chi;
+  total_rhs.K = matter_rhs.K;
+  total_rhs.Theta = matter_rhs.Theta;
+  total_rhs.lapse = matter_rhs.lapse;
+
+  FOR1(i)
+  {
+    total_rhs.Gamma[i] = matter_rhs.Gamma[i];
+    total_rhs.shift[i] = matter_rhs.shift[i];
+    total_rhs.B[i]     = matter_rhs.B[i];
+
+    FOR1(j)
+    {
+      total_rhs.h[i][j]   =  matter_rhs.h[i][j];
+      total_rhs.A[i][j]   =  matter_rhs.A[i][j];
+    }
+  }
+
+  //add evolution of matter fields themselves
+  matter_t my_matter(m_matter_params);
+  my_matter.add_matter_rhs(total_rhs, matter_vars, d1, d2, advec);
+
+  //Add dissipation to all terms
+  FOR1(idir) m_deriv.add_dissipation(total_rhs, m_sigma, idir);
+
+  //Write the rhs into the output FArrayBox
+  m_driver.store_vars(total_rhs);
+
+}
+
+// Function to add in matter terms to CCZ4 rhs
+template <class matter_t>
+template <class data_t>
+void CCZ4Matter<matter_t>::add_EMTensor_rhs(
+    typename matter_t::Vars<data_t>  &matter_rhs,
+    const typename matter_t::Vars<data_t>  &matter_vars,
+    const typename matter_t::Vars< tensor<1,data_t> >& d1,
+    const typename matter_t::Vars< tensor<2,data_t> >& d2,
+    const typename matter_t::Vars<data_t>  &advec) {
 
   using namespace TensorAlgebra;
  
@@ -75,7 +122,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
     matter_rhs.Theta += 0.0;
   } else {
     matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
-    matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
+    matter_rhs.Theta += 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
   }
 
   // Update RHS for other variables
@@ -101,33 +148,6 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
     matter_rhs.B[i] += add_rhs_Gamma;
 
   }
-  //function ends
-
-  //add evolution of matter fields
-  typename matter_t::Vars<data_t> total_matter_rhs;
-  total_matter_rhs = my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
-
-  //Add dissipation to all terms
-  FOR1(idir) m_deriv.add_dissipation(total_matter_rhs, m_sigma, idir);
-//  FOR1(idir) m_deriv.add_dissipation(matter_rhs, m_sigma, idir);
-
-  //Write the rhs into the output FArrayBox
-  m_driver.store_vars(total_matter_rhs);
-//  m_driver.store_vars(matter_rhs);
-
-}
-
-// Function to add in matter terms to CCZ4 rhs
-template <class matter_t>
-template <class data_t>
-void CCZ4Matter<matter_t>::matter_rhs_equation(
-    typename matter_t::Vars<data_t>  &rhs,
-    const typename matter_t::Vars<data_t>  &matter_vars,
-    const typename matter_t::Vars< tensor<1,data_t> >& d1,
-    const typename matter_t::Vars< tensor<2,data_t> >& d2,
-    const typename matter_t::Vars<data_t>  &advec) {
-
-//moved above for test
 
 }
 

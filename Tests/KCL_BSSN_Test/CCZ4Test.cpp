@@ -145,13 +145,15 @@ int main()
     params.kappa1 = 0.0;
     params.kappa2 = 0.0;
     params.kappa3 = 0.0;
-    params.shift_gamma_coeff = 0.75;
-    params.lapse_advec_coeff = 1;
-    params.shift_advec_coeff = 0;
-    params.beta_driver = 1.0;
+    params.shift_Gamma_coeff = 0.75;
+    params.lapse_advec_coeff = 1.0;
+    params.lapse_power = 1.0;
+    params.lapse_coeff = 2.0;
+    params.shift_advec_coeff = 0.0;
+    params.eta = 1.0;
 
     SFMatter::matter_params_t matter_params;
-    matter_params.scalar_mass = 0.0;
+    matter_params.scalar_mass = 1.1;
     matter_params.amplitudeSF = 0.0025;
     matter_params.widthSF = 1.0;
 
@@ -210,8 +212,8 @@ int main()
                     CHF_CONST_REAL(params.kappa1),
                     CHF_CONST_REAL(params.kappa2),
                     CHF_CONST_REAL(params.kappa3),
-                    CHF_CONST_REAL(params.beta_driver),
-                    CHF_CONST_REAL(params.shift_gamma_coeff),
+                    CHF_CONST_REAL(params.eta),
+                    CHF_CONST_REAL(params.shift_Gamma_coeff),
                     CHF_CONST_REAL(sigma),
                     CHF_BOX(box));
 

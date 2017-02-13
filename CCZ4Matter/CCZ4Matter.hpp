@@ -65,7 +65,7 @@ class CCZ4Matter : public CCZ4 {
        \sa compute()
   */
   template <class data_t>
-  void matter_rhs_equation(
+  void add_EMTensor_rhs(
       typename matter_t::Vars<data_t> &matter_rhs,
       const typename matter_t::Vars<data_t> &vars,
       const typename matter_t::Vars< tensor<1,data_t> > &d1,

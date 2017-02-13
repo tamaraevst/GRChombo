@@ -19,12 +19,13 @@ void auto_read_params(ParmParse& pp)
     pp.get("dt_multiplier", dt_multiplier);
 
     // Lapse evolution
-    pp.get("LapseAdvectionCoeff",LapseAdvectionCoeff);
+    pp.get("lapse_advec_coeff", lapse_advec_coeff);
+    pp.get("lapse_coeff", lapse_coeff);
+    pp.get("lapse_power", lapse_power);
 
     // Shift Evolution
-    pp.get("ShiftBCoeff",ShiftBCoeff);
-    pp.get("ShiftAdvectionCoeff",ShiftAdvectionCoeff);
-    pp.get("F",F);
+    pp.get("shift_advec_coeff", shift_advec_coeff);
+    pp.get("shift_Gamma_coeff",shift_Gamma_coeff);
     pp.get("eta",eta);
     pp.get("SpatialBetaDriverRadius",SpatialBetaDriverRadius);
 
@@ -68,10 +69,9 @@ Real dt_multiplier;
 ///// Problem specific parameters
 Real regrid_threshold_K, regrid_threshold_phi, regrid_threshold;
 //Lapse evolution
-Real LapseAdvectionCoeff;
+Real lapse_power, lapse_coeff, lapse_advec_coeff;
 //ShiftEvolution
-Real ShiftAdvectionCoeff, F, eta, SpatialBetaDriverRadius;
-int ShiftBCoeff;
+Real shift_advec_coeff, shift_Gamma_coeff, eta, SpatialBetaDriverRadius;
 //CCZ4 parameters
 int formulation;
 double kappa1, kappa2, kappa3;

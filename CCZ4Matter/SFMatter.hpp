@@ -122,8 +122,8 @@ class SFMatter {
       \sa compute_potential()
   */
   template <class data_t>
-  Vars<data_t> add_matter_rhs(
-      Vars<data_t> &matter_rhs,
+  void add_matter_rhs(
+      Vars<data_t> &total_rhs,
       const Vars<data_t> &vars,
       const Vars< tensor<1,data_t> >& d1,
       const Vars< tensor<2,data_t> >& d2,
