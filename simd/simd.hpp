@@ -142,9 +142,9 @@ define_simd_overload(sinh)
 define_simd_overload(cosh)
 
 /* Extra pow overloads */
-template <typename t> 
+template <typename t, typename t1> 
 ALWAYS_INLINE 
-simd<t> pow(const simd<t>& a, const t b)\
+simd<t> pow(const simd<t>& a, const t1 b)\
 {
    simd<t> simd_b(b);
    return pow(a,simd_b);\
