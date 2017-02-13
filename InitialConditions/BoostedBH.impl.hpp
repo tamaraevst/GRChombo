@@ -45,7 +45,7 @@ template <class data_t>
 data_t
 BoostedBH::center_dist(Coordinates<data_t> coords) const
 {
-	data_t r = sqrt(  pow(coords.x - m_params.center[0],(decltype(coords.x))2)
+	data_t r = sqrt(  pow(coords.x - m_params.center[0],2)
                     + pow(coords.y - m_params.center[1],2)
                     + pow(coords.z - m_params.center[2],2));
 
@@ -74,7 +74,7 @@ BoostedBH::psi2_0(data_t r) const
 {
 	const data_t F = psi0(r);
 	const data_t FF = F * F;
-	return pow(1 + F, (decltype(F))-5) * (F / 8) * (FF * FF + 5 * F * FF + 10 * FF + 10 * F + 5);
+	return pow(1 + F, -5) * (F / 8) * (FF * FF + 5 * F * FF + 10 * FF + 10 * F + 5);
 }
 
 template <class data_t>
@@ -83,7 +83,7 @@ BoostedBH::psi2_2(data_t r) const
 {
 	const data_t F = psi0(r);
 	const data_t FF = F * F;
-	return 0.05 * pow(1 + F, (decltype(F))-5) * FF * (84 * F * FF * FF + 378 * FF * FF + 658 * F * FF
+	return 0.05 * pow(1 + F, -5) * FF * (84 * F * FF * FF + 378 * FF * FF + 658 * F * FF
 		+ 539 * FF + 192 * F + 15) + 4.2 * F * FF * log(F / (1 + F));
 }
 

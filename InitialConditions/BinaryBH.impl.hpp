@@ -45,7 +45,7 @@ template <class data_t>
 data_t BinaryBH::compute_chi(Coordinates<data_t> coords)
 {
     const data_t psi = 1. + bh1.psi_minus_one(coords) + bh2.psi_minus_one(coords);
-    return pow(psi, (decltype(psi))-4);
+    return pow(psi, -4);
 }
 
 template <class data_t>
