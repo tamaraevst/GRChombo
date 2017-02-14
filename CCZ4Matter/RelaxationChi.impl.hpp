@@ -7,7 +7,6 @@
 #ifndef RELAXATIONCHI_IMPL_HPP_
 #define RELAXATIONCHI_IMPL_HPP_
 
-//TODO KClough: inline??
 template <class matter_t>
 RelaxationChi<matter_t>::RelaxationChi(
     const FABDriverBase& driver,

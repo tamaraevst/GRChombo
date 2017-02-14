@@ -7,7 +7,6 @@
 #ifndef CONSTRAINTSMATTER_IMPL_HPP_
 #define CONSTRAINTSMATTER_IMPL_HPP_
 
-//TODO KClough: inline?
 template <class matter_t>
 ConstraintsMatter<matter_t>::ConstraintsMatter(
     const FABDriverBase& driver,

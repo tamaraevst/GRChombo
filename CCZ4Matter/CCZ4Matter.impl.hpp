@@ -10,7 +10,6 @@
 
 #define COVARIANTZ4
 
-//TODO KClough: inline??
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     params_t params,
