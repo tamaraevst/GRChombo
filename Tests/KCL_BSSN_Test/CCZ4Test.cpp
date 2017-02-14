@@ -1,7 +1,9 @@
 #define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
-//#include <omp.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "FArrayBox.H"
 #include <iostream>
@@ -34,7 +36,9 @@
 
 int main()
 {
+#ifdef _OPENMP
     std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+#endif
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
