@@ -28,16 +28,16 @@ template <class data_t>
 void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
 {
   //copy data from chombo gridpoint into local variables
-  typename matter_t::Vars<data_t> matter_vars;
+  Vars<data_t> matter_vars;
   m_driver.local_vars(matter_vars);
 
   //work out first derivatives of variables on grid
-  typename matter_t::Vars< tensor<1, data_t> > d1;
+  Vars< tensor<1, data_t> > d1;
   FOR1(idir) m_deriv.diff1(d1, idir);
 
   // Repeated derivatives
   // Work out second derivatives of variables on grid
-  typename matter_t::Vars< tensor<2,data_t> > d2;
+  Vars< tensor<2,data_t> > d2;
   FOR1(idir) m_deriv.diff2(d2, idir);
   // Mixed derivatives
   // Note: no need to symmetrise explicitely, this is done in mixed_diff2
@@ -46,12 +46,12 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   m_deriv.mixed_diff2(d2, 2, 1);
 
   // Calculate advection terms
-  typename matter_t::Vars<data_t> advec;
+  Vars<data_t> advec;
   advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(advec, matter_vars.shift[idir], idir);
 
   // Call CCZ4 RHS - work out RHS without matter, no dissipation
-  typename matter_t::Vars<data_t> matter_rhs;
+  Vars<data_t> matter_rhs;
   matter_rhs.assign(0.);
   matter_rhs = rhs_equation(matter_vars, d1, d2, advec);
 
@@ -61,7 +61,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   //TODO: K Clough
   //It is necessary to reassign the rhs to a new var here
   //but I do not know why, for now it doesn't cost much, so ok.
-  typename matter_t::Vars<data_t> total_rhs;
+  Vars<data_t> total_rhs;
   total_rhs.assign(0.);
 
   total_rhs.chi = matter_rhs.chi;
@@ -98,11 +98,11 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
 template <class matter_t>
 template <class data_t>
 void CCZ4Matter<matter_t>::add_EMTensor_rhs(
-    typename matter_t::Vars<data_t>  &matter_rhs,
-    const typename matter_t::Vars<data_t>  &matter_vars,
-    const typename matter_t::Vars< tensor<1,data_t> >& d1,
-    const typename matter_t::Vars< tensor<2,data_t> >& d2,
-    const typename matter_t::Vars<data_t>  &advec) {
+    Vars<data_t>  &matter_rhs,
+    const Vars<data_t>  &matter_vars,
+    const Vars< tensor<1,data_t> >& d1,
+    const Vars< tensor<2,data_t> >& d2,
+    const Vars<data_t>  &advec) {
 
   using namespace TensorAlgebra;
  

@@ -29,7 +29,11 @@
 
 template <class matter_t>
 class CCZ4Matter : public CCZ4 {
- public:
+
+  //Use the variable definition in matter_t
+  template<class data_t>
+  using Vars=typename matter_t::template Vars<data_t>;
+public:
   //!  Constructor of class CCZ4Matter
   /*!
        Inputs are the box driver and grid spacing, plus the CCZ4 evolution parameters and
@@ -53,8 +57,7 @@ class CCZ4Matter : public CCZ4 {
   template <class data_t>
   void compute(int ix, int iy, int iz);
 
- protected:
-
+protected:
   //! The function which calculates the RHS, given the vars and derivatives
   /*!
        \param vars the value of the variables at the point.
@@ -66,11 +69,11 @@ class CCZ4Matter : public CCZ4 {
   */
   template <class data_t>
   void add_EMTensor_rhs(
-      typename matter_t::Vars<data_t> &matter_rhs,
-      const typename matter_t::Vars<data_t> &vars,
-      const typename matter_t::Vars< tensor<1,data_t> > &d1,
-      const typename matter_t::Vars< tensor<2,data_t> > &d2,
-      const typename matter_t::Vars<data_t> &advec);
+      Vars<data_t> &matter_rhs,
+      const Vars<data_t> &vars,
+      const Vars< tensor<1,data_t> > &d1,
+      const Vars< tensor<2,data_t> > &d2,
+      const Vars<data_t> &advec);
 
   //! Newton's constant, set to one by default.
   const double m_G_Newton;
