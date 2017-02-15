@@ -18,7 +18,7 @@ CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     double sigma,
     int formulation,
     double G_Newton)
-    : CCZ4(driver, params, dx, sigma, formulation, 0.0), //No cosmological const
+    : CCZ4(driver, params, dx, sigma, formulation, 0.0 /*No cosmological constant*/),
       m_matter_params (matter_params) , m_G_Newton (G_Newton) {}
 
 
@@ -78,7 +78,7 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     const Vars<data_t>  &advec) {
 
   using namespace TensorAlgebra;
- 
+
   auto h_UU = compute_inverse(matter_vars.h);
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
@@ -107,19 +107,16 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
 
   FOR1(i)
   {
-    data_t add_rhs_Gamma = 0.0;
+    data_t matter_term_Gamma = 0.0;
     FOR1(j)
     {
-      add_rhs_Gamma +=
+      matter_term_Gamma +=
           - 16.0*M_PI*m_G_Newton*matter_vars.lapse*h_UU[i][j]*emtensor.Si[j];
     }
 
-    matter_rhs.Gamma[i] += add_rhs_Gamma;
-    matter_rhs.B[i] += add_rhs_Gamma;
-
+    matter_rhs.Gamma[i] += matter_term_Gamma;
+    matter_rhs.B[i] += matter_term_Gamma;
   }
-
 }
-
 
 #endif /* CCZ4MATTER_IMPL_HPP_ */

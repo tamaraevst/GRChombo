@@ -13,7 +13,7 @@ ConstraintsMatter<matter_t>::ConstraintsMatter(
     const typename matter_t::matter_params_t matter_params,
     double dx,
     double G_Newton)
-    : Constraints(driver, dx, 0.0), //Cosmological constant set to zero
+    : Constraints(driver, dx, 0.0 /*No cosmological constant*/),
       m_matter_params (matter_params),
       m_G_Newton (G_Newton) {}
 
@@ -72,7 +72,6 @@ void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
   m_driver.store_vars(out.Mom[0], c_Mom1);
   m_driver.store_vars(out.Mom[1], c_Mom2);
   m_driver.store_vars(out.Mom[2], c_Mom3);
-
 }
 
 #endif /* CONSTRAINTSMATTER_IMPL_HPP_ */

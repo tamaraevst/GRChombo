@@ -21,7 +21,7 @@ auto SFMatter::compute_emtensor(
   emtensor_t<data_t> out;
 
   // Find the potential and its gradient in terms of phi
-  potential_t<data_t> potential = compute_potential(vars.phi);//
+  potential_t<data_t> potential = compute_potential(vars.phi);
 
   // Some useful quantities
   data_t Vt = - vars.Pi * vars.Pi + 2.0*potential.V_of_phi;
@@ -65,16 +65,17 @@ auto SFMatter::compute_emtensor(
     }
   }
 
+  auto lapse_squared = vars.lapse*vars.lapse;
   // rho = n^a n^b T_ab
-  out.rho = dphidt2/vars.lapse/vars.lapse + 0.5*Vt;
+  out.rho = dphidt2/lapse_squared + 0.5*Vt;
   FOR2(i,j)
   {
     out.rho += (-0.5*Vt*vars.h[i][j]/vars.chi + out.Sij[i][j])
-              * vars.shift[i]*vars.shift[j]/vars.lapse/vars.lapse;
+              * vars.shift[i]*vars.shift[j]/lapse_squared;
   }
   FOR1(i)
   {
-    out.rho += - 2.0*vars.shift[i]*T_i[i]/vars.lapse/vars.lapse;
+    out.rho += - 2.0*vars.shift[i]*T_i[i]/lapse_squared;
   }
 
   return out;

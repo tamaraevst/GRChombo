@@ -31,9 +31,9 @@ void BubbleSF::compute(int ix, int iy, int iz) {
 template <class data_t>
 data_t BubbleSF::compute_phi(Coordinates<data_t> coords) {
 
-  data_t rr2 = pow(coords.x - m_matter_params.centerSF[0],(decltype(coords.x))2)
-                 + pow(coords.y - m_matter_params.centerSF[1],2)
-                 + pow(coords.z - m_matter_params.centerSF[2],2);
+  data_t rr2 =   pow(coords.x - m_matter_params.centerSF[0],2)
+               + pow(coords.y - m_matter_params.centerSF[1],2)
+               + pow(coords.z - m_matter_params.centerSF[2],2);
 
   double minimum_rr2 = 1e-12;
   auto r_is_too_small = simd_compare_lt(rr2, minimum_rr2);
@@ -41,9 +41,9 @@ data_t BubbleSF::compute_phi(Coordinates<data_t> coords) {
 
   data_t rr = sqrt(rr2);
   double R0 = 5.0;
-  data_t phiout = m_matter_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_matter_params.widthSF);
+  data_t out_phi = m_matter_params.amplitudeSF*rr2*exp(-(rr-R0)*(rr-R0)/m_matter_params.widthSF);
 
-  return phiout;
+  return out_phi;
 
 }
 

@@ -31,6 +31,6 @@ class BubbleSF {
 
 };
 
-#include "BubbleSF.impl.hpp" 
+#include "BubbleSF.impl.hpp"
 
 #endif /* BUBBLESF_HPP_ */

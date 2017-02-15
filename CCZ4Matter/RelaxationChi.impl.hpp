@@ -12,10 +12,10 @@ RelaxationChi<matter_t>::RelaxationChi(
     const FABDriverBase& driver,
     SFMatter::matter_params_t matter_params,
     double dx,
-    double relaxspeed,
+    double relax_speed,
     double G_Newton)
     : m_matter_params (matter_params),
-      m_relaxspeed (relaxspeed),
+      m_relax_speed (relax_speed),
       m_G_Newton (G_Newton),
       m_driver (driver),
       m_deriv (dx, m_driver) {}
@@ -77,12 +77,12 @@ void RelaxationChi<matter_t>::rhs_equation(
   matter_t my_matter(m_matter_params);
   auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
   auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
-  auto A_UU       = TensorAlgebra::raise_all(vars.A, h_UU);
-  data_t tr_AA    = TensorAlgebra::compute_trace(vars.A, A_UU);
+  auto A_UU       = raise_all(vars.A, h_UU);
+  data_t tr_AA    = compute_trace(vars.A, A_UU);
 
   //Calculate the relaxation RHS for chi, all other vars RHS zero
   //Could have called ConstraintsMatter here, but it is hardly worth it
-  rhs.chi =  m_relaxspeed*(ricci.scalar+(GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM
+  rhs.chi =  m_relax_speed*(ricci.scalar+(GR_SPACEDIM-1.)*vars.K*vars.K/GR_SPACEDIM
                            - tr_AA - 16.0*M_PI*m_G_Newton*emtensor.rho);
 }
 

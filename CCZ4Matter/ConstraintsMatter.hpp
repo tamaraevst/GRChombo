@@ -49,10 +49,8 @@ public:
   void compute(int x, int y, int z);
 
 protected:
-  //! The matter params
-  const typename matter_t::matter_params_t m_matter_params;
-  //! Newton's constant, set to one by default.
-  double m_G_Newton;
+  const typename matter_t::matter_params_t m_matter_params; //!< The matter params
+  double m_G_Newton; //!< Newton's constant, set to one by default.
 
 };
 

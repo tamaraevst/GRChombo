@@ -48,9 +48,9 @@ public:
 
   //!  The compute member which calculates the RHS at each point in the box
   /*!
-       \param ix the x index of the point on the level.
-       \param iy the y index of the point on the level.
-       \param iz the z index of the point on the level.
+       \param ix the integer x coordinate of the current grid-cell.
+       \param iy the integer y coordinate of the current grid-cell.
+       \param iz the integer z coordinate of the current grid-cell.
        \return is void - the RHS is written directly to the grid in the function.
        \sa matter_rhs_equation()
   */
