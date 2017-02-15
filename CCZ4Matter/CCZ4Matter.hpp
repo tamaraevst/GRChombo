@@ -29,7 +29,11 @@
 
 template <class matter_t>
 class CCZ4Matter : public CCZ4 {
- public:
+
+  //Use the variable definition in matter_t
+  template<class data_t>
+  using Vars=typename matter_t::template Vars<data_t>;
+public:
   //!  Constructor of class CCZ4Matter
   /*!
        Inputs are the box driver and grid spacing, plus the CCZ4 evolution parameters and
@@ -38,23 +42,22 @@ class CCZ4Matter : public CCZ4 {
        toggled between CCZ4 and BSSN. The default is CCZ4. It allows the user to set
        the value of Newton's constant, which is set to one by default.
   */
-  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params, 
+  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params,
              double dx, double sigma, int formulation = CCZ4::USE_CCZ4,
              double G_Newton = 1.0);
 
   //!  The compute member which calculates the RHS at each point in the box
   /*!
-       \param ix the x index of the point on the level.
-       \param iy the y index of the point on the level.
-       \param iz the z index of the point on the level.
+       \param ix the integer x coordinate of the current grid-cell.
+       \param iy the integer y coordinate of the current grid-cell.
+       \param iz the integer z coordinate of the current grid-cell.
        \return is void - the RHS is written directly to the grid in the function.
        \sa matter_rhs_equation()
   */
   template <class data_t>
   void compute(int ix, int iy, int iz);
 
- protected:
-
+protected:
   //! The function which calculates the RHS, given the vars and derivatives
   /*!
        \param vars the value of the variables at the point.
@@ -66,18 +69,17 @@ class CCZ4Matter : public CCZ4 {
   */
   template <class data_t>
   void add_EMTensor_rhs(
-      typename matter_t::Vars<data_t> &matter_rhs,
-      const typename matter_t::Vars<data_t> &vars,
-      const typename matter_t::Vars< tensor<1,data_t> > &d1,
-      const typename matter_t::Vars< tensor<2,data_t> > &d2,
-      const typename matter_t::Vars<data_t> &advec);
-
-  //! Newton's constant, set to one by default.
-  const double m_G_Newton;
+      Vars<data_t> &matter_rhs,
+      const Vars<data_t> &vars,
+      const Vars< tensor<1,data_t> > &d1,
+      const Vars< tensor<2,data_t> > &d2,
+      const Vars<data_t> &advec);
 
   //! The matter params
   const typename matter_t::matter_params_t m_matter_params;
 
+  //! Newton's constant, set to one by default.
+  const double m_G_Newton;
 };
 
 #include "CCZ4Matter.impl.hpp"

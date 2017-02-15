@@ -1,7 +1,9 @@
 #define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
-//#include <omp.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #include "FArrayBox.H"
 #include <iostream>
@@ -34,7 +36,9 @@
 
 int main()
 {
+#ifdef _OPENMP
     std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+#endif
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
@@ -173,7 +177,6 @@ int main()
 
 #ifdef COMPARE_WITH_CHF
 
-    int ONE = 1;
     int SIX = 6;
     int THREE = 3;
 
@@ -229,10 +232,10 @@ int main()
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_chf = out_fab_chf.norm(0,i,1);
-        if (max_err > 1e-9)
+        if (max_err > 1e-5)
         {
-            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
-            std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
+            std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
+            std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
         }
     }
 

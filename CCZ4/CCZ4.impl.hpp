@@ -15,7 +15,17 @@ CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma
     m_cosmological_constant (cosmological_constant),
     m_driver (driver),
     m_deriv (dx, m_driver)
-{}
+{
+    //Sanity check: a user who wants to use BSSN should also have damping paramters = 0
+    if (m_formulation == USE_BSSN)
+    {
+        if ( (m_params.kappa1 != 0.) || (params.kappa2 != 0.) || (params.kappa3 != 0.) )
+        {
+            MayDay::Error("BSSN formulation is selected - CCZ4 kappa values should be set to zero in params");
+        }
+    }
+    if (m_formulation > USE_BSSN) MayDay::Error("The requested formulation is not supported");
+}
 
 template <class data_t>
 void
@@ -40,7 +50,8 @@ CCZ4::compute(int ix, int iy, int iz)
     advec.assign(0.);
     FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
-    Vars<data_t> rhs = rhs_equation(vars, d1, d2, advec);
+    Vars<data_t> rhs;
+    rhs_equation(rhs, vars, d1, d2, advec);
 
     FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma,idir);
 
@@ -61,27 +72,16 @@ CCZ4::compute(int ix, int iy, int iz)
  * @param advec The advection derivatives of the variables
 */
 template <class data_t, template<typename> class vars_t>
-auto
-CCZ4::rhs_equation(const vars_t<data_t> &vars,
+void
+CCZ4::rhs_equation(vars_t<data_t> &rhs,
+          const vars_t<data_t> &vars,
           const vars_t< tensor<1,data_t> >& d1,
           const vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
-) -> vars_t<data_t>
+)
 {
-    vars_t<data_t> rhs;
-
 //    Might want to work through the code and eliminate chi divisions where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
-
-    if (m_formulation == USE_BSSN)
-    {
-     if ((abs(m_params.kappa1) > 1e-6) || (abs(m_params.kappa2) > 1e-6)||(abs(m_params.kappa3) > 1e-6))
-     {
-      //  check whether the CCZ4 damping constants are set to zero, else error
-      MayDay::Error("BSSN formulation is selected - CCZ4 kappa values should be set to zero in params");
-     }
-    }
-
     using namespace TensorAlgebra;
 
     auto h_UU = compute_inverse(vars.h);
@@ -89,17 +89,16 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
-    FOR1(i)
+
+    if (m_formulation == USE_BSSN)
     {
-      if (m_formulation == USE_BSSN) {
-        // NB this should be true anyway if setup is correct for BSSN, but we enforce it
-        Z_over_chi[i] = 0.0;
-        Z[i] = 0.0;
-      } else {
-        Z_over_chi[i] = 0.5*(vars.Gamma[i] - chris.contracted[i]);
-        Z[i] = vars.chi*Z_over_chi[i];
-      }
+        FOR1(i) Z_over_chi[i] = 0.0;
     }
+    else
+    {
+        FOR1(i) Z_over_chi[i] = 0.5*(vars.Gamma[i] - chris.contracted[i]);
+    }
+    FOR1(i) Z[i] = vars.chi*Z_over_chi[i];
 
     auto ricci =  CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
@@ -173,24 +172,17 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
 
     if (m_formulation == USE_BSSN)
     {
-     // ensure the Theta of CCZ4 remains at zero
-     rhs.Theta = 0;
+        rhs.Theta = 0; // ensure the Theta of CCZ4 remains at zero
+        // Use hamiltonian constraint to remove ricci.scalar for BSSN update
+        rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
     }
     else
     {
-     rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
+        rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K
+                      - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
-     rhs.Theta += - vars.lapse * m_cosmological_constant;
-    }
-
-    if (m_formulation == USE_BSSN)
-    {
-     // Use hamiltonian constraint to remove ricci.scalar for BSSN update
-     rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
-    }
-    else
-    {
-     rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+        rhs.Theta += - vars.lapse * m_cosmological_constant;
+        rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
     }
 
     tensor<1, data_t> Gammadot;
@@ -226,8 +218,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         rhs.shift[i] = m_params.shift_advec_coeff*advec.shift[i] + m_params.shift_Gamma_coeff*vars.B[i];
         rhs.B[i] = m_params.shift_advec_coeff*advec.B[i] + (1 - m_params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - m_params.eta*etaDecay*vars.B[i];
     }
-
-    return rhs;
 }
 
 template <class data_t>
