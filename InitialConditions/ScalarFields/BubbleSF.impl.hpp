@@ -9,6 +9,11 @@
 #include "SFMatter.hpp"
 #include "simd.hpp"
 
+inline
+BubbleSF::BubbleSF(const FABDriverBase& a_driver, SFMatter::matter_params_t a_matter_params, double a_dx)
+    : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params)
+{}
+
 template <class data_t>
 void BubbleSF::compute(int ix, int iy, int iz) {
 
