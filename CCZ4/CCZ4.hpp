@@ -17,11 +17,10 @@
 class CCZ4
 {
 public:
-
     enum
     {
-     USE_CCZ4,
-     USE_BSSN
+        USE_CCZ4,
+        USE_BSSN
     };
 
     template <class data_t>
@@ -59,8 +58,8 @@ public:
 protected:
     const params_t m_params;
     const double m_sigma;
-    double m_cosmological_constant;
     int m_formulation;
+    double m_cosmological_constant;
     const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
 
