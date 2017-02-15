@@ -29,6 +29,10 @@
 
 template <class matter_t>
 class RelaxationChi {
+  //Use the variable definition in matter_t
+  template<class data_t>
+  using Vars=typename matter_t::template Vars<data_t>;
+
  public:
   //! Constructor of class RelaxationChi
   /*!
@@ -71,11 +75,12 @@ class RelaxationChi {
       \sa compute()
   */
   template <class data_t>
-  typename matter_t::Vars<data_t> rhs_equation(
-      const typename matter_t::Vars<data_t> &vars,
-      const typename matter_t::Vars< tensor<1,data_t> > &d1,
-      const typename matter_t::Vars< tensor<2,data_t> > &d2,
-      const typename matter_t::Vars<data_t> &advec);
+  void rhs_equation(
+      Vars<data_t> &rhs,
+      const Vars<data_t> &vars,
+      const Vars< tensor<1,data_t> > &d1,
+      const Vars< tensor<2,data_t> > &d2,
+      const Vars<data_t> &advec);
 
 };
 

@@ -23,15 +23,15 @@ template <class data_t>
 void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
 {
   //Calculate non matter contributions to Constraints
-  typename matter_t::Vars<data_t> vars;
+  Vars<data_t> vars;
   m_driver.local_vars(vars);
 
   //Calculate first derivatives
-  typename matter_t::Vars< tensor<1, data_t> > d1;
+  Vars< tensor<1, data_t> > d1;
   FOR1(idir) m_deriv.diff1(d1, idir);
 
   //Calculate second derivatives
-  typename matter_t::Vars< tensor<2,data_t> > d2;
+  Vars< tensor<2,data_t> > d2;
   // Repeated derivatives
   FOR1(idir) m_deriv.diff2(d2, idir);
   // Mixed derivatives
@@ -46,7 +46,7 @@ void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
   //Calculate EM Tensor and add matter terms, need advection and geometric objects
   matter_t my_matter(m_matter_params);
 
-  typename matter_t::Vars<data_t> advec;
+  Vars<data_t> advec;
   advec.assign(0.);
   FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
@@ -55,7 +55,7 @@ void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
   // Energy Momentum tensor
-  typename matter_t::emtensor_t<data_t> emtensor =
+  typename matter_t::template emtensor_t<data_t> emtensor =
       my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
   //Hamiltonain constraint
