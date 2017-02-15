@@ -40,7 +40,8 @@ CCZ4::compute(int ix, int iy, int iz)
     advec.assign(0.);
     FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
 
-    Vars<data_t> rhs = rhs_equation(vars, d1, d2, advec);
+    Vars<data_t> rhs;
+    rhs_equation(rhs, vars, d1, d2, advec);
 
     FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma,idir);
 
@@ -61,15 +62,14 @@ CCZ4::compute(int ix, int iy, int iz)
  * @param advec The advection derivatives of the variables
 */
 template <class data_t, template<typename> class vars_t>
-auto
-CCZ4::rhs_equation(const vars_t<data_t> &vars,
+void
+CCZ4::rhs_equation(vars_t<data_t> &rhs,
+          const vars_t<data_t> &vars,
           const vars_t< tensor<1,data_t> >& d1,
           const vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
-) -> vars_t<data_t>
+)
 {
-    vars_t<data_t> rhs;
-
 //    Might want to work through the code and eliminate chi divisions where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
@@ -226,8 +226,6 @@ CCZ4::rhs_equation(const vars_t<data_t> &vars,
         rhs.shift[i] = m_params.shift_advec_coeff*advec.shift[i] + m_params.shift_Gamma_coeff*vars.B[i];
         rhs.B[i] = m_params.shift_advec_coeff*advec.B[i] + (1 - m_params.shift_advec_coeff)*advec.Gamma[i] + Gammadot[i] - m_params.eta*etaDecay*vars.B[i];
     }
-
-    return rhs;
 }
 
 template <class data_t>
