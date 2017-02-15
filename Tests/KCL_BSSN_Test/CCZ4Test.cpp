@@ -177,7 +177,6 @@ int main()
 
 #ifdef COMPARE_WITH_CHF
 
-    int ONE = 1;
     int SIX = 6;
     int THREE = 3;
 

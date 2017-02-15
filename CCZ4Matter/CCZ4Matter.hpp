@@ -42,7 +42,7 @@ public:
        toggled between CCZ4 and BSSN. The default is CCZ4. It allows the user to set
        the value of Newton's constant, which is set to one by default.
   */
-  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params, 
+  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params,
              double dx, double sigma, int formulation = CCZ4::USE_CCZ4,
              double G_Newton = 1.0);
 
@@ -75,12 +75,11 @@ protected:
       const Vars< tensor<2,data_t> > &d2,
       const Vars<data_t> &advec);
 
-  //! Newton's constant, set to one by default.
-  const double m_G_Newton;
-
   //! The matter params
   const typename matter_t::matter_params_t m_matter_params;
 
+  //! Newton's constant, set to one by default.
+  const double m_G_Newton;
 };
 
 #include "CCZ4Matter.impl.hpp"

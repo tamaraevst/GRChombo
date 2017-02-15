@@ -14,8 +14,6 @@
 
 class BubbleSF {
  public:
-  const SFMatter::matter_params_t m_matter_params;
-
   BubbleSF(const FABDriverBase& a_driver, SFMatter::matter_params_t a_matter_params, double a_dx)
         : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params) {}
 
@@ -29,6 +27,8 @@ class BubbleSF {
   template<class data_t>
   data_t compute_phi(Coordinates<data_t> coords);
 
+ public:
+  const SFMatter::matter_params_t m_matter_params;
 };
 
 #include "BubbleSF.impl.hpp"

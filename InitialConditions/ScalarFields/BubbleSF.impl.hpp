@@ -1,5 +1,5 @@
 #if !defined(BUBBLESF_HPP_)
-#error "This file should only be included through BubbleSF.hpp
+#error "This file should only be included through BubbleSF.hpp"
 #endif
 
 #ifndef BUBBLESF_IMPL_HPP_
