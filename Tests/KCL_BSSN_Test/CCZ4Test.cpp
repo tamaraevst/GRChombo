@@ -233,7 +233,7 @@ int main()
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_chf = out_fab_chf.norm(0,i,1);
-        if (max_err > 1e-9)
+        if (max_err > 1e-5)
         {
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
