@@ -1,10 +1,6 @@
 #ifndef VARSBASE_HPP_
 #define VARSBASE_HPP_
 
-//This class is a base class for variables type in compute classes.
-//Inherit from it to get the functionality of loading grid variables into the variable type
-//Derivatives are implemented using tensor<N, data_t>
-
 #include "StackVector.hpp"
 #include "IndexApplicator.hpp"
 #include "GRUtils.hpp"
@@ -13,6 +9,19 @@
 #include "UserVariables.hpp"
 #include "tensor.hpp"
 
+///This class is a base class for variables types in compute classes.
+/**Inherit from it to get the functionality of loading grid variables into your new variables class.
+ * VarsBase contains a list of c_NUM (as defined in UserVariables.hpp) assignment pointers which can map a number in the enum
+ * defined in UserVariables.hpp to a variable of the variables class that inherits from VarsBase.
+ * These assignment pointers are then used to load values from the Chombo grid into the variables class.
+ *
+ * e.g. A child Vars of VarsBase may have a member variable 'chi'. VarsBase m_assignement_ptrs[c_chi] should then be
+ * set up to point to this variable chi. To do this use the functions define_enum_mapping.
+ *
+ * NB: A VarsBase object cannot be copied as this almost certainly causes troubles with the assignement pointers
+ * pointing to the old data. If you must copy a child of VarsBase you have to write an explicit copy constructor
+ * and = operator for the child. These should create a new VarsBase object and explicitly fix the assignment pointers.
+ */
 template <class var_t>
 class VarsBase
 {
@@ -22,6 +31,10 @@ protected:
      StackVector<var_t*,2> m_assignment_ptrs[c_NUM];
 
 public:
+     VarsBase(VarsBase const &) = delete; //!< VarsBase cannot be copied (see class description).
+     void operator=(VarsBase const &vars) = delete; //!< VarsBase cannot be copied (see class description).
+     VarsBase() {} //!< Default constructor. Leaves assignment pointers empty.
+
      //This function assigns a mapping from a chombo grid variable to a local
      //variable (i.e. a variable that only exists for the current cell).
      //This can be used up to two times (e.g. for
