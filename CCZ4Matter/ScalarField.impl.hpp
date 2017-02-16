@@ -1,17 +1,17 @@
-// Last edited K Clough 31.01.17
+// Last edited K Clough 15.02.17
 
-#if !defined(SFMATTER_HPP_)
-#error "This file should only be included through SFMatter.hpp"
+#if !defined(SCALARFIELD_HPP_)
+#error "This file should only be included through ScalarField.hpp"
 #endif
 
-#ifndef SFMATTER_IMPL_HPP_
-#define SFMATTER_IMPL_HPP_
+#ifndef SCALARFIELD_IMPL_HPP_
+#define SCALARFIELD_IMPL_HPP_
 
 #define COVARIANTZ4
 
 // Calculate the stress energy tensor elements
 template <class data_t>
-auto SFMatter::compute_emtensor(
+auto ScalarField::compute_emtensor(
     const Vars<data_t> &vars,
     const Vars< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
@@ -83,22 +83,22 @@ auto SFMatter::compute_emtensor(
 
 /// Set the potential function for the scalar field here
 template <class data_t>
-auto SFMatter::compute_potential(const data_t phi_here) -> potential_t<data_t> {
+auto ScalarField::compute_potential(const data_t phi_here) -> potential_t<data_t> {
 
   potential_t<data_t> out;
 
   //The potential value at phi
-  out.V_of_phi = m_matter_params.scalar_mass*phi_here; // e.g. m^2 phi^2
+  out.V_of_phi = m_params.scalar_mass*phi_here; // e.g. m^2 phi^2
 
   //The potential gradient at phi
-  out.dVdphi = m_matter_params.scalar_mass;  //  e.g. 2 m^2 phi
+  out.dVdphi = m_params.scalar_mass;  //  e.g. 2 m^2 phi
 
   return out;
 }
 
 // Sums all contributions the the RHS, including matter terms
 template <class data_t>
-void SFMatter::add_matter_rhs(
+void ScalarField::add_matter_rhs(
     Vars<data_t> &total_rhs,
     const Vars<data_t> &vars,
     const Vars< tensor<1,data_t> >& d1,
@@ -131,7 +131,7 @@ void SFMatter::add_matter_rhs(
 }
 
 template <class data_t>
-SFMatter::Vars<data_t>::Vars()
+ScalarField::Vars<data_t>::Vars()
 {
   //Define the mapping from components of chombo grid to elements in Vars.
   //This allows to read/write data from the chombo grid into local
@@ -158,4 +158,4 @@ SFMatter::Vars<data_t>::Vars()
 
 }
 
-#endif /* SFMATTER_IMPL_HPP_ */
+#endif /* SCALARFIELD_IMPL_HPP_ */

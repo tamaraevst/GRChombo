@@ -1,4 +1,4 @@
-// Last edited K Clough 31.01.17
+// Last edited K Clough 16.02.17
 
 #ifndef CCZ4MATTER_HPP_
 #define CCZ4MATTER_HPP_
@@ -10,7 +10,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "SFMatter.hpp"
+#include "ScalarField.hpp"
 #include "VarsBase.hpp"
 #include "CCZ4.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -23,8 +23,8 @@
      It then adds in the additional matter terms to the CCZ4 evolution (those including
      the stress energy tensor), and calculates the evolution of the matter variables.
      It does not assume a specific form of matter but is templated over a matter class
-     matter_t. Please see the class SFMatter as an example of a matter_t.
-     \sa CCZ4(), SFMatter()
+     matter_t. Please see the class ScalarField as an example of a matter_t.
+     \sa CCZ4(), ScalarField()
 */
 
 template <class matter_t>
@@ -42,7 +42,7 @@ public:
        toggled between CCZ4 and BSSN. The default is CCZ4. It allows the user to set
        the value of Newton's constant, which is set to one by default.
   */
-  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::matter_params_t matter_params,
+  CCZ4Matter(const FABDriverBase& driver, params_t params, const typename matter_t::params_t matter_params,
              double dx, double sigma, int formulation = CCZ4::USE_CCZ4,
              double G_Newton = 1.0);
 
@@ -76,7 +76,7 @@ protected:
       const Vars<data_t> &advec);
 
   //! The matter params
-  const typename matter_t::matter_params_t m_matter_params;
+  const typename matter_t::params_t m_matter_params;
 
   //! Newton's constant, set to one by default.
   const double m_G_Newton;

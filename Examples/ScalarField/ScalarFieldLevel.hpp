@@ -1,7 +1,7 @@
 // Last edited K Clough 16.10.16
 
-#ifndef MATTERSFLEVEL_HPP_
-#define MATTERSFLEVEL_HPP_
+#ifndef SCALARFIELDLEVEL_HPP_
+#define SCALARFIELDLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
 
@@ -13,11 +13,11 @@
      period of relaxation for the conformal factor chi, for non analytic initial
      conditions (for example, a general field configuration at a moment of time symmetry
      assuming conformal flatness).
-     \sa CCZ4Matter(), ConstraintsMatter(), SFMatter(), RelaxationChi()
+     \sa CCZ4Matter(), ConstraintsMatter(), ScalarField(), RelaxationChi()
 */
-class MatterSFLevel : public GRAMRLevel
+class ScalarFieldLevel : public GRAMRLevel
 {
-    friend class MatterSFLevelFactory;
+    friend class ScalarFieldLevelFactory;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
@@ -47,6 +47,6 @@ class MatterSFLevel : public GRAMRLevel
 
 };
 
-#include "MatterSFLevel.impl.hpp"
+#include "ScalarFieldLevel.impl.hpp"
 
-#endif /* MATTERSFLEVEL_HPP_ */
+#endif /* SCALARFIELDLEVEL_HPP_ */

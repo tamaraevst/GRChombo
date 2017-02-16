@@ -1,21 +1,20 @@
 // Last edited K Clough 16.10.16
 
-#if !defined(MATTERSFLEVEL_HPP_)
-#error "This file should only be included through MatterSFLevel.hpp"
+#if !defined(SCALARFIELDLEVEL_HPP_)
+#error "This file should only be included through ScalarFieldLevel.hpp"
 #endif
 
-#ifndef MATTERSFLEVEL_IMPL_HPP_
-#define MATTERSFLEVEL_IMPL_HPP_
+#ifndef SCALARFIELDLEVEL_IMPL_HPP_
+#define SCALARFIELDLEVEL_IMPL_HPP_
 
 //General includes common to most GR problems
-#include "MatterSFLevel.hpp"
+#include "ScalarFieldLevel.hpp"
 #include "FABDriver.hpp"
 #include "EnforceTfA.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
 
 //For RHS update
-//#include "CCZ4.hpp"
 #include "CCZ4Matter.hpp"
 
 //For constraints calculation
@@ -25,12 +24,12 @@
 #include "ComputeModGrad.hpp"
 
 //Problem specific includes
-#include "BubbleSF.hpp"
-#include "SFMatter.hpp"
+#include "ScalarBubble.hpp"
+#include "ScalarField.hpp"
 #include "RelaxationChi.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
-void MatterSFLevel::specificAdvance()
+void ScalarFieldLevel::specificAdvance()
 {
     //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
@@ -43,35 +42,35 @@ void MatterSFLevel::specificAdvance()
 }
 
 // Initial data for field and metric variables
-void MatterSFLevel::initialData()
+void ScalarFieldLevel::initialData()
 {
-    CH_TIME("MatterSFLevel::initialData");
-    if (m_verbosity) pout () << "MatterSFLevel::initialData " << m_level << endl;
+    CH_TIME("ScalarFieldLevel::initialData");
+    if (m_verbosity) pout () << "ScalarFieldLevel::initialData " << m_level << endl;
 
     //First set everything to zero ... we don't want undefined values in constraints etc
     m_state_new.setVal(0.);
 
     //Initial conditions for scalar field - here a bubble
-    FABDriver<BubbleSF>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
+    FABDriver<ScalarBubble>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 
 }
 
 // Things to do before outputting a checkpoint file
-void MatterSFLevel::preCheckpointLevel()
+void ScalarFieldLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<SFMatter> >(m_p.matter_params, m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
-void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
+void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
 {
 
     //Relaxation function for chi - this will eventually be done separately with hdf5 as input
     if (m_time < m_p.relaxtime) {
       //Calculate chi relaxation right hand side
       //Note this assumes conformal chi and Mom constraint trivially satisfied
-      FABDriver<RelaxationChi<SFMatter> >(m_p.matter_params, m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+      FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
       a_rhs.setVal(0., Interval(c_h11,c_Mom3));
@@ -82,8 +81,8 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
    	 	//Enforce positive chi and alpha
     	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-    	//Calculate CCZ4 right hand side with SF matter
-    	FABDriver<CCZ4Matter<SFMatter> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    	//Calculate CCZ4Matter right hand side with matter_t = ScalarField
+    	FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
     	//We don't want undefined values floating around in the constraints
     	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
@@ -92,7 +91,7 @@ void MatterSFLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
 }
 
 // Things to do at ODE update, after soln + rhs
-void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
+void ScalarFieldLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
 {
     //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
@@ -103,7 +102,7 @@ void MatterSFLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_
 // TODO KClough: It is a bit ugly to have all this here, may want to create a hook
 // in the main routine and then just put the conditional here - but tagging is very
 // problem specific, so it is hard to have a "general" routine
-void MatterSFLevel::tagCells (IntVectSet& a_tags)
+void ScalarFieldLevel::tagCells (IntVectSet& a_tags)
 {
     CH_TIME("GRAMRLevel::tagCells");
     if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;

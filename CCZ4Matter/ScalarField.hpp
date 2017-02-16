@@ -1,7 +1,7 @@
 // Last edited K Clough 31.01.17
 
-#ifndef SFMATTER_HPP_
-#define SFMATTER_HPP_
+#ifndef SCALARFIELD_HPP_
+#define SCALARFIELD_HPP_
 
 #include "simd.hpp"
 #include "tensor.hpp"
@@ -25,10 +25,10 @@
      \sa CCZ4Matter(), ConstraintsMatter()
 */
 
-class SFMatter {
+class ScalarField {
  public:
-  //! A structure for the input params for SF properties and initial conditions
-  struct matter_params_t {
+  //! A structure for the input params for scalar field properties and initial conditions
+  struct params_t {
       double amplitudeSF;
       std::vector<double> centerSF;
       double widthSF;
@@ -37,14 +37,14 @@ class SFMatter {
 
  protected:
   //! The local copy of the matter params
-  matter_params_t m_matter_params;
+  params_t m_params;
 
  public:
-  //!  Constructor of class SFMatter
+  //!  Constructor of class ScalarField
   /*!
        Inputs are the matter parameters.
   */
-  SFMatter(matter_params_t matter_params) : m_matter_params (matter_params) {}
+  ScalarField(params_t params) : m_params (params) {}
 
   //! Structure containing all the rhs variables for the gravity and matter fields
   template <class data_t>
@@ -131,6 +131,6 @@ class SFMatter {
 
 };
 
-#include "SFMatter.impl.hpp"
+#include "ScalarField.impl.hpp"
 
-#endif /* SFMATTER_HPP_ */
+#endif /* SCALARFIELD_HPP_ */

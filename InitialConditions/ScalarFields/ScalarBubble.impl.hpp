@@ -1,23 +1,22 @@
-#if !defined(BUBBLESF_HPP_)
-#error "This file should only be included through BubbleSF.hpp"
+#if !defined(SCALARBUBBLE_HPP_)
+#error "This file should only be included through ScalarBubble.hpp"
 #endif
 
-#ifndef BUBBLESF_IMPL_HPP_
-#define BUBBLESF_IMPL_HPP_
+#ifndef SCALARBUBBLE_IMPL_HPP_
+#define SCALARBUBBLE_IMPL_HPP_
 
-#include "BubbleSF.hpp"
-#include "SFMatter.hpp"
+#include "ScalarField.hpp"
 #include "simd.hpp"
 
 inline
-BubbleSF::BubbleSF(const FABDriverBase& a_driver, SFMatter::matter_params_t a_matter_params, double a_dx)
+ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, ScalarField::params_t a_matter_params, double a_dx)
     : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params)
 {}
 
 template <class data_t>
-void BubbleSF::compute(int ix, int iy, int iz) {
+void ScalarBubble::compute(int ix, int iy, int iz) {
 
-  SFMatter::Vars<data_t> vars;
+  ScalarField::Vars<data_t> vars;
   vars.assign(0.); //Set only the non-zero components explicitly below
   Coordinates<data_t> coords(ix,iy,iz,m_dx);
 
@@ -34,7 +33,7 @@ void BubbleSF::compute(int ix, int iy, int iz) {
 }
 
 template <class data_t>
-data_t BubbleSF::compute_phi(Coordinates<data_t> coords) {
+data_t ScalarBubble::compute_phi(Coordinates<data_t> coords) {
 
   data_t rr2 =   pow(coords.x - m_matter_params.centerSF[0],2)
                + pow(coords.y - m_matter_params.centerSF[1],2)
@@ -52,5 +51,5 @@ data_t BubbleSF::compute_phi(Coordinates<data_t> coords) {
 
 }
 
-#endif /* BUBBLESF_IMPL_HPP_ */
+#endif /* SCALARBUBBLE_IMPL_HPP_ */
 

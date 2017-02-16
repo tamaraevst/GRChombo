@@ -11,7 +11,7 @@
 #include <sys/time.h>
 
 #include "CCZ4Matter.hpp"
-#include "SFMatter.hpp"
+#include "ScalarField.hpp"
 #include "FABDriver.hpp"
 #include "GRBSSNChomboF_F.H"
 #include "UserVariables.hpp"
@@ -156,7 +156,7 @@ int main()
     params.shift_advec_coeff = 0.0;
     params.eta = 1.0;
 
-    SFMatter::matter_params_t matter_params;
+    ScalarField::params_t matter_params;
     matter_params.scalar_mass = 1.1;
     matter_params.amplitudeSF = 0.0025;
     matter_params.widthSF = 1.0;
@@ -168,7 +168,7 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    FABDriver<CCZ4Matter<SFMatter> >(params, matter_params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
+    FABDriver<CCZ4Matter<ScalarField> >(params, matter_params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 
@@ -232,7 +232,7 @@ int main()
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_chf = out_fab_chf.norm(0,i,1);
-        if (max_err > 1e-5)
+        if (max_err/max_chf > 1e-7)
         {
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;

@@ -8,7 +8,7 @@
 
 //Problem specific includes:
 #include "CCZ4.hpp"
-#include "SFMatter.hpp"
+#include "ScalarField.hpp"
 
 class SimulationParameters
 {
@@ -46,7 +46,7 @@ public:
 
     //Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4Params;
-    SFMatter::matter_params_t matter_params;
+    ScalarField::params_t matter_params;
 
 };
 

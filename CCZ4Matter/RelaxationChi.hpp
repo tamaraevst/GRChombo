@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 16.02.17
 
 #ifndef RELAXATIONCHI_HPP_
 #define RELAXATIONCHI_HPP_
@@ -10,7 +10,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "SFMatter.hpp"
+#include "ScalarField.hpp"
 #include "VarsBase.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
@@ -39,7 +39,7 @@ class RelaxationChi {
       Takes in the box driver and the grid spacing, plus the relaxation speed and
       value of Newton's constant, which is set to one by default.
   */
-  RelaxationChi(const FABDriverBase& driver, SFMatter::matter_params_t matter_params, double dx, double relax_speed,
+  RelaxationChi(const FABDriverBase& driver, typename matter_t::params_t matter_params, double dx, double relax_speed,
                 double G_Newton = 1.0);
 
   //! The compute member which calculates the RHS at each point in the box
@@ -55,7 +55,7 @@ class RelaxationChi {
 
  protected:
   //! The matter params
-  SFMatter::matter_params_t m_matter_params;
+  typename matter_t::params_t m_matter_params;
   //! The coefficient of the Hamiltonian used to determine relaxation speed.
   const double m_relax_speed;
   //! Newton's constant, set to one by default.

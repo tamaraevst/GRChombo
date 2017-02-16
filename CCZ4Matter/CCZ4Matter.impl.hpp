@@ -1,4 +1,4 @@
-// Last edited K Clough 31.01.17
+// Last edited K Clough 16.02.17
 
 #if !defined(CCZ4MATTER_HPP_)
 #error "This file should only be included through CCZ4Matter.hpp"
@@ -13,7 +13,7 @@
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
     params_t params,
-    const typename matter_t::matter_params_t matter_params,
+    const typename matter_t::params_t matter_params,
     double dx,
     double sigma,
     int formulation,

@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 16.02.17
 
 #if !defined(RELAXATIONCHI_HPP_)
 #error "This file should only be included through RelaxationChi.hpp"
@@ -10,7 +10,7 @@
 template <class matter_t>
 RelaxationChi<matter_t>::RelaxationChi(
     const FABDriverBase& driver,
-    SFMatter::matter_params_t matter_params,
+    typename matter_t::params_t matter_params,
     double dx,
     double relax_speed,
     double G_Newton)

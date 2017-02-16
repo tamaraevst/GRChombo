@@ -1,4 +1,4 @@
-// Last edited K Clough 31.01.17
+// Last edited K Clough 16.02.17
 
 #if !defined(CONSTRAINTSMATTER_HPP_)
 #error "This file should only be included through ConstraintsMatter.hpp"
@@ -10,7 +10,7 @@
 template <class matter_t>
 ConstraintsMatter<matter_t>::ConstraintsMatter(
     const FABDriverBase& driver,
-    const typename matter_t::matter_params_t matter_params,
+    const typename matter_t::params_t matter_params,
     double dx,
     double G_Newton)
     : Constraints(driver, dx, 0.0 /*No cosmological constant*/),
