@@ -29,21 +29,17 @@ class ScalarField {
  public:
   //! A structure for the input params for scalar field properties and initial conditions
   struct params_t {
-      double amplitudeSF;
-      std::vector<double> centerSF;
-      double widthSF;
-      double scalar_mass;
+      double amplitudeSF;//!< Amplitude of bump in initial SF bubble
+      std::vector<double> centerSF;//!< Centre of bump in initial SF bubble
+      double widthSF;//!< Width of bump in initial SF bubble
+      double scalar_mass;//!< Mass of the scalar field
   };
 
  protected:
-  //! The local copy of the matter params
-  params_t m_params;
+  params_t m_params;//!< The local copy of the matter params
 
  public:
-  //!  Constructor of class ScalarField
-  /*!
-       Inputs are the matter parameters.
-  */
+  //!  Constructor of class ScalarField, inputs are the matter parameters.
   ScalarField(params_t params) : m_params (params) {}
 
   //! Structure containing all the rhs variables for the gravity and matter fields
@@ -84,50 +80,28 @@ class ScalarField {
       data_t  dVdphi; //!< Gradient of V(\phi)
   };
 
-  //! The function which calculates the EM Tensor, given the vars and derivatives
-  /*!
-      \param vars the value of the variables at the point.
-      \param d1 the value of the first derivatives of the variables.
-      \param h_UU the inverse metric (raised indices)
-      \param chris_ULL is the conformal chrisoffel symbol in ULL form
-      \param advec the value of the advection terms beta^i d_i(var).
-      \return is the EM Tensor structure
-      \sa compute_potential()
-  */
+  //! The function which calculates the EM Tensor, given the vars and derivatives \sa compute_potential()
   template <class data_t>
   emtensor_t<data_t> compute_emtensor(
-      const Vars<data_t> &vars,
-      const Vars< tensor<1,data_t> >& d1,
-      const tensor<2, data_t>& h_UU,
-      const tensor<3, data_t>& chris_ULL,
-      const Vars<data_t> &advec
+      const Vars<data_t> &vars,//!< the value of the variables at the point.
+      const Vars< tensor<1,data_t> >& d1,//!< the value of the first derivatives of the variables.
+      const tensor<2, data_t>& h_UU,//!< the inverse metric (raised indices)
+      const tensor<3, data_t>& chris_ULL,//!< the conformal chrisoffel symbol in ULL form.
+      const Vars<data_t> &advec//!< the value of the advection terms beta^i d_i(var)
   );
 
-  //! The function which calculates the potential function, given the field value
-  /*!
-      \param phi is the value of the field at the point
-      \return is the potential structure - the value of V and its derivative
-      \sa compute_emtensor()
-  */
+  //! The function which calculates the potential function, given the field value \sa compute_emtensor()
   template <class data_t>
   potential_t<data_t> compute_potential(const data_t phi);
 
-  //! The function which adds in the matter field RHS, given the vars and derivatives
-  /*!
-      \param matter_rhs contains the value of the RHS terms for all vars.
-      \param vars the value of the variables at the point.
-      \param d1 the value of the first derivatives of the variables.
-      \param d2 the value of the second derivatives of the variables.
-      \param advec the value of the advection terms beta^i d_i(var).
-      \sa compute_potential()
-  */
+  //! The function which adds in the RHS for the matter field vars \sa compute_potential()
   template <class data_t>
   void add_matter_rhs(
-      Vars<data_t> &total_rhs,
-      const Vars<data_t> &vars,
-      const Vars< tensor<1,data_t> >& d1,
-      const Vars< tensor<2,data_t> >& d2,
-      const Vars<data_t> &advec);
+      Vars<data_t> &total_rhs, //!< contains the value of the RHS terms for all vars.
+      const Vars<data_t> &vars, //!< the value of the variables at the point.
+      const Vars< tensor<1,data_t> >& d1, //!< the value of the first derivatives of the variables.
+      const Vars< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
+      const Vars<data_t> &advec); //!< the value of the advection terms beta^i d_i(var).
 
 };
 

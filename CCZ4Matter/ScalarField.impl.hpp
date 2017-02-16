@@ -88,15 +88,15 @@ auto ScalarField::compute_potential(const data_t phi_here) -> potential_t<data_t
   potential_t<data_t> out;
 
   //The potential value at phi
-  out.V_of_phi = m_params.scalar_mass*phi_here; // e.g. m^2 phi^2
+  out.V_of_phi = pow(m_params.scalar_mass*phi_here, 2.0); // e.g. m^2 phi^2
 
   //The potential gradient at phi
-  out.dVdphi = m_params.scalar_mass;  //  e.g. 2 m^2 phi
+  out.dVdphi = 2.0*pow(m_params.scalar_mass,2.0)*phi_here;  //  e.g. 2 m^2 phi
 
   return out;
 }
 
-// Sums all contributions the the RHS, including matter terms
+// Adds in the RHS for the matter vars
 template <class data_t>
 void ScalarField::add_matter_rhs(
     Vars<data_t> &total_rhs,

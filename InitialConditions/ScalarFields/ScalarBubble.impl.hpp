@@ -13,6 +13,7 @@ ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, ScalarField::params_t 
     : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params)
 {}
 
+// Compute the value of the initial vars on the grid
 template <class data_t>
 void ScalarBubble::compute(int ix, int iy, int iz) {
 
@@ -32,6 +33,7 @@ void ScalarBubble::compute(int ix, int iy, int iz) {
   m_driver.store_vars(vars);
 }
 
+// Compute the value of phi at the current point
 template <class data_t>
 data_t ScalarBubble::compute_phi(Coordinates<data_t> coords) {
 

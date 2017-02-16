@@ -20,7 +20,7 @@ ConstraintsMatter<matter_t>::ConstraintsMatter(
 
 template <class matter_t>
 template <class data_t>
-void ConstraintsMatter<matter_t>::compute(int x, int y, int z)
+void ConstraintsMatter<matter_t>::compute(int ix, int iy, int iz)
 {
   //Calculate non matter contributions to Constraints
   Vars<data_t> vars;

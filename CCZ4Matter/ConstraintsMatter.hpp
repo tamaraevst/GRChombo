@@ -25,28 +25,26 @@
 */
 template <class matter_t>
 class ConstraintsMatter : public Constraints {
+
   //Use the variable definition in matter_t
   template<class data_t>
   using Vars=typename matter_t::template Vars<data_t>;
+
 public:
   //! Constructor of class ConstraintsMatter
   /*!
-       Takes in the box driver and the grid spacing, plus optionally the
-       value of Newton's constant, which is set to one by default.
+       Takes in the box driver, the grid spacing, and matter params plus 
+       optionally the value of Newton's constant, which is set to one by default.
   */
   ConstraintsMatter(const FABDriverBase& driver,
                     const typename matter_t::params_t matter_params,
                     double dx, double G_Newton = 1.0);
 
   //! The compute member which calculates the constraints at each point in the box
-  /*!
-       \param ix the x index of the point on the level.
-       \param iy the y index of the point on the level.
-       \param iz the z index of the point on the level.
-       \return is void - the constraints are written directly to the grid in the function.
-  */
   template <class data_t>
-  void compute(int x, int y, int z);
+  void compute(int ix,//!<the integer x coordinate of the current grid-cell.
+               int iy,//!<the integer y coordinate of the current grid-cell. 
+               int iz);//!<the integer z coordinate of the current grid-cell.
 
 protected:
   const typename matter_t::params_t m_matter_params; //!< The matter params

@@ -38,7 +38,8 @@ void ScalarFieldLevel::specificAdvance()
     FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Check for nan's
-    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new, SKIP_GHOST_CELLS, no_simd_support());
+    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new,
+                                              SKIP_GHOST_CELLS, no_simd_support());
 }
 
 // Initial data for field and metric variables
@@ -52,14 +53,14 @@ void ScalarFieldLevel::initialData()
 
     //Initial conditions for scalar field - here a bubble
     FABDriver<ScalarBubble>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
-
 }
 
 // Things to do before outputting a checkpoint file
 void ScalarFieldLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx, m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx, 
+                    m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
@@ -67,26 +68,29 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
 {
 
     //Relaxation function for chi - this will eventually be done separately with hdf5 as input
-    if (m_time < m_p.relaxtime) {
-      //Calculate chi relaxation right hand side
-      //Note this assumes conformal chi and Mom constraint trivially satisfied
-      FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
+    if (m_time < m_p.relaxtime)
+    {
+        //Calculate chi relaxation right hand side
+        //Note this assumes conformal chi and Mom constraint trivially satisfied
+        FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed, 
+                                   m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
-       //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
-      a_rhs.setVal(0., Interval(c_h11,c_Mom3));
-    } else {
+        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
+        a_rhs.setVal(0., Interval(c_h11,c_Mom3));
+    } 
+    else 
+    {
+        FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-    	FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+        //Enforce positive chi and alpha
+        FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-   	 	//Enforce positive chi and alpha
-    	FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+        //Calculate CCZ4Matter right hand side with matter_t = ScalarField
+        FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, 
+                        m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
-    	//Calculate CCZ4Matter right hand side with matter_t = ScalarField
-    	FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
-
-    	//We don't want undefined values floating around in the constraints
-    	a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
-
+        //We don't want undefined values floating around in the constraints
+        a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
     }
 }
 

@@ -53,7 +53,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   Vars<data_t> matter_rhs;
   rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
-  //add RHS matter terms from EM tensor for matter fields
+  //add RHS matter terms from EM tensor
   add_EMTensor_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
   //add evolution of matter fields themselves
@@ -67,7 +67,7 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   m_driver.store_vars(matter_rhs);
 }
 
-// Function to add in matter terms to CCZ4 rhs
+// Function to add in EM Tensor matter terms to CCZ4 rhs
 template <class matter_t>
 template <class data_t>
 void CCZ4Matter<matter_t>::add_EMTensor_rhs(
@@ -86,11 +86,14 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
   matter_t my_matter(m_matter_params);
   auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
 
-  // Update RHS for K and Theta depending on formulation
-  if (m_formulation == USE_BSSN) {
+  //Update RHS for K and Theta depending on formulation
+  if (m_formulation == USE_BSSN) 
+  {
     matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S + emtensor.rho);
     matter_rhs.Theta += 0.0;
-  } else {
+  } 
+  else 
+  {
     matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
     matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
   }
