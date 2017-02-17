@@ -17,6 +17,12 @@
 class CCZ4
 {
 public:
+    enum
+    {
+        USE_CCZ4,
+        USE_BSSN
+    };
+
     template <class data_t>
     struct Vars : VarsBase<data_t>
     {
@@ -52,12 +58,13 @@ public:
 protected:
     const params_t m_params;
     const double m_sigma;
+    int m_formulation;
     double m_cosmological_constant;
     const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
 
 public:
-    CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, double cosmological_constant = 0);
+    CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, int formulation = USE_CCZ4, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(int ix, int iy, int iz);

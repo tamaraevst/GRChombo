@@ -18,7 +18,7 @@
 
 void BinaryBHLevel::specificAdvance()
 {
-    //Enforce the trace free alpha condition
+    //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Enforce positive chi and alpha
@@ -61,7 +61,7 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
 
 void BinaryBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
 {
-    //Enforce the trace free alpha condition
+    //Enforce the trace free A_ij condition
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
 

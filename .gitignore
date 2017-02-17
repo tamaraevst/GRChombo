@@ -1,3 +1,5 @@
+pout.*
+*.pbs
 *.s
 d
 o
@@ -5,7 +7,7 @@ p
 f
 *_F.H
 .DS_Store
-log
+log*
 *.ex
 *.swp
 *.out

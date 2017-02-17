@@ -4,12 +4,12 @@
 ###  variable using the libraries named in the `LibNames' variable.
 
 # Included makefiles need an absolute path to the Chombo installation
-# CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
+# CHOMBO_HOME := Please set the CHOMBO_HOME locally(e.g. export CHOMBO_HOME=... in bash)
 
-ebase := GRChombo_BinaryBH
+ebase := CCZ4Test
 
-LibNames := AMRTimeDependent AMRTools BoxTools
+LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../InitialConditions/ ../../FABDriver ../../GRChomboCore
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../CCZ4Matter ../../FABDriver
 
 include $(CHOMBO_HOME)/mk/Make.test
