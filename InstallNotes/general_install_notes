@@ -8,9 +8,9 @@ This folder also contains specific install notes for a collection of machines GR
 To compile Chombo:
 You should check out the adapted Chombo version from the git repository (currently GRChombo will not compile
 with the standard version of Chombo). The installation parameters can be set in Make.defs.local in the folder
-CHOMBO_HOME/lib/mk/. This folder contains examples for Make.defs.local files for machines we have run GRChombo on.
+${CHOMBO_HOME}/mk/. This folder contains examples for Make.defs.local files for machines we have run GRChombo on.
 Once the Make.defs.local file has been set just run "make all DIM=3 (or 2,4,5... if you are thus inclined) -j 32
-(compiles in parallel on 32 ranks)" in the folder CHOMBO_HOME/lib/. This will also compile the tests which is a good
+(compiles in parallel on 32 ranks)" in the folder ${CHOMBO_HOME}. This will also compile the tests which is a good
 thing to do once but subsequently it is faster to only compile the library by invoking "make lib DIM=3 -j 32".
 
 To compile GRChombo:
