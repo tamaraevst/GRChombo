@@ -5,6 +5,7 @@
 #include "tensor.hpp"
 #include "VarsBase.hpp"
 #include "FABDriverBase.hpp"
+#include "CellIndex.hpp"
 #include <array>
 
 class FourthOrderDerivatives

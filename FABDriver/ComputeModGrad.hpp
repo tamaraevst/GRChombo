@@ -26,7 +26,7 @@ public:
    void compute(Cell current_cell)
    {
        tensor<1,data_t> d1_arr[c_NUM];
-       FOR1(idir) m_deriv.diff1(d1_arr, idir);
+       FOR1(idir) m_deriv.diff1(d1_arr, current_cell, idir);
 
        std::array<data_t, c_NUM> mod_d1_arr = {0.};
        FORVARS(ivar)
@@ -39,7 +39,7 @@ public:
        }
 
        // Write back into the flattened Chombo box
-       m_driver.store_vars(mod_d1_arr);
+       m_driver.store_vars(mod_d1_arr, current_cell);
    }
 
 };

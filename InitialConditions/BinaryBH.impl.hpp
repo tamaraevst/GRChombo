@@ -39,7 +39,7 @@ void BinaryBH::compute(Cell current_cell)
             MayDay::Error("BinaryBH::Supplied initial lapse not supported.");
     }
 
-    m_driver.store_vars(vars);
+    m_driver.store_vars(vars, current_cell);
 }
 
 template <class data_t>

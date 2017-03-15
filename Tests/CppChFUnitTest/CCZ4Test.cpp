@@ -32,7 +32,9 @@
 
 int main()
 {
-//    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+#ifdef _OPENMP
+    std::cout << "#threads = " << omp_get_max_threads() << std::endl;
+#endif
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
