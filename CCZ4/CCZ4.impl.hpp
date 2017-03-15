@@ -59,18 +59,6 @@ CCZ4::compute(int ix, int iy, int iz)
     m_driver.store_vars(rhs);
 }
 
-/// Calculates the rhs for CCZ4
-/*
- * Calculates the right hand side for CCZ4 with slicing - n \alpha^m (K - 2\Theta)
- * and Gamma-Driver shift condition.
- * The variables (the template argument vars_t) must contain at least the members:
- * chi, h[i][j], Gamma[i], A[i][j], Theta, lapse and shift[i].
- *
- * @param vars The values of the current variables
- * @param d1 First derivative of the variables
- * @param d2 The second derivative the variables
- * @param advec The advection derivatives of the variables
-*/
 template <class data_t, template<typename> class vars_t>
 void
 CCZ4::rhs_equation(vars_t<data_t> &rhs,
