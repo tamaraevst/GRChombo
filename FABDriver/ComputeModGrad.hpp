@@ -6,6 +6,7 @@
 #include "tensor.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "Cell.hpp"
 
 #include <array>
 
@@ -22,7 +23,7 @@ public:
    {};
 
    template <class data_t>
-   void compute(int x, int y, int z)
+   void compute(Cell current_cell)
    {
        tensor<1,data_t> d1_arr[c_NUM];
        FOR1(idir) m_deriv.diff1(d1_arr, idir);

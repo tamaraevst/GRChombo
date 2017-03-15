@@ -9,6 +9,7 @@
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
 #include "VarsBase.hpp"
+#include "Cell.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
@@ -67,7 +68,7 @@ public:
     CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, int formulation = USE_CCZ4, double cosmological_constant = 0);
 
     template <class data_t>
-    void compute(int ix, int iy, int iz);
+    void compute(Cell current_cell);
 
 protected:
     template <class data_t, template<typename> class vars_t>

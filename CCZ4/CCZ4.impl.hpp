@@ -29,7 +29,7 @@ CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma
 
 template <class data_t>
 void
-CCZ4::compute(int ix, int iy, int iz)
+CCZ4::compute(Cell current_cell)
 {
     Vars<data_t> vars;
     m_driver.local_vars(vars);

@@ -8,6 +8,7 @@
 #include "CCZ4Geometry.hpp"
 #include "TensorAlgebra.hpp"
 #include "Interval.H"
+#include "Cell.hpp"
 
 #include <array>
 
@@ -32,15 +33,15 @@ public:
     };
 
     template <class data_t>
-    void compute(int ix, int iy, int iz)
+    void compute(Cell current_cell)
     {
         Vars<data_t> vars;
-        m_driver.local_vars(vars);
+        m_driver.local_vars(vars, current_cell);
 
         auto h_UU = TensorAlgebra::compute_inverse(vars.h);
         TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
-        m_driver.store_vars(vars, Interval(c_A11, c_A33));
+        m_driver.store_vars(vars, current_cell, Interval(c_A11, c_A33));
     }
 };
 

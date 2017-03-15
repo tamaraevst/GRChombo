@@ -14,10 +14,10 @@ Constraints::Constraints(const FABDriverBase& driver, double dx, double cosmolog
 
 template <class data_t>
 void
-Constraints::compute(int ix, int iy, int iz)
+Constraints::compute(Cell current_cell)
 {
     Vars<data_t> vars;
-    m_driver.local_vars(vars);
+    m_driver.local_vars(vars, current_cell);
 
     Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, idir);

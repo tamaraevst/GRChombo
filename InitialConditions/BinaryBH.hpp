@@ -7,6 +7,7 @@
 #include "Coordinates.hpp"
 #include "BoostedBH.hpp"
 #include "FABDriverBase.hpp"
+#include "Cell.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
@@ -38,7 +39,7 @@ public:
         m_initial_lapse (a_initial_lapse) {}
 
     template <class data_t>
-    void compute(int ix, int iy, int iz);
+    void compute(Cell current_cell);
 
 protected:
     template <class data_t>
