@@ -2,6 +2,7 @@
 #define COORDINATES_HPP_
 
 #include "simd.hpp"
+#include "Cell.hpp"
 
 template <class data_t>
 class Coordinates
@@ -27,6 +28,11 @@ public:
 #endif
 
         compute_coord<double>(z, iz, dx);
+    }
+
+    Coordinates(Cell current_cell, double dx)
+    {
+        Coordinates(current_cell.m_ix, current_cell.m_iy, current_cell.m_iz, dx);
     }
 
     template <typename t>

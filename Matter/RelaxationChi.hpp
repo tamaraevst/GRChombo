@@ -14,7 +14,7 @@
 #include "VarsBase.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
-
+#include "Cell.hpp"
 
 //!  Calculates RHS for relaxation of the conformal factor, for initial conditions
 /*!
@@ -50,9 +50,7 @@ class RelaxationChi {
 
   //! The compute member which calculates the RHS at each point in the box \sa rhs_equation()
   template <class data_t>
-  void compute(int ix,//!<the integer x coordinate of the current grid-cell.
-               int iy,//!<the integer y coordinate of the current grid-cell. 
-               int iz);//!<the integer z coordinate of the current grid-cell.
+  void compute(Cell current_cell);
 
  protected:
   typename matter_t::params_t m_matter_params;//!< The matter params

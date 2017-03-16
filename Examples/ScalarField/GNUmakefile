@@ -10,6 +10,6 @@ ebase := GRChombo_ScalarField
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../CCZ4Matter ../../InitialConditions/ScalarFields ../../FABDriver ../../GRChomboCore
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../Matter ../../InitialConditions/ScalarFields ../../FABDriver ../../GRChomboCore
 
 include $(CHOMBO_HOME)/mk/Make.test

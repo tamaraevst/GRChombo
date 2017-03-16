@@ -14,6 +14,7 @@
 #include "always_inline.hpp"
 #include "VarsBase.hpp"
 #include "Interval.H"
+#include "CellIndex.hpp"
 
 #include <array>
 
@@ -30,48 +31,31 @@ public: //TODO: these shouldn't be public ...
     const int *m_out_hi;
     int m_out_stride[3];
 
-protected:
-    int m_in_idx;
-    int m_out_idx;
-
-public:
-    //Some setters:
-    ALWAYS_INLINE
-    void set_idx(int ix, int iy, int iz);
-
-    //Some getters:
-    ALWAYS_INLINE
-    int get_in_idx() const;
-
-    ALWAYS_INLINE
-    int get_out_idx() const;
-
-    //The rest:
     template <class data_t>
     ALWAYS_INLINE
-    data_t local_vars(int icomp) const;
+    data_t local_vars(CellIndexIn in_idx, int icomp) const;
 
     template <class data_t>
     ALWAYS_INLINE
-    void local_vars(data_t& out, int icomp) const;
+    void local_vars(data_t& out, CellIndexIn in_idx, int icomp) const;
 
     template <class data_t>
-    void local_vars(data_t (&out)[c_NUM]) const;
+    void local_vars(data_t (&out)[c_NUM], CellIndexIn in_idx) const;
 
     template <class data_t>
-    void local_vars(VarsBase<data_t>& vars) const;
+    void local_vars(VarsBase<data_t>& vars, CellIndexIn in_idx) const;
 
     template <class data_t>
-    void store_vars(const data_t& value, const int icomp) const;
+    void store_vars(const data_t& value, CellIndexOut out_index, const int icomp) const;
 
     template <class data_t>
-    void store_vars(const std::array<data_t, c_NUM>& values) const;
+    void store_vars(const std::array<data_t, c_NUM>& values, CellIndexOut out_index) const;
 
     template <class data_t>
-    void store_vars(const VarsBase<data_t>& vars, const Interval a_comps) const;
+    void store_vars(const VarsBase<data_t>& vars, CellIndexOut out_index, const Interval a_comps) const;
 
     template <class data_t>
-    void store_vars(const VarsBase<data_t>& vars) const;
+    void store_vars(const VarsBase<data_t>& vars, CellIndexOut out_index) const;
 };
 
 #include "FABDriverBase.impl.hpp"

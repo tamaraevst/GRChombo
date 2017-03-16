@@ -8,13 +8,14 @@
 #include "BinaryBH.hpp"
 #include "CCZ4.hpp"
 #include "simd.hpp"
+#include "Cell.hpp"
 
 template <class data_t>
-void BinaryBH::compute(int ix, int iy, int iz)
+void BinaryBH::compute(Cell current_cell)
 {
     CCZ4::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
-    Coordinates<data_t> coords(ix,iy,iz,m_dx);
+    Coordinates<data_t> coords(current_cell,m_dx);
 
     vars.chi = compute_chi(coords);
 
@@ -38,7 +39,7 @@ void BinaryBH::compute(int ix, int iy, int iz)
             MayDay::Error("BinaryBH::Supplied initial lapse not supported.");
     }
 
-    m_driver.store_vars(vars);
+    m_driver.store_vars(vars, current_cell);
 }
 
 template <class data_t>
