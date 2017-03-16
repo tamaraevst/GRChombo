@@ -11,6 +11,7 @@
 #include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include "ScalarField.hpp"
+#include "Cell.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial matter config
 class ScalarBubble {
@@ -19,7 +20,7 @@ class ScalarBubble {
 
   //! Function to compute the value of all the initial vars on the grid
   template <class data_t>
-  void compute(int ix, int iy, int iz);
+  void compute(Cell current_cell);
 
  protected:
   const FABDriverBase& m_driver;

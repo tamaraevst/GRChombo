@@ -6,6 +6,7 @@
 #define FABDRIVER_IMPL_HPP_
 
 #include "simd.hpp"
+#include "Cell.hpp"
 
 template <class compute_t>
 template <typename... param_types>
@@ -25,15 +26,13 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
         //the compute class you are using allows for vectorisation (is templated over the data type)
         //To switch vectorisation off in a vectorised compute class pass disable_simd as last parameter to the
         //execute function. For a compute class without simd support pass no_simd_support().
-        set_idx(ix,iy,iz);
-        m_compute.template compute<simd<double> >(ix,iy,iz);
+        m_compute.template compute<simd<double> >( Cell(ix,iy,iz, m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
     // REMAINDER LOOP
 #pragma novector
     for (int ix = x_simd_max + simd<double>::simd_len; ix <= loop_hi_x; ++ix)
     {
-        set_idx(ix,iy,iz);
-        m_compute.template compute<double>(ix,iy,iz);
+        m_compute.template compute<double>( Cell(ix,iy,iz, m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
 }
 
@@ -45,8 +44,7 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
-        set_idx(ix,iy,iz);
-        m_compute.template compute<double>(ix,iy,iz);
+        m_compute.template compute<double>( Cell(ix,iy,iz, m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
 }
 
@@ -58,8 +56,7 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
-        set_idx(ix,iy,iz);
-        m_compute.compute(ix,iy,iz);
+        m_compute.compute( Cell(ix,iy,iz, m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
 }
 

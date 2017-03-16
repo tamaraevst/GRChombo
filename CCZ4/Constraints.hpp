@@ -9,6 +9,7 @@
 #include "GRUtils.hpp"
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "Cell.hpp"
 
 #include "CCZ4Geometry.hpp"
 
@@ -47,7 +48,7 @@ public:
     Constraints(const FABDriverBase& driver, double dx, double cosmological_constant = 0);
 
     template <class data_t>
-    void compute(int x, int y, int z);
+    void compute(Cell current_cell);
 
 protected:
     template <class data_t, template<typename> class vars_t>

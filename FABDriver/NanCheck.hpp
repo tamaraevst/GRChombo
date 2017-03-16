@@ -5,6 +5,7 @@
 
 #include "UserVariables.hpp"
 #include "FABDriverBase.hpp"
+#include "Cell.hpp"
 
 class NanCheck
 {
@@ -21,13 +22,13 @@ public:
    NanCheck(const FABDriverBase& driver, const std::string a_error_info, const double a_max_abs) :
        m_driver (driver), m_error_info (a_error_info), m_max_abs (a_max_abs) {}
 
-   void compute(int ix, int iy, int iz)
+   void compute( Cell current_cell )
    {
       bool stop = false;
       FORVARS(i)
       {
           double val;
-          m_driver.local_vars(val,i);
+          m_driver.local_vars(val,current_cell,i);
           if ( std::isnan(val) || abs(val) > m_max_abs) stop = true;
       }
       if (stop)
@@ -37,9 +38,9 @@ public:
               pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
               FORVARS(i)
               {
-                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars<double>(i) << endl;
+                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars<double>(current_cell, i) << endl;
               }
-              pout() << "ix: " << ix << " iy: " << iy << " iz: " << iz << endl;
+              pout() << "ix: " << current_cell.m_ix << " iy: " << current_cell.m_iy << " iz: " << current_cell.m_iz << endl;
           }
           MayDay::Error("Values have become nan.");
       }

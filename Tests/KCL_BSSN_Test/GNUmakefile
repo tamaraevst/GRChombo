@@ -6,10 +6,10 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally(e.g. export CHOMBO_HOME=... in bash)
 
-ebase := CCZ4Test
+ebase := BSSNTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../CCZ4Matter ../../FABDriver
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../Matter ../../FABDriver
 
 include $(CHOMBO_HOME)/mk/Make.test

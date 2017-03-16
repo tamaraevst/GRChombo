@@ -13,6 +13,7 @@
 #include "ScalarField.hpp"
 #include "VarsBase.hpp"
 #include "CCZ4.hpp"
+#include "Cell.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
 
@@ -50,9 +51,7 @@ public:
 
   //!  The compute member which calculates the RHS at each point in the box \sa matter_rhs_equation()
   template <class data_t>
-  void compute(int ix,//!<the integer x coordinate of the current grid-cell.
-               int iy,//!<the integer y coordinate of the current grid-cell. 
-               int iz);//!<the integer z coordinate of the current grid-cell.
+  void compute(Cell current_cell);
 
 protected:
   //! The function which adds in the EM Tensor terms to the CCZ4 rhs \sa compute()

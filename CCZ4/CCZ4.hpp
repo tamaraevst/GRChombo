@@ -9,6 +9,7 @@
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
 #include "VarsBase.hpp"
+#include "Cell.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
@@ -101,7 +102,7 @@ public:
       * need to call it directly.
       */
     template <class data_t>
-    void compute(int ix, int iy, int iz);
+    void compute(Cell current_cell);
 
 protected:
     /// Calculates the rhs for CCZ4

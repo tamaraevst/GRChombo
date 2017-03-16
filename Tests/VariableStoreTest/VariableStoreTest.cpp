@@ -1,6 +1,7 @@
 #include <iostream>
 #include "FABDriverBase.hpp"
 #include "VarsBase.hpp"
+#include "CellIndex.hpp"
 
 struct vars_t : VarsBase<double>
 {
@@ -30,7 +31,9 @@ int main()
     FABDriverBase driver;
     FORVARS(i) driver.m_out_ptr[i] = &out[i];
 
-    driver.store_vars(vars);
+    CellIndexOut out_index = 0;
+
+    driver.store_vars(vars, out_index);
 
     if (out[c_var] != 42.) failed=1;
     if (out[c_sym_var] != 84.) failed=2;
