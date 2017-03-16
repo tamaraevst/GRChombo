@@ -13,6 +13,7 @@
 #include "ScalarField.hpp"
 #include "Constraints.hpp"
 #include <array>
+#include "Cell.hpp"
 
 //!  Calculates the Hamiltonain and Momentum constraints with matter fields
 /*!
@@ -42,9 +43,7 @@ public:
 
   //! The compute member which calculates the constraints at each point in the box
   template <class data_t>
-  void compute(int ix,//!<the integer x coordinate of the current grid-cell.
-               int iy,//!<the integer y coordinate of the current grid-cell. 
-               int iz);//!<the integer z coordinate of the current grid-cell.
+  void compute(Cell current_cell);
 
 protected:
   const typename matter_t::params_t m_matter_params; //!< The matter params

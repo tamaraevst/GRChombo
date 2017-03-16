@@ -15,11 +15,11 @@ ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, ScalarField::params_t 
 
 // Compute the value of the initial vars on the grid
 template <class data_t>
-void ScalarBubble::compute(int ix, int iy, int iz) {
+void ScalarBubble::compute(Cell current_cell) {
 
   ScalarField::Vars<data_t> vars;
   vars.assign(0.); //Set only the non-zero components explicitly below
-  Coordinates<data_t> coords(ix,iy,iz,m_dx);
+  Coordinates<data_t> coords(current_cell,m_dx);
 
   vars.phi = compute_phi(coords);
   vars.Pi = 0;
@@ -30,7 +30,7 @@ void ScalarBubble::compute(int ix, int iy, int iz) {
   //Conformal metric is flat
   FOR1(i) vars.h[i][i] = 1.;
 
-  m_driver.store_vars(vars);
+  m_driver.store_vars(vars, current_cell);
 }
 
 // Compute the value of phi at the current point

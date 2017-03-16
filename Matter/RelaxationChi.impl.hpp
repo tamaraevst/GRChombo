@@ -22,30 +22,30 @@ RelaxationChi<matter_t>::RelaxationChi(
 
 template <class matter_t>
 template <class data_t>
-void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
+void RelaxationChi<matter_t>::compute(Cell current_cell) {
 
   //copy data from chombo gridpoint into local variables
   Vars<data_t> vars;
-  m_driver.local_vars(vars);
+  m_driver.local_vars(vars, current_cell);
 
   //work out first derivatives of variables on grid
   Vars< tensor<1, data_t> > d1;
-  FOR1(idir) m_deriv.diff1(d1, idir);
+  FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
   //work out second derivatives of variables on grid
   Vars< tensor<2,data_t> > d2;
   // Repeated derivatives
-  FOR1(idir) m_deriv.diff2(d2, idir);
+  FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
   // Mixed derivatives
   // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-  m_deriv.mixed_diff2(d2, 1, 0);
-  m_deriv.mixed_diff2(d2, 2, 0);
-  m_deriv.mixed_diff2(d2, 2, 1);
+  m_deriv.mixed_diff2(d2, current_cell, 1, 0);
+  m_deriv.mixed_diff2(d2, current_cell, 2, 0);
+  m_deriv.mixed_diff2(d2, current_cell, 2, 1);
 
   // Calculate advection components
   Vars<data_t> advec;
   advec.assign(0.);
-  FOR1(idir) m_deriv.add_advection(advec, vars.shift[idir], idir);
+  FOR1(idir) m_deriv.add_advection(advec, current_cell, vars.shift[idir], idir);
 
   //work out RHS including advection
   Vars<data_t> rhs;
@@ -56,7 +56,7 @@ void RelaxationChi<matter_t>::compute(int ix, int iy, int iz) {
   //    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idir);
 
   //Write the rhs into the output FArrayBox
-  m_driver.store_vars(rhs);
+  m_driver.store_vars(rhs, current_cell);
 }
 
 template <class matter_t>

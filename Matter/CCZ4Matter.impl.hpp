@@ -24,30 +24,30 @@ CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
 
 template <class matter_t>
 template <class data_t>
-void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
+void CCZ4Matter<matter_t>::compute(Cell current_cell)
 {
   //copy data from chombo gridpoint into local variables
   Vars<data_t> matter_vars;
-  m_driver.local_vars(matter_vars);
+  m_driver.local_vars(matter_vars, current_cell);
 
   //work out first derivatives of variables on grid
   Vars< tensor<1, data_t> > d1;
-  FOR1(idir) m_deriv.diff1(d1, idir);
+  FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
   // Repeated derivatives
   // Work out second derivatives of variables on grid
   Vars< tensor<2,data_t> > d2;
-  FOR1(idir) m_deriv.diff2(d2, idir);
+  FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
   // Mixed derivatives
   // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-  m_deriv.mixed_diff2(d2, 1, 0);
-  m_deriv.mixed_diff2(d2, 2, 0);
-  m_deriv.mixed_diff2(d2, 2, 1);
+  m_deriv.mixed_diff2(d2, current_cell, 1, 0);
+  m_deriv.mixed_diff2(d2, current_cell, 2, 0);
+  m_deriv.mixed_diff2(d2, current_cell, 2, 1);
 
   // Calculate advection terms
   Vars<data_t> advec;
   advec.assign(0.);
-  FOR1(idir) m_deriv.add_advection(advec, matter_vars.shift[idir], idir);
+  FOR1(idir) m_deriv.add_advection(advec, current_cell, matter_vars.shift[idir], idir);
 
   // Call CCZ4 RHS - work out RHS without matter, no dissipation
   Vars<data_t> matter_rhs;
@@ -61,10 +61,10 @@ void CCZ4Matter<matter_t>::compute(int ix, int iy, int iz)
   my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
   //Add dissipation to all terms
-  FOR1(idir) m_deriv.add_dissipation(matter_rhs, m_sigma, idir);
+  FOR1(idir) m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma, idir);
 
   //Write the rhs into the output FArrayBox
-  m_driver.store_vars(matter_rhs);
+  m_driver.store_vars(matter_rhs, current_cell);
 }
 
 // Function to add in EM Tensor matter terms to CCZ4 rhs
