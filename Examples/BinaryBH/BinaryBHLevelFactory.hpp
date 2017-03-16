@@ -1,5 +1,5 @@
-#ifndef CCZ4LEVELFACTORY_HPP_
-#define CCZ4LEVELFACTORY_HPP_
+#ifndef BINARYBHLEVELFACTORY_HPP_
+#define BINARYBHLEVELFACTORY_HPP_
 
 //General includes:
 #include "AMRLevelFactory.H"
@@ -21,7 +21,6 @@ public:
     ~BinaryBHLevelFactory();
 
 protected:
-    Real m_dt_multiplier;
     SimulationParameters m_p;
     ProfilingInfo* m_profilingInfo;
 };
@@ -44,4 +43,4 @@ BinaryBHLevelFactory::new_amrlevel() const
     binary_bh_level_ptr->initialDtMultiplier(m_p.dt_multiplier);
     return (static_cast <AMRLevel*> (binary_bh_level_ptr));
 }
-#endif /* CCZ4LEVELFACTORY_HPP_ */
+#endif /* BINARYBHLEVELFACTORY_HPP_ */
