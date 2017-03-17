@@ -13,7 +13,7 @@ class InterpolatorTestLevel : public GRAMRLevel
     virtual
     void initialData()
     {
-        m_state_new.setVal(5.);
+        m_state_new.setVal(42.);
     }
 
     virtual

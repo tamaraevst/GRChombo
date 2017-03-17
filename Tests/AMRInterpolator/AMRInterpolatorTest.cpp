@@ -92,8 +92,17 @@ main(int argc ,char* argv[])
 
     int status = 0;
 
-    if ( status == 0 ) pout() << "GRChombo finished." << endl ;
-    else pout() << "GRChombo failed with return code " << status << endl ;
+    //TODO: at the moment the data are a bit too trivial to test the Interpolator throughly
+    //Make the data more interesting
+    for (int iPhi=0; iPhi<num_points; ++iPhi)
+    {
+        status |= (abs(chi_ptr[0] - 42.) > 1e-10);
+        status |= (abs(phi_ptr[0] - 42.) > 1e-10);
+    }
+
+
+    if ( status == 0 ) pout() << "AMRInterpolator test passed." << endl ;
+    else pout() << "AMRInterpolator test failed with return code " << status << endl ;
 
     mainFinalize();
     return status;
