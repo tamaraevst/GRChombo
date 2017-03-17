@@ -1,8 +1,8 @@
 #ifndef _LAGRANGE_HPP_
 #define _LAGRANGE_HPP_
 
-#include "InterpSource.hpp"
 #include <utility>
+#include "InterpSource.hpp"
 
 template <int Order>
 class Lagrange

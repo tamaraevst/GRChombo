@@ -1,5 +1,5 @@
-#ifndef _INTERPSOURCE_HPP_
-#define _INTERPSOURCE_HPP_
+#ifndef _INTERPSOURCE_H_
+#define _INTERPSOURCE_H_
 
 #include "Array.hpp"
 
@@ -8,7 +8,7 @@ class InterpSource {
 public:
     virtual const LevelData<FArrayBox>& getLevelData() const = 0;
     virtual bool contains(const Array<double, CH_SPACEDIM>& point) const = 0;
-    virtual void refresh() = 0;
+    virtual void fillAllGhosts() = 0;
 };
 
-#endif /* _INTERPSOURCE_HPP_ */
+#endif /* _INTERPSOURCE_H_ */

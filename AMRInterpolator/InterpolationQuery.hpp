@@ -11,6 +11,8 @@ public:
     typedef map<Derivative, vector<out_t> > comp_map_t;
     typedef typename map<Derivative, vector<out_t> >::iterator iterator;
 
+    const int m_num_points;
+
 private:
 
     template <typename InterpAlgo> friend class AMRInterpolator;
@@ -19,8 +21,6 @@ private:
     comp_map_t m_comps;
 
 public:
-
-    const int m_num_points;
 
     InterpolationQuery(int num_points) :
         m_num_points (num_points),

@@ -96,7 +96,7 @@ template <int Order>
 bool
 Lagrange<Order>::Stencil::operator==(const Lagrange<Order>::Stencil& rhs) const
 {
-    return (rhs.m_width == m_width) && (rhs.m_deriv == m_deriv) && (rhs.m_point_offset == m_point_offset) && (dx == m_dx);
+    return (rhs.m_width == m_width) && (rhs.m_deriv == m_deriv) && (rhs.m_point_offset == m_point_offset) && (rhs.dx == m_dx);
 }
 
 template <int Order>
@@ -109,7 +109,7 @@ Lagrange<Order>::Stencil::isSameAs(int width, int deriv, double dx, double point
 /* STENCIL ACCESSOR */
 
 template <int Order>
-Lagrange<Order>::Stencil
+typename Lagrange<Order>::Stencil
 Lagrange<Order>::getStencil(int width, int deriv, double dx, double point_offset)
 {
     for (typename stencil_collection_t::iterator it = m_memoized_stencils.begin(); it != m_memoized_stencils.end(); ++it)

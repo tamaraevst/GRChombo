@@ -32,7 +32,7 @@ AMRInterpolator<InterpAlgo>::refresh()
 
     for (int level_idx = 0; level_idx < m_num_levels; ++level_idx) {
         AMRLevel& level = *levels[level_idx];
-        dynamic_cast<InterpSource&>(level).refresh();
+        dynamic_cast<InterpSource&>(level).fillAllGhosts();
     }
 }
 
@@ -494,8 +494,8 @@ AMRInterpolator<InterpAlgo>::calculateAnswers(InterpolationQuery& query)
 
     const Vector<AMRLevel*>& levels = const_cast<AMR&>(m_amr).getAMRLevels();
     const int num_levels = levels.size();
-    const int num_answers = m_mpi.totalAnswerCount();
     const int num_comps = query.numComps();
+    const int num_answers = m_mpi.totalAnswerCount();
 
     Array<double, CH_SPACEDIM> grid_coord;
     IntVect nearest;

@@ -3,10 +3,10 @@
 
 // Chombo includes
 
-#include "AMRLevel.hpp"
-#include "AMR.hpp"
+#include "AMRLevel.H"
+#include "AMR.H"
 
-#include "UsingNamespace.hpp"
+#include "UsingNamespace.H"
 
 // Our includes
 
@@ -14,8 +14,9 @@
 #include "InterpolationLayout.hpp"
 #include "InterpSource.hpp"
 #include "InterpolationAlgorithm.hpp"
-#include "MPIContext.hpp"
 #include "InterpolationQuery.hpp"
+
+#include "MPIContext.hpp"
 
 // End include
 
