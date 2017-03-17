@@ -31,9 +31,8 @@ public:
     }
 
     Coordinates(Cell current_cell, double dx)
-    {
-        Coordinates(current_cell.m_ix, current_cell.m_iy, current_cell.m_iz, dx);
-    }
+        : Coordinates(current_cell.m_ix, current_cell.m_iy, current_cell.m_iz, dx)
+    {}
 
     template <typename t>
     ALWAYS_INLINE
