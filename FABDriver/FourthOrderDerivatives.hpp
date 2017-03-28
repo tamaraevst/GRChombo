@@ -12,12 +12,17 @@ class FourthOrderDerivatives
 {
 public:
     const double m_dx;
+private:
+    const double m_one_over_dx;
+    const double m_one_over_dx2;
 protected:
     const FABDriverBase& m_driver;
 
 public:
     FourthOrderDerivatives(double dx, const FABDriverBase& driver) :
         m_dx (dx),
+        m_one_over_dx (1/dx),
+        m_one_over_dx2 (1/(dx*dx)),
         m_driver (driver)
     {}
 
@@ -36,7 +41,7 @@ public:
         return (    weight_far  * in[idx - 2*stride]
                   - weight_near * in[idx -   stride]
                   + weight_near * in[idx +   stride]
-                  - weight_far  * in[idx + 2*stride]) / m_dx;
+                  - weight_far  * in[idx + 2*stride])*m_one_over_dx;
     }
 
     //Writes directly into the vars object - use this wherever possible
@@ -77,7 +82,7 @@ public:
                       + weight_near  * in[idx - stride]
                       - weight_local * in[idx]
                       + weight_near  * in[idx + stride]
-                      - weight_far   * in[idx + 2*stride]) / (m_dx*m_dx);
+                      - weight_far   * in[idx + 2*stride]) * m_one_over_dx2;
     }
 
     //Writes 2nd deriv directly into the vars object - use this wherever possible
@@ -132,7 +137,7 @@ public:
                       - weight_far_far   * in[idx + 2*stride1 - 2*stride2]
                       + weight_near_far  * in[idx + 2*stride1 - stride2]
                       - weight_near_far  * in[idx + 2*stride1 + stride2]
-                      + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) / (m_dx*m_dx);
+                      + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) * m_one_over_dx2;
     }
 
     template <class data_t>
@@ -185,14 +190,14 @@ protected: //Let's keep this protected ... we may want to change the advection c
                           + weight_1 * in_centre
                           + weight_2 * in_right
                           + weight_3 * in[idx + 2*stride]
-                          + weight_4 * in[idx + 3*stride]) / m_dx;
+                          + weight_4 * in[idx + 3*stride]) * m_one_over_dx;
 
         data_t downwind;
         downwind = vec_comp * (- weight_4 * in[idx - 3*stride]
                           - weight_3 * in[idx - 2*stride]
                           - weight_2 * in_left
                           - weight_1 * in_centre
-                          - weight_0 * in_right) / m_dx;
+                          - weight_0 * in_right) * m_one_over_dx;
 
         return simd_conditional(shift_positive, upwind , downwind);
     }
@@ -239,7 +244,7 @@ public:
                  - weight_local * in[idx]
                  + weight_near  * in[idx + stride]
                  - weight_far   * in[idx + 2*stride]
-                 + weight_vfar  * in[idx + 3*stride]) / m_dx;
+                 + weight_vfar  * in[idx + 3*stride]) * m_one_over_dx;
     }
 
     template <class data_t>
