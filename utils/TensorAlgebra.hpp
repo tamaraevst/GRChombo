@@ -12,18 +12,18 @@ namespace TensorAlgebra
     {
         //FIXME: this function currently assumes a symmetic tensor ... change this?
         data_t deth = matrix[0][0]*matrix[1][1]*matrix[2][2] + 2*matrix[0][1]*matrix[0][2]*matrix[1][2] - matrix[0][0]*matrix[1][2]*matrix[1][2] - matrix[1][1]*matrix[0][2]*matrix[0][2] - matrix[2][2]*matrix[0][1]*matrix[0][1];
+        data_t deth_inverse = 1./deth;
         tensor<2, data_t> h_UU;
-        {
-            h_UU[0][0] = (matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[1][2]) / deth;
-            h_UU[0][1] = (matrix[0][2]*matrix[1][2] - matrix[0][1]*matrix[2][2]) / deth;
-            h_UU[0][2] = (matrix[0][1]*matrix[1][2] - matrix[0][2]*matrix[1][1]) / deth;
-            h_UU[1][1] = (matrix[0][0]*matrix[2][2] - matrix[0][2]*matrix[0][2]) / deth;
-            h_UU[1][2] = (matrix[0][1]*matrix[0][2] - matrix[0][0]*matrix[1][2]) / deth;
-            h_UU[2][2] = (matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[0][1]) / deth;
-            h_UU[1][0] = h_UU[0][1];
-            h_UU[2][0] = h_UU[0][2];
-            h_UU[2][1] = h_UU[1][2];
-        }
+        h_UU[0][0] = (matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[1][2]) * deth_inverse;
+        h_UU[0][1] = (matrix[0][2]*matrix[1][2] - matrix[0][1]*matrix[2][2]) * deth_inverse;
+        h_UU[0][2] = (matrix[0][1]*matrix[1][2] - matrix[0][2]*matrix[1][1]) * deth_inverse;
+        h_UU[1][1] = (matrix[0][0]*matrix[2][2] - matrix[0][2]*matrix[0][2]) * deth_inverse;
+        h_UU[1][2] = (matrix[0][1]*matrix[0][2] - matrix[0][0]*matrix[1][2]) * deth_inverse;
+        h_UU[2][2] = (matrix[0][0]*matrix[1][1] - matrix[0][1]*matrix[0][1]) * deth_inverse;
+        h_UU[1][0] = h_UU[0][1];
+        h_UU[2][0] = h_UU[0][2];
+        h_UU[2][1] = h_UU[1][2];
+
         return h_UU;
     }
 
@@ -90,9 +90,10 @@ namespace TensorAlgebra
     make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
     {
         auto trace = compute_trace(tensor_LL, inverse_metric);
+        double one_over_gr_spacedim = 1./( (double) GR_SPACEDIM );
         FOR2(i,j)
         {
-            tensor_LL[i][j] -= 1./( (double) GR_SPACEDIM) * metric[i][j] * trace;
+            tensor_LL[i][j] -= one_over_gr_spacedim * metric[i][j] * trace;
         }
     }
 
