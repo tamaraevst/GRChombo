@@ -106,7 +106,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
         covd2lapse[k][l] = vars.chi*covdtilde2lapse[k][l] + 0.5*(d1.lapse[k]*d1.chi[l] + d1.chi[k]*d1.lapse[l] - vars.h[k][l]*dlapse_dot_dchi);
     }
 
-    data_t tr_covd2lapse = -(GR_SPACEDIM/2.0)*dlapse_dot_dchi;
+    data_t tr_covd2lapse = -0.5*GR_SPACEDIM*dlapse_dot_dchi;
     FOR1(i)
     {
         tr_covd2lapse -= vars.chi*chris.contracted[i]*d1.lapse[i];
@@ -121,10 +121,10 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 
     //A^{ij} A_{ij}. - Note the abuse of the compute trace function.
     data_t tr_A2    = compute_trace(vars.A, A_UU);
-    rhs.chi = advec.chi + (2.0/GR_SPACEDIM)*vars.chi*(vars.lapse*vars.K - divshift);
+    rhs.chi = advec.chi + 2*ONE_OVER_GR_SPACEDIM*vars.chi*(vars.lapse*vars.K - divshift);
     FOR2(i,j)
     {
-        rhs.h[i][j] = advec.h[i][j] - 2.0*vars.lapse*vars.A[i][j] - (2.0/GR_SPACEDIM)*vars.h[i][j]*divshift;
+        rhs.h[i][j] = advec.h[i][j] - 2*vars.lapse*vars.A[i][j] - 2*ONE_OVER_GR_SPACEDIM*vars.h[i][j]*divshift;
         FOR1(k)
         {
             rhs.h[i][j] += vars.h[k][i]*d1.shift[k][j] + vars.h[k][j]*d1.shift[k][i];
@@ -140,7 +140,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 
     FOR2(i,j)
     {
-        rhs.A[i][j] = advec.A[i][j] + Adot_TF[i][j] + vars.A[i][j]*(vars.lapse*(vars.K - 2*vars.Theta) - (2.0/GR_SPACEDIM)*divshift);
+        rhs.A[i][j] = advec.A[i][j] + Adot_TF[i][j] + vars.A[i][j]*(vars.lapse*(vars.K - 2*vars.Theta) - 2*ONE_OVER_GR_SPACEDIM*divshift);
         FOR1(k)
         {
             rhs.A[i][j] += vars.A[k][i]*d1.shift[k][j] + vars.A[k][j]*d1.shift[k][i];
@@ -162,11 +162,11 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
     {
         rhs.Theta = 0; // ensure the Theta of CCZ4 remains at zero
         // Use hamiltonian constraint to remove ricci.scalar for BSSN update
-        rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
+        rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K*ONE_OVER_GR_SPACEDIM) - tr_covd2lapse;
     }
     else
     {
-        rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*vars.K*vars.K
+        rhs.Theta = advec.Theta + 0.5*vars.lapse*(ricci.scalar - tr_A2 + ((GR_SPACEDIM-1.0)*ONE_OVER_GR_SPACEDIM)*vars.K*vars.K
                       - 2*vars.Theta*vars.K) - 0.5*vars.Theta*kappa1_lapse*((GR_SPACEDIM+1) + m_params.kappa2*(GR_SPACEDIM-1)) - Z_dot_d1lapse;
 
         rhs.Theta += - vars.lapse * m_cosmological_constant;
@@ -176,19 +176,19 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
     tensor<1, data_t> Gammadot;
     FOR1(i)
     {
-        Gammadot[i] = (2.0/GR_SPACEDIM)*(divshift*(chris.contracted[i] + 2*m_params.kappa3*Z_over_chi[i]) - 2*vars.lapse*vars.K*Z_over_chi[i]) - 2*kappa1_lapse*Z_over_chi[i];
+        Gammadot[i] = 2*ONE_OVER_GR_SPACEDIM*(divshift*(chris.contracted[i] + 2*m_params.kappa3*Z_over_chi[i]) - 2*vars.lapse*vars.K*Z_over_chi[i]) - 2*kappa1_lapse*Z_over_chi[i];
         FOR1(j)
         {
             Gammadot[i] += 2*h_UU[i][j]*(vars.lapse*d1.Theta[j] - vars.Theta*d1.lapse[j])
                 - 2*A_UU[i][j]*d1.lapse[j]
-                - vars.lapse*((2*(GR_SPACEDIM-1.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d1.K[j] + GR_SPACEDIM*A_UU[i][j]*d1.chi[j]/vars.chi)
+                - vars.lapse*( 2*(GR_SPACEDIM-1.0)*ONE_OVER_GR_SPACEDIM*h_UU[i][j]*d1.K[j] + GR_SPACEDIM*A_UU[i][j]*d1.chi[j]/vars.chi )
                 - (chris.contracted[j] + 2*m_params.kappa3*Z_over_chi[j])*d1.shift[i][j];
 
             FOR1(k)
             {
                 Gammadot[i] += 2*vars.lapse*chris.ULL[i][j][k]*A_UU[j][k]
                     + h_UU[j][k]*d2.shift[i][j][k]
-                    + ((GR_SPACEDIM-2.0)/(double) GR_SPACEDIM)*h_UU[i][j]*d2.shift[k][j][k];
+                    + (GR_SPACEDIM-2.0)*ONE_OVER_GR_SPACEDIM*h_UU[i][j]*d2.shift[k][j][k];
             }
         }
     }
