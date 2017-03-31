@@ -40,7 +40,7 @@ public:
               {
                   pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars<double>(current_cell, i) << endl;
               }
-              pout() << "ix: " << current_cell.m_ix << " iy: " << current_cell.m_iy << " iz: " << current_cell.m_iz << endl;
+              pout() << "Integer coordinates: " << current_cell.get_int_vect() << endl;
           }
           MayDay::Error("Values have become nan.");
       }
