@@ -2,7 +2,6 @@
 #define COORDINATES_HPP_
 
 #include "simd.hpp"
-#include "Cell.hpp"
 
 template <class data_t>
 class Coordinates
@@ -12,27 +11,23 @@ public:
     double y;
     double z;
 
-    Coordinates(int ix, int iy, int iz, double dx)
+    Coordinates(IntVect integer_coords, double dx)
     {
-        compute_coord<data_t>(x, ix, dx);
+        compute_coord<data_t>(x, integer_coords[0], dx);
 
         //The below code allows for 2D Cartoon reduction:
-#if IDX_SPACEDIM == CH_SPACEDIM
-        compute_coord<double>(y, iy, dx);
-#elif IDX_SPACEDIM == CH_SPACEDIM + 1
+#if IDX_SPACEDIM == CH_SPACEDIM && CH_SPACEDIM == 3
+        compute_coord<double>(y, integer_coords[1], dx);
+        compute_coord<double>(z, integer_coords[2], dx);
+#elif IDX_SPACEDIM == CH_SPACEDIM + 1 && CH_SPACEDIM == 2
         y = 0;
+        compute_coord<double>(z, integer_coords[1], dx);
 #else
 #ifdef CH_SPACEDIM
 #error compute_coord has not got your dimension combination implemented.
 #endif
 #endif
-
-        compute_coord<double>(z, iz, dx);
     }
-
-    Coordinates(Cell current_cell, double dx)
-        : Coordinates(current_cell.m_ix, current_cell.m_iy, current_cell.m_iz, dx)
-    {}
 
     template <typename t>
     ALWAYS_INLINE
