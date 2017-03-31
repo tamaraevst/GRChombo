@@ -90,9 +90,10 @@ namespace TensorAlgebra
     make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
     {
         auto trace = compute_trace(tensor_LL, inverse_metric);
+        double one_over_gr_spacedim = 1./( (double) GR_SPACEDIM );
         FOR2(i,j)
         {
-            tensor_LL[i][j] -= ONE_OVER_GR_SPACEDIM * metric[i][j] * trace;
+            tensor_LL[i][j] -= one_over_gr_spacedim * metric[i][j] * trace;
         }
     }
 
