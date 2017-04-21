@@ -2,7 +2,6 @@
 #define COORDINATES_HPP_
 
 #include "simd.hpp"
-#include "Cell.hpp"
 
 template <class data_t>
 class Coordinates
@@ -30,26 +29,28 @@ public:
 #endif
     }
 
+    template <typename t>
     ALWAYS_INLINE
     static
     void
-    compute_coord(double& out, int position, double dx)
+    compute_coord(t& out, int position, double dx)
     {
         out = (position+0.5)*dx;
     }
 
     //MK: I passed 'out' as argument because overloading by return type doesn't work
+    template <typename t>
     ALWAYS_INLINE
     static
-    void
-    compute_coord(simd<double>& out, int position, double dx)
+    typename std::enable_if<(simd_traits<double>::simd_len > 1), void >::type
+    compute_coord(simd<t>& out, int position, double dx)
     {
-        double out_arr[simd_traits<double>::simd_len];
-        for (int i = 0; i < simd_traits<double>::simd_len; ++i)
+        t out_arr[simd_traits<t>::simd_len];
+        for (int i = 0; i < simd_traits<t>::simd_len; ++i)
         {
             out_arr[i] = (position+i+0.5)*dx;
         }
-        out = simd<double>::load(out_arr);
+        out = simd<t>::load(out_arr);
     }
 
     data_t
