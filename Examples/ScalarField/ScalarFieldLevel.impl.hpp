@@ -101,6 +101,13 @@ void ScalarFieldLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData&
     FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
+// Specify if you want any plot files to be written, with which vars
+void ScalarFieldLevel::specificWritePlotHeader(int &num_states, std::vector<int> &plot_states) const
+{
+    num_states = 2;
+    plot_states = {c_chi, c_K};
+}
+
 // Tell Chombo when to mark cells for regridding
 // override virtual tagcells function for tagging based on K and phi gradients
 // TODO KClough: It is a bit ugly to have all this here, may want to create a hook

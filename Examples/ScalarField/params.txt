@@ -1,7 +1,8 @@
 # Last edited K Clough 16.10.16
 
 verbosity = 0
-chk_prefix = /scratch/kclough/outMatterSF_
+chk_prefix = outMatterSF_
+plot_prefix = outMatterSFp_
 #restart_file = outMatterSF_000060.3d.hdf5
 
 # Set up grid spacings and regrid params
@@ -45,7 +46,8 @@ block_factor = 16
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
-checkpoint_interval = 1
+checkpoint_interval = 10
+plot_interval = 1
 dt_multiplier = 0.25
 stop_time = 5.0
 max_steps = 10000000
