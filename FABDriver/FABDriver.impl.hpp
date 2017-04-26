@@ -7,6 +7,7 @@
 
 #include "simd.hpp"
 #include "Cell.hpp"
+#include "DebuggingTools.hpp"
 
 template <class compute_t>
 template <typename... param_types>
@@ -17,6 +18,9 @@ ALWAYS_INLINE
 void
 FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
+#ifdef EQUATION_DEBUG_MODE /*TODO: MK: think of a nicer way. This macro jungle is a bit too much.*/
+    innermost_loop(iy, iz, loop_lo_x, loop_hi_x, disable_simd()); //In equation debug mode never use simd
+#else
     int x_simd_max = loop_lo_x + simd<double>::simd_len * (((loop_hi_x - loop_lo_x + 1) / simd<double>::simd_len) - 1);
     // SIMD LOOP
 #pragma novector
@@ -34,6 +38,7 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
     {
         m_compute.template compute<double>( Cell(IntVect(ix,iy,iz), m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
+#endif
 }
 
 template <class compute_t>
@@ -44,6 +49,9 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
+#ifdef EQUATION_DEBUG_MODE
+        EquationDebugging::set_global_cell_coordinates(IntVect(ix,iy,iz));
+#endif
         m_compute.template compute<double>( Cell(IntVect(ix,iy,iz), m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
 }
@@ -56,6 +64,9 @@ FABDriver<compute_t>::innermost_loop(const int iy, const int iz, const int loop_
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
+#ifdef EQUATION_DEBUG_MODE
+        EquationDebugging::set_global_cell_coordinates(IntVect(ix,iy,iz));
+#endif
         m_compute.compute( Cell(IntVect(ix,iy,iz), m_in_lo, m_out_lo, m_in_stride, m_out_stride) );
     }
 }
