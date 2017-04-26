@@ -57,7 +57,7 @@ public:
     get_radius(IntVect center)
     {
         //Note that this is not currently dimension independent
-	data_t r = sqrt(  pow(x - center[0],2)
+        data_t r = sqrt(  pow(x - center[0],2)
                         + pow(y - center[1],2)
                         + pow(z - center[2],2));
 
@@ -78,8 +78,8 @@ public:
         compute_coord(xx, integer_coords[0], dx);
         compute_coord(yy, integer_coords[1], dx);
         compute_coord(zz, integer_coords[2], dx);
- 
-	data_t r = sqrt(  pow(xx - center[0],2)
+
+        data_t r = sqrt(  pow(xx - center[0],2)
                         + pow(yy - center[1],2)
                         + pow(zz - center[2],2));
 

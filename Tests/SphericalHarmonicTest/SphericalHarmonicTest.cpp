@@ -3,32 +3,12 @@
 #endif
 
 #include "FArrayBox.H"
-#include <iostream>
-#include <iomanip>
 #include <sys/time.h>
 #include "FABDriver.hpp"
 #include "ScalarField.hpp"
 #include "HarmonicTest.hpp"
 #include "UserVariables.hpp"
 #include "DebuggingTools.hpp"
-
-#define CHF_FRAn(a, n, c) \
-    a.dataPtr(n), \
-    D_DECL6(&a.loVect()[0],  \
-            &a.loVect()[1],  \
-            &a.loVect()[2],  \
-            &a.loVect()[3],  \
-            &a.loVect()[4],  \
-            &a.loVect()[5]), \
-    D_DECL6(&a.hiVect()[0],  \
-            &a.hiVect()[1],  \
-            &a.hiVect()[2],  \
-            &a.hiVect()[3],  \
-            &a.hiVect()[4],  \
-            &a.hiVect()[5]), \
-    &c
-
-#define CHF_CONST_FRAn(a, n, c) CHF_FRAn(a ,n, c)
 
 int main()
 {
@@ -48,23 +28,23 @@ int main()
     const double dx = length / (N_GRID);
     const double center = length/2.0;
 
-    for (int zz = -3; zz < N_GRID+3; ++zz)
+    for (int iz = -3; iz < N_GRID+3; ++iz)
     {
-        const double z = (zz+0.5)*dx - center;
-        for (int yy = -3; yy < N_GRID+3; ++yy)
+        const double z = (iz+0.5)*dx - center;
+        for (int iy = -3; iy < N_GRID+3; ++iy)
         {
-            const double y = (yy+0.5)*dx - center;
-            for (int xx = -3; xx < N_GRID+3; ++xx)
+            const double y = (iy+0.5)*dx - center;
+            for (int ix = -3; ix < N_GRID+3; ++ix)
             {
-                const double x = (xx+0.5)*dx - center;
+                const double x = (ix+0.5)*dx - center;
                 double r = sqrt(x*x + y*y + z*z);
                 double rho = sqrt(x*x + y*y);
-                const IntVect iv(xx,yy,zz);
-                if (r < 1e-6) 
+                const IntVect iv(ix,iy,iz);
+                if (r < 1e-6)
                 {
                     r = 1e-6;
                 }
-                if (rho < 1e-6) 
+                if (rho < 1e-6)
                 {
                     rho = 1e-6;
                 }
@@ -74,16 +54,10 @@ int main()
                 double harmonic;
                 harmonic = sqrt(5.0/16.0/M_PI)*x*(2*z*z - z*r - r*r)/rho/r/r;
                 in_fab(iv, c_phi) = harmonic/r;
-//                if ((xx==30) && (yy==30) && (zz==30))
-//                {
-//                    DEBUG_OUT(harmonic);
-//                }
             }
         }
     }
 
-    //Fill in the Parameters
-//    std::vector<double> center_vector;
     IntVect center_vector(center, center, center);
 
     //Test the spherical harmonics across grid
@@ -100,5 +74,4 @@ int main()
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX Actual Value = " << max_act << std::endl;
         }
     }
-
 }

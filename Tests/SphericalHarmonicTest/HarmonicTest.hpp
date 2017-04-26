@@ -6,8 +6,6 @@
 #include "tensor.hpp"
 #include "Coordinates.hpp"
 #include "FABDriverBase.hpp"
-#include <vector>
-#include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include "Cell.hpp"
 
@@ -29,6 +27,6 @@ class HarmonicTest {
 
 };
 
-#include "HarmonicTest.impl.hpp" 
+#include "HarmonicTest.impl.hpp"
 
 #endif /* HARMONICTEST_HPP_ */
