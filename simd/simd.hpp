@@ -171,6 +171,24 @@ simd<t> atan2(const t1 b, const simd<t>& a)\
 #include "x64/x64.hpp"
 #endif
 
+template <typename t>
+ALWAYS_INLINE
+ostream& operator<< (ostream& os, const simd<t>& in_simd)
+{
+    t in_arr[simd_traits<t>::simd_len];
+    simd<t>::store(in_arr, in_simd);
+
+    os << "( ";
+    for (int i = 0; i < simd_traits<t>::simd_len; ++i)
+    {
+        os << in_simd[i] << " ";
+    }
+    os << ")";
+    if (os.fail())
+        MayDay::Error("operator<<(ostream&,simd<t>&) failed");
+    return os;
+}
+
 #include "simdify.hpp"
 
 #endif /* SIMD_HPP_ */
