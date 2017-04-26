@@ -163,6 +163,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
         rhs.Theta = 0; // ensure the Theta of CCZ4 remains at zero
         // Use hamiltonian constraint to remove ricci.scalar for BSSN update
         rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
+        rhs.K += - 2*vars.lapse*m_cosmological_constant/(GR_SPACEDIM-1.);
     }
     else
     {
@@ -171,6 +172,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 
         rhs.Theta += - vars.lapse * m_cosmological_constant;
         rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+        rhs.K += - 2*vars.lapse * GR_SPACEDIM/(GR_SPACEDIM-1.) * m_cosmological_constant;
     }
 
     tensor<1, data_t> Gammadot;

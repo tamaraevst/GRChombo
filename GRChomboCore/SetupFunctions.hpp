@@ -186,6 +186,20 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
         amr.checkpointPrefix(prefix);
     }
 
+    if (pp.contains("plot_interval"))
+    {
+        int plot_interval;
+        pp.get("plot_interval", plot_interval);
+        amr.plotInterval(plot_interval);
+    }
+
+    if (pp.contains("plot_prefix"))
+    {
+        std::string prefix;
+        pp.query("plot_prefix",prefix);
+        amr.plotPrefix(prefix);
+    }
+
     int verbosity;
     pp.get("verbosity", verbosity);
     amr.verbosity(verbosity);

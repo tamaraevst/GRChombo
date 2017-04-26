@@ -137,10 +137,15 @@ define_simd_overload(log)
 define_simd_overload(log2)
 define_simd_overload(sqrt)
 define_binary_simd_overload(pow)
+define_simd_overload(abs)
 define_simd_overload(tanh)
 define_simd_overload(tan)
 define_simd_overload(sinh)
 define_simd_overload(cosh)
+define_simd_overload(acos)
+define_simd_overload(asin)
+define_simd_overload(atan)
+define_binary_simd_overload(atan2)
 
 /* Extra pow overloads */
 template <typename t, typename t1> 
@@ -149,6 +154,15 @@ simd<t> pow(const simd<t>& a, const t1 b)\
 {
    simd<t> simd_b(b);
    return pow(a,simd_b);\
+}
+
+/* Extra atan2 overloads */
+template <typename t, typename t1> 
+ALWAYS_INLINE 
+simd<t> atan2(const t1 b, const simd<t>& a)\
+{
+   simd<t> simd_b(b);
+   return atan2(simd_b, a);\
 }
 
 #include "simd_base.hpp"
