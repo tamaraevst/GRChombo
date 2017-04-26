@@ -102,9 +102,8 @@ void ScalarFieldLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData&
 }
 
 // Specify if you want any plot files to be written, with which vars
-void ScalarFieldLevel::specificWritePlotHeader(int &num_states, std::vector<int> &plot_states) const
+void ScalarFieldLevel::specificWritePlotHeader(std::vector<int> &plot_states) const
 {
-    num_states = 2;
     plot_states = {c_chi, c_K};
 }
 

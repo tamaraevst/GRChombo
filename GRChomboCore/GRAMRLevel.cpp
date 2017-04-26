@@ -564,12 +564,12 @@ GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
     if (m_verbosity) pout() << "GRAMRLevel::writePlotLevel" << endl;
 
     // number and index of states to print
-    int num_states = 0;
     std::vector<int> plot_states;
     // to be specified in specific Level class
-    specificWritePlotHeader(num_states, plot_states);
+    specificWritePlotHeader(plot_states);
+    int num_states = plot_states.size();
 
-    if ( num_states > 0 ) 
+    if ( num_states > 0 )
     {
         // Setup the level string
         char levelStr[20];
@@ -613,7 +613,7 @@ GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
         }
 
         plot_data.exchange(plot_data.interval());
-      
+
         // Write the data for this level
         write (a_handle, levelGrids);
         write (a_handle, plot_data, "data");
@@ -626,12 +626,12 @@ GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
     if (m_verbosity) pout() << "GRAMRLevel::writePlotHeader" << endl;
 
     // number and index of states to print
-    int num_states = 0;
     std::vector<int> plot_states;
     // to be specified in specific Level class
-    specificWritePlotHeader(num_states, plot_states);
+    specificWritePlotHeader(plot_states);
+    int num_states = plot_states.size();
 
-    if ( num_states > 0 ) 
+    if ( num_states > 0 )
     {
         // Setup the number of components
         HDF5HeaderData header;
@@ -649,6 +649,10 @@ GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
         header.writeToFile(a_handle);
 
         if (m_verbosity) pout() << header << endl;
+    }
+    else
+    {
+        MayDay::Warning("GRAMRLevel::writePlotLevel: A plot interval is provided but no components are selected for plotting. Plot files will be empty.");
     }
 }
 #endif /*ifdef CH_USE_HDF5*/

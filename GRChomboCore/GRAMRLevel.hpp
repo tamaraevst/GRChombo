@@ -139,7 +139,7 @@ public:
 
     // Specify which variables to write at plot intervals
     virtual
-    void specificWritePlotHeader(int &num_states, std::vector<int> &plot_states) const {};
+    void specificWritePlotHeader(std::vector<int> &plot_states) const {};
 #endif
 
     virtual
