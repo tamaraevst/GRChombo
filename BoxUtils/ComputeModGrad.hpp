@@ -4,7 +4,6 @@
 
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Cell.hpp"
 
@@ -13,20 +12,18 @@
 class ComputeModGrad
 {
 protected:
-   const FABDriverBase& m_driver;
    const FourthOrderDerivatives m_deriv;
 
 public:
-   ComputeModGrad(const FABDriverBase& driver, double dx) :
-      m_driver (driver),
-      m_deriv (dx, m_driver)
+   ComputeModGrad(double dx) :
+      m_deriv (dx)
    {};
 
    template <class data_t>
    void compute(Cell current_cell)
    {
        tensor<1,data_t> d1_arr[c_NUM];
-       FOR1(idir) m_deriv.diff1(d1_arr, current_cell, idir);
+       FOR1(idir) m_deriv.diff1(d1_arr, current_cell, current_cell.get_box_pointers(), idir);
 
        std::array<data_t, c_NUM> mod_d1_arr = {0.};
        FORVARS(ivar)
@@ -39,7 +36,7 @@ public:
        }
 
        // Write back into the flattened Chombo box
-       m_driver.store_vars(mod_d1_arr, current_cell);
+       current_cell.store_vars(mod_d1_arr);
    }
 
 };
