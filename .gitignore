@@ -13,3 +13,5 @@ log*
 *.out
 *.hdf5
 *.dSYM
+
+Doxygen/html
