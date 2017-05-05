@@ -16,6 +16,7 @@
 #define DEBUG_SHOW(VAR) pout() << #VAR << ": " << VAR << " "
 #define DEBUG_FILE pout() << __FILENAME__ << ": "
 #define DEBUG_END pout() << std::endl
+#define DEBUG_DOUBLE_PRECISION pout() << std::setprecision(16)
 
 ///The macros DEBUG_OUT make debugging quicker and allow easy printing of a variable.
 #define DEBUG_OUT(VAR) DEBUG_FILE; DEBUG_SHOW(VAR); DEBUG_END
