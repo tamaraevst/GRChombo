@@ -38,7 +38,11 @@ public:
               pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
               FORVARS(i)
               {
-                  pout() << UserVariables::variable_names[i] << ": " << m_driver.local_vars<double>(current_cell, i) << endl;
+                  double val = m_driver.local_vars<double>(current_cell, i);
+                  if ( std::isnan(val) || abs(val) > m_max_abs) pout() << "---> ";
+                  else if ( abs(val) > m_max_abs/1e2 ) pout() << "   > ";
+                  else pout() << "     ";
+                  pout() << UserVariables::variable_names[i] << ": " << val << endl;
               }
               pout() << "Integer coordinates: " << current_cell.get_int_vect() << endl;
           }
