@@ -12,6 +12,7 @@
 #include "NanCheck.hpp"
 #include "Constraints.hpp"
 #include "CCZ4.hpp"
+#include "ComputeClassPack.hpp"
 
 //Initial data
 #include "BinaryBH.hpp"
@@ -19,11 +20,10 @@
 void BinaryBHLevel::specificAdvance()
 {
     //Enforce the trace free A_ij condition and positive chi and alpha
-    BoxLoops::loop(std::make_tuple(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Check for nan's
-    //if (m_p.nan_check) BoxLoops::loop<NanCheck>().execute(m_state_new, m_state_new, SKIP_GHOST_CELLS, no_simd_support());
-#warning no_simd_support currently doesn't work! TODO: fix this!
+    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, no_simd_support());
 }
 
 void BinaryBHLevel::initialData()
@@ -48,7 +48,7 @@ void BinaryBHLevel::preCheckpointLevel()
 void BinaryBHLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
 {
     //Enforce positive chi and alpha and trace free A
-    BoxLoops::loop(std::make_tuple(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
 
     //Calculate CCZ4 right hand side
     BoxLoops::loop(CCZ4(m_p.ccz4Params, m_dx, m_p.sigma), a_soln, a_rhs, SKIP_GHOST_CELLS);

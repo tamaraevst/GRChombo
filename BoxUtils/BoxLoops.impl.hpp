@@ -13,7 +13,7 @@
 template <typename... compute_ts>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(std::tuple<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
+BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
 #ifdef EQUATION_DEBUG_MODE /*TODO: MK: think of a nicer way. This macro jungle is a bit too much.*/
@@ -28,23 +28,22 @@ BoxLoops::innermost_loop(std::tuple<compute_ts...> compute_class_pack, const Box
         //the compute class you are using allows for vectorisation (is templated over the data type)
         //To switch vectorisation off in a vectorised compute class pass disable_simd as last parameter to the
         //loop function. For a compute class without simd support pass no_simd_support().
-        call_compute(compute_class_pack, Cell(IntVect(ix,iy,iz), box_pointers) );
+        compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers) );
     }
     // REMAINDER LOOP
 #pragma novector
     for (int ix = x_simd_max + simd<double>::simd_len; ix <= loop_hi_x; ++ix)
     {
-#warning TODO: sort out the <double> calls and put them back in!
-        //compute_class.template compute<double>( Cell(IntVect(ix,iy,iz), box_pointers) );
+        compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers), disable_simd());
     }
 #endif
 }
 
-template <typename... compute_ts>
+template <typename... compute_ts, typename... simd_info>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(std::tuple<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
-                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, disable_simd)
+BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
+                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, simd_info... info)
 {
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
@@ -52,31 +51,13 @@ BoxLoops::innermost_loop(std::tuple<compute_ts...> compute_class_pack, const Box
 #ifdef EQUATION_DEBUG_MODE
         EquationDebugging::set_global_cell_coordinates(IntVect(ix,iy,iz));
 #endif
-#warning TODO: sort out the <double> calls and put them back in!
-        //compute_class.template compute<double>( Cell(IntVect(ix,iy,iz), box_pointers) );
-    }
-}
-
-template <typename... compute_ts>
-ALWAYS_INLINE
-void
-BoxLoops::innermost_loop(std::tuple<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
-                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, no_simd_support)
-{
-#pragma novector
-    for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
-    {
-#ifdef EQUATION_DEBUG_MODE
-        EquationDebugging::set_global_cell_coordinates(IntVect(ix,iy,iz));
-#endif
-#warning TODO: sort out the no simd call and put it back in.
-        //compute_class.compute( Cell(IntVect(ix,iy,iz), box_pointers) );
+        compute_class_pack.call_compute( Cell(IntVect(ix,iy,iz), box_pointers), std::forward<simd_info>(info)... );
     }
 }
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(std::tuple<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
+BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
 {
     //Makes sure we are not requesting data outside the box of 'out'
     CH_assert(out.box().contains(loop_box));
@@ -103,12 +84,12 @@ template <typename compute_t, typename... simd_info>
 void
 BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, const Box & loop_box, simd_info... info)
 {
-    loop(std::make_tuple(compute_class), in, out, loop_box, std::forward<simd_info>(info)...);
+    loop(make_compute_pack(compute_class), in, out, loop_box, std::forward<simd_info>(info)...);
 }
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(std::tuple<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
+BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
 {
     loop(compute_class_pack, in,out,out.box(), std::forward<simd_info>(info)...);
 }
@@ -117,12 +98,12 @@ template <typename compute_t, typename... simd_info>
 void
 BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, simd_info... info)
 {
-    loop(std::make_tuple(compute_class), in, out, std::forward<simd_info>(info)...);
+    loop(make_compute_pack(compute_class), in, out, std::forward<simd_info>(info)...);
 }
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(std::tuple<compute_ts...> compute_class_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
+BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
     DataIterator dit0  = in.dataIterator();
     int nbox = dit0.size();
@@ -144,7 +125,7 @@ template <typename compute_t, typename... simd_info>
 void
 BoxLoops::loop(compute_t compute_class, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
-    loop(std::make_tuple(compute_class), in, out, fill_ghosts, std::forward<simd_info>(info)...);
+    loop(make_compute_pack(compute_class), in, out, fill_ghosts, std::forward<simd_info>(info)...);
 }
 
 #endif /* BOXLOOPS_IMPL_HPP_ */

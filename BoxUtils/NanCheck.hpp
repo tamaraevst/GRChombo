@@ -13,6 +13,8 @@ protected:
    const double m_max_abs = 1e20;
 
 public:
+   NanCheck() {}
+
    NanCheck(const std::string a_error_info) : m_error_info (a_error_info) {}
 
    NanCheck(const std::string a_error_info, const double a_max_abs) :
