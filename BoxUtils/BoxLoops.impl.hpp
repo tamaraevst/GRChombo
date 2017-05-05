@@ -16,18 +16,17 @@ void
 BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
-#ifdef EQUATION_DEBUG_MODE /*TODO: MK: think of a nicer way. This macro jungle is a bit too much.*/
-    innermost_loop(compute_class, iy, iz, loop_lo_x, loop_hi_x, disable_simd()); //In equation debug mode never use simd
+#ifdef EQUATION_DEBUG_MODE
+    int simd_width = 1; //In eqution debug mode we don't use simd
 #else
-    int x_simd_max = loop_lo_x + simd<double>::simd_len * (((loop_hi_x - loop_lo_x + 1) / simd<double>::simd_len) - 1);
+    int simd_width = simd<double>::simd_len;
+#endif
+
+    int x_simd_max = loop_lo_x + simd_width * (((loop_hi_x - loop_lo_x + 1) / simd_width) - 1);
     // SIMD LOOP
 #pragma novector
-    for (int ix = loop_lo_x; ix <= x_simd_max; ix += simd<double>::simd_len)
+    for (int ix = loop_lo_x; ix <= x_simd_max; ix += simd_width)
     {
-        //If you were sent here by a compile error of no matching function call make sure that
-        //the compute class you are using allows for vectorisation (is templated over the data type)
-        //To switch vectorisation off in a vectorised compute class pass disable_simd as last parameter to the
-        //loop function. For a compute class without simd support pass no_simd_support().
         compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers) );
     }
     // REMAINDER LOOP
@@ -36,7 +35,6 @@ BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, con
     {
         compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers), disable_simd());
     }
-#endif
 }
 
 template <typename... compute_ts, typename... simd_info>
@@ -48,9 +46,6 @@ BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, con
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
-#ifdef EQUATION_DEBUG_MODE
-        EquationDebugging::set_global_cell_coordinates(IntVect(ix,iy,iz));
-#endif
         compute_class_pack.call_compute( Cell(IntVect(ix,iy,iz), box_pointers), std::forward<simd_info>(info)... );
     }
 }

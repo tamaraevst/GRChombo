@@ -1,6 +1,8 @@
 #ifndef COMPUTECLASSPACK_HPP_
 #define COMPUTECLASSPACK_HPP_
 
+#include "DebuggingTools.hpp"
+
 template <typename... compute_ts>
 class ComputeClassPack
 {
@@ -24,18 +26,33 @@ class ComputeClassPack
     template <class compute_t>
     void call_single_compute(compute_t& compute_class, const Cell& current_cell)
     {
+        //If you were sent here by a compile error of no matching function call make sure that
+        //the compute class you are using allows for vectorisation (is templated over the data type)
+        //To switch vectorisation off in a vectorised compute class pass disable_simd as last parameter to the
+        //loop function. For a compute class without simd support pass no_simd_support().
+#ifdef EQUATION_DEBUG_MODE //In equation debug mode simd is switched off
+        compute_class.template compute<double>(current_cell);
+        EquationDebugging::set_global_cell_coordinates(current_cell);
+#else
         compute_class.template compute<simd<double>>(current_cell);
+#endif
     }
 
     template <class compute_t>
     void call_single_compute(compute_t& compute_class, const Cell& current_cell, disable_simd)
     {
+#ifdef EQUATION_DEBUG_MODE
+        EquationDebugging::set_global_cell_coordinates(current_cell);
+#endif
         compute_class.template compute<double>(current_cell);
     }
 
     template <class compute_t>
     void call_single_compute(compute_t& compute_class, const Cell& current_cell, no_simd_support)
     {
+#ifdef EQUATION_DEBUG_MODE
+        EquationDebugging::set_global_cell_coordinates(current_cell);
+#endif
         compute_class.compute(current_cell);
     }
     //End: Helper functions for calling 'compute' for several compute classes
