@@ -15,6 +15,13 @@
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
 
+//If a potential is to be included, POTENTIAL must be defined
+//and with each include of ScalarField.hpp and a Potential.hpp file provided
+//containing a function compute_potential() with a form as in the scalar field examples
+#ifdef POTENTIAL
+#include "Potential.hpp"
+#endif
+
 //!  Calculates the matter type specific elements such as the EMTensor and matter evolution
 /*!
      This class is an example of a matter_t object which calculates the matter type specific
@@ -81,27 +88,23 @@ class ScalarField {
   };
 
   //! The function which calculates the EM Tensor, given the vars and derivatives \sa compute_potential()
-  template <class data_t>
+  template <class data_t, template<typename> class vars_t>
   emtensor_t<data_t> compute_emtensor(
-      const Vars<data_t> &vars,//!< the value of the variables at the point.
-      const Vars< tensor<1,data_t> >& d1,//!< the value of the first derivatives of the variables.
+      const vars_t<data_t> &vars,//!< the value of the variables at the point.
+      const vars_t< tensor<1,data_t> >& d1,//!< the value of the first derivatives of the variables.
       const tensor<2, data_t>& h_UU,//!< the inverse metric (raised indices)
       const tensor<3, data_t>& chris_ULL,//!< the conformal chrisoffel symbol in ULL form.
-      const Vars<data_t> &advec//!< the value of the advection terms beta^i d_i(var)
+      const vars_t<data_t> &advec//!< the value of the advection terms beta^i d_i(var)
   );
 
-  //! The function which calculates the potential function, given the field value \sa compute_emtensor()
-  template <class data_t>
-  potential_t<data_t> compute_potential(const data_t phi);
-
   //! The function which adds in the RHS for the matter field vars \sa compute_potential()
-  template <class data_t>
+  template <class data_t, template<typename> class vars_t>
   void add_matter_rhs(
-      Vars<data_t> &total_rhs, //!< contains the value of the RHS terms for all vars.
-      const Vars<data_t> &vars, //!< the value of the variables at the point.
-      const Vars< tensor<1,data_t> >& d1, //!< the value of the first derivatives of the variables.
-      const Vars< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
-      const Vars<data_t> &advec); //!< the value of the advection terms beta^i d_i(var).
+      vars_t<data_t> &total_rhs, //!< contains the value of the RHS terms for all vars.
+      const vars_t<data_t> &vars, //!< the value of the variables at the point.
+      const vars_t< tensor<1,data_t> >& d1, //!< the value of the first derivatives of the variables.
+      const vars_t< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
+      const vars_t<data_t> &advec); //!< the value of the advection terms beta^i d_i(var).
 
 };
 

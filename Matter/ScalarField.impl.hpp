@@ -10,18 +10,24 @@
 #define COVARIANTZ4
 
 // Calculate the stress energy tensor elements
-template <class data_t>
+template <class data_t, template<typename> class vars_t>
 auto ScalarField::compute_emtensor(
-    const Vars<data_t> &vars,
-    const Vars< tensor<1,data_t> >& d1,
+    const vars_t<data_t> &vars,
+    const vars_t< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
     const tensor<3, data_t> &chris_ULL,
-    const Vars<data_t> &advec) -> emtensor_t<data_t> {
+    const vars_t<data_t> &advec) -> emtensor_t<data_t> {
 
   emtensor_t<data_t> out;
 
-  // Find the potential and its gradient in terms of phi
-  potential_t<data_t> potential = compute_potential(vars.phi);
+  // Set the field to be massless unless the user has written a Potential function
+  potential_t<data_t> potential;
+  potential.V_of_phi = 0.0;
+  potential.dVdphi = 0.0;
+
+#ifdef POTENTIAL
+  compute_potential(potential.V_of_phi, potential.dVdphi, vars.phi, m_params.scalar_mass);
+#endif
 
   // Some useful quantities
   data_t Vt = - vars.Pi * vars.Pi + 2.0*potential.V_of_phi;
@@ -81,35 +87,28 @@ auto ScalarField::compute_emtensor(
   return out;
 }
 
-/// Set the potential function for the scalar field here
-template <class data_t>
-auto ScalarField::compute_potential(const data_t phi_here) -> potential_t<data_t> {
-
-  potential_t<data_t> out;
-
-  //The potential value at phi
-  out.V_of_phi = pow(m_params.scalar_mass*phi_here, 2.0); // e.g. m^2 phi^2
-
-  //The potential gradient at phi
-  out.dVdphi = 2.0*pow(m_params.scalar_mass,2.0)*phi_here;  //  e.g. 2 m^2 phi
-
-  return out;
-}
-
 // Adds in the RHS for the matter vars
-template <class data_t>
+template <class data_t, template<typename> class vars_t>
 void ScalarField::add_matter_rhs(
-    Vars<data_t> &total_rhs,
-    const Vars<data_t> &vars,
-    const Vars< tensor<1,data_t> >& d1,
-    const Vars< tensor<2,data_t> >& d2,
-    const Vars<data_t> &advec) {
+    vars_t<data_t> &total_rhs,
+    const vars_t<data_t> &vars,
+    const vars_t< tensor<1,data_t> >& d1,
+    const vars_t< tensor<2,data_t> >& d2,
+    const vars_t<data_t> &advec) {
 
   using namespace TensorAlgebra;
 
   auto h_UU = compute_inverse(vars.h);
   auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
-  potential_t<data_t> potential = compute_potential(vars.phi);
+
+  // Set the field to be massless unless the user has written a Potential function
+  potential_t<data_t> potential;
+  potential.V_of_phi = 0.0;
+  potential.dVdphi = 0.0;
+
+#ifdef POTENTIAL
+  compute_potential(potential.V_of_phi, potential.dVdphi, vars.phi, m_params.scalar_mass);
+#endif
 
   //evolution equations for scalar field and (minus) its conjugate momentum
   total_rhs.phi = vars.lapse*vars.Pi + advec.phi;

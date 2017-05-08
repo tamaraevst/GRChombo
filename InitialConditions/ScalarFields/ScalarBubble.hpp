@@ -10,8 +10,14 @@
 #include "tensor.hpp"
 #include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
-#include "ScalarField.hpp"
 #include "Cell.hpp"
+
+//Ensure we define POTENTIAL (done wherever else we include ScalarField.hpp)
+//assuming we wish to include a potential for scalar field
+#ifndef POTENTIAL
+#define POTENTIAL
+#endif
+#include "ScalarField.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial matter config
 class ScalarBubble {

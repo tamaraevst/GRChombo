@@ -5,9 +5,6 @@
 #ifndef SCALARBUBBLE_IMPL_HPP_
 #define SCALARBUBBLE_IMPL_HPP_
 
-#include "ScalarField.hpp"
-#include "simd.hpp"
-
 inline
 ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, ScalarField::params_t a_matter_params, double a_dx)
     : m_driver (a_driver), m_dx (a_dx), m_matter_params (a_matter_params)

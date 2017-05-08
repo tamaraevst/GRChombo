@@ -24,8 +24,14 @@
 #include "ComputeModGrad.hpp"
 
 //Problem specific includes
-#include "ScalarBubble.hpp"
+//Ensure we define POTENTIAL (also done in SimulationParameters.hpp,
+//and wherever else we include ScalarField.hpp)
+//assuming we wish to include a potential for scalar field
+#ifndef POTENTIAL
+#define POTENTIAL
+#endif
 #include "ScalarField.hpp"
+#include "ScalarBubble.hpp"
 #include "RelaxationChi.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
@@ -59,7 +65,7 @@ void ScalarFieldLevel::initialData()
 void ScalarFieldLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx, 
+    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx,
                     m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
@@ -72,13 +78,13 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
     {
         //Calculate chi relaxation right hand side
         //Note this assumes conformal chi and Mom constraint trivially satisfied
-        FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed, 
+        FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed,
                                    m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
         //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
         a_rhs.setVal(0., Interval(c_h11,c_Mom3));
-    } 
-    else 
+    }
+    else
     {
         FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
@@ -86,7 +92,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
         FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
         //Calculate CCZ4Matter right hand side with matter_t = ScalarField
-        FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4Params, m_p.matter_params, m_dx, m_p.sigma, 
+        FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4_params, m_p.matter_params, m_dx, m_p.sigma,
                         m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
         //We don't want undefined values floating around in the constraints
