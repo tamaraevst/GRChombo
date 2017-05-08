@@ -20,10 +20,10 @@ auto ScalarField::compute_emtensor(
 
   emtensor_t<data_t> out;
 
-  // Set the field to be massless unless the user has written a Potential function
+  // Set the field to be simply m^2 phi^2 unless the user has written a Potential function
   potential_t<data_t> potential;
-  potential.V_of_phi = 0.0;
-  potential.dVdphi = 0.0;
+  potential.V_of_phi = pow(m_params.scalar_mass*vars.phi, 2.0);
+  potential.dVdphi = 2.0*pow(m_params.scalar_mass, 2.0)*vars.phi;
 
 #ifdef POTENTIAL
   compute_potential(potential.V_of_phi, potential.dVdphi, vars.phi, m_params.scalar_mass);
