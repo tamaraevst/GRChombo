@@ -7,14 +7,9 @@
 #include "ParmParse.H"
 
 //Problem specific includes:
-
-//If a non zero potential is to be used this must be defined
-//And a file Potential.hpp provided (see examples)
-#ifndef POTENTIAL
-#define POTENTIAL
-#endif
 #include "CCZ4.hpp"
-#include "ScalarField.hpp"
+#include "ScalarBubble.hpp"
+#include "Potential.hpp"
 
 class SimulationParameters
 {
@@ -30,10 +25,13 @@ public:
         auto_read_params(pp);
 
         //Fill in the Matter Parameters
-        matter_params.amplitudeSF = amplitudeSF;
-        matter_params.centerSF = centerSF;
-        matter_params.widthSF = widthSF;
-        matter_params.scalar_mass = scalar_mass;
+        initial_params.amplitudeSF = amplitudeSF;
+        initial_params.centerSF = centerSF;
+        initial_params.widthSF = widthSF;
+        initial_params.r_zero = r_zero;
+
+        //Fill in the potential parameters
+        potential_params.scalar_mass = scalar_mass;
 
         //Fill in the ccz4Parameters
         ccz4_params.kappa1 = kappa1;
@@ -52,7 +50,8 @@ public:
 
     //Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4_params;
-    ScalarField::params_t matter_params;
+    ScalarBubble::params_t initial_params;
+    Potential::params_t potential_params;
 
 };
 

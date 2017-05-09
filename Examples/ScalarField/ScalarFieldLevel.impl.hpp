@@ -24,12 +24,7 @@
 #include "ComputeModGrad.hpp"
 
 //Problem specific includes
-//Ensure we define POTENTIAL (also done in SimulationParameters.hpp,
-//and wherever else we include ScalarField.hpp)
-//assuming we wish to include a potential for scalar field
-#ifndef POTENTIAL
-#define POTENTIAL
-#endif
+#include "Potential.hpp"
 #include "ScalarField.hpp"
 #include "ScalarBubble.hpp"
 #include "RelaxationChi.hpp"
@@ -58,14 +53,16 @@ void ScalarFieldLevel::initialData()
     m_state_new.setVal(0.);
 
     //Initial conditions for scalar field - here a bubble
-    FABDriver<ScalarBubble>(m_p.matter_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
+    FABDriver<ScalarBubble>(m_p.initial_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 // Things to do before outputting a checkpoint file
 void ScalarFieldLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    FABDriver<ConstraintsMatter<ScalarField> >(m_p.matter_params, m_dx,
+    Potential potential(m_p.potential_params);
+    ScalarFieldWithPotential scalar_field(potential);
+    FABDriver<ConstraintsMatter<ScalarFieldWithPotential> >(scalar_field, m_dx,
                     m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
@@ -78,7 +75,9 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
     {
         //Calculate chi relaxation right hand side
         //Note this assumes conformal chi and Mom constraint trivially satisfied
-        FABDriver<RelaxationChi<ScalarField> >(m_p.matter_params, m_dx, m_p.relaxspeed,
+        Potential potential(m_p.potential_params);
+        ScalarFieldWithPotential scalar_field(potential);
+        FABDriver<RelaxationChi<ScalarFieldWithPotential> >(scalar_field, m_dx, m_p.relaxspeed,
                                    m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
         //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
@@ -92,7 +91,9 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
         FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
         //Calculate CCZ4Matter right hand side with matter_t = ScalarField
-        FABDriver<CCZ4Matter<ScalarField> >(m_p.ccz4_params, m_p.matter_params, m_dx, m_p.sigma,
+        Potential potential(m_p.potential_params);
+        ScalarFieldWithPotential scalar_field(potential);
+        FABDriver<CCZ4Matter<ScalarFieldWithPotential> >(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
                         m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
 
         //We don't want undefined values floating around in the constraints

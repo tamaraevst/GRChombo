@@ -4,6 +4,16 @@
 
 #include "TensorAlgebra.hpp"
 
+//! A structure for the decomposed elements of the Energy Momentum Tensor in 3+1D
+template <class data_t>
+struct emtensor_t 
+{
+        tensor<2, data_t> Sij; //!< S_ij = T_ij
+        tensor<1,data_t>  Si; //!< S_i = T_ia_n^a
+        data_t            S; //!< S = S^i_i
+        data_t            rho; //!< rho = T_ab n^a n^b
+};
+
 template <class data_t>
 struct chris_t
 {
