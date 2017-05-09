@@ -85,6 +85,7 @@ G_Newton = 1.0
 # SF Initial data
 amplitudeSF = 0.0025
 widthSF = 1.0
+r_zero = 5.0
 scalar_mass = 0.001
 # SF parameter for bubble centre - don't forget to update it
 # if L is changed!
