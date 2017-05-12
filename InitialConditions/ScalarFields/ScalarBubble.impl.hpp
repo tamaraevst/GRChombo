@@ -37,8 +37,7 @@ void ScalarBubble::compute(Cell current_cell)
 template <class data_t>
 data_t ScalarBubble::compute_phi(Coordinates<data_t> coords)
 {
-    IntVect iv(m_params.centerSF[0], m_params.centerSF[1], m_params.centerSF[2]);
-    data_t rr = coords.get_radius(iv);
+    data_t rr = coords.get_radius(m_params.centerSF);
     data_t rr2 = rr*rr;
     data_t out_phi = m_params.amplitudeSF*rr2*exp(-pow(rr-m_params.r_zero/m_params.widthSF, 2.0));
 
