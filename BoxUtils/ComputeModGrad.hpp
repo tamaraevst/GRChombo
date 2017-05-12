@@ -23,7 +23,7 @@ public:
    void compute(Cell current_cell)
    {
        tensor<1,data_t> d1_arr[c_NUM];
-       FOR1(idir) m_deriv.diff1(d1_arr, current_cell, current_cell.get_box_pointers(), idir);
+       FOR1(idir) m_deriv.diff1(d1_arr, current_cell, idir);
 
        std::array<data_t, c_NUM> mod_d1_arr = {0.};
        FORVARS(ivar)

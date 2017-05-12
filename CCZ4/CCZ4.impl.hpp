@@ -34,26 +34,25 @@ CCZ4::compute(Cell current_cell)
     current_cell.local_vars(vars);
 
     Vars< tensor<1, data_t> > d1;
-#warning this signature where we have to pass current_cell twice practically is unnecessary. Change the derivatives code.
-    FOR1(idir) m_deriv.diff1(d1, current_cell, current_cell.get_box_pointers(), idir);
+    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
     Vars< tensor<2,data_t> > d2;
     // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, current_cell, current_cell.get_box_pointers(), idir);
+    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
     // Mixed derivatives
     // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 2, 1);
+    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
 
     Vars<data_t> advec;
     advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, current_cell, current_cell.get_box_pointers(), vars.shift[idir], idir);
+    FOR1(idir) m_deriv.add_advection(advec, current_cell, vars.shift[idir], idir);
 
     Vars<data_t> rhs;
     rhs_equation(rhs, vars, d1, d2, advec);
 
-    FOR1(idir) m_deriv.add_dissipation(rhs, current_cell, current_cell.get_box_pointers(), m_sigma,idir);
+    FOR1(idir) m_deriv.add_dissipation(rhs, current_cell, m_sigma,idir);
 
     //Write the rhs into the output FArrayBox
     current_cell.store_vars(rhs);

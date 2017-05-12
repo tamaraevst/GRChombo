@@ -54,24 +54,28 @@ public:
         return m_integer_coords;
     }
 
+    ALWAYS_INLINE
     bool operator ==(const IntVect iv)
     {
         return (m_integer_coords == iv);
     }
 
     ///Returns the integer coordinates of this Cell in the form of an IntVect
+    ALWAYS_INLINE
     IntVect get_int_vect() const
     {
         return m_integer_coords;
     }
 
     ///Returns Index in the flattened Chombo array where the input data for this cell resides
+    ALWAYS_INLINE
     CellIndexIn get_in_index() const
     {
         return m_in_index;
     }
 
     ///Returns Index in the flattened Chombo array where the output data for this cell should be written to
+    ALWAYS_INLINE
     CellIndexOut get_out_index() const
     {
         return m_out_index;
@@ -87,6 +91,7 @@ public:
     )
 
     ///Returns the box pointers
+    ALWAYS_INLINE
     BoxPointers get_box_pointers() const
     {
         return m_box_pointers;

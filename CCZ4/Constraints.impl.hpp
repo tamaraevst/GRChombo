@@ -19,16 +19,16 @@ Constraints::compute(Cell current_cell)
     current_cell.local_vars(vars);
 
     Vars< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, current_cell, current_cell.get_box_pointers(), idir);
+    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
     Vars< tensor<2,data_t> > d2;
     // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, current_cell, current_cell.get_box_pointers(), idir);
+    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
     // Mixed derivatives
     // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, current_cell.get_box_pointers(), 2, 1);
+    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
 
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 

@@ -13,6 +13,7 @@
 #include "Constraints.hpp"
 #include "CCZ4.hpp"
 #include "ComputeClassPack.hpp"
+#include "SetValue.hpp"
 
 //Initial data
 #include "BinaryBH.hpp"
@@ -31,12 +32,9 @@ void BinaryBHLevel::initialData()
     CH_TIME("BinaryBHLevel::initialData");
     if (m_verbosity) pout () << "BinaryBHLevel::initialData " << m_level << endl;
 
-    //First set everything to zero ... we don't want undefined values in constraints etc
-#warning: TODO: Could write trivial compute class for this so that it can be included with other things
-    m_state_new.setVal(0.);
-
-    BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
-    BoxLoops::loop(binary, m_state_new, m_state_new, FILL_GHOST_CELLS);
+    BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx); //Set up the compute class for the BinaryBH initial data
+    //First set everything to zero (to avoid undefinded values on constraints) then calculate initial data
+    BoxLoops::loop(make_compute_pack(SetValue(0.), binary), m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 void BinaryBHLevel::preCheckpointLevel()
@@ -50,11 +48,9 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, con
     //Enforce positive chi and alpha and trace free A
     BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
 
-    //Calculate CCZ4 right hand side
-    BoxLoops::loop(CCZ4(m_p.ccz4Params, m_dx, m_p.sigma), a_soln, a_rhs, SKIP_GHOST_CELLS);
-
-    //We don't want undefined values floating around in the constraints
-    a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
+    //Calculate CCZ4 right hand side and set constraints to zero to avoid undefined values
+    BoxLoops::loop(make_compute_pack( CCZ4(m_p.ccz4Params, m_dx, m_p.sigma), SetValue(0, Interval(c_Ham, c_Mom3)) ),
+                   a_soln, a_rhs, SKIP_GHOST_CELLS);
 }
 
 void BinaryBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
