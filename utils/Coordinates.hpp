@@ -53,8 +53,10 @@ public:
         out = simd<t>::load(out_arr);
     }
 
+    // function which returns the radius subject to a floor
+    // for when a Coordinates object exists
     data_t
-    get_radius(IntVect center)
+    get_radius(std::vector<double> center)
     {
         //Note that this is not currently dimension independent
         data_t r = sqrt(  pow(x - center[0],2)
@@ -66,9 +68,11 @@ public:
         return simd_conditional(r_is_too_small, minimum_r, r);
     }
 
+    // static function which returns radius subject to a floor
+    // for when no coordinates object exists
     static
     data_t
-    get_radius(IntVect integer_coords, double dx, IntVect center)
+    get_radius(IntVect integer_coords, double dx, std::vector<double> center)
     {
         data_t xx;
         double yy;
