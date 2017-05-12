@@ -14,7 +14,7 @@
 #include "Potential.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial matter config
-class ScalarBubble 
+class ScalarBubble
 {
 public:
     //! A structure for the input params for scalar field properties and initial conditions
