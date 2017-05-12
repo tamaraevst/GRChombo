@@ -11,7 +11,7 @@
 
 class HarmonicTest {
  public:
-  HarmonicTest(const FABDriverBase& a_driver, IntVect a_center_vector, double a_dx)
+  HarmonicTest(const FABDriverBase& a_driver, std::vector<double> a_center_vector, double a_dx)
         : m_driver (a_driver), m_dx (a_dx), m_center_vector (a_center_vector) {}
 
   template <class data_t>
@@ -20,7 +20,7 @@ class HarmonicTest {
  protected:
   const FABDriverBase& m_driver;
   double m_dx;
-  IntVect m_center_vector;
+  std::vector<double> m_center_vector;
 
   template<class data_t>
   data_t compute_harmonic(Coordinates<data_t> coords);
