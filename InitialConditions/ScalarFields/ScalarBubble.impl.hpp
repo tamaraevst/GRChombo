@@ -12,7 +12,7 @@ ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, params_t a_params, dou
 
 // Compute the value of the initial vars on the grid
 template <class data_t>
-void ScalarBubble::compute(Cell current_cell) 
+void ScalarBubble::compute(Cell current_cell)
 {
     ScalarField<Potential>::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
