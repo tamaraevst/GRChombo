@@ -15,6 +15,7 @@
 #include "CCZ4.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
+#include "DefaultPotential.hpp"
 
 //!  Calculates the matter type specific elements such as the EMTensor and matter evolution
 /*!
@@ -22,20 +23,20 @@
      elements for the RHS update and the evaluation of the constraints. This includes the
      Energy Momentum Tensor, and the matter evolution terms. In this case, a scalar field,
      the matter elements are phi and (minus) its conjugate momentum, Pi. It is templated over a
-     potential function my_potential_t which the user must specify in a class. It assumes minimal 
-     coupling of the field to gravity.
+     potential function potential_t which the user must specify in a class, although a default is 
+     provided which sets dVdphi and V_of_phi to zero. It assumes minimal coupling of the field to gravity.
      \sa CCZ4Matter(), ConstraintsMatter()
 */
-template <class my_potential_t>
+template <class potential_t = DefaultPotential>
 class ScalarField
 {
 protected:
     //!The local copy of the potential
-    my_potential_t my_potential;
+    potential_t my_potential;
 
 public:
     //!  Constructor of class ScalarField, inputs are the matter parameters.
-    ScalarField(const my_potential_t a_potential) : my_potential (a_potential) {}
+    ScalarField(const potential_t a_potential) : my_potential (a_potential) {}
 
     //! Structure containing all the rhs variables for the gravity and matter fields
     template <class data_t>
@@ -57,13 +58,6 @@ public:
     data_t Pi;
 
     Vars();
-    };
-
-    //! A structure for the potential data - the value of V and its gradient
-    template <class data_t>
-    struct potential_t {
-        data_t  V_of_phi; //!< V(\phi)
-        data_t  dVdphi; //!< Gradient of V(\phi)
     };
 
     //! The function which calculates the EM Tensor, given the vars and derivatives

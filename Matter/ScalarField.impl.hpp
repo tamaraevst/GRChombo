@@ -8,9 +8,9 @@
 #define SCALARFIELD_IMPL_HPP_
 
 // Calculate the stress energy tensor elements
-template <class my_potential_t>
+template <class potential_t>
 template <class data_t, template<typename> class vars_t>
-auto ScalarField<my_potential_t>::compute_emtensor(
+auto ScalarField<potential_t>::compute_emtensor(
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
@@ -20,15 +20,14 @@ auto ScalarField<my_potential_t>::compute_emtensor(
     emtensor_t<data_t> out;
 
     //set the potential values
-    potential_t<data_t> potential;
-    potential.V_of_phi = 0.0;
-    potential.dVdphi = 0.0;
+    data_t V_of_phi = 0.0;
+    data_t dVdphi = 0.0;
 
     //compute potential
-    my_potential.compute_potential(potential.V_of_phi, potential.dVdphi, vars.phi);
+    my_potential.compute_potential(V_of_phi, dVdphi, vars.phi);
 
     // Some useful quantities
-    data_t Vt = - vars.Pi * vars.Pi + 2.0*potential.V_of_phi;
+    data_t Vt = - vars.Pi * vars.Pi + 2.0*V_of_phi;
     FOR2(i,j)
     {
         Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j];
@@ -86,9 +85,9 @@ auto ScalarField<my_potential_t>::compute_emtensor(
 }
 
 // Adds in the RHS for the matter vars
-template <class my_potential_t>
+template <class potential_t>
 template <class data_t, template<typename> class vars_t>
-void ScalarField<my_potential_t>::add_matter_rhs(
+void ScalarField<potential_t>::add_matter_rhs(
     vars_t<data_t> &total_rhs,
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
@@ -101,16 +100,15 @@ void ScalarField<my_potential_t>::add_matter_rhs(
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //set the potential values
-    potential_t<data_t> potential;
-    potential.V_of_phi = 0.0;
-    potential.dVdphi = 0.0;
+    data_t V_of_phi = 0.0;
+    data_t dVdphi = 0.0;
 
     //compute potential
-    my_potential.compute_potential(potential.V_of_phi, potential.dVdphi, vars.phi);
+    my_potential.compute_potential(V_of_phi, dVdphi, vars.phi);
 
     //evolution equations for scalar field and (minus) its conjugate momentum
     total_rhs.phi = vars.lapse*vars.Pi + advec.phi;
-    total_rhs.Pi = vars.lapse*(vars.K*vars.Pi - potential.dVdphi) + advec.Pi;
+    total_rhs.Pi = vars.lapse*(vars.K*vars.Pi - dVdphi) + advec.Pi;
 
     FOR2(i,j)
     {
@@ -126,9 +124,9 @@ void ScalarField<my_potential_t>::add_matter_rhs(
     }
 }
 
-template <class my_potential_t>
+template <class potential_t>
 template <class data_t>
-ScalarField<my_potential_t>::Vars<data_t>::Vars()
+ScalarField<potential_t>::Vars<data_t>::Vars()
 {
     //Define the mapping from components of chombo grid to elements in Vars.
     //This allows to read/write data from the chombo grid into local

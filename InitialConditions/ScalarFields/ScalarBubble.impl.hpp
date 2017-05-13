@@ -14,7 +14,7 @@ ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, params_t a_params, dou
 template <class data_t>
 void ScalarBubble::compute(Cell current_cell)
 {
-    ScalarField<Potential>::Vars<data_t> vars;
+    ScalarField<>::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
     Coordinates<data_t> coords(current_cell,m_dx);
 

@@ -11,7 +11,6 @@
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include "Cell.hpp"
 #include "ScalarField.hpp"
-#include "Potential.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial matter config
 class ScalarBubble
