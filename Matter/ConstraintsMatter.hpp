@@ -1,4 +1,4 @@
-// Last edited K Clough 16.02.17
+// Last edited K Clough 08.05.17
 
 #ifndef CONSTRAINTSMATTER_HPP_
 #define CONSTRAINTSMATTER_HPP_
@@ -10,7 +10,6 @@
 #include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "CCZ4Geometry.hpp"
-#include "ScalarField.hpp"
 #include "Constraints.hpp"
 #include <array>
 #include "Cell.hpp"
@@ -25,29 +24,29 @@
      \sa Constraints(), ScalarField()
 */
 template <class matter_t>
-class ConstraintsMatter : public Constraints {
-
-  //Use the variable definition in matter_t
-  template<class data_t>
-  using Vars=typename matter_t::template Vars<data_t>;
+class ConstraintsMatter : public Constraints
+{
+    //Use the variable definition in matter_t
+    template<class data_t>
+    using Vars=typename matter_t::template Vars<data_t>;
 
 public:
-  //! Constructor of class ConstraintsMatter
-  /*!
-       Takes in the box driver, the grid spacing, and matter params plus 
-       optionally the value of Newton's constant, which is set to one by default.
-  */
-  ConstraintsMatter(const FABDriverBase& driver,
-                    const typename matter_t::params_t matter_params,
-                    double dx, double G_Newton = 1.0);
+    //!  Constructor of class ConstraintsMatter
+    /*!
+         Takes in the box driver, the grid spacing, and matter params plus 
+         optionally the value of Newton's constant, which is set to one by default.
+    */
+    ConstraintsMatter(const FABDriverBase& driver,
+                      const matter_t a_matter,
+                      double dx, double G_Newton = 1.0);
 
-  //! The compute member which calculates the constraints at each point in the box
-  template <class data_t>
-  void compute(Cell current_cell);
+    //! The compute member which calculates the constraints at each point in the box
+    template <class data_t>
+    void compute(Cell current_cell);
 
 protected:
-  const typename matter_t::params_t m_matter_params; //!< The matter params
-  double m_G_Newton; //!< Newton's constant, set to one by default.
+    matter_t my_matter; //!< The matter object, e.g. a scalar field
+    double m_G_Newton; //!< Newton's constant, set to one by default.
 
 };
 

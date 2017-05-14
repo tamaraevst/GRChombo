@@ -12,59 +12,57 @@
 
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
+    matter_t a_matter,
     params_t params,
-    const typename matter_t::params_t matter_params,
     double dx,
     double sigma,
     int formulation,
     double G_Newton)
     : CCZ4(driver, params, dx, sigma, formulation, 0.0 /*No cosmological constant*/),
-      m_matter_params (matter_params) , m_G_Newton (G_Newton) {}
-
+      my_matter (a_matter) , m_G_Newton (G_Newton) {}
 
 template <class matter_t>
 template <class data_t>
 void CCZ4Matter<matter_t>::compute(Cell current_cell)
 {
-  //copy data from chombo gridpoint into local variables
-  Vars<data_t> matter_vars;
-  m_driver.local_vars(matter_vars, current_cell);
+    //copy data from chombo gridpoint into local variables
+    Vars<data_t> matter_vars;
+    m_driver.local_vars(matter_vars, current_cell);
 
-  //work out first derivatives of variables on grid
-  Vars< tensor<1, data_t> > d1;
-  FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
+    //work out first derivatives of variables on grid
+    Vars< tensor<1, data_t> > d1;
+    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
-  // Repeated derivatives
-  // Work out second derivatives of variables on grid
-  Vars< tensor<2,data_t> > d2;
-  FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
-  // Mixed derivatives
-  // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-  m_deriv.mixed_diff2(d2, current_cell, 1, 0);
-  m_deriv.mixed_diff2(d2, current_cell, 2, 0);
-  m_deriv.mixed_diff2(d2, current_cell, 2, 1);
+    // Repeated derivatives
+    // Work out second derivatives of variables on grid
+    Vars< tensor<2,data_t> > d2;
+    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
+    // Mixed derivatives
+    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
+    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
+    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
 
-  // Calculate advection terms
-  Vars<data_t> advec;
-  advec.assign(0.);
-  FOR1(idir) m_deriv.add_advection(advec, current_cell, matter_vars.shift[idir], idir);
+    // Calculate advection terms
+    Vars<data_t> advec;
+    advec.assign(0.);
+    FOR1(idir) m_deriv.add_advection(advec, current_cell, matter_vars.shift[idir], idir);
 
-  // Call CCZ4 RHS - work out RHS without matter, no dissipation
-  Vars<data_t> matter_rhs;
-  rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
+    // Call CCZ4 RHS - work out RHS without matter, no dissipation
+    Vars<data_t> matter_rhs;
+    rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
-  //add RHS matter terms from EM tensor
-  add_EMTensor_rhs(matter_rhs, matter_vars, d1, d2, advec);
+    //add RHS matter terms from EM tensor
+    add_EMTensor_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
-  //add evolution of matter fields themselves
-  matter_t my_matter(m_matter_params);
-  my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
+    //add evolution of matter fields themselves
+    my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
-  //Add dissipation to all terms
-  FOR1(idir) m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma, idir);
+    //Add dissipation to all terms
+    FOR1(idir) m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma, idir);
 
-  //Write the rhs into the output FArrayBox
-  m_driver.store_vars(matter_rhs, current_cell);
+    //Write the rhs into the output FArrayBox
+    m_driver.store_vars(matter_rhs, current_cell);
 }
 
 // Function to add in EM Tensor matter terms to CCZ4 rhs
@@ -79,47 +77,46 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
 
   using namespace TensorAlgebra;
 
-  auto h_UU = compute_inverse(matter_vars.h);
-  auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    auto h_UU = compute_inverse(matter_vars.h);
+    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
-  //Calculate elements of the decomposed stress energy tensor
-  matter_t my_matter(m_matter_params);
-  auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
+    //Calculate elements of the decomposed stress energy tensor
+    auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
 
-  //Update RHS for K and Theta depending on formulation
-  if (m_formulation == USE_BSSN) 
-  {
-    matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S + emtensor.rho);
-    matter_rhs.Theta += 0.0;
-  } 
-  else 
-  {
-    matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
-    matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
-  }
-
-  // Update RHS for other variables
-  tensor<2, data_t> Sij_TF = emtensor.Sij;
-  make_trace_free(Sij_TF, matter_vars.h, h_UU);
-
-  FOR2(i,j)
-  {
-    matter_rhs.A[i][j] +=
-        - 8.0*M_PI*m_G_Newton*matter_vars.chi*matter_vars.lapse*Sij_TF[i][j];
-  }
-
-  FOR1(i)
-  {
-    data_t matter_term_Gamma = 0.0;
-    FOR1(j)
+    //Update RHS for K and Theta depending on formulation
+    if (m_formulation == USE_BSSN) 
     {
-      matter_term_Gamma +=
-          - 16.0*M_PI*m_G_Newton*matter_vars.lapse*h_UU[i][j]*emtensor.Si[j];
+      matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S + emtensor.rho);
+      matter_rhs.Theta += 0.0;
+    } 
+    else 
+    {
+      matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
+      matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;
     }
 
-    matter_rhs.Gamma[i] += matter_term_Gamma;
-    matter_rhs.B[i] += matter_term_Gamma;
-  }
+    // Update RHS for other variables
+    tensor<2, data_t> Sij_TF = emtensor.Sij;
+    make_trace_free(Sij_TF, matter_vars.h, h_UU);
+
+    FOR2(i,j)
+    {
+        matter_rhs.A[i][j] +=
+            - 8.0*M_PI*m_G_Newton*matter_vars.chi*matter_vars.lapse*Sij_TF[i][j];
+    }
+
+    FOR1(i)
+    {
+        data_t matter_term_Gamma = 0.0;
+        FOR1(j)
+        {
+            matter_term_Gamma +=
+              - 16.0*M_PI*m_G_Newton*matter_vars.lapse*h_UU[i][j]*emtensor.Si[j];
+        }
+
+        matter_rhs.Gamma[i] += matter_term_Gamma;
+        matter_rhs.B[i] += matter_term_Gamma;
+    }
 }
 
 #endif /* CCZ4MATTER_IMPL_HPP_ */

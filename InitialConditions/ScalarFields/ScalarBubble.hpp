@@ -7,31 +7,38 @@
 #include "Coordinates.hpp"
 #include "FABDriverBase.hpp"
 #include <vector>
-#include "tensor.hpp"
 #include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
-#include "ScalarField.hpp"
 #include "Cell.hpp"
+#include "ScalarField.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial matter config
-class ScalarBubble {
- public:
-  ScalarBubble(const FABDriverBase& a_driver, ScalarField::params_t a_matter_params, double a_dx);
+class ScalarBubble
+{
+public:
+    //! A structure for the input params for scalar field properties and initial conditions
+    struct params_t {
+        double amplitudeSF;//!< Amplitude of bump in initial SF bubble
+        std::vector<double> centerSF;//!< Centre of perturbation in initial SF bubble
+        double widthSF;//!< Width of bump in initial SF bubble
+        double r_zero;//!< Position of bump relative to centre
+    };
 
-  //! Function to compute the value of all the initial vars on the grid
-  template <class data_t>
-  void compute(Cell current_cell);
+    //! The constructor
+    ScalarBubble(const FABDriverBase& a_driver, params_t a_params, double a_dx);
 
- protected:
-  const FABDriverBase& m_driver;
-  double m_dx;
+    //! Function to compute the value of all the initial vars on the grid
+    template <class data_t>
+    void compute(Cell current_cell);
 
-  //! Function to compute the value of phi at each point
-  template<class data_t>
-  data_t compute_phi(Coordinates<data_t> coords);
+protected:
+    const FABDriverBase& m_driver;
+    double m_dx;
+    const params_t m_params;//!< The matter initial condition params
 
- public:
-  const ScalarField::params_t m_matter_params;//!< The matter params
+    //! Function to compute the value of phi at each point
+    template<class data_t>
+    data_t compute_phi(Coordinates<data_t> coords);
 };
 
 #include "ScalarBubble.impl.hpp"
