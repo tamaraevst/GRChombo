@@ -21,25 +21,22 @@ int main()
 
     const int N_GRID = 64;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
-    Box ghosted_box(IntVect(-3,-3,-3), IntVect(N_GRID+2,N_GRID+2,N_GRID+2));
-    FArrayBox in_fab(ghosted_box, c_NUM);
-    in_fab.setVal(0.0);
-//    BoxLoops::loop(make_compute_pack(SetValue(0.0)), in_fab, in_fab);
+    FArrayBox in_fab(box, c_NUM);
+    BoxLoops::loop(make_compute_pack(SetValue(0.0)), in_fab, in_fab);
     FArrayBox out_fab(box, c_NUM);
-    out_fab.setVal(0.0);
-//    BoxLoops::loop(make_compute_pack(SetValue(0.0)), out_fab, out_fab);
+    BoxLoops::loop(make_compute_pack(SetValue(0.0)), out_fab, out_fab);
     double length = 64.0;
 
     const double dx = length / (N_GRID);
     const double center = length/2.0;
 
-    for (int iz = -3; iz < N_GRID+3; ++iz)
+    for (int iz = 0; iz < N_GRID; ++iz)
     {
         const double z = (iz+0.5)*dx - center;
-        for (int iy = -3; iy < N_GRID+3; ++iy)
+        for (int iy = 0; iy < N_GRID; ++iy)
         {
             const double y = (iy+0.5)*dx - center;
-            for (int ix = -3; ix < N_GRID+3; ++ix)
+            for (int ix = 0; ix < N_GRID; ++ix)
             {
                 const double x = (ix+0.5)*dx - center;
                 double r = sqrt(x*x + y*y + z*z);
