@@ -11,14 +11,14 @@
 #define COVARIANTZ4
 
 template <class matter_t>
-CCZ4Matter<matter_t>::CCZ4Matter(const FABDriverBase& driver,
+CCZ4Matter<matter_t>::CCZ4Matter(
     matter_t a_matter,
     params_t params,
     double dx,
     double sigma,
     int formulation,
     double G_Newton)
-    : CCZ4(driver, params, dx, sigma, formulation, 0.0 /*No cosmological constant*/),
+    : CCZ4(params, dx, sigma, formulation, 0.0 /*No cosmological constant*/),
       my_matter (a_matter) , m_G_Newton (G_Newton) {}
 
 template <class matter_t>
@@ -27,7 +27,7 @@ void CCZ4Matter<matter_t>::compute(Cell current_cell)
 {
     //copy data from chombo gridpoint into local variables
     Vars<data_t> matter_vars;
-    m_driver.local_vars(matter_vars, current_cell);
+    current_cell.local_vars(matter_vars);
 
     //work out first derivatives of variables on grid
     Vars< tensor<1, data_t> > d1;
@@ -62,7 +62,7 @@ void CCZ4Matter<matter_t>::compute(Cell current_cell)
     FOR1(idir) m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma, idir);
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(matter_rhs, current_cell);
+    current_cell.store_vars(matter_rhs);
 }
 
 // Function to add in EM Tensor matter terms to CCZ4 rhs
@@ -84,12 +84,12 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
 
     //Update RHS for K and Theta depending on formulation
-    if (m_formulation == USE_BSSN) 
+    if (m_formulation == USE_BSSN)
     {
       matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S + emtensor.rho);
       matter_rhs.Theta += 0.0;
-    } 
-    else 
+    }
+    else
     {
       matter_rhs.K += 4.0*M_PI*m_G_Newton*matter_vars.lapse*(emtensor.S - 3*emtensor.rho);
       matter_rhs.Theta += - 8.0*M_PI*m_G_Newton*matter_vars.lapse*emtensor.rho;

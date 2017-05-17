@@ -9,7 +9,6 @@
 
 template <class matter_t>
 RelaxationChi<matter_t>::RelaxationChi(
-    const FABDriverBase& driver,
     matter_t a_matter,
     double dx,
     double relax_speed,
@@ -17,8 +16,7 @@ RelaxationChi<matter_t>::RelaxationChi(
     : my_matter (a_matter),
       m_relax_speed (relax_speed),
       m_G_Newton (G_Newton),
-      m_driver (driver),
-      m_deriv (dx, m_driver) {}
+      m_deriv (dx) {}
 
 template <class matter_t>
 template <class data_t>
@@ -26,7 +24,7 @@ void RelaxationChi<matter_t>::compute(Cell current_cell) {
 
     //copy data from chombo gridpoint into local variables
     Vars<data_t> vars;
-    m_driver.local_vars(vars, current_cell);
+    current_cell.local_vars(vars);
 
     //work out first derivatives of variables on grid
     Vars< tensor<1, data_t> > d1;
@@ -56,7 +54,7 @@ void RelaxationChi<matter_t>::compute(Cell current_cell) {
     //    FOR1(idir) m_deriv.add_dissipation(rhs, m_sigma, idir);
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(rhs, current_cell);
+    current_cell.store_vars(rhs);
 }
 
 template <class matter_t>

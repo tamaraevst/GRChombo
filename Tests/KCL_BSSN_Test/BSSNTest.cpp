@@ -9,13 +9,13 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
-
+#include "UserVariables.hpp"
 #include "CCZ4Matter.hpp"
 #include "ScalarField.hpp"
 #include "Potential.hpp"
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
+
 #include "GRBSSNChomboF_F.H"
-#include "UserVariables.hpp"
 
 #define CHF_FRAn(a, n, c) \
     a.dataPtr(n), \
@@ -167,9 +167,11 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
+    // Typedef for scalar field
+    typedef ScalarField<Potential> ScalarFieldWithPotential;
     Potential my_potential(potential_params);
-    ScalarField<Potential> my_scalar_field(my_potential);
-    FABDriver<CCZ4Matter<ScalarField<Potential> > >(my_scalar_field, params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
+    ScalarFieldWithPotential my_scalar_field(my_potential);
+    BoxLoops::loop(CCZ4Matter<ScalarFieldWithPotential>(my_scalar_field, params, dx, sigma, formulation, G_Newton), in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 

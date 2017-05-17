@@ -1,6 +1,7 @@
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+#include "always_inline.hpp"
 #include "CellIndex.hpp"
 #include "BoxPointers.hpp"
 #include "IntVect.H"

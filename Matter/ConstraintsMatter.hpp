@@ -3,11 +3,9 @@
 #ifndef CONSTRAINTSMATTER_HPP_
 #define CONSTRAINTSMATTER_HPP_
 
-#include "FArrayBox.H"
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "CCZ4Geometry.hpp"
 #include "Constraints.hpp"
@@ -33,11 +31,10 @@ class ConstraintsMatter : public Constraints
 public:
     //!  Constructor of class ConstraintsMatter
     /*!
-         Takes in the box driver, the grid spacing, and matter params plus 
+         Takes in the grid spacing, and matter object plus
          optionally the value of Newton's constant, which is set to one by default.
     */
-    ConstraintsMatter(const FABDriverBase& driver,
-                      const matter_t a_matter,
+    ConstraintsMatter(const matter_t a_matter,
                       double dx, double G_Newton = 1.0);
 
     //! The compute member which calculates the constraints at each point in the box

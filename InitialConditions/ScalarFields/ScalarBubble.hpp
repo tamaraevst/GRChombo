@@ -5,7 +5,6 @@
 #include "VarsBase.hpp"
 #include "tensor.hpp"
 #include "Coordinates.hpp"
-#include "FABDriverBase.hpp"
 #include <vector>
 #include <array>
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -25,14 +24,13 @@ public:
     };
 
     //! The constructor
-    ScalarBubble(const FABDriverBase& a_driver, params_t a_params, double a_dx);
+    ScalarBubble(params_t a_params, double a_dx);
 
     //! Function to compute the value of all the initial vars on the grid
     template <class data_t>
     void compute(Cell current_cell);
 
 protected:
-    const FABDriverBase& m_driver;
     double m_dx;
     const params_t m_params;//!< The matter initial condition params
 

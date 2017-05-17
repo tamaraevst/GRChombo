@@ -6,7 +6,6 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
@@ -37,13 +36,12 @@ class CCZ4Matter : public CCZ4
 public:
     //!  Constructor of class CCZ4Matter
     /*!
-       Inputs are the box driver and grid spacing, plus the CCZ4 evolution parameters and
-       the matter parameters.
+       Inputs are the grid spacing, plus the CCZ4 evolution parameters and a matter object.
        It also takes the dissipation parameter sigma, and allows the formulation to be
        toggled between CCZ4 and BSSN. The default is CCZ4. It allows the user to set
        the value of Newton's constant, which is set to one by default.
     */
-    CCZ4Matter(const FABDriverBase& driver, matter_t a_matter, params_t params, 
+    CCZ4Matter(matter_t a_matter, params_t params,
                double dx, double sigma, int formulation = CCZ4::USE_CCZ4,
                double G_Newton = 1.0);
 
@@ -59,7 +57,7 @@ protected:
         const Vars<data_t> &vars, //!<the value of the variables at the point.
         const Vars< tensor<1,data_t> > &d1, //!<the value of the first derivatives of the variables.
         const Vars< tensor<2,data_t> > &d2, //!<the value of the second derivatives of the variables.
-        const Vars<data_t> &advec //!<the value of the advection terms beta^i d_i(var). 
+        const Vars<data_t> &advec //!<the value of the advection terms beta^i d_i(var).
     );
 
     // Class members
