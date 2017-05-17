@@ -10,6 +10,6 @@ ebase := SphericalHarmonicTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../Matter ../../FABDriver
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../Matter ../../BoxUtils
 
 include $(CHOMBO_HOME)/mk/Make.test
