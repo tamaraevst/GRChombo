@@ -58,7 +58,7 @@ int main()
         }
     }
 
-    IntVect center_vector(center, center, center);
+    std::vector<double> center_vector = {center, center, center};
 
     //Test the spherical harmonics across grid
     FABDriver<HarmonicTest>(center_vector, dx).execute(in_fab, out_fab); // disable_simd());

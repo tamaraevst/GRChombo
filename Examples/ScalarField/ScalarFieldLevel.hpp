@@ -4,7 +4,9 @@
 #define SCALARFIELDLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
-
+//Problem specific includes
+#include "Potential.hpp"
+#include "ScalarField.hpp"
 
 //!  A class for the evolution of a scalar field, minimally coupled to gravity
 /*!
@@ -20,6 +22,9 @@ class ScalarFieldLevel : public GRAMRLevel
     friend class ScalarFieldLevelFactory;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
+
+    // Typedef for scalar field
+    typedef ScalarField<Potential> ScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
     virtual
