@@ -5,6 +5,7 @@
 #include "CellIndex.hpp"
 #include "BoxPointers.hpp"
 #include "IntVect.H"
+#include "VarsBase.hpp"
 
 ///Encapsulates information about the position of a cell
 /** It contains the position of the cell on the Chombo grid and the index of the flattened Chombo array where the data

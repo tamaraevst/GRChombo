@@ -13,7 +13,7 @@
 template <typename... compute_ts>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
+BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
 #ifdef EQUATION_DEBUG_MODE
@@ -27,32 +27,32 @@ BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, con
 #pragma novector
     for (int ix = loop_lo_x; ix <= x_simd_max; ix += simd_width)
     {
-        compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers) );
+        compute_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers) );
     }
     // REMAINDER LOOP
 #pragma novector
     for (int ix = x_simd_max + simd<double>::simd_len; ix <= loop_hi_x; ++ix)
     {
-        compute_class_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers), disable_simd());
+        compute_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers), disable_simd());
     }
 }
 
 template <typename... compute_ts, typename... simd_info>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(ComputeClassPack<compute_ts...> compute_class_pack, const BoxPointers& box_pointers,
+BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, simd_info... info)
 {
 #pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
-        compute_class_pack.call_compute( Cell(IntVect(ix,iy,iz), box_pointers), std::forward<simd_info>(info)... );
+        compute_pack.call_compute( Cell(IntVect(ix,iy,iz), box_pointers), std::forward<simd_info>(info)... );
     }
 }
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
+BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
 {
     //Makes sure we are not requesting data outside the box of 'out'
     CH_assert(out.box().contains(loop_box));
@@ -71,7 +71,7 @@ BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const FArrayB
 #endif
         for (int iy = loop_lo[1]; iy <= loop_hi[1]; ++iy)
         {
-            innermost_loop(compute_class_pack, box_pointers, iy, iz, loop_lo[0], loop_hi[0], std::forward<simd_info>(info)...);
+            innermost_loop(compute_pack, box_pointers, iy, iz, loop_lo[0], loop_hi[0], std::forward<simd_info>(info)...);
         }
 }
 
@@ -84,9 +84,9 @@ BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, con
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
+BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
 {
-    loop(compute_class_pack, in,out,out.box(), std::forward<simd_info>(info)...);
+    loop(compute_pack, in,out,out.box(), std::forward<simd_info>(info)...);
 }
 
 template <typename compute_t, typename... simd_info>
@@ -98,7 +98,7 @@ BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, sim
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
+BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
     DataIterator dit0  = in.dataIterator();
     int nbox = dit0.size();
@@ -112,7 +112,7 @@ BoxLoops::loop(ComputeClassPack<compute_ts...> compute_class_pack, const LevelDa
         if (fill_ghosts) out_box = out_fab.box();
         else out_box = in.disjointBoxLayout()[di];
 
-        loop(compute_class_pack, in_fab,out_fab,out_box, std::forward<simd_info>(info)...);
+        loop(compute_pack, in_fab,out_fab,out_box, std::forward<simd_info>(info)...);
     }
 }
 

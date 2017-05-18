@@ -12,7 +12,7 @@
 #include "NanCheck.hpp"
 #include "Constraints.hpp"
 #include "CCZ4.hpp"
-#include "ComputeClassPack.hpp"
+#include "ComputePack.hpp"
 #include "SetValue.hpp"
 
 //Initial data

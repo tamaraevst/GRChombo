@@ -10,6 +10,6 @@ ebase := VariableStoreTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../FABDriver
+src_dirs := ../../utils ../../simd ../../BoxUtils
 
 include $(CHOMBO_HOME)/mk/Make.test

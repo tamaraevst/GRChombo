@@ -10,7 +10,7 @@
 #include "Cell.hpp"
 #include "BoxLoops.hpp"
 #include "DebuggingTools.hpp"
-#include "ComputeClassPack.hpp"
+#include "ComputePack.hpp"
 #include "SetValue.hpp"
 
 int main()

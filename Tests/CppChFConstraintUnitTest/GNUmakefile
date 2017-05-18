@@ -10,6 +10,6 @@ ebase := ConstraintTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../FABDriver
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../BoxUtils
 
 include $(CHOMBO_HOME)/mk/Make.test

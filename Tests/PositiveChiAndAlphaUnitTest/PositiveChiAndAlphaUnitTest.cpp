@@ -4,7 +4,7 @@
 #include "tensor.hpp"
 #include "GRutils.hpp"
 
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
 #include "PositiveChiAndAlpha.hpp"
 
 
@@ -34,7 +34,7 @@ int main()
         }
     }
 
-    FABDriver<PositiveChiAndAlpha>().execute(in_fab,in_fab);
+    BoxLoops::loop(PositiveChiAndAlpha(), in_fab,in_fab);
 
     for (int iz = 0; iz < N_GRID; ++iz)
     {

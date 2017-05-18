@@ -28,7 +28,7 @@
 #include "ScalarField.hpp"
 #include "ScalarBubble.hpp"
 #include "RelaxationChi.hpp"
-#include "ComputeClassPack.hpp"
+#include "ComputePack.hpp"
 #include "SetValue.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
