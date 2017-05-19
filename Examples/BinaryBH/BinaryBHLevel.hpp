@@ -5,7 +5,7 @@
 
 class BinaryBHLevel : public GRAMRLevel
 {
-    friend class BinaryBHLevelFactory;
+    friend class DefaultLevelFactory<BinaryBHLevel>;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
