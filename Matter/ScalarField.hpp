@@ -6,7 +6,6 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
@@ -23,7 +22,7 @@
      elements for the RHS update and the evaluation of the constraints. This includes the
      Energy Momentum Tensor, and the matter evolution terms. In this case, a scalar field,
      the matter elements are phi and (minus) its conjugate momentum, Pi. It is templated over a
-     potential function potential_t which the user must specify in a class, although a default is 
+     potential function potential_t which the user must specify in a class, although a default is
      provided which sets dVdphi and V_of_phi to zero. It assumes minimal coupling of the field to gravity.
      \sa CCZ4Matter(), ConstraintsMatter()
 */

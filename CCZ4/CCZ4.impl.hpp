@@ -8,13 +8,12 @@
 #define COVARIANTZ4
 
 inline
-CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, int formulation, double cosmological_constant) :
+CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation, double cosmological_constant) :
     m_params (params),
     m_sigma (sigma),
     m_formulation (formulation),
     m_cosmological_constant (cosmological_constant),
-    m_driver (driver),
-    m_deriv (dx, m_driver)
+    m_deriv (dx)
 {
     //Sanity check: a user who wants to use BSSN should also have damping paramters = 0
     if (m_formulation == USE_BSSN)
@@ -32,7 +31,7 @@ void
 CCZ4::compute(Cell current_cell)
 {
     Vars<data_t> vars;
-    m_driver.local_vars(vars, current_cell);
+    current_cell.local_vars(vars);
 
     Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
@@ -56,7 +55,7 @@ CCZ4::compute(Cell current_cell)
     FOR1(idir) m_deriv.add_dissipation(rhs, current_cell, m_sigma,idir);
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(rhs, current_cell);
+    current_cell.store_vars(rhs);
 }
 
 template <class data_t, template<typename> class vars_t>

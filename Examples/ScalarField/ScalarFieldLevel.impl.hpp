@@ -1,4 +1,4 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 17.05.17
 
 #if !defined(SCALARFIELDLEVEL_HPP_)
 #error "This file should only be included through ScalarFieldLevel.hpp"
@@ -9,7 +9,7 @@
 
 //General includes common to most GR problems
 #include "ScalarFieldLevel.hpp"
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
 #include "EnforceTfA.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
@@ -28,19 +28,17 @@
 #include "ScalarField.hpp"
 #include "ScalarBubble.hpp"
 #include "RelaxationChi.hpp"
+#include "ComputePack.hpp"
+#include "SetValue.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
 {
-    //Enforce the trace free A_ij condition
-    FABDriver<EnforceTfA>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
-
-    //Enforce positive chi and alpha
-    FABDriver<PositiveChiAndAlpha>().execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
+    //Enforce trace free A_ij and positive chi and alpha
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Check for nan's
-    if (m_p.nan_check) FABDriver<NanCheck>().execute(m_state_new, m_state_new,
-                                              SKIP_GHOST_CELLS, no_simd_support());
+    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, no_simd_support());
 }
 
 // Initial data for field and metric variables
@@ -49,11 +47,9 @@ void ScalarFieldLevel::initialData()
     CH_TIME("ScalarFieldLevel::initialData");
     if (m_verbosity) pout () << "ScalarFieldLevel::initialData " << m_level << endl;
 
-    //First set everything to zero ... we don't want undefined values in constraints etc
-    m_state_new.setVal(0.);
-
-    //Initial conditions for scalar field - here a bubble
-    FABDriver<ScalarBubble>(m_p.initial_params, m_dx).execute(m_state_new, m_state_new, FILL_GHOST_CELLS);
+    //First set everything to zero ... we don't want undefined values in constraints etc, then
+    //initial conditions for scalar field - here a bubble
+    BoxLoops::loop(make_compute_pack(SetValue(0.0), ScalarBubble(m_p.initial_params, m_dx)), m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 // Things to do before outputting a checkpoint file
@@ -62,8 +58,8 @@ void ScalarFieldLevel::preCheckpointLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential);
-    FABDriver<ConstraintsMatter<ScalarFieldWithPotential> >(scalar_field, m_dx,
-                    m_p.G_Newton).execute(m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(scalar_field, m_dx,
+                    m_p.G_Newton), m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
@@ -75,37 +71,32 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
     {
         //Calculate chi relaxation right hand side
         //Note this assumes conformal chi and Mom constraint trivially satisfied
+        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        FABDriver<RelaxationChi<ScalarFieldWithPotential> >(scalar_field, m_dx, m_p.relaxspeed,
-                                   m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
-
-        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
-        a_rhs.setVal(0., Interval(c_h11,c_Mom3));
+        BoxLoops::loop(make_compute_pack(RelaxationChi<ScalarFieldWithPotential>(scalar_field, m_dx, m_p.relaxspeed,
+                                   m_p.G_Newton), SetValue(0.0, Interval(c_h11, c_Mom3))), a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
     else
     {
-        FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
 
-        //Enforce positive chi and alpha
-        FABDriver<PositiveChiAndAlpha>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+        //Enforce trace free A_ij and positive chi and alpha
+        BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
 
         //Calculate CCZ4Matter right hand side with matter_t = ScalarField
+        //We don't want undefined values floating around in the constraints so zero these
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        FABDriver<CCZ4Matter<ScalarFieldWithPotential> >(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
-                        m_p.formulation, m_p.G_Newton).execute(a_soln, a_rhs, SKIP_GHOST_CELLS);
-
-        //We don't want undefined values floating around in the constraints
-        a_rhs.setVal(0., Interval(c_Ham,c_Mom3));
+        BoxLoops::loop(make_compute_pack(CCZ4Matter<ScalarFieldWithPotential>(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
+                        m_p.formulation, m_p.G_Newton), SetValue(0.0, Interval(c_Ham, c_Mom3))), a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
 }
 
 // Things to do at ODE update, after soln + rhs
 void ScalarFieldLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
 {
-    //Enforce the trace free A_ij condition
-    FABDriver<EnforceTfA>().execute(a_soln, a_soln, FILL_GHOST_CELLS);
+    //Enforce trace free A_ij
+    BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
 // Specify if you want any plot files to be written, with which vars
@@ -140,7 +131,7 @@ void ScalarFieldLevel::tagCells (IntVectSet& a_tags)
 
         //mod gradient
         FArrayBox mod_grad_fab(b,c_NUM);
-        FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
+        BoxLoops::loop(ComputeModGrad(m_dx), state_fab, mod_grad_fab);
 
         const IntVect& smallEnd = b.smallEnd();
         const IntVect& bigEnd = b.bigEnd();

@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #include "CCZ4.hpp"
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
 #include "GRBSSNChomboF_F.H"
 
 #define CHF_FRAn(a, n, c) \
@@ -148,7 +148,7 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    FABDriver<CCZ4>(params, dx, sigma).execute(in_fab, out_fab);
+    BoxLoops::loop(CCZ4(params,dx,sigma), in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 

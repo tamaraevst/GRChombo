@@ -14,7 +14,7 @@
 template <class data_t>
 void HarmonicTest::compute(Cell current_cell) {
 
-    ScalarField::Vars<data_t> vars;
+    ScalarField<>::Vars<data_t> vars;
     Coordinates<data_t> coords(current_cell, m_dx);
 
     vars.phi = compute_harmonic(coords);
@@ -22,7 +22,7 @@ void HarmonicTest::compute(Cell current_cell) {
     data_t radius = Coordinates<data_t>::get_radius(current_cell, m_dx, m_center_vector);
     vars.phi = vars.phi/radius;
 
-    m_driver.store_vars(vars.phi, current_cell, c_phi);
+    current_cell.store_vars(vars.phi, c_phi);
 }
 
 template <class data_t>

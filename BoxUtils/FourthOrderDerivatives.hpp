@@ -4,8 +4,7 @@
 #include "UserVariables.hpp"
 #include "tensor.hpp"
 #include "VarsBase.hpp"
-#include "FABDriverBase.hpp"
-#include "CellIndex.hpp"
+#include "Cell.hpp"
 #include <array>
 
 class FourthOrderDerivatives
@@ -15,15 +14,12 @@ public:
 private:
     const double m_one_over_dx;
     const double m_one_over_dx2;
-protected:
-    const FABDriverBase& m_driver;
 
 public:
-    FourthOrderDerivatives(double dx, const FABDriverBase& driver) :
+    FourthOrderDerivatives(double dx) :
         m_dx (dx),
         m_one_over_dx (1/dx),
-        m_one_over_dx2 (1/(dx*dx)),
-        m_driver (driver)
+        m_one_over_dx2 (1/(dx*dx))
     {}
 
     template <class data_t>
@@ -47,23 +43,25 @@ public:
     //Writes directly into the vars object - use this wherever possible
     template <class data_t>
     void
-    diff1(VarsBase< tensor<1, data_t> >& d1, CellIndexIn in_index, int direction) const
+    diff1(VarsBase< tensor<1, data_t> >& d1, const Cell& current_cell, int direction) const
     {
-        int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            d1.assign(diff1<data_t>(m_driver.m_in_ptr[i], in_index, stride), i, direction);
+            d1.assign(diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride), i, direction);
         }
     }
 
     template <class data_t>
     void
-    diff1(tensor<1,data_t> (&diffArray)[c_NUM], CellIndexIn in_index, int direction) const
+    diff1(tensor<1,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction) const
     {
-        int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            diffArray[i][direction] = diff1<data_t>(m_driver.m_in_ptr[i], in_index,stride);
+            diffArray[i][direction] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index,stride);
         }
     }
 
@@ -88,23 +86,25 @@ public:
     //Writes 2nd deriv directly into the vars object - use this wherever possible
     template <class data_t>
     void
-    diff2(VarsBase< tensor<2,data_t> >& d2, CellIndexIn in_index, int direction) const
+    diff2(VarsBase< tensor<2,data_t> >& d2, const Cell& current_cell, int direction) const
     {
-        int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            d2.assign(diff2<data_t>(m_driver.m_in_ptr[i], in_index, stride), i, direction, direction);
+            d2.assign(diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride), i, direction, direction);
         }
     }
 
     template <class data_t>
     void
-    diff2(tensor<2,data_t> (&diffArray)[c_NUM], CellIndexIn in_index, int direction) const
+    diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction) const
     {
-        int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            diffArray[i][direction][direction] = diff2<data_t>(m_driver.m_in_ptr[i],in_index,stride);
+            diffArray[i][direction][direction] = diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i],in_index,stride);
         }
     }
 
@@ -142,13 +142,14 @@ public:
 
     template <class data_t>
     void
-    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, CellIndexIn in_index, int direction1, int direction2) const
+    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, const Cell& current_cell, int direction1, int direction2) const
     {
-        int stride1 = m_driver.m_in_stride[direction1];
-        int stride2 = m_driver.m_in_stride[direction2];
+        const int stride1 = current_cell.get_box_pointers().m_in_stride[direction1];
+        const int stride2 = current_cell.get_box_pointers().m_in_stride[direction2];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            data_t tmp = mixed_diff2<data_t>(m_driver.m_in_ptr[i], in_index, stride1, stride2);
+            data_t tmp = mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride1, stride2);
             d2.assign(tmp, i, direction1, direction2);
             d2.assign(tmp, i, direction2, direction1);
         }
@@ -156,13 +157,14 @@ public:
 
     template <class data_t>
     void
-    mixed_diff2(tensor<2,data_t> (&diffArray)[c_NUM], CellIndexIn in_index, int direction1, int direction2) const
+    mixed_diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction1, int direction2) const
     {
-        int stride1 = m_driver.m_in_stride[direction1];
-        int stride2 = m_driver.m_in_stride[direction2];
+        const int stride1 = current_cell.get_box_pointers().m_in_stride[direction1];
+        const int stride2 = current_cell.get_box_pointers().m_in_stride[direction2];
+        const int in_index = current_cell.get_in_index();
         FORVARS(i)
         {
-            data_t diff2_value = mixed_diff2<data_t>(m_driver.m_in_ptr[i],in_index,stride1, stride2);
+            data_t diff2_value = mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i],in_index,stride1, stride2);
             diffArray[i][direction1][direction2] = diff2_value;
             diffArray[i][direction2][direction1] = diff2_value;
         }
@@ -205,25 +207,27 @@ protected: //Let's keep this protected ... we may want to change the advection c
 public:
     template <class data_t>
     void
-    add_advection(VarsBase<data_t>& vars, CellIndexIn in_index, const data_t& vec_comp, const int dir) const
+    add_advection(VarsBase<data_t>& vars, const Cell& current_cell, const data_t& vec_comp, const int dir) const
     {
-        const int stride = m_driver.m_in_stride[dir];
+        const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
+        const int in_index = current_cell.get_in_index();
         FORVARS(ivar)
         {
-            vars.plus(advection_term(m_driver.m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive),ivar);
+            vars.plus(advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive),ivar);
         }
     }
 
     template <class data_t>
     void
-    add_advection(data_t (&out)[c_NUM], CellIndexIn in_index, const data_t& vec_comp, const int dir) const
+    add_advection(data_t (&out)[c_NUM], const Cell& current_cell, const data_t& vec_comp, const int dir) const
     {
-        const int stride = m_driver.m_in_stride[dir];
+        const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
+        const int in_index = current_cell.get_in_index();
         FORVARS(ivar)
         {
-            out[ivar] += advection_term(m_driver.m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive);
+            out[ivar] += advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive);
         }
     }
 
@@ -249,23 +253,25 @@ public:
 
     template <class data_t>
     void
-    add_dissipation(VarsBase<data_t>& vars, CellIndexIn in_index, const double factor, const int direction) const
+    add_dissipation(VarsBase<data_t>& vars, const Cell& current_cell, const double factor, const int direction) const
     {
-        const int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(ivar)
         {
-            vars.plus(factor*dissipation_term<data_t>(m_driver.m_in_ptr[ivar], in_index, stride), ivar);
+            vars.plus(factor*dissipation_term<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride), ivar);
         }
     }
 
     template <class data_t>
     void
-    add_dissipation(data_t (&out)[c_NUM], CellIndexIn in_index, const double factor, const int direction) const
+    add_dissipation(data_t (&out)[c_NUM], const Cell& current_cell, const double factor, const int direction) const
     {
-        const int stride = m_driver.m_in_stride[direction];
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
         FORVARS(ivar)
         {
-            out[ivar] += factor*dissipation_term<data_t>(m_driver.m_in_ptr[ivar], in_index, stride);
+            out[ivar] += factor*dissipation_term<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride);
         }
     }
 };

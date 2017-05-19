@@ -9,11 +9,10 @@
 
 template <class matter_t>
 ConstraintsMatter<matter_t>::ConstraintsMatter(
-    const FABDriverBase& driver,
     const matter_t a_matter,
     double dx,
     double G_Newton)
-    : Constraints(driver, dx, 0.0 /*No cosmological constant*/),
+    : Constraints(dx, 0.0 /*No cosmological constant*/),
       my_matter (a_matter),
       m_G_Newton (G_Newton) {}
 
@@ -24,7 +23,7 @@ void ConstraintsMatter<matter_t>::compute(Cell current_cell)
 {
     //Calculate non matter contributions to Constraints
     Vars<data_t> vars;
-    m_driver.local_vars(vars, current_cell);
+    current_cell.local_vars(vars);
 
     //Calculate first derivatives
     Vars< tensor<1, data_t> > d1;
@@ -65,10 +64,10 @@ void ConstraintsMatter<matter_t>::compute(Cell current_cell)
     }
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(out.Ham, current_cell, c_Ham);
-    m_driver.store_vars(out.Mom[0], current_cell, c_Mom1);
-    m_driver.store_vars(out.Mom[1], current_cell, c_Mom2);
-    m_driver.store_vars(out.Mom[2], current_cell, c_Mom3);
+    current_cell.store_vars(out.Ham, c_Ham);
+    current_cell.store_vars(out.Mom[0], c_Mom1);
+    current_cell.store_vars(out.Mom[1], c_Mom2);
+    current_cell.store_vars(out.Mom[2], c_Mom3);
 }
 
 #endif /* CONSTRAINTSMATTER_IMPL_HPP_ */

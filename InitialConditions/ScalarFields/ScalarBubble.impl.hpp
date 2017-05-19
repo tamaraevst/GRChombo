@@ -6,8 +6,8 @@
 #define SCALARBUBBLE_IMPL_HPP_
 
 inline
-ScalarBubble::ScalarBubble(const FABDriverBase& a_driver, params_t a_params, double a_dx)
-    : m_driver (a_driver), m_dx (a_dx), m_params (a_params)
+ScalarBubble::ScalarBubble(params_t a_params, double a_dx)
+    : m_dx (a_dx), m_params (a_params)
 {}
 
 // Compute the value of the initial vars on the grid
@@ -30,7 +30,7 @@ void ScalarBubble::compute(Cell current_cell)
     FOR1(i) vars.h[i][i] = 1.;
 
     //Store the initial values of the variables
-    m_driver.store_vars(vars, current_cell);
+    current_cell.store_vars(vars);
 }
 
 // Compute the value of phi at the current point

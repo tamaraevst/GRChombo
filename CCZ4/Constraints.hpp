@@ -7,7 +7,6 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Cell.hpp"
 
@@ -40,12 +39,11 @@ protected:
         tensor<1, data_t> Mom;
     };
 
-    const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
     double m_cosmological_constant;
 
 public:
-    Constraints(const FABDriverBase& driver, double dx, double cosmological_constant = 0);
+    Constraints(double dx, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(Cell current_cell);

@@ -1,7 +1,7 @@
 // Last edited K Clough 16.10.16
 
-#ifndef USERVARIABLES_HPP
-#define USERVARIABLES_HPP
+#ifndef USERVARIABLES_HPP_
+#define USERVARIABLES_HPP_
 
 //TODO: This file can be auto-generated from a list of variable names
 //Also, we should probably scope this enum too...
@@ -102,4 +102,4 @@ namespace UserVariables
     };
 }
 
-#endif /* USERVARIABLES_HPP */
+#endif /* USERVARIABLES_HPP_ */

@@ -9,7 +9,7 @@
 #include <sys/time.h>
 
 #include "Constraints.hpp"
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
 #include "BoxIterator.H"
 #include "ConstraintTestF_F.H"
 
@@ -135,11 +135,11 @@ int main()
     struct timeval begin, end;
 
     // Make sure instructions are hot in cache
-    FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result, box);
+    BoxLoops::loop(Constraints(dx), in_fab, in_fab_cpp_result, box);
 
     gettimeofday(&begin, NULL);
 
-    FABDriver<Constraints>(dx).execute(in_fab, in_fab_cpp_result, box);
+    BoxLoops::loop(Constraints(dx), in_fab, in_fab_cpp_result, box);
 
     gettimeofday(&end, NULL);
 

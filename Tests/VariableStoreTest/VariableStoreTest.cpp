@@ -1,5 +1,7 @@
 #include <iostream>
-#include "FABDriverBase.hpp"
+
+#include "UserVariables.hpp"
+#include "Cell.hpp"
 #include "VarsBase.hpp"
 #include "CellIndex.hpp"
 
@@ -27,16 +29,15 @@ int main()
     vars.symmetric_var_2 = 84.;
 
 
-    double out[c_NUM];
-    FABDriverBase driver;
-    FORVARS(i) driver.m_out_ptr[i] = &out[i];
+    Box box(IntVect(0,0,0), IntVect(0,0,0));
+    FArrayBox fab_in(box, 3);
+    FArrayBox fab_out(box, 3);
+    Cell current_cell(IntVect(0,0,0), BoxPointers(fab_in, fab_out));
 
-    CellIndexOut out_index = 0;
+    current_cell.store_vars(vars);
 
-    driver.store_vars(vars, out_index);
-
-    if (out[c_var] != 42.) failed=1;
-    if (out[c_sym_var] != 84.) failed=2;
+    if (fab_out(IntVect::Zero,0) != 42.) failed=1;
+    if (fab_out(IntVect::Zero,1) != 84.) failed=2;
 
     if (failed) std::cout << "Variable store test FAILED with code " << failed << std::endl;
     else std::cout << "Variable store test PASSED. (return code " << failed << ")" << std::endl;

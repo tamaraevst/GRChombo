@@ -1,4 +1,4 @@
-// Last edited K Clough 09.05.17
+// Last edited K Clough 17.05.17
 
 #ifndef RELAXATIONCHI_HPP_
 #define RELAXATIONCHI_HPP_
@@ -6,7 +6,6 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
@@ -39,11 +38,10 @@ class RelaxationChi {
 public:
     //! Constructor of class RelaxationChi
     /*!
-        Takes in the box driver and the grid spacing, plus the relaxation speed, the
-        matter params, and the value of Newton's constant, which is set to one by default.
+        Takes in the grid spacing, plus the relaxation speed, a matter object
+        and the value of Newton's constant, which is set to one by default.
     */
-    RelaxationChi(const FABDriverBase& driver, 
-                  matter_t a_matter, 
+    RelaxationChi(matter_t a_matter,
                   double dx, double relax_speed,
                   double G_Newton = 1.0);
 
@@ -55,7 +53,6 @@ protected:
     matter_t my_matter;//!< The matter object, e.g. a scalar field.
     const double m_relax_speed;//!< The coefficient of the Hamiltonian used to set relaxation speed.
     const double m_G_Newton;//!< Newton's constant, set to one by default.
-    const FABDriverBase& m_driver;//!< The driver for the array box
     const FourthOrderDerivatives m_deriv;//!< An object for calculating derivatives of the variables
 
     //! The function which calculates the RHS, given the vars and derivatives \sa compute()

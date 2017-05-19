@@ -1,5 +1,5 @@
-#ifndef USER_ENUM
-#define USER_ENUM
+#ifndef USERVARIABLES_HPP_
+#define USERVARIABLES_HPP_
 
 enum {
     c_chi,
@@ -44,4 +44,44 @@ enum {
     c_NUM
 };
 
-#endif /* USER_ENUM */
+namespace UserVariables
+{
+    static constexpr char const * variable_names[c_NUM] =
+    {
+        "chi",
+
+        "h11",
+        "h12",
+        "h13",
+        "h22",
+        "h23",
+        "h33",
+
+        "K",
+
+        "A11",
+        "A12",
+        "A13",
+        "A22",
+        "A23",
+        "A33",
+
+        "Theta",
+
+        "Gamma1",
+        "Gamma2",
+        "Gamma3",
+
+        "lapse",
+
+        "shift1",
+        "shift2",
+        "shift3",
+
+        "B1",
+        "B2",
+        "B3",
+    };
+}
+
+#endif /* USERVARIABLES_HPP */

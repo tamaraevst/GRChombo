@@ -2,9 +2,9 @@
 #include "LevelRK4.H"
 
 //TODO: Remove this once tagCells is sorted out!
-#include "FABDriver.hpp"
 #include "ComputeModGrad.hpp"
 #include "GRAMRLevel.hpp"
+#include "BoxLoops.hpp"
 
 GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
 : m_num_ghosts (a_p.num_ghosts), m_p(a_p), m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
@@ -167,7 +167,7 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
 
         //mod gradient
         FArrayBox mod_grad_fab(b,c_NUM);
-        FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
+        BoxLoops::loop(ComputeModGrad(m_dx), state_fab, mod_grad_fab);
 
         const IntVect& smallEnd = b.smallEnd();
         const IntVect& bigEnd = b.bigEnd();
