@@ -49,7 +49,8 @@ void ScalarFieldLevel::initialData()
 
     //First set everything to zero ... we don't want undefined values in constraints etc, then
     //initial conditions for scalar field - here a bubble
-    BoxLoops::loop(make_compute_pack(SetValue(0.0), ScalarBubble(m_p.initial_params, m_dx)), m_state_new, m_state_new, FILL_GHOST_CELLS);
+    BoxLoops::loop(make_compute_pack(SetValue(0.0), ScalarBubble(m_p.initial_params, m_dx)),
+                                                        m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 // Things to do before outputting a checkpoint file
@@ -58,8 +59,8 @@ void ScalarFieldLevel::preCheckpointLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential);
-    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(scalar_field, m_dx,
-                    m_p.G_Newton), m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(scalar_field, m_dx, m_p.G_Newton),
+                                                        m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
@@ -74,8 +75,10 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
         //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        BoxLoops::loop(make_compute_pack(RelaxationChi<ScalarFieldWithPotential>(scalar_field, m_dx, m_p.relaxspeed,
-                                   m_p.G_Newton), SetValue(0.0, Interval(c_h11, c_Mom3))), a_soln, a_rhs, SKIP_GHOST_CELLS);
+        RelaxationChi<ScalarFieldWithPotential> relaxation(scalar_field, m_dx, m_p.relaxspeed, m_p.G_Newton);
+        SetValue set_other_values_zero(0.0, Interval(c_h11, c_Mom3));
+        auto compute_pack1 = make_compute_pack(relaxation, set_other_values_zero);
+        BoxLoops::loop(compute_pack1, a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
     else
     {
@@ -87,8 +90,11 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, 
         //We don't want undefined values floating around in the constraints so zero these
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        BoxLoops::loop(make_compute_pack(CCZ4Matter<ScalarFieldWithPotential>(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
-                        m_p.formulation, m_p.G_Newton), SetValue(0.0, Interval(c_Ham, c_Mom3))), a_soln, a_rhs, SKIP_GHOST_CELLS);
+        CCZ4Matter<ScalarFieldWithPotential> my_ccz4_matter(scalar_field, 
+                                                m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton); 
+        SetValue set_constraints_zero(0.0, Interval(c_Ham, c_Mom3));
+        auto compute_pack2 = make_compute_pack(my_ccz4_matter, set_constraints_zero);
+        BoxLoops::loop(compute_pack2, a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
 }
 
