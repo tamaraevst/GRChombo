@@ -19,7 +19,7 @@
 */
 class ScalarFieldLevel : public GRAMRLevel
 {
-    friend class ScalarFieldLevelFactory;
+    friend class DefaultLevelFactory<ScalarFieldLevel>;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 

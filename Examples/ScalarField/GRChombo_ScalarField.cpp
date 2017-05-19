@@ -23,8 +23,8 @@ using std::endl;
 #include "SimulationParameters.hpp"
 
 //Problem specific includes:
-#include "ScalarFieldLevelFactory.hpp"
-
+#include "DefaultLevelFactory.hpp"
+#include "ScalarFieldLevel.hpp"
 
 //TODO: Remove the below three lines if they aren't necessary
 #if defined(__i386__) && defined(__SSE__)
@@ -47,7 +47,7 @@ runGRChombo (int argc, char* argv[])
     //The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
     //and an associated LevelFactory)
-    ScalarFieldLevelFactory matter_sf_level_fact(sim_params);
+    DefaultLevelFactory<ScalarFieldLevel> matter_sf_level_fact(sim_params);
     AMR amr;
     setupAMRObject(amr, matter_sf_level_fact);
 
