@@ -1,8 +1,8 @@
 # Last edited K Clough 20.5.17
 
 verbosity = 0
-chk_prefix = KerrBH_
-plot_prefix = KerrBHp_
+chk_prefix = /scratch2/kclough/KerrBH_
+plot_prefix = /scratch2/kclough/KerrBHp_
 #restart_file = KerrBH_000060.3d.hdf5
 
 # Set up grid spacings and regrid params

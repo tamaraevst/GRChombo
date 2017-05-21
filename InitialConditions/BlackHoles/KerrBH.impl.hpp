@@ -22,7 +22,8 @@ void KerrBH::compute(Cell current_cell)
 
     // this is the spherical shift (phi is the only non zero one in Kerr, but function is general)
     tensor<1,data_t> spherical_shift;
-    // the analytic lapse per arxiv gr-qc/9601010
+
+    // the analytic lapse
     data_t kerr_lapse;
 
     // The other variables
@@ -202,20 +203,24 @@ void KerrBH::spherical_to_cartesian(Vars<data_t> &vars,
 
     // The shift - NB a vector not a one form so need inverse - dxdphi, dydphi etc instead
     tensor<2,data_t> inv_jac;
-    jac[0][0] = x/r;
-    jac[1][0] = y/r;
-    jac[2][0] = z/r;
-    jac[0][1] = z*cosphi;
-    jac[1][1] = z*sinphi;
-    jac[2][1] = -r*sinth;
-    jac[0][2] = -y;
-    jac[1][2] = x;
-    jac[2][2] = 0.0;
+    inv_jac[0][0] = x/r;
+    inv_jac[1][0] = y/r;
+    inv_jac[2][0] = z/r;
+    inv_jac[0][1] = z*cosph;
+    inv_jac[1][1] = z*sinph;
+    inv_jac[2][1] = -r*sinth;
+    inv_jac[0][2] = -y;
+    inv_jac[1][2] = x;
+    inv_jac[2][2] = 0.0;
 
     // transform the shift
-    FOR2(i,j)
+    FOR1(i)
     {
-        vars.shift[i] += inv_jac[i][j]*spherical_shift[j];
+        vars.shift[i] = 0.0;
+        FOR1(j)
+        {
+            vars.shift[i] += inv_jac[i][j]*spherical_shift[j];
+        }
     }
 }
 
