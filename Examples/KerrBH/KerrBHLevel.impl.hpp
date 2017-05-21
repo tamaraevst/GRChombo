@@ -59,9 +59,6 @@ void KerrBHLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const
     BoxLoops::loop(make_compute_pack(CCZ4(m_p.ccz4Params, m_dx, m_p.sigma), SetValue(0, Interval(c_Ham, c_Mom3)) ),
                    a_soln, a_rhs, SKIP_GHOST_CELLS);
 
-    //For now this seems necessary
-    a_rhs.setVal(0.0, Interval(c_Ham, c_Mom3));
-
 }
 
 void KerrBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
