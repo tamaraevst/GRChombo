@@ -25,7 +25,7 @@ public:
     {
         for(int i = m_interval.begin(); i<=m_interval.end(); ++i)
         {
-            current_cell.store_vars(m_value, i);
+            current_cell.store_vars( (data_t) m_value, i);
         }
     }
 };
