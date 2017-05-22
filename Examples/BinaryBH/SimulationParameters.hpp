@@ -30,22 +30,22 @@ public:
         bh2_params.momentum = momentumB;
 
         //Fill in he ccz4Parameters
-        ccz4Params.kappa1 = kappa1;
-        ccz4Params.kappa2 = kappa2;
-        ccz4Params.kappa3 = kappa3;
-        ccz4Params.shift_Gamma_coeff = shift_Gamma_coeff;
-        ccz4Params.shift_advec_coeff = shift_advec_coeff;
-        ccz4Params.eta = eta;
-        ccz4Params.lapse_advec_coeff = lapse_advec_coeff;
-        ccz4Params.lapse_power = lapse_power;
-        ccz4Params.lapse_coeff = lapse_coeff;
+        ccz4_params.kappa1 = kappa1;
+        ccz4_params.kappa2 = kappa2;
+        ccz4_params.kappa3 = kappa3;
+        ccz4_params.shift_Gamma_coeff = shift_Gamma_coeff;
+        ccz4_params.shift_advec_coeff = shift_advec_coeff;
+        ccz4_params.eta = eta;
+        ccz4_params.lapse_advec_coeff = lapse_advec_coeff;
+        ccz4_params.lapse_power = lapse_power;
+        ccz4_params.lapse_coeff = lapse_coeff;
     }
 
     //SimulationParameters.inc declares all variables and defines auto_read_params(ParmParse& pp)
 #include "SimulationParameters.inc"
 
     //Collection of parameters necessary for the CCZ4 RHS
-    CCZ4::params_t ccz4Params;
+    CCZ4::params_t ccz4_params;
     BoostedBH::params_t bh2_params;
     BoostedBH::params_t bh1_params;
 };
