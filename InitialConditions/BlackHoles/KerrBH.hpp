@@ -9,6 +9,8 @@
 #include "Coordinates.hpp"
 #include "CCZ4.hpp"
 #include "Cell.hpp"
+#include "TensorAlgebra.hpp"
+#include "InitialDataTools.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 
 #include <array>
@@ -56,18 +58,9 @@ protected:
                       data_t &kerr_lapse,//!<< The lapse for the kerr solution
                       const Coordinates<data_t> coords);//!<< Coords of current cell
 
-    //! Function which computes the cartesian components of the CCZ4 vars from spherical K_ij, g_ij and beta^i
-    template <class data_t>
-    void spherical_to_cartesian(Vars<data_t> &vars,
-                                tensor<2,data_t> &spherical_g,//!<< The spatial metric in spherical coords
-                                tensor<2,data_t> &spherical_K,//!<< The extrinsic curvature in spherical coords
-                                tensor<1,data_t> &spherical_shift, //!<< The components of the kerr shift in spherical coords
-                                const Coordinates<data_t> coords);//!<< Coords of current cell
-
     //! Function to get coordinates in cartesian space, and radius
     template <class data_t>
-    void get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z, 
-                          data_t &r, data_t &r2, data_t &rho, data_t &rho2);
+    void get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z, data_t &r);
 };
 
 #include "KerrBH.impl.hpp"
