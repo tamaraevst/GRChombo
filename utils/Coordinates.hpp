@@ -2,6 +2,7 @@
 #define COORDINATES_HPP_
 
 #include "simd.hpp"
+#include "MiscUtils.hpp"
 
 template <class data_t>
 class Coordinates
@@ -64,8 +65,9 @@ public:
                         + pow(z - center[2],2));
 
         double minimum_r = 1e-6;
-        auto r_is_too_small = simd_compare_lt(r, minimum_r);
-        return simd_conditional(r_is_too_small, minimum_r, r);
+        MIN_CUT_OFF(r, minimum_r);
+
+        return r;
     }
 
     // static function which returns radius subject to a floor
@@ -88,8 +90,9 @@ public:
                         + pow(zz - center[2],2));
 
         double minimum_r = 1e-6;
-        auto r_is_too_small = simd_compare_lt(r, minimum_r);
-        return simd_conditional(r_is_too_small, minimum_r, r);
+        MIN_CUT_OFF(r, minimum_r);
+
+        return r;
     }
 
 };

@@ -60,7 +60,7 @@ protected:
 
     //! Function to get coordinates in cartesian space, and radius
     template <class data_t>
-    void get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z, data_t &r);
+    void get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z);
 };
 
 #include "KerrBH.impl.hpp"

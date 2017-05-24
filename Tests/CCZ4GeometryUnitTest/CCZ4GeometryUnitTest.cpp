@@ -23,7 +23,7 @@ int main()
 
 #include "values1.hpp" //Including the auto generated file with values
 
-   auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+   auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
 
    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 

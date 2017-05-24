@@ -2,7 +2,7 @@
 #include <iostream>
 #include "PositiveChiAndAlpha.hpp"
 #include "tensor.hpp"
-#include "GRutils.hpp"
+#include "GRUtils.hpp"
 
 #include "BoxLoops.hpp"
 #include "PositiveChiAndAlpha.hpp"

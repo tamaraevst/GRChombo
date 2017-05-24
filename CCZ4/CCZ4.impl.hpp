@@ -71,7 +71,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse(vars.h);
+    auto h_UU = compute_inverse_sym(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     tensor<1, data_t> Z_over_chi;

@@ -96,7 +96,7 @@ void ScalarField<potential_t>::add_matter_rhs(
 
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse(vars.h);
+    auto h_UU = compute_inverse_sym(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //set the potential values

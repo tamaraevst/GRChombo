@@ -37,23 +37,14 @@ public:
         FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
 
         using namespace TensorAlgebra;
-        auto h_UU = compute_inverse(vars.h);
+        auto h_UU = compute_inverse_sym(vars.h);
         auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
         //assign values of Gamma^k = h_UU^ij * \tilde{Gamma}^k_ij
-        FOR1(i)
-        {
-            vars.Gamma[i] = 0.0;
-            FOR2(j,k)
-            {
-                vars.Gamma[i] += h_UU[j][k] * chris.ULL[i][j][k];
-            }
-        }
+        vars.Gamma = chris.contracted;
 
         //Write the rhs into the output FArrayBox
-        current_cell.store_vars(vars.Gamma[0], c_Gamma1);
-        current_cell.store_vars(vars.Gamma[1], c_Gamma2);
-        current_cell.store_vars(vars.Gamma[2], c_Gamma3);
+        current_cell.store_vars(vars, Interval(c_Gamma1, c_Gamma3));
     }
 
 };

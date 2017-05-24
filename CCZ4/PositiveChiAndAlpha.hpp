@@ -3,6 +3,7 @@
 #define POSITIVECHIANDALPHA_HPP_
 
 #include "UserVariables.hpp"
+#include "MiscUtils.hpp"
 #include "simd.hpp"
 #include "Cell.hpp"
 
@@ -16,11 +17,8 @@ public:
       current_cell.local_vars(chi, c_chi);
       current_cell.local_vars(lapse, c_lapse);
 
-      auto chi_is_too_small = simd_compare_lt(chi, 1e-4);
-      chi = simd_conditional(chi_is_too_small, 1e-4, chi);
-
-      auto lapse_is_too_small = simd_compare_lt(lapse, 1e-4);
-      lapse = simd_conditional(lapse_is_too_small, 1e-4, lapse);
+      MIN_CUT_OFF(chi, 1e-4);
+      MIN_CUT_OFF(lapse, 1e-4);
 
       current_cell.store_vars(chi, c_chi);
       current_cell.store_vars(lapse, c_lapse);

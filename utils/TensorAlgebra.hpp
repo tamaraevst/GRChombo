@@ -9,21 +9,31 @@ namespace TensorAlgebra
     template <class data_t>
     ALWAYS_INLINE
     static data_t
+    compute_determinant_sym(const tensor<2,data_t,3>& matrix) //This function only works for 3D matrix
+    {
+        data_t det = matrix[0][0]*matrix[1][1]*matrix[2][2] + 2*matrix[0][1]*matrix[0][2]*matrix[1][2]
+                   - matrix[0][0]*matrix[1][2]*matrix[1][2] - matrix[1][1]*matrix[0][2]*matrix[0][2]
+                   - matrix[2][2]*matrix[0][1]*matrix[0][1];
+
+        return det;
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static data_t
     compute_determinant(const tensor<2,data_t,3>& matrix) //This function only works for 3D matrix
     {
-        // work out detj for the jacobian, needed to transform tensor densities
-        data_t detm = matrix[0][0]*(matrix[1][1]*matrix[2][2]-matrix[1][2]*matrix[2][1])-
+        data_t det = matrix[0][0]*(matrix[1][1]*matrix[2][2]-matrix[1][2]*matrix[2][1])-
                       matrix[0][1]*(matrix[2][2]*matrix[1][0]-matrix[1][2]*matrix[2][0])+
                       matrix[0][2]*(matrix[1][0]*matrix[2][1]-matrix[1][1]*matrix[2][0]);
-        return detm;
+        return det;
     }
 
     template <class data_t>
     static tensor<2, data_t>
-    compute_inverse(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
+    compute_inverse_sym(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
     {
-        //FIXME: this function currently assumes a symmetic tensor ... change this?
-        data_t deth = compute_determinant(matrix);
+        data_t deth = compute_determinant_sym(matrix);
         data_t deth_inverse = 1./deth;
         tensor<2, data_t> h_UU;
         h_UU[0][0] = (matrix[1][1]*matrix[2][2] - matrix[1][2]*matrix[1][2]) * deth_inverse;
@@ -41,7 +51,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     static tensor<2, data_t>
-    compute_inverse_asym(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
+    compute_inverse(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
     {
         data_t deth = compute_determinant(matrix);
         data_t deth_inverse = 1./deth;

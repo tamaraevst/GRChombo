@@ -3,37 +3,38 @@
 
 #include "always_inline.hpp"
 #include "tensor.hpp"
+#include "MiscUtils.hpp"
 
 namespace InitialDataTools
 {
     //Convert a tensor (with two lower indices) in spherical coords to cartesian coords
     template <class data_t>
     static tensor<2, data_t>
-    spherical_to_cartesian_LL(tensor<2, data_t> spherical_g, data_t r, data_t x, double y, double z)
+    spherical_to_cartesian_LL(tensor<2, data_t> spherical_g, data_t x, double y, double z)
     {
         tensor<2, data_t> cartesian_g;
 
         // calculate useful position quantities
         data_t rho2 = x*x + y*y;
-        double minimum_rho2 = 1e-12;
-        auto rho_is_too_small = simd_compare_lt(rho2, minimum_rho2);
-        rho2 = simd_conditional(rho_is_too_small, minimum_rho2, rho2);
+        MIN_CUT_OFF(rho2, 1e-12);
         data_t rho = sqrt(rho2);
-        data_t r2 = r*r;
+        data_t r2 = x*x + y*y + z*z;
+        MIN_CUT_OFF(r2, 1e-12);
+        data_t r = sqrt(r2);
 
         //And the sines and cosines of phi and theta
-        data_t costh = z/r;
-        data_t sinth = rho/r;
-        data_t cosph = x/rho;
-        data_t sinph = y/rho;
+        data_t cos_theta = z/r;
+        data_t sin_theta = rho/r;
+        data_t cos_phi = x/rho;
+        data_t sin_phi = y/rho;
 
         // derivatives for jacobian matrix - drdx etc
         tensor<2,data_t> jac;
         jac[0][0] = x/r;
-        jac[1][0] = cosph*z/r2;
+        jac[1][0] = cos_phi*z/r2;
         jac[2][0] = -y/rho2;
         jac[0][1] = y/r;
-        jac[1][1] = sinph*z/r2;
+        jac[1][1] = sin_phi*z/r2;
         jac[2][1] = x/rho2;
         jac[0][2] = z/r;
         jac[1][2] = -rho/r2;
@@ -54,31 +55,32 @@ namespace InitialDataTools
     //Convert a vector (with one upper index) in spherical coords to cartesian coords
     template <class data_t>
     tensor<1, data_t>
-    spherical_to_cartesian_U(tensor<1, data_t> spherical_v, data_t r, data_t x, double y, double z)
+    spherical_to_cartesian_U(tensor<1, data_t> spherical_v, data_t x, double y, double z)
     {
         tensor<1, data_t> cartesian_v;
 
         // calculate useful position quantities
         data_t rho2 = x*x + y*y;
-        double minimum_rho2 = 1e-12;
-        auto rho_is_too_small = simd_compare_lt(rho2, minimum_rho2);
-        rho2 = simd_conditional(rho_is_too_small, minimum_rho2, rho2);
+        MIN_CUT_OFF(rho2, 1e-12);
         data_t rho = sqrt(rho2);
+        data_t r2 = x*x + y*y + z*z;
+        MIN_CUT_OFF(r2, 1e-12);
+        data_t r = sqrt(r2);
 
         //And the sines and cosines of phi and theta
-        data_t costh = z/r;
-        data_t sinth = rho/r;
-        data_t cosph = x/rho;
-        data_t sinph = y/rho;
+        data_t cos_theta = z/r;
+        data_t sin_theta = rho/r;
+        data_t cos_phi = x/rho;
+        data_t sin_phi = y/rho;
 
         // calculate the inverse jacobian, dxdr etc
         tensor<2,data_t> inv_jac;
         inv_jac[0][0] = x/r;
         inv_jac[1][0] = y/r;
         inv_jac[2][0] = z/r;
-        inv_jac[0][1] = z*cosph;
-        inv_jac[1][1] = z*sinph;
-        inv_jac[2][1] = -r*sinth;
+        inv_jac[0][1] = z*cos_phi;
+        inv_jac[1][1] = z*sin_phi;
+        inv_jac[2][1] = -r*sin_theta;
         inv_jac[0][2] = -y;
         inv_jac[1][2] = x;
         inv_jac[2][2] = 0.0;

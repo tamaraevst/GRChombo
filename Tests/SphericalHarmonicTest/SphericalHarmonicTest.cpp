@@ -55,7 +55,7 @@ int main()
                 // and also the calculation of r in coords
                 double harmonic;
                 harmonic = sqrt(5.0/16.0/M_PI)*x*(2*z*z - z*r - r*r)/rho/r/r;
-                in_fab(iv, c_phi) = harmonic/r;
+                in_fab(iv, c_phi) = harmonic/r/r;
             }
         }
     }

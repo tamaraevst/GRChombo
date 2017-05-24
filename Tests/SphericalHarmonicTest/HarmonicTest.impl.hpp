@@ -19,8 +19,9 @@ void HarmonicTest::compute(Cell current_cell) {
 
     vars.phi = compute_harmonic(coords);
 
-    data_t radius = Coordinates<data_t>::get_radius(current_cell, m_dx, m_center_vector);
-    vars.phi = vars.phi/radius;
+    data_t radius1 = coords.get_radius(m_center_vector);
+    data_t radius2 = Coordinates<data_t>::get_radius(current_cell, m_dx, m_center_vector);
+    vars.phi = vars.phi/radius1/radius2;
 
     current_cell.store_vars(vars.phi, c_phi);
 }
@@ -33,14 +34,12 @@ data_t HarmonicTest::compute_harmonic(Coordinates<data_t> coords) {
     double y = coords.y - m_center_vector[1];
     double z = coords.z - m_center_vector[2];
 
-    data_t rr = coords.get_radius(m_center_vector);
-
     //Add in el, em spherical harmonics here, spin weight es
     using namespace SphericalHarmonics;
     int es = -1;
     int el = 2;
     int em = -1;
-    auto Y_lm = spin_Y_lm(x, y, z, rr, es, el, em);
+    auto Y_lm = spin_Y_lm(x, y, z, es, el, em);
     data_t out = Y_lm.Real;
 
     return out;
