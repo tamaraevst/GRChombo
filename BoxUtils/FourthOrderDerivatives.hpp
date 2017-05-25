@@ -55,13 +55,22 @@ public:
 
     template <class data_t>
     void
-    diff1(tensor<1,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction) const
+    diff1(tensor<1,data_t>& diff_value, const Cell& current_cell, int direction, int ivar) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
+        diff_value[direction] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index,stride);
+    }
+
+    template <class data_t, int num_vars>
+    void
+    diff1(tensor<1,data_t> (&diff_array)[num_vars], const Cell& current_cell, int direction, int start_var = 0) const
+    {
+        const int stride = current_cell.get_box_pointers().m_in_stride[direction];
+        const int in_index = current_cell.get_in_index();
+        for (int i=start_var; i<start_var+num_vars; ++i)
         {
-            diffArray[i][direction] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index,stride);
+            diff_array[i][direction] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index,stride);
         }
     }
 
