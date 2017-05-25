@@ -116,6 +116,9 @@ public:
     template <class data_t>
     void store_vars(const data_t& value, const int icomp) const;
 
+    template <class data_t, int num_comp>
+    void store_vars(const tensor<1, data_t, num_comp>& values, const int start_comp) const;
+
     template <class data_t>
     void store_vars(const std::array<data_t, c_NUM>& values) const;
 
