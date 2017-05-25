@@ -51,7 +51,7 @@ Constraints::constraint_equations(
 
    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-   auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+   auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
    auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);

@@ -68,7 +68,7 @@ void RelaxationChi<matter_t>::rhs_equation(
 
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse(vars.h);
+    auto h_UU = compute_inverse_sym(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //Calculate elements of the decomposed stress energy tensor and ricci tensor

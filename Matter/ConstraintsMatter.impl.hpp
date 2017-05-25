@@ -48,7 +48,7 @@ void ConstraintsMatter<matter_t>::compute(Cell current_cell)
     FOR1(idir) m_deriv.add_advection(advec, current_cell, vars.shift[idir], idir);
 
     // Inverse metric and Christoffel symbol
-    auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+    auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     // Energy Momentum tensor

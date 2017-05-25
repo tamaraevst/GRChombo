@@ -30,7 +30,7 @@ public:
         Vars<data_t> vars;
         current_cell.local_vars(vars);
 
-        auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+        auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
         TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
         current_cell.store_vars(vars, Interval(c_A11, c_A33));

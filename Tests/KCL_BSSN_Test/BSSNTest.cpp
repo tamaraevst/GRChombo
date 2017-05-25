@@ -14,6 +14,7 @@
 #include "ScalarField.hpp"
 #include "Potential.hpp"
 #include "BoxLoops.hpp"
+#include "SetValue.hpp"
 
 #include "GRBSSNChomboF_F.H"
 

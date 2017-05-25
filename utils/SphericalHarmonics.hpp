@@ -4,6 +4,7 @@
 #include "tensor.hpp"
 #include "Coordinates.hpp"
 #include "Combinatorics.hpp"
+#include "MiscUtils.hpp"
 
 // Functions for the spin weighted spherical harmonics
 // The harmonics here are taken from recurrance relation for Wigner small d-matrix elements
@@ -22,7 +23,6 @@ namespace SphericalHarmonics
     Y_lm_t<data_t> spin_Y_lm(const data_t x,
                               const double y,
                               const double z,
-                              const data_t r,
                               const int es,
                               const int el,
                               const int em)
@@ -31,6 +31,9 @@ namespace SphericalHarmonics
 
         Y_lm_t<data_t> Y_lm;
 
+        // calculate useful position quantities
+        data_t r = sqrt(x*x + y*y + z*z);
+        MIN_CUT_OFF(r, 1e-6);
         data_t theta = acos(z/r);
         data_t phi = atan2(y,x);
 
