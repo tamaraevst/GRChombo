@@ -166,8 +166,8 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         const FArrayBox& state_fab = m_state_new[di];
 
         //mod gradient
-        FArrayBox mod_grad_fab(b,c_NUM);
-        BoxLoops::loop(ComputeModGrad(m_dx), state_fab, mod_grad_fab);
+        FArrayBox tagging_criterion(b,1);
+        computeTaggingCriterion(tagging_criterion, state_fab);
 
         const IntVect& smallEnd = b.smallEnd();
         const IntVect& bigEnd = b.bigEnd();
@@ -187,8 +187,7 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         {
             IntVect iv(ix,iy,iz);
             //At the moment only base on gradient chi/chi^2
-            if (m_dx * mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2)
-                >= m_p.regrid_threshold)
+            if (tagging_criterion(iv,0) >= m_p.regrid_threshold)
             {
                 // local_tags |= is not thread safe.
 #pragma omp critical
