@@ -14,6 +14,7 @@
 #include "CCZ4.hpp"
 #include "ComputePack.hpp"
 #include "SetValue.hpp"
+#include "ChiTaggingCriterion.hpp"
 
 //Initial data
 #include "BinaryBH.hpp"
@@ -57,6 +58,11 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_
 {
     //Enforce the trace free A_ij condition
     BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
+}
+
+void BinaryBHLevel::computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state)
+{
+    BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
 
 #endif

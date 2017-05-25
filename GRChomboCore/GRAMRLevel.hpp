@@ -130,6 +130,10 @@ public:
     virtual
     void initialData() = 0;
 
+    // Tagging criterion
+    virtual
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state) = 0;
+
     virtual
     void fillBdyGhosts() {}
 
