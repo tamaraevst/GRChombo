@@ -50,6 +50,14 @@ Cell::store_vars(const data_t& value, const int icomp) const
     SIMDIFY<data_t>(m_box_pointers.m_out_ptr[icomp])[m_out_index] = value;
 }
 
+template <class data_t, int num_comp>
+ALWAYS_INLINE
+void
+Cell::store_vars(const tensor<1, data_t, num_comp>& values, const int start_comp) const
+{
+    for (int i = 0; i < num_comp; ++i) store_vars(values[i], start_comp + i);
+}
+
 template <class data_t>
 ALWAYS_INLINE
 void
