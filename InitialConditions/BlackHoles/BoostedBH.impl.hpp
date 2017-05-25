@@ -52,6 +52,7 @@ BoostedBH::center_dist(Coordinates<data_t> coords) const
 
     double minimum_r = 1e-6;
     MIN_CUT_OFF(r, minimum_r);
+    return r;
 }
 
 template <class data_t>
