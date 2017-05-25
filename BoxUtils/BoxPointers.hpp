@@ -20,11 +20,9 @@ public:
     {
         // dataPtr in Chombo does CH_assert bound check
         // which we don't want to do in a loop
-        for (int i = 0; i < c_NUM; ++i)
-        {
-            m_in_ptr[i] = in.dataPtr(i);
-            m_out_ptr[i] = out.dataPtr(i);
-        }
+        for (int i = 0; i < c_NUM; ++i) m_in_ptr[i] = in.dataPtr(i);
+        //If the output FArrayBox doesn't have all components, just don't set the pointers
+        for (int i = 0; i < out.nComp(); ++i) m_out_ptr[i] = out.dataPtr(i);
 
         m_in_lo = in.loVect();
         m_in_hi = in.hiVect();
