@@ -31,8 +31,8 @@ class ComputePack
         //To switch vectorisation off in a vectorised compute class pass disable_simd as last parameter to the
         //loop function. For a compute class without simd support pass no_simd_support().
 #ifdef EQUATION_DEBUG_MODE //In equation debug mode simd is switched off
-        compute_class.template compute<double>(current_cell);
         EquationDebugging::set_global_cell_coordinates(current_cell);
+        compute_class.template compute<double>(current_cell);
 #else
         compute_class.template compute<simd<double>>(current_cell);
 #endif
