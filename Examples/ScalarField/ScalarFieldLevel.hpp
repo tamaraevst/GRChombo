@@ -52,8 +52,7 @@ class ScalarFieldLevel : public GRAMRLevel
 
     //! Tell Chombo how to tag cells for regridding
     virtual
-    void tagCells(IntVectSet& a_tags);
-
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
 };
 
 #include "ScalarFieldLevel.impl.hpp"

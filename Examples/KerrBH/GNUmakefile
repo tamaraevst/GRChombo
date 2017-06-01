@@ -10,6 +10,6 @@ ebase := GRChombo_KerrBH
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
-src_dirs := ../../AMRInterpolator ../../utils ../../simd ../../CCZ4 ../../InitialConditions/BlackHoles ../../BoxUtils ../../GRChomboCore
+src_dirs := ../../utils ../../simd ../../CCZ4 ../../InitialConditions/BlackHoles ../../BoxUtils ../../GRChomboCore ../../TaggingCriteria
 
 include $(CHOMBO_HOME)/mk/Make.test

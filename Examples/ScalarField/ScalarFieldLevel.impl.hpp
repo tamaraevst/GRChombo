@@ -21,7 +21,7 @@
 #include "ConstraintsMatter.hpp"
 
 //For tag cells
-#include "ComputeModGrad.hpp"
+#include "PhiAndKTaggingCriterion.hpp"
 
 //Problem specific includes
 #include "Potential.hpp"
@@ -111,76 +111,9 @@ void ScalarFieldLevel::specificWritePlotHeader(std::vector<int> &plot_states) co
     plot_states = {c_chi, c_K};
 }
 
-// Tell Chombo when to mark cells for regridding
-// override virtual tagcells function for tagging based on K and phi gradients
-// TODO KClough: It is a bit ugly to have all this here, may want to create a hook
-// in the main routine and then just put the conditional here - but tagging is very
-// problem specific, so it is hard to have a "general" routine
-void ScalarFieldLevel::tagCells (IntVectSet& a_tags)
+void ScalarFieldLevel::computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state)
 {
-    CH_TIME("GRAMRLevel::tagCells");
-    if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;
-
-    fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
-
-    // Create tags based on undivided gradient of phi and K
-    IntVectSet local_tags;
-
-    const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
-    DataIterator dit0 = level_domain.dataIterator();
-    int nbox = dit0.size();
-    for(int ibox = 0; ibox < nbox; ++ibox)
-    {
-        DataIndex di = dit0[ibox];
-        const Box& b = level_domain[di];
-        const FArrayBox& state_fab = m_state_new[di];
-
-        //mod gradient
-        FArrayBox mod_grad_fab(b,c_NUM);
-        BoxLoops::loop(ComputeModGrad(m_dx), state_fab, mod_grad_fab);
-
-        const IntVect& smallEnd = b.smallEnd();
-        const IntVect& bigEnd = b.bigEnd();
-
-        const int xmin = smallEnd[0];
-        const int ymin = smallEnd[1];
-        const int zmin = smallEnd[2];
-
-        const int xmax = bigEnd[0];
-        const int ymax = bigEnd[1];
-        const int zmax = bigEnd[2];
-
-#pragma omp parallel for collapse(3) schedule(static) default(shared)
-        for (int iz = zmin; iz <= zmax; ++iz)
-        for (int iy = ymin; iy <= ymax; ++iy)
-        for (int ix = xmin; ix <= xmax; ++ix)
-        {
-            IntVect iv(ix,iy,iz);
-
-            //At the moment only base on gradient K and phi
-            //NB the mod_grad_fab is the true gradient, but we want the change
-            //across the cell, so multiply by dx (otherwise you regrid forever...)
-            if ((mod_grad_fab(iv,c_K)* m_dx >= m_p.regrid_threshold_K)
-            || (mod_grad_fab(iv,c_phi) * m_dx >= m_p.regrid_threshold_phi))
-            {
-                // local_tags |= is not thread safe.
-#pragma omp critical
-                {
-                    local_tags |= iv;
-                }
-            }
-        }
-    }
-
-    local_tags.grow(m_p.tag_buffer_size);
-
-    // Need to do this in two steps unless a IntVectSet::operator &=
-    // (ProblemDomain) operator is defined
-    Box local_tags_box = local_tags.minBox();
-    local_tags_box &= m_problem_domain;
-    local_tags &= local_tags_box;
-
-    a_tags = local_tags;
+    BoxLoops::loop(PhiAndKTaggingCriterion(m_dx, m_p.regrid_threshold_phi, m_p.regrid_threshold_K), current_state, tagging_criterion);
 }
 
 #endif

@@ -17,9 +17,9 @@ L =  64
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
-regrid_threshold = 0.3 #not used in this example
+regrid_threshold = 0.5
 regrid_threshold_K = 0.02
-regrid_threshold_phi = 0.0175
+regrid_threshold_phi = 0.02
 tag_buffer_size = 3 # How many cells to extend tagged zones by
 
 # Level data
