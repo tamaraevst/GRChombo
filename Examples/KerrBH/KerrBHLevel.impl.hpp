@@ -14,6 +14,7 @@
 #include "CCZ4.hpp"
 #include "ComputePack.hpp"
 #include "SetValue.hpp"
+#include "ChiTaggingCriterion.hpp"
 
 //Initial data
 #include "KerrBH.hpp"
@@ -72,6 +73,11 @@ void KerrBHLevel::specificWritePlotHeader(std::vector<int>& plot_states) const
 {
     //Specify the variables we want to output as plot
     plot_states = {c_chi, c_K, c_lapse, c_shift1};    
+}
+
+void KerrBHLevel::computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state)
+{
+    BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
 
 #endif

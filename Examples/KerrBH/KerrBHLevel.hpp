@@ -29,6 +29,8 @@ class KerrBHLevel : public GRAMRLevel
     virtual
     void specificWritePlotHeader(std::vector<int> &plot_states) const;
 
+    virtual
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
 };
 
 #include "KerrBHLevel.impl.hpp"
