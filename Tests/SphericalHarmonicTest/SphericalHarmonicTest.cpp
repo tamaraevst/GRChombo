@@ -60,7 +60,7 @@ int main()
         }
     }
 
-    std::vector<double> center_vector = {center, center, center};
+    std::array<double, CH_SPACEDIM> center_vector = {center, center, center};
 
     //Test the spherical harmonics across grid
     BoxLoops::loop(HarmonicTest(center_vector, dx), in_fab, out_fab); // disable_simd());
