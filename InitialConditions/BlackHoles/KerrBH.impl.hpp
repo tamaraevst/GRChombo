@@ -22,15 +22,15 @@ void KerrBH::compute(Cell current_cell)
 
     // The cartesian variables and coords
     Vars<data_t> vars;
-    Coordinates<data_t> coords(current_cell, m_dx);
+    Coordinates<data_t> coords(current_cell, m_dx, m_params.center);
 
     // Compute the components in spherical coords as per 1401.1548
     compute_kerr(spherical_g, spherical_K, spherical_shift, kerr_lapse, coords);
 
-    // get position
-    data_t x;
-    double y, z;
-    get_position(coords, x, y, z);
+    // work out where we are on the grid
+    data_t x = coords.x;
+    double y = coords.y;
+    double z = coords.z;
 
     using namespace InitialDataTools;
     // Convert spherical components to cartesian components using coordinate transforms
@@ -78,20 +78,19 @@ void KerrBH::compute_kerr(tensor<2,data_t> &spherical_g,
     double M = m_params.mass;
     double a = m_params.spin;
 
-    // get position
-    data_t x, r, r2, rho, rho2;
-    double y, z;
-    get_position(coords, x, y, z);
+    // work out where we are on the grid
+    data_t x = coords.x;
+    double y = coords.y;
+    double z = coords.z;
 
     //the radius, subject to a floor
-    r2 = x*x + y*y + z*z;
-    MIN_CUT_OFF(r2, 1e-12);
-    r = sqrt(r2);
+    data_t r = coords.get_radius();
+    data_t r2 = r*r;
 
     //the radius in xy plane, subject to a floor
-    rho2 = x*x + y*y;
+    data_t rho2 = x*x + y*y;
     MIN_CUT_OFF(rho2, 1e-12);
-    rho = sqrt(rho2);
+    data_t rho = sqrt(rho2);
 
     //calculate useful position quantities
     data_t cos_theta = z/r;
@@ -145,15 +144,6 @@ void KerrBH::compute_kerr(tensor<2,data_t> &spherical_g,
     spherical_shift[0] = 0.0;
     spherical_shift[1] = 0.0;
     spherical_shift[2] = - 2.0*M*a*r_BL / AA;
-}
-
-template <class data_t>
-void KerrBH::get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z)
-{
-    // work out where we are on the grid
-    x = coords.x - m_params.center[0];
-    y = coords.y - m_params.center[1];
-    z = coords.z - m_params.center[2];
 }
 
 #endif /* KERRBH_IMPL_HPP_ */

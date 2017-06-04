@@ -27,7 +27,7 @@ public:
     struct params_t
     {
         double mass;//!<< The mass of the Kerr BH
-        std::vector<double> center;//!< The center of the Kerr BH
+        std::array<double, CH_SPACEDIM> center;//!< The center of the Kerr BH
         double spin;//!< The spin param a = J/M, so 0 < a < 1
     };
 
@@ -58,9 +58,6 @@ protected:
                       data_t &kerr_lapse,//!<< The lapse for the kerr solution
                       const Coordinates<data_t> coords);//!<< Coords of current cell
 
-    //! Function to get coordinates in cartesian space, and radius
-    template <class data_t>
-    void get_position(Coordinates<data_t> coords, data_t &x, double &y, double &z);
 };
 
 #include "KerrBH.impl.hpp"

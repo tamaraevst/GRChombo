@@ -16,7 +16,7 @@ void ScalarBubble::compute(Cell current_cell)
 {
     ScalarField<>::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
-    Coordinates<data_t> coords(current_cell,m_dx);
+    Coordinates<data_t> coords(current_cell, m_dx, m_params.centerSF);
 
     //set the field vars
     vars.phi = compute_phi(coords);
@@ -37,7 +37,7 @@ void ScalarBubble::compute(Cell current_cell)
 template <class data_t>
 data_t ScalarBubble::compute_phi(Coordinates<data_t> coords)
 {
-    data_t rr = coords.get_radius(m_params.centerSF);
+    data_t rr = coords.get_radius();
     data_t rr2 = rr*rr;
     data_t out_phi = m_params.amplitudeSF*rr2*exp(-pow(rr-m_params.r_zero/m_params.widthSF, 2.0));
 

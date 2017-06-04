@@ -18,7 +18,7 @@ public:
     //! A structure for the input params for scalar field properties and initial conditions
     struct params_t {
         double amplitudeSF;//!< Amplitude of bump in initial SF bubble
-        std::vector<double> centerSF;//!< Centre of perturbation in initial SF bubble
+        std::array<double, CH_SPACEDIM> centerSF;//!< Centre of perturbation in initial SF bubble
         double widthSF;//!< Width of bump in initial SF bubble
         double r_zero;//!< Position of bump relative to centre
     };
