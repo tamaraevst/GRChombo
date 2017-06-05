@@ -11,7 +11,7 @@
 
 class HarmonicTest {
  public:
-  HarmonicTest(std::vector<double> a_center_vector, double a_dx)
+  HarmonicTest(std::array<double, CH_SPACEDIM> a_center_vector, double a_dx)
         : m_dx (a_dx), m_center_vector (a_center_vector) {}
 
   template <class data_t>
@@ -19,7 +19,7 @@ class HarmonicTest {
 
  protected:
   double m_dx;
-  std::vector<double> m_center_vector;
+  std::array<double, CH_SPACEDIM> m_center_vector;
 
   template<class data_t>
   data_t compute_harmonic(Coordinates<data_t> coords);

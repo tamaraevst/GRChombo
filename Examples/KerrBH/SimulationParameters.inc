@@ -42,7 +42,10 @@ void auto_read_params(ParmParse& pp)
     //Initial Kerr data
     pp.get("kerr_mass", kerr_mass);
     pp.get("kerr_spin", kerr_spin);
-    pp.getarr("kerr_center", kerr_center, 0, SpaceDim);
+    for(int i=0; i < CH_SPACEDIM; i++)
+    {
+        pp.get("kerr_center", kerr_center[i], i);
+    }
 
     //Misc
     pp.get("nan_check", nan_check);
@@ -74,4 +77,4 @@ Real sigma; //Dissipation
 //Initial data for Kerr
 double G_Newton;
 Real kerr_mass, kerr_spin;
-std::vector<Real> kerr_center;
+std::array<double, CH_SPACEDIM> kerr_center;
