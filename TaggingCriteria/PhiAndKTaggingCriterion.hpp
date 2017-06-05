@@ -5,9 +5,11 @@ class PhiAndKTaggingCriterion
 {
 protected:
    const double m_dx;
+
    const double m_threshold_phi;
    const double m_threshold_K;
    const FourthOrderDerivatives m_deriv;
+
 public:
    PhiAndKTaggingCriterion(double dx, double threshold_phi, double threshold_K)
     : m_dx (dx), m_deriv (dx), m_threshold_phi (threshold_phi), m_threshold_K (threshold_K) {};
