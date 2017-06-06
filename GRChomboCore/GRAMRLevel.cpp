@@ -2,7 +2,6 @@
 #include "LevelRK4.H"
 
 //TODO: Remove this once tagCells is sorted out!
-#include "ComputeModGrad.hpp"
 #include "GRAMRLevel.hpp"
 #include "BoxLoops.hpp"
 

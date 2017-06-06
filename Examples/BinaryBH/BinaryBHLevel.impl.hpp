@@ -25,7 +25,7 @@ void BinaryBHLevel::specificAdvance()
     BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     //Check for nan's
-    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, no_simd_support());
+    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, disable_simd());
 }
 
 void BinaryBHLevel::initialData()

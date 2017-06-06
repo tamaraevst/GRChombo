@@ -20,10 +20,10 @@ namespace BoxLoops
     void innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x);
 
-    ///Perform the innermost (i.e. the x) loop with special simd_info to switch simd off if necessary
-    template <typename... compute_ts, typename... simd_info>
+    ///Perform the innermost (i.e. the x) loop, simd switched off
+    template <typename... compute_ts>
     void innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
-                    const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, simd_info... info);
+                    const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, disable_simd);
 
     ///Performs loop insde the box loop_box and calls compute(...) for all compute classes in the compute_pack
     ///with input FArrayBox 'in' and output FArrayBox 'out'.

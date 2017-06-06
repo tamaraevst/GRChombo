@@ -13,7 +13,7 @@ Constraints::Constraints(double dx, double cosmological_constant /*defaulted*/) 
 
 template <class data_t>
 void
-Constraints::compute(Cell current_cell)
+Constraints::compute(Cell<data_t> current_cell)
 {
     Vars<data_t> vars;
     current_cell.local_vars(vars);

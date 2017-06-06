@@ -8,10 +8,9 @@
 #include "BinaryBH.hpp"
 #include "CCZ4.hpp"
 #include "simd.hpp"
-#include "Cell.hpp"
 
 template <class data_t>
-void BinaryBH::compute(Cell current_cell)
+void BinaryBH::compute(Cell<data_t> current_cell)
 {
     CCZ4::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below
