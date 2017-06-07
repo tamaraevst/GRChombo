@@ -15,7 +15,7 @@ class HarmonicTest {
         : m_dx (a_dx), m_center_vector (a_center_vector) {}
 
   template <class data_t>
-  void compute(Cell current_cell);
+  void compute(Cell<data_t> current_cell);
 
  protected:
   double m_dx;

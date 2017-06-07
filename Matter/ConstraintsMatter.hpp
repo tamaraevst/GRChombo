@@ -39,7 +39,7 @@ public:
 
     //! The compute member which calculates the constraints at each point in the box
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     matter_t my_matter; //!< The matter object, e.g. a scalar field

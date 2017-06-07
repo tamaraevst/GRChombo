@@ -12,7 +12,7 @@
 #include "DebuggingTools.hpp"
 
 template <class data_t>
-void HarmonicTest::compute(Cell current_cell) {
+void HarmonicTest::compute(Cell<data_t> current_cell) {
 
     ScalarField<>::Vars<data_t> vars;
     Coordinates<data_t> coords(current_cell, m_dx, m_center_vector);

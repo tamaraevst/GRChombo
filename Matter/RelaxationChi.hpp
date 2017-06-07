@@ -47,7 +47,7 @@ public:
 
     //! The compute member which calculates the RHS at each point in the box \sa rhs_equation()
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     matter_t my_matter;//!< The matter object, e.g. a scalar field.

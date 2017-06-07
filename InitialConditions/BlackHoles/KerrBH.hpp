@@ -47,7 +47,7 @@ public:
     }
 
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     //! Function which computes the components of the metric in spherical coords

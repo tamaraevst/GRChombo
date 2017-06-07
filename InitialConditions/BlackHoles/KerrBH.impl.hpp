@@ -12,7 +12,7 @@
 // Computes semi-isotropic Kerr solution as detailed in Liu, Etienne and Shapiro 2010,
 // arxiv gr-qc/1001.4077
 template <class data_t>
-void KerrBH::compute(Cell current_cell)
+void KerrBH::compute(Cell<data_t> current_cell)
 {
     // set up vars for the metric and extrinsic curvature, shift and lapse in spherical coords
     tensor<2,data_t> spherical_g;

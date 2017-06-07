@@ -12,7 +12,7 @@ ScalarBubble::ScalarBubble(params_t a_params, double a_dx)
 
 // Compute the value of the initial vars on the grid
 template <class data_t>
-void ScalarBubble::compute(Cell current_cell)
+void ScalarBubble::compute(Cell<data_t> current_cell)
 {
     ScalarField<>::Vars<data_t> vars;
     vars.assign(0.); //Set only the non-zero components explicitly below

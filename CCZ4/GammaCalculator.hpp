@@ -26,7 +26,7 @@ public:
     GammaCalculator(double a_dx) :  m_dx (a_dx), m_deriv (a_dx) {}
 
     template <class data_t>
-    void compute(Cell current_cell)
+    void compute(Cell<data_t> current_cell)
     {
         //copy data from chombo gridpoint into local variables
         Vars<data_t> vars;
