@@ -20,7 +20,7 @@ public:
    NanCheck(const std::string a_error_info, const double a_max_abs) :
        m_error_info (a_error_info), m_max_abs (a_max_abs) {}
 
-   void compute( Cell current_cell )
+   void compute( Cell<double> current_cell )
    {
       bool stop = false;
       FORVARS(i)
@@ -36,7 +36,7 @@ public:
               pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
               FORVARS(i)
               {
-                  pout() << UserVariables::variable_names[i] << ": " << current_cell.local_vars<double>( i) << endl;
+                  pout() << UserVariables::variable_names[i] << ": " << current_cell.local_vars(i) << endl;
               }
               pout() << "Integer coordinates: " << current_cell.get_int_vect() << endl;
           }

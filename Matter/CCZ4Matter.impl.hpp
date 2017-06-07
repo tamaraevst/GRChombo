@@ -23,7 +23,7 @@ CCZ4Matter<matter_t>::CCZ4Matter(
 
 template <class matter_t>
 template <class data_t>
-void CCZ4Matter<matter_t>::compute(Cell current_cell)
+void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell)
 {
     //copy data from chombo gridpoint into local variables
     Vars<data_t> matter_vars;

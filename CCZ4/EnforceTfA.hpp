@@ -25,7 +25,7 @@ public:
     };
 
     template <class data_t>
-    void compute(Cell current_cell)
+    void compute(Cell<data_t> current_cell)
     {
         Vars<data_t> vars;
         current_cell.local_vars(vars);

@@ -97,7 +97,7 @@ public:
       * need to call it directly.
       */
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     /// Calculates the rhs for CCZ4

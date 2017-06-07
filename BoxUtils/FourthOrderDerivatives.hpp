@@ -43,7 +43,7 @@ public:
     //Writes directly into the vars object - use this wherever possible
     template <class data_t>
     void
-    diff1(VarsBase< tensor<1, data_t> >& d1, const Cell& current_cell, int direction) const
+    diff1(VarsBase< tensor<1, data_t> >& d1, const Cell<data_t>& current_cell, int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -55,7 +55,7 @@ public:
 
     template <class data_t>
     void
-    diff1(tensor<1,data_t>& diff_value, const Cell& current_cell, int direction, int ivar) const
+    diff1(tensor<1,data_t>& diff_value, const Cell<data_t>& current_cell, int direction, int ivar) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -64,7 +64,7 @@ public:
 
     template <class data_t, int num_vars>
     void
-    diff1(tensor<1,data_t> (&diff_array)[num_vars], const Cell& current_cell, int direction, int start_var = 0) const
+    diff1(tensor<1,data_t> (&diff_array)[num_vars], const Cell<data_t>& current_cell, int direction, int start_var = 0) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -95,7 +95,7 @@ public:
     //Writes 2nd deriv directly into the vars object - use this wherever possible
     template <class data_t>
     void
-    diff2(VarsBase< tensor<2,data_t> >& d2, const Cell& current_cell, int direction) const
+    diff2(VarsBase< tensor<2,data_t> >& d2, const Cell<data_t>& current_cell, int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -107,7 +107,7 @@ public:
 
     template <class data_t>
     void
-    diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction) const
+    diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell<data_t>& current_cell, int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -151,7 +151,7 @@ public:
 
     template <class data_t>
     void
-    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, const Cell& current_cell, int direction1, int direction2) const
+    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, const Cell<data_t>& current_cell, int direction1, int direction2) const
     {
         const int stride1 = current_cell.get_box_pointers().m_in_stride[direction1];
         const int stride2 = current_cell.get_box_pointers().m_in_stride[direction2];
@@ -166,7 +166,7 @@ public:
 
     template <class data_t>
     void
-    mixed_diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell& current_cell, int direction1, int direction2) const
+    mixed_diff2(tensor<2,data_t> (&diffArray)[c_NUM], const Cell<data_t>& current_cell, int direction1, int direction2) const
     {
         const int stride1 = current_cell.get_box_pointers().m_in_stride[direction1];
         const int stride2 = current_cell.get_box_pointers().m_in_stride[direction2];
@@ -216,7 +216,7 @@ protected: //Let's keep this protected ... we may want to change the advection c
 public:
     template <class data_t>
     void
-    add_advection(VarsBase<data_t>& vars, const Cell& current_cell, const data_t& vec_comp, const int dir) const
+    add_advection(VarsBase<data_t>& vars, const Cell<data_t>& current_cell, const data_t& vec_comp, const int dir) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
@@ -229,7 +229,7 @@ public:
 
     template <class data_t>
     void
-    add_advection(data_t (&out)[c_NUM], const Cell& current_cell, const data_t& vec_comp, const int dir) const
+    add_advection(data_t (&out)[c_NUM], const Cell<data_t>& current_cell, const data_t& vec_comp, const int dir) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
@@ -262,7 +262,7 @@ public:
 
     template <class data_t>
     void
-    add_dissipation(VarsBase<data_t>& vars, const Cell& current_cell, const double factor, const int direction) const
+    add_dissipation(VarsBase<data_t>& vars, const Cell<data_t>& current_cell, const double factor, const int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
@@ -274,7 +274,7 @@ public:
 
     template <class data_t>
     void
-    add_dissipation(data_t (&out)[c_NUM], const Cell& current_cell, const double factor, const int direction) const
+    add_dissipation(data_t (&out)[c_NUM], const Cell<data_t>& current_cell, const double factor, const int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();

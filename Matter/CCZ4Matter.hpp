@@ -47,7 +47,7 @@ public:
 
     //!  The compute member which calculates the RHS at each point in the box \sa matter_rhs_equation()
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     //! The function which adds in the EM Tensor terms to the CCZ4 rhs \sa compute()

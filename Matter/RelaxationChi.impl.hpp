@@ -20,7 +20,7 @@ RelaxationChi<matter_t>::RelaxationChi(
 
 template <class matter_t>
 template <class data_t>
-void RelaxationChi<matter_t>::compute(Cell current_cell) {
+void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) {
 
     //copy data from chombo gridpoint into local variables
     Vars<data_t> vars;

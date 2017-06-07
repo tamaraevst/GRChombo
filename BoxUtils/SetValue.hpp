@@ -21,11 +21,11 @@ public:
         m_value (a_value), m_interval (a_interval) {}
 
     template <class data_t>
-    void compute(Cell current_cell)
+    void compute(Cell<data_t> current_cell)
     {
         for(int i = m_interval.begin(); i<=m_interval.end(); ++i)
         {
-            current_cell.store_vars( (data_t) m_value, i);
+            current_cell.store_vars(m_value, i);
         }
     }
 };

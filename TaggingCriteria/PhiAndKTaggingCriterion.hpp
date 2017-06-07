@@ -13,13 +13,13 @@ public:
     : m_dx (dx), m_deriv (dx), m_threshold_phi (threshold_phi), m_threshold_K (threshold_K) {};
 
    template <class data_t>
-   void compute(Cell current_cell)
+   void compute(Cell<data_t> current_cell)
    {
-       auto phi = current_cell.template local_vars<data_t>(c_phi);
+       auto phi = current_cell.local_vars(c_phi);
        tensor<1,data_t> d1_phi;
        FOR1(idir) m_deriv.diff1(d1_phi, current_cell, idir, c_phi);
 
-       auto K = current_cell.template local_vars<data_t>(c_K);
+       auto K = current_cell.local_vars(c_K);
        tensor<1,data_t> d1_K;
        FOR1(idir) m_deriv.diff1(d1_K, current_cell, idir, c_K);
 

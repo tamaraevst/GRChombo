@@ -1,6 +1,9 @@
 #ifndef CHITAGGINGCRITERION_HPP_
 #define CHITAGGINGCRITERION_HPP_
 
+#include "Cell.hpp"
+#include "FourthOrderDerivatives.hpp"
+
 class ChiTaggingCriterion
 {
 protected:
@@ -10,9 +13,9 @@ public:
    ChiTaggingCriterion(double dx) : m_dx (dx), m_deriv (dx) {};
 
    template <class data_t>
-   void compute(Cell current_cell)
+   void compute(Cell<data_t> current_cell)
    {
-       auto chi = current_cell.template local_vars<data_t>(c_chi);
+       auto chi = current_cell.local_vars(c_chi);
        tensor<1,data_t> d1_chi;
        FOR1(idir) m_deriv.diff1(d1_chi, current_cell, idir, c_chi);
 

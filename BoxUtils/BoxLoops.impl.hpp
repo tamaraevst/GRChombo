@@ -16,37 +16,31 @@ void
 BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
-#ifdef EQUATION_DEBUG_MODE
-    int simd_width = 1; //In eqution debug mode we don't use simd
-#else
     int simd_width = simd<double>::simd_len;
-#endif
-
     int x_simd_max = loop_lo_x + simd_width * (((loop_hi_x - loop_lo_x + 1) / simd_width) - 1);
     // SIMD LOOP
 #pragma novector
     for (int ix = loop_lo_x; ix <= x_simd_max; ix += simd_width)
     {
-        compute_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers) );
+        compute_pack.call_compute(Cell<simd<double>>(IntVect(ix,iy,iz), box_pointers) );
     }
+
     // REMAINDER LOOP
-#pragma novector
     for (int ix = x_simd_max + simd<double>::simd_len; ix <= loop_hi_x; ++ix)
     {
-        compute_pack.call_compute(Cell(IntVect(ix,iy,iz), box_pointers), disable_simd());
+        compute_pack.call_compute(Cell<double>(IntVect(ix,iy,iz), box_pointers));
     }
 }
 
-template <typename... compute_ts, typename... simd_info>
+template <typename... compute_ts>
 ALWAYS_INLINE
 void
 BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
-                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, simd_info... info)
+                         const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, disable_simd)
 {
-#pragma novector
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
     {
-        compute_pack.call_compute( Cell(IntVect(ix,iy,iz), box_pointers), std::forward<simd_info>(info)... );
+        compute_pack.call_compute( Cell<double>(IntVect(ix,iy,iz), box_pointers) );
     }
 }
 
@@ -71,7 +65,11 @@ BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FAr
 #endif
         for (int iy = loop_lo[1]; iy <= loop_hi[1]; ++iy)
         {
+#ifdef EQUATION_DEBUG_MODE
+            innermost_loop(compute_pack, box_pointers, iy, iz, loop_lo[0], loop_hi[0], disable_simd());
+#else
             innermost_loop(compute_pack, box_pointers, iy, iz, loop_lo[0], loop_hi[0], std::forward<simd_info>(info)...);
+#endif
         }
 }
 

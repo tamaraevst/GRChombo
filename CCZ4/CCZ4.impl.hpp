@@ -28,7 +28,7 @@ CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation, double cos
 
 template <class data_t>
 void
-CCZ4::compute(Cell current_cell)
+CCZ4::compute(Cell<data_t> current_cell)
 {
     Vars<data_t> vars;
     current_cell.local_vars(vars);

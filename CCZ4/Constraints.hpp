@@ -46,7 +46,7 @@ public:
     Constraints(double dx, double cosmological_constant = 0);
 
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     template <class data_t, template<typename> class vars_t>

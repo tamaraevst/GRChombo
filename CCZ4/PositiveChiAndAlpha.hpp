@@ -11,7 +11,7 @@ class PositiveChiAndAlpha
 {
 public:
    template <class data_t>
-   void compute(Cell current_cell)
+   void compute(Cell<data_t> current_cell)
    {
       data_t chi, lapse;
       current_cell.local_vars(chi, c_chi);
