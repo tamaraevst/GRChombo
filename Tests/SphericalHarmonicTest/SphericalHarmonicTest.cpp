@@ -66,6 +66,8 @@ int main()
     BoxLoops::loop(HarmonicTest(center_vector, dx), in_fab, out_fab); // disable_simd());
     out_fab -= in_fab;
 
+    int failed = 0;
+
     for (int i = 0; i < c_NUM; ++i)
     {
         double max_err = out_fab.norm(0, i, 1);
@@ -74,6 +76,12 @@ int main()
         {
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX Actual Value = " << max_act << std::endl;
+            failed = -1;
         }
     }
+
+    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
+    else std::cout << "Spherical Harmonic test failed..." << std::endl;
+
+    return failed;
 }

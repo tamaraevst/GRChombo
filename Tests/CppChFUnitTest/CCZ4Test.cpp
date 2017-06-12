@@ -1,4 +1,3 @@
-#define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
 //#include <omp.h>
@@ -155,8 +154,6 @@ int main()
     int cxx_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
     std::cout << "C++ version took " << cxx_time << "ms" << std::endl;
 
-#ifdef COMPARE_WITH_CHF
-
     int ONE = 1;
     int SIX = 6;
     int THREE = 3;
@@ -201,6 +198,8 @@ int main()
 
     std::cout << "C++ speedup = " << setprecision(2) << (double) fort_time / cxx_time << "x" << std::endl;
 
+    int failed = 0;
+
     out_fab -= out_fab_chf;
     for (int i = 0; i < c_NUM; ++i)
     {
@@ -210,9 +209,12 @@ int main()
         {
             std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
+            failed = -1;
         }
     }
 
-#endif
+    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
+    else std::cout << "Spherical Harmonic test failed..." << std::endl;
 
+    return failed;
 }

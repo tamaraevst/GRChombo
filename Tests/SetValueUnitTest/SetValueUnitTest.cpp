@@ -12,7 +12,7 @@
 
 int main()
 {
-   int passed = 1;
+   int failed = 0;
 
     const int N_GRID = 8;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
@@ -28,9 +28,9 @@ int main()
             for (int ix = 0; ix < N_GRID; ++ix)
             {
                 const IntVect iv(ix,iy,iz);
-                if (in_fab(iv, c_chi) != value) 
+                if (in_fab(iv, c_chi) != value)
                 {
-                    passed = -1;
+                    failed = -1;
                     pout () << iv << std::endl;
                 }
             }
@@ -38,8 +38,8 @@ int main()
     }
 
 
-   if (passed == 1) std::cout << "SetValue test passed" << std::endl;
+   if (failed == 0) std::cout << "SetValue test passed" << std::endl;
    else std::cout << "SetValue test NOT passed" << std::endl;
 
-   return passed;
+   return failed;
 }

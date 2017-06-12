@@ -197,7 +197,7 @@ int main()
            if (max_err ==  in_fab_cpp_result(bit(), i) ) location = bit();
         }
         //double max_err = in_fab_cpp_result.norm(0, i, 1);
-        if (max_err > 1e-11)
+        if (max_err > 1e-10)
         {
             std::cout << "COMPONENT " << i << " DOES NOT AGREE: MAX ERROR = " << max_err <<
                " AT INTVECT " << location << std::endl;
