@@ -1,4 +1,3 @@
-#define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
 #ifdef _OPENMP
@@ -179,8 +178,6 @@ int main()
     int cxx_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
     std::cout << "C++ version took " << cxx_time << "ms" << std::endl;
 
-#ifdef COMPARE_WITH_CHF
-
     int SIX = 6;
     int THREE = 3;
 
@@ -231,6 +228,8 @@ int main()
 
     std::cout << "C++ speedup = " << setprecision(2) << (double) fort_time / cxx_time << "x" << std::endl;
 
+    int failed = 0;
+
     out_fab -= out_fab_chf;
     for (int i = 0; i < c_NUM; ++i)
     {
@@ -243,6 +242,8 @@ int main()
         }
     }
 
-#endif
+    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
+    else std::cout << "Spherical Harmonic test failed..." << std::endl;
 
+    return failed;
 }

@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include "always_inline.hpp"
+#include "MayDay.H"
 
 template <typename t> struct _simd_remove_const { typedef t type; };
 template <typename t> struct _simd_remove_const<const t> { typedef t type; };
@@ -172,7 +173,7 @@ simd<t> atan2(const t1 b, const simd<t>& a)\
 
 template <typename t>
 ALWAYS_INLINE
-ostream& operator<< (ostream& os, const simd<t>& in_simd)
+std::ostream& operator<< (std::ostream& os, const simd<t>& in_simd)
 {
     t in_arr[simd_traits<t>::simd_len];
     simd<t>::store(in_arr, in_simd);
@@ -184,7 +185,7 @@ ostream& operator<< (ostream& os, const simd<t>& in_simd)
     }
     os << ")";
     if (os.fail())
-        MayDay::Error("operator<<(ostream&,simd<t>&) failed");
+        MayDay::Error("operator<<(std::ostream&,simd<t>&) failed");
     return os;
 }
 
