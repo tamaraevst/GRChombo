@@ -11,7 +11,7 @@
 
 class GRAMRLevel : public AMRLevel
 {
-protected:
+public:
     GRAMRLevel(const SimulationParameters& a_p, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
 
     virtual
