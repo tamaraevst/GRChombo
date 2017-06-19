@@ -36,11 +36,12 @@ using std::endl;
 int
 main(int argc ,char* argv[])
 {
-    mainSetup(argc, argv);
+    auto required_argc = 1;
+    mainSetup(argc, argv, required_argc);
 
     //Load the parameter file and construct the SimulationParameter class
     //To add more parameters edit the SimulationParameters file.
-    char* in_file = argv[1];
+    char const* in_file = "params.txt";
     ParmParse  pp(argc-2,argv+2,NULL,in_file);
     SimulationParameters sim_params(pp);
 
@@ -50,12 +51,13 @@ main(int argc ,char* argv[])
 
     //Setup the AMRInterpolator
     int num_points = 2;
+    pp.query("num_points", num_points);
 
-    double* chi_ptr = new double[num_points];
-    double* phi_ptr = new double[num_points];
-    double* interp_x = new double[num_points];
-    double* interp_y = new double[num_points];
-    double* interp_z = new double[num_points];
+    std::unique_ptr<double[]> chi_ptr {new double[num_points]};
+    std::unique_ptr<double[]> phi_ptr {new double[num_points]};
+    std::unique_ptr<double[]> interp_x {new double[num_points]};
+    std::unique_ptr<double[]> interp_y {new double[num_points]};
+    std::unique_ptr<double[]> interp_z {new double[num_points]};
 
     double L;
     pp.get("L", L);
@@ -72,13 +74,13 @@ main(int argc ,char* argv[])
 
     InterpolationQuery query(num_points);
     query
-        .setCoords(0, interp_x)
-        .setCoords(1, interp_y)
-        .setCoords(2, interp_z)
-        .addComp(c_chi, chi_ptr)
-        .addComp(c_phi, phi_ptr);
+        .setCoords(0, interp_x.get())
+        .setCoords(1, interp_y.get())
+        .setCoords(2, interp_z.get())
+        .addComp(c_chi, chi_ptr.get())
+        .addComp(c_phi, phi_ptr.get());
 
-    double dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])->get_dx(); //coarsest grid spacing
+    auto dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])->get_dx(); //coarsest grid spacing
     Array<double, 3> dx;
     Array<double, CH_SPACEDIM> origin;
     for (int idir=0; idir<CH_SPACEDIM; ++idir)
@@ -92,14 +94,11 @@ main(int argc ,char* argv[])
 
     int status = 0;
 
-    //TODO: at the moment the data are a bit too trivial to test the Interpolator throughly
-    //Make the data more interesting
-    for (int iPhi=0; iPhi<num_points; ++iPhi)
+    for (int ipoint=0; ipoint<num_points; ++ipoint)
     {
-        status |= (abs(chi_ptr[0] - 42.) > 1e-10);
-        status |= (abs(phi_ptr[0] - 42.) > 1e-10);
+        status |= (abs(chi_ptr[ipoint] - 42.) > 1e-10);
+        status |= (abs(phi_ptr[ipoint] - 42.) > 1e-10);
     }
-
 
     if ( status == 0 ) pout() << "AMRInterpolator test passed." << endl ;
     else pout() << "AMRInterpolator test failed with return code " << status << endl ;

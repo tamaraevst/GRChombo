@@ -72,10 +72,15 @@ void
 MPIContext::exchangeLayout()
 {
     CH_assert(!m_async_active);
+#ifdef CH_MPI
     MPI_Alltoall(m_query.countsPtr(), 1, MPI_INT, m_answer.countsPtr(), 1, MPI_INT, Chombo_MPI::comm);
+#else
+    *m_answer.countsPtr() = *m_query.countsPtr();
+#endif
     m_answer.updateDirty();
 }
 
+#ifdef CH_MPI
 void
 MPIContext::asyncBegin()
 {
@@ -121,7 +126,6 @@ MPIContext::asyncExchangeAnswer(void* sendbuf, void* recvbuf, MPI_Datatype type)
         recvbuf, m_query.countsPtr(), m_query.displsPtr(), type,
         Chombo_MPI::comm);
 #endif
-
 }
 
 void
@@ -136,5 +140,6 @@ MPIContext::asyncEnd()
 
     m_mpi_requests.clear();
 }
+#endif /* ifdef CH_MPI */
 
 #endif /* _MPICONTEXT_IMPL_HPP_ */

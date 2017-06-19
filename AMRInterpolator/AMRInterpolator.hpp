@@ -32,6 +32,7 @@ public:
 private:
     void computeLevelLayouts();
     InterpolationLayout findBoxes(InterpolationQuery& query);
+
     void prepareMPI(InterpolationQuery& query, const InterpolationLayout layout);
     void exchangeMPIQuery();
     void calculateAnswers(InterpolationQuery& query);

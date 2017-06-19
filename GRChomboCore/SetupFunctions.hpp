@@ -23,7 +23,7 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory);
 //TODO (MK): There is a lot of clutter still in this file ... get rid of everything that's not necessary
 //and comment on the rest (so that we don't carry around useless code forever
 
-void mainSetup(int argc ,char* argv[])
+void mainSetup(int argc, char* argv[], int required_argc = 2)
 {
 #ifdef CH_MPI
     // Start MPI
@@ -51,7 +51,7 @@ void mainSetup(int argc ,char* argv[])
 #endif
     }
 
-    if (argc < 2)
+    if (argc < required_argc)
     {
         cerr << " usage " << argv[0] << " <input_file_name> " << endl;
         exit(0);

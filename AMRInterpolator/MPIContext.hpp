@@ -26,11 +26,13 @@ public:
 
     void exchangeLayout();
 
+#ifdef CH_MPI
     // MPI asynchronous comms
     void asyncBegin();
     void asyncExchangeQuery(void* sendbuf, void* recvbuf, MPI_Datatype type);
     void asyncExchangeAnswer(void* sendbuf, void* recvbuf, MPI_Datatype type);
     void asyncEnd();
+#endif
 
     // MPI utils
     static int comm_size();
@@ -43,23 +45,29 @@ private:
     bool m_query_dirty;
 
     bool m_async_active;
+#ifdef CH_MPI
     vector<MPI_Request> m_mpi_requests;
+#endif
 
 };
 
 int
 MPIContext::comm_size()
 {
-    int out;
+    int out = 1;
+#ifdef CH_MPI
     MPI_Comm_size(Chombo_MPI::comm, &out);
+#endif
     return out;
 }
 
 int
 MPIContext::comm_rank()
 {
-    int out;
+    int out = 0;
+#ifdef CH_MPI
     MPI_Comm_rank(Chombo_MPI::comm, &out);
+#endif
     return out;
 }
 

@@ -16,8 +16,8 @@ class Lagrange
     {
         int m_width;
         int m_deriv;
-        double m_point_offset;
         double m_dx;
+        double m_point_offset;
 
         double *m_weights;
 

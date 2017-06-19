@@ -89,7 +89,6 @@ AMRInterpolator<InterpAlgo>::interp(InterpolationQuery& query)
 
     // Prepare MPI buffers
     prepareMPI(query, interp_layout);
-
     // Calculate interpolated values
     exchangeMPIQuery();
     calculateAnswers(query);
@@ -439,6 +438,7 @@ AMRInterpolator<InterpAlgo>::prepareMPI(InterpolationQuery& query, const Interpo
 
     // Resize MPI 'answer' buffers
     int num_answers = m_mpi.totalAnswerCount();
+
     m_answer_level.resize(num_answers);
     m_answer_box.resize(num_answers);
     for (int i = 0; i < CH_SPACEDIM; ++i) m_answer_coords[i].resize(num_answers);
@@ -466,6 +466,7 @@ AMRInterpolator<InterpAlgo>::exchangeMPIQuery()
         _pout << TAG << "Entering exchangeMPIQuery" << endl;
     }
 
+#ifdef CH_MPI //TODO: it would be nicer if this ifdef were moved into MPIContext ... the only issue is the MPI datatype
     m_mpi.asyncBegin();
 
     m_mpi.asyncExchangeQuery(&m_query_level[0], &m_answer_level[0], MPI_INT);
@@ -476,6 +477,11 @@ AMRInterpolator<InterpAlgo>::exchangeMPIQuery()
     }
 
     m_mpi.asyncEnd();
+#else
+    m_answer_level = m_query_level;
+    m_answer_box = m_query_box;
+    for (int i = 0; i < CH_SPACEDIM; ++i) m_answer_coords[i] = m_query_coords[i];
+#endif
 
     if (m_verbosity) {
         _pout << TAG << "Entering exchangeMPIQuery" << endl;
@@ -493,8 +499,8 @@ AMRInterpolator<InterpAlgo>::calculateAnswers(InterpolationQuery& query)
     }
 
     const Vector<AMRLevel*>& levels = const_cast<AMR&>(m_amr).getAMRLevels();
-    const int num_levels = levels.size();
-    const int num_comps = query.numComps();
+    //const int num_levels = levels.size();
+    //const int num_comps = query.numComps();
     const int num_answers = m_mpi.totalAnswerCount();
 
     Array<double, CH_SPACEDIM> grid_coord;
@@ -574,6 +580,7 @@ AMRInterpolator<InterpAlgo>::calculateAnswers(InterpolationQuery& query)
     }
 }
 
+
 template <typename InterpAlgo>
 void
 AMRInterpolator<InterpAlgo>::exchangeMPIAnswer()
@@ -582,6 +589,7 @@ AMRInterpolator<InterpAlgo>::exchangeMPIAnswer()
         pout() << TAG << "Entering exchangeMPIAnswer" << endl;
     }
 
+#ifdef CH_MPI //TODO: it would be nicer if this ifdef were moved into MPIContext ... the only issue is the MPI datatype
     m_mpi.asyncBegin();
 
     m_mpi.asyncExchangeAnswer(&m_answer_level[0], &m_query_level[0], MPI_INT);
@@ -592,6 +600,11 @@ AMRInterpolator<InterpAlgo>::exchangeMPIAnswer()
     }
 
     m_mpi.asyncEnd();
+#else
+    m_query_level = m_answer_level;
+    m_query_box = m_answer_box;
+    m_query_data = m_answer_data;
+#endif
 
     if (m_verbosity) {
         pout() << TAG << "Leaving exchangeMPIAnswer" << endl;

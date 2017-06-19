@@ -4,6 +4,8 @@ N2 = 32
 N3 = 32
 L = 16
 
+num_points = 3
+
 num_ghosts = 3
 max_level = 1
 regrid_interval = 1 1 1 1 0 0 0 0 0
