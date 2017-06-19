@@ -20,10 +20,12 @@ using std::endl;
 #include "AMR.H"
 
 #include "SetupFunctions.hpp"
+
 #include "SimulationParameters.hpp"
+#include "DefaultLevelFactory.hpp"
 
 //Problem specific includes:
-#include "BinaryBHLevelFactory.hpp"
+#include "BinaryBHLevel.hpp"
 
 
 //TODO: Remove the below three lines if they aren't necessary
@@ -47,7 +49,7 @@ runGRChombo (int argc, char* argv[])
     //The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
     //and an associated LevelFactory)
-    BinaryBHLevelFactory binary_bh_level_fact(sim_params);
+    DefaultLevelFactory<BinaryBHLevel> binary_bh_level_fact(sim_params);
     AMR amr;
     setupAMRObject(amr, binary_bh_level_fact);
 

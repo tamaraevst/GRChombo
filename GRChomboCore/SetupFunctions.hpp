@@ -11,6 +11,10 @@ using std::cerr;
 #include "AMR.H"
 #include "AMRLevelFactory.H"
 
+#ifdef EQUATION_DEBUG_MODE
+#include "DebuggingTools.hpp"
+#endif
+
 //This function calls MPI_Init, makes sure a parameter file is supplied etc...
 void mainSetup(int argc ,char* argv[]);
 
@@ -41,6 +45,11 @@ void mainSetup(int argc, char* argv[], int required_argc = 2)
 #else
     rank = 0;
     number_procs = 1;
+#endif
+
+#ifdef EQUATION_DEBUG_MODE
+    EquationDebugging::check_no_omp();
+    MayDay::Warning("GRChombo is running in equation debug mode. This mode is intended only for debugging and leads to significantly worse performance.");
 #endif
 
     if (rank == 0)
@@ -175,6 +184,20 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
         std::string prefix;
         pp.query("chk_prefix",prefix);
         amr.checkpointPrefix(prefix);
+    }
+
+    if (pp.contains("plot_interval"))
+    {
+        int plot_interval;
+        pp.get("plot_interval", plot_interval);
+        amr.plotInterval(plot_interval);
+    }
+
+    if (pp.contains("plot_prefix"))
+    {
+        std::string prefix;
+        pp.query("plot_prefix",prefix);
+        amr.plotPrefix(prefix);
     }
 
     int verbosity;

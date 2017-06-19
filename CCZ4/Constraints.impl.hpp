@@ -6,18 +6,17 @@
 #define CONSTRAINTS_IMPL_HPP_
 
 inline
-Constraints::Constraints(const FABDriverBase& driver, double dx, double cosmological_constant /*defaulted*/) :
-    m_driver (driver),
-    m_deriv (dx, m_driver),
+Constraints::Constraints(double dx, double cosmological_constant /*defaulted*/) :
+    m_deriv (dx),
     m_cosmological_constant (cosmological_constant)
 {}
 
 template <class data_t>
 void
-Constraints::compute(Cell current_cell)
+Constraints::compute(Cell<data_t> current_cell)
 {
     Vars<data_t> vars;
-    m_driver.local_vars(vars, current_cell);
+    current_cell.local_vars(vars);
 
     Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
@@ -34,10 +33,10 @@ Constraints::compute(Cell current_cell)
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(out.Ham, current_cell, c_Ham);
-    m_driver.store_vars(out.Mom[0], current_cell, c_Mom1);
-    m_driver.store_vars(out.Mom[1], current_cell, c_Mom2);
-    m_driver.store_vars(out.Mom[2], current_cell, c_Mom3);
+    current_cell.store_vars(out.Ham, c_Ham);
+    current_cell.store_vars(out.Mom[0], c_Mom1);
+    current_cell.store_vars(out.Mom[1], c_Mom2);
+    current_cell.store_vars(out.Mom[2], c_Mom3);
 }
 
 template <class data_t, template<typename> class vars_t>
@@ -52,7 +51,7 @@ Constraints::constraint_equations(
 
    const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
-   auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+   auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
    auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);

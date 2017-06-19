@@ -23,11 +23,12 @@ using std::endl;
 #include "SimulationParameters.hpp"
 
 //Problem specific includes:
-#include "InterpolatorTestLevelFactory.hpp"
+#include "UserVariables.hpp"
+#include "DefaultLevelFactory.hpp"
 #include "AMRInterpolator.hpp"
 #include "Lagrange.hpp"
 #include "InterpolationQuery.hpp"
-#include "UserVariables.hpp"
+#include "InterpolatorTestLevel.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -45,7 +46,7 @@ main(int argc ,char* argv[])
     ParmParse  pp(argc-2,argv+2,NULL,in_file);
     SimulationParameters sim_params(pp);
 
-    InterpolatorTestLevelFactory interpolator_test_level_fact(sim_params);
+    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(sim_params);
     AMR amr;
     setupAMRObject(amr, interpolator_test_level_fact);
 

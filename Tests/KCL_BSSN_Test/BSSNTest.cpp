@@ -1,4 +1,3 @@
-#define COMPARE_WITH_CHF
 #define COVARIANTZ4
 
 #ifdef _OPENMP
@@ -9,12 +8,14 @@
 #include <iostream>
 #include <iomanip>
 #include <sys/time.h>
-
+#include "UserVariables.hpp"
 #include "CCZ4Matter.hpp"
 #include "ScalarField.hpp"
-#include "FABDriver.hpp"
+#include "Potential.hpp"
+#include "BoxLoops.hpp"
+#include "SetValue.hpp"
+
 #include "GRBSSNChomboF_F.H"
-#include "UserVariables.hpp"
 
 #define CHF_FRAn(a, n, c) \
     a.dataPtr(n), \
@@ -47,7 +48,7 @@ int main()
     FArrayBox out_fab(box, c_NUM);
     FArrayBox out_fab_chf(box, c_NUM);
 
-    const double dx = 1.0 / (N_GRID - 1);
+    const double dx = 1.0 / N_GRID;
 
     for (int zz = -3; zz < N_GRID+3; ++zz)
     {
@@ -156,10 +157,8 @@ int main()
     params.shift_advec_coeff = 0.0;
     params.eta = 1.0;
 
-    ScalarField::params_t matter_params;
-    matter_params.scalar_mass = 1.1;
-    matter_params.amplitudeSF = 0.0025;
-    matter_params.widthSF = 1.0;
+    Potential::params_t potential_params;
+    potential_params.scalar_mass = 1.1;
 
     int formulation = 1; //BSSN
     double G_Newton = 1.0;
@@ -168,14 +167,16 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    FABDriver<CCZ4Matter<ScalarField> >(params, matter_params, dx, sigma, formulation, G_Newton).execute(in_fab, out_fab);
+    // Typedef for scalar field
+    typedef ScalarField<Potential> ScalarFieldWithPotential;
+    Potential my_potential(potential_params);
+    ScalarFieldWithPotential my_scalar_field(my_potential);
+    BoxLoops::loop(CCZ4Matter<ScalarFieldWithPotential>(my_scalar_field, params, dx, sigma, formulation, G_Newton), in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 
     int cxx_time = end.tv_sec*1000+end.tv_usec/1000-begin.tv_sec*1000-begin.tv_usec/1000;
     std::cout << "C++ version took " << cxx_time << "ms" << std::endl;
-
-#ifdef COMPARE_WITH_CHF
 
     int SIX = 6;
     int THREE = 3;
@@ -227,18 +228,22 @@ int main()
 
     std::cout << "C++ speedup = " << setprecision(2) << (double) fort_time / cxx_time << "x" << std::endl;
 
+    int failed = 0;
+
     out_fab -= out_fab_chf;
     for (int i = 0; i < c_NUM; ++i)
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_chf = out_fab_chf.norm(0,i,1);
-        if (max_err/max_chf > 1e-7)
+        if (max_err/max_chf > 1e-6)
         {
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
         }
     }
 
-#endif
+    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
+    else std::cout << "Spherical Harmonic test failed..." << std::endl;
 
+    return failed;
 }

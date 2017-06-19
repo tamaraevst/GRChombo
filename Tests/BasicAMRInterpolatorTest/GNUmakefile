@@ -10,6 +10,6 @@ ebase := AMRInterpolatorTest
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
-src_dirs := ../../utils ../../simd  ../../FABDriver ../../GRChomboCore ../../AMRInterpolator
+src_dirs := ../../utils ../../simd  ../../BoxUtils ../../GRChomboCore ../../AMRInterpolator
 
 include $(CHOMBO_HOME)/mk/Make.test

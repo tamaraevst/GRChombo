@@ -2,7 +2,7 @@
 #define COORDINATES_HPP_
 
 #include "simd.hpp"
-#include "Cell.hpp"
+#include "MiscUtils.hpp"
 
 template <class data_t>
 class Coordinates
@@ -11,51 +11,95 @@ public:
     data_t x; //We vectorise over x so we must allow x to be a vector
     double y;
     double z;
+    std::array<double, CH_SPACEDIM> m_center;
 
-    Coordinates(int ix, int iy, int iz, double dx)
+    Coordinates(IntVect integer_coords, double dx, std::array<double, CH_SPACEDIM> center = {0})
+        : m_center (center)
     {
-        compute_coord<data_t>(x, ix, dx);
+        compute_coord(x, integer_coords[0], dx, center[0]);
 
         //The below code allows for 2D Cartoon reduction:
-#if IDX_SPACEDIM == CH_SPACEDIM
-        compute_coord<double>(y, iy, dx);
-#elif IDX_SPACEDIM == CH_SPACEDIM + 1
+#if IDX_SPACEDIM == CH_SPACEDIM && CH_SPACEDIM == 3
+        compute_coord(y, integer_coords[1], dx, center[1]);
+        compute_coord(z, integer_coords[2], dx, center[2]);
+#elif IDX_SPACEDIM == CH_SPACEDIM + 1 && CH_SPACEDIM == 2
         y = 0;
+        compute_coord(z, integer_coords[1], dx, center[1]);
 #else
 #ifdef CH_SPACEDIM
 #error compute_coord has not got your dimension combination implemented.
 #endif
 #endif
-
-        compute_coord<double>(z, iz, dx);
-    }
-
-    Coordinates(Cell current_cell, double dx)
-    {
-        Coordinates(current_cell.m_ix, current_cell.m_iy, current_cell.m_iz, dx);
     }
 
     template <typename t>
     ALWAYS_INLINE
     static
     void
-    compute_coord(t& out, int position, double dx)
+    compute_coord(t& out, int position, double dx, double center_distance = 0)
     {
-        out = (position+0.5)*dx;
+        out = (position+0.5)*dx - center_distance;
     }
 
     //MK: I passed 'out' as argument because overloading by return type doesn't work
+    template <typename t>
     ALWAYS_INLINE
     static
     typename std::enable_if<(simd_traits<double>::simd_len > 1), void >::type
-    compute_coord(simd<double>& out, int position, double dx)
+    compute_coord(simd<t>& out, int position, double dx, double center_distance = 0)
     {
-        double out_arr[simd_traits<double>::simd_len];
-        for (int i = 0; i < simd_traits<double>::simd_len; ++i)
+        t out_arr[simd_traits<t>::simd_len];
+        for (int i = 0; i < simd_traits<t>::simd_len; ++i)
         {
-            out_arr[i] = (position+i+0.5)*dx;
+            out_arr[i] = (position+i+0.5)*dx - center_distance;
         }
-        out = simd<double>::load(out_arr);
+        out = simd<t>::load(out_arr);
     }
+
+    // function which returns the radius subject to a floor
+    // for when a Coordinates object exists
+    data_t
+    get_radius() const
+    {
+        //Note that this is not currently dimension independent
+        data_t r = sqrt( pow(x,2) + pow(y,2) + pow(z,2) );
+        double minimum_r = 1e-6;
+        MIN_CUT_OFF(r, minimum_r);
+
+        return r;
+    }
+
+    // static function which returns radius subject to a floor
+    // for when no coordinates object exists
+    static
+    data_t
+    get_radius(IntVect integer_coords, double dx, std::array<double, GR_SPACEDIM> center = {0})
+    {
+        data_t xx;
+        double yy;
+        double zz;
+
+        //Note that this is not currently dimension independent
+        compute_coord(xx, integer_coords[0], dx, center[0]);
+        compute_coord(yy, integer_coords[1], dx, center[1]);
+        compute_coord(zz, integer_coords[2], dx, center[2]);
+
+        data_t r = sqrt( pow(xx,2) + pow(yy,2) + pow(zz,2) );
+
+        double minimum_r = 1e-6;
+        MIN_CUT_OFF(r, minimum_r);
+
+        return r;
+    }
+
 };
+
+template <typename data_t>
+ALWAYS_INLINE
+ostream& operator<< (ostream& os, const Coordinates<data_t>& in_coords)
+{
+    os << "(x,y,z) = (" << in_coords.x << "," << in_coords.y << "," << in_coords.z << ")"
+       << " r = " << in_coords.get_radius();
+    return os;
+}
 #endif /* COORDINATES_HPP_ */

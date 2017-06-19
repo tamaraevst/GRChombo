@@ -139,5 +139,18 @@ public:
          //The 0 component must exists so just take this one.
          return *m_assignment_ptrs[ivar][0];
      }
+
+     ///Prints all elements of the vars element with component names. Useful for debugging.
+     void print() const
+     {
+        FORVARS(ivar)
+        {
+            if (variable_defined(ivar))
+            {
+                pout () << UserVariables::variable_names[ivar] << ": "
+                        << *m_assignment_ptrs[ivar][0] << std::endl;
+            }
+        }
+     }
 };
 #endif /* VARSBASE_HPP_ */

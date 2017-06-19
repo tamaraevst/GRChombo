@@ -4,7 +4,9 @@
 #define SCALARFIELDLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
-
+//Problem specific includes
+#include "Potential.hpp"
+#include "ScalarField.hpp"
 
 //!  A class for the evolution of a scalar field, minimally coupled to gravity
 /*!
@@ -17,9 +19,12 @@
 */
 class ScalarFieldLevel : public GRAMRLevel
 {
-    friend class ScalarFieldLevelFactory;
+    friend class DefaultLevelFactory<ScalarFieldLevel>;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
+
+    // Typedef for scalar field
+    typedef ScalarField<Potential> ScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
     virtual
@@ -41,10 +46,13 @@ class ScalarFieldLevel : public GRAMRLevel
     virtual
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
 
+    //! Specify which variables to write at plot intervals
+    virtual
+    void specificWritePlotHeader(std::vector<int> &plot_states) const;
+
     //! Tell Chombo how to tag cells for regridding
     virtual
-    void tagCells(IntVectSet& a_tags);
-
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
 };
 
 #include "ScalarFieldLevel.impl.hpp"

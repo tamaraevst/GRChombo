@@ -2,16 +2,16 @@
 #include <iostream>
 #include "PositiveChiAndAlpha.hpp"
 #include "tensor.hpp"
-#include "GRutils.hpp"
+#include "GRUtils.hpp"
 
-#include "FABDriver.hpp"
+#include "BoxLoops.hpp"
 #include "PositiveChiAndAlpha.hpp"
 
 
 
 int main()
 {
-   int passed = 1;
+   int failed = 0;
 
     const int N_GRID = 8;
     Box box(IntVect(0,0,0), IntVect(N_GRID-1,N_GRID-1,N_GRID-1));
@@ -34,7 +34,7 @@ int main()
         }
     }
 
-    FABDriver<PositiveChiAndAlpha>().execute(in_fab,in_fab);
+    BoxLoops::loop(PositiveChiAndAlpha(), in_fab,in_fab);
 
     for (int iz = 0; iz < N_GRID; ++iz)
     {
@@ -48,14 +48,14 @@ int main()
                 else value = 1e-4;  //PositiveChiAndAlpha should change 1e-10 to 1e-4
 
                 if ( (in_fab(iv, c_chi) != value)
-                     || (in_fab(iv, c_lapse) != value) ) passed = -1;
+                     || (in_fab(iv, c_lapse) != value) ) failed = -1;
             }
         }
     }
 
 
-   if (passed == 1) std::cout << "PositiveChiAndAlpha test passed" << std::endl;
+   if (failed == 0) std::cout << "PositiveChiAndAlpha test passed" << std::endl;
    else std::cout << "PositiveChiAndAlpha test NOT passed" << std::endl;
 
-   return passed;
+   return failed;
 }

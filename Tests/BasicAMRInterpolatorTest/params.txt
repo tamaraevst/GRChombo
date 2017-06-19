@@ -1,4 +1,4 @@
-verbosity = 1
+verbosity = 0
 N1 = 32
 N2 = 32
 N3 = 32

@@ -8,13 +8,12 @@
 #define COVARIANTZ4
 
 inline
-CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma, int formulation, double cosmological_constant) :
+CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation, double cosmological_constant) :
     m_params (params),
     m_sigma (sigma),
     m_formulation (formulation),
     m_cosmological_constant (cosmological_constant),
-    m_driver (driver),
-    m_deriv (dx, m_driver)
+    m_deriv (dx)
 {
     //Sanity check: a user who wants to use BSSN should also have damping paramters = 0
     if (m_formulation == USE_BSSN)
@@ -29,10 +28,10 @@ CCZ4::CCZ4(const FABDriverBase& driver, params_t params, double dx, double sigma
 
 template <class data_t>
 void
-CCZ4::compute(Cell current_cell)
+CCZ4::compute(Cell<data_t> current_cell)
 {
     Vars<data_t> vars;
-    m_driver.local_vars(vars, current_cell);
+    current_cell.local_vars(vars);
 
     Vars< tensor<1, data_t> > d1;
     FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
@@ -56,7 +55,7 @@ CCZ4::compute(Cell current_cell)
     FOR1(idir) m_deriv.add_dissipation(rhs, current_cell, m_sigma,idir);
 
     //Write the rhs into the output FArrayBox
-    m_driver.store_vars(rhs, current_cell);
+    current_cell.store_vars(rhs);
 }
 
 template <class data_t, template<typename> class vars_t>
@@ -72,7 +71,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse(vars.h);
+    auto h_UU = compute_inverse_sym(vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     tensor<1, data_t> Z_over_chi;
@@ -163,6 +162,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
         rhs.Theta = 0; // ensure the Theta of CCZ4 remains at zero
         // Use hamiltonian constraint to remove ricci.scalar for BSSN update
         rhs.K = advec.K + vars.lapse*(tr_A2 + vars.K*vars.K/GR_SPACEDIM) - tr_covd2lapse;
+        rhs.K += - 2*vars.lapse*m_cosmological_constant/(GR_SPACEDIM-1.);
     }
     else
     {
@@ -171,6 +171,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 
         rhs.Theta += - vars.lapse * m_cosmological_constant;
         rhs.K = advec.K + vars.lapse*(ricci.scalar + vars.K*(vars.K - 2*vars.Theta) ) - kappa1_lapse*GR_SPACEDIM*(1+m_params.kappa2)*vars.Theta - tr_covd2lapse;
+        rhs.K += - 2*vars.lapse * GR_SPACEDIM/(GR_SPACEDIM-1.) * m_cosmological_constant;
     }
 
     tensor<1, data_t> Gammadot;

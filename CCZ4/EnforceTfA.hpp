@@ -4,7 +4,6 @@
 
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "FABDriverBase.hpp"
 #include "CCZ4Geometry.hpp"
 #include "TensorAlgebra.hpp"
 #include "Interval.H"
@@ -14,14 +13,7 @@
 
 class EnforceTfA
 {
-protected:
-    const FABDriverBase& m_driver;
-
 public:
-    EnforceTfA(const FABDriverBase& driver) :
-        m_driver (driver)
-    {}
-
     template <class data_t>
     struct Vars : VarsBase<data_t>
     {
@@ -33,15 +25,15 @@ public:
     };
 
     template <class data_t>
-    void compute(Cell current_cell)
+    void compute(Cell<data_t> current_cell)
     {
         Vars<data_t> vars;
-        m_driver.local_vars(vars, current_cell);
+        current_cell.local_vars(vars);
 
-        auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+        auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
         TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
-        m_driver.store_vars(vars, current_cell, Interval(c_A11, c_A33));
+        current_cell.store_vars(vars, Interval(c_A11, c_A33));
     }
 };
 

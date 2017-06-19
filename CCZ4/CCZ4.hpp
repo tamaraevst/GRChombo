@@ -4,7 +4,6 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 #include "GRUtils.hpp"
-#include "FABDriverBase.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
@@ -17,8 +16,8 @@
 
 /// Compute class to calculate the CCZ4 right hand side
 /**
- * This compute class implements the CCZ4 right hand side equations. Use it by handing it to a FABDriver and calling the
- * FABDriver's execute function.
+ * This compute class implements the CCZ4 right hand side equations. Use it by handing it to a loop in the BoxLoops
+ * namespace.
  * CCZ4 includes two classes in its scope: CCZ4::Vars (the CCZ4 variables like conformal factor, conformal metric,
  * extrinsic curvature, etc) and CCZ4::Params (parameters necessary for CCZ4 like gauge and damping parameters).
  **/
@@ -80,15 +79,11 @@ protected:
     const double m_sigma; //!< Coefficient for Kreiss-Oliger dissipation
     int m_formulation;
     double m_cosmological_constant;
-    const FABDriverBase& m_driver;
     const FourthOrderDerivatives m_deriv;
 
 public:
     /// Constructor
-    /** In most cases this constructor will not be called directly but by calling the constructor of the FABDriver which
-     * (which will forward its arguments to the constructor of CCZ4).
-     */
-    CCZ4(const FABDriverBase& driver, //!< The FABDriver that uses this CCZ4 s compute class
+    CCZ4(
          params_t params, //!< The CCZ4 parameters
          double dx, //!< The grid spacing
          double sigma, //!< Kreiss-Oliger dissipation coefficient
@@ -98,11 +93,11 @@ public:
 
     /// Compute function
     /** This function orchestrates the calculation of the rhs for one specific grid cell given by the integer
-      * coordinates ix, iy and iz. This function is called by the FABDriver for each grid cell; there should rarely be a
+      * coordinates ix, iy and iz. This function is called by the BoxLoops::loop for each grid cell; there should rarely be a
       * need to call it directly.
       */
     template <class data_t>
-    void compute(Cell current_cell);
+    void compute(Cell<data_t> current_cell);
 
 protected:
     /// Calculates the rhs for CCZ4

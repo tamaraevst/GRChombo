@@ -20,7 +20,6 @@ public:
         pp.get("L", L);
         pp.getarr("isPeriodic", isPeriodic,0, SpaceDim);
         pp.get("num_ghosts", num_ghosts);
-        //pp.get("dt_multiplier", dt_multiplier);
     }
     int verbosity;
     Real L; //Physical sidelength of the grid
@@ -29,6 +28,7 @@ public:
     double regrid_threshold = 0;
     int tag_buffer_size=0;
     bool ignore_checkpoint_name_mismatch = false;
+    double dt_multiplier = 0.2; //Doesn't matter for this test
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

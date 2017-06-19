@@ -6,6 +6,7 @@
 #define BOOSTEDBH_IMPL_HPP_
 
 #include "BoostedBH.hpp"
+#include "MiscUtils.hpp"
 #include <cmath>
 
 inline
@@ -50,8 +51,8 @@ BoostedBH::center_dist(Coordinates<data_t> coords) const
                     + pow(coords.z - m_params.center[2],2));
 
     double minimum_r = 1e-6;
-    auto r_is_too_small = simd_compare_lt(r, minimum_r);
-    return simd_conditional(r_is_too_small, minimum_r, r);
+    MIN_CUT_OFF(r, minimum_r);
+    return r;
 }
 
 template <class data_t>

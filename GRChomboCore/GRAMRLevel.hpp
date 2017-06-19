@@ -13,7 +13,7 @@
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {
-protected:
+public:
     GRAMRLevel(const SimulationParameters& a_p, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
 
     virtual
@@ -141,12 +141,20 @@ public:
     virtual
     void initialData() = 0;
 
+    // Tagging criterion
+    virtual
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state) = 0;
+
     virtual
     void fillBdyGhosts() {}
 
 #ifdef CH_USE_HDF5
     virtual
     void preCheckpointLevel() {}
+
+    // Specify which variables to write at plot intervals
+    virtual
+    void specificWritePlotHeader(std::vector<int> &plot_states) const {};
 #endif
 
     virtual

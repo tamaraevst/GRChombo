@@ -5,7 +5,7 @@
 
 class BinaryBHLevel : public GRAMRLevel
 {
-    friend class BinaryBHLevelFactory;
+    friend class DefaultLevelFactory<BinaryBHLevel>;
     //Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
@@ -24,6 +24,9 @@ class BinaryBHLevel : public GRAMRLevel
 
     virtual
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
+
+    virtual
+    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
 };
 
 #include "BinaryBHLevel.impl.hpp"

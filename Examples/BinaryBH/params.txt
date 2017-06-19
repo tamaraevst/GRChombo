@@ -1,8 +1,8 @@
 verbosity = 1
-chk_prefix = /scratch/kclough/BinaryBH_
+chk_prefix = BinaryBH_
 #restart_file = BinaryBH_000360.3d.hdf5
 
-# Set up grid spacings and regrid params 
+# Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
 
 N1 = 32

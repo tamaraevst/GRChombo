@@ -2,10 +2,9 @@
 #include "LevelRK4.H"
 
 //TODO: Remove this once tagCells is sorted out!
-#include "FABDriver.hpp"
-#include "ComputeModGrad.hpp"
 #include "GRAMRLevel.hpp"
 #include "Array.hpp"
+#include "BoxLoops.hpp"
 
 GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
 : m_num_ghosts (a_p.num_ghosts), m_p(a_p), m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
@@ -193,8 +192,8 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         const FArrayBox& state_fab = m_state_new[di];
 
         //mod gradient
-        FArrayBox mod_grad_fab(b,c_NUM);
-        FABDriver<ComputeModGrad>(m_dx).execute(state_fab, mod_grad_fab);
+        FArrayBox tagging_criterion(b,1);
+        computeTaggingCriterion(tagging_criterion, state_fab);
 
         const IntVect& smallEnd = b.smallEnd();
         const IntVect& bigEnd = b.bigEnd();
@@ -214,8 +213,7 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
         {
             IntVect iv(ix,iy,iz);
             //At the moment only base on gradient chi/chi^2
-            if (m_dx * mod_grad_fab(iv,c_chi)/pow(state_fab(iv,c_chi),2)
-                >= m_p.regrid_threshold)
+            if (tagging_criterion(iv,0) >= m_p.regrid_threshold)
             {
                 // local_tags |= is not thread safe.
 #pragma omp critical
@@ -588,11 +586,99 @@ GRAMRLevel::readCheckpointLevel (HDF5Handle& a_handle)
 void
 GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
 {
+    if (m_verbosity) pout() << "GRAMRLevel::writePlotLevel" << endl;
+
+    // number and index of states to print
+    std::vector<int> plot_states;
+    // to be specified in specific Level class
+    specificWritePlotHeader(plot_states);
+    int num_states = plot_states.size();
+
+    if ( num_states > 0 )
+    {
+        // Setup the level string
+        char levelStr[20];
+        sprintf(levelStr,"%d",m_level);
+        const std::string label = std::string("level_") + levelStr;
+
+        a_handle.setGroup(label);
+
+        // Setup the level header information
+        HDF5HeaderData header;
+
+        header.m_int ["ref_ratio"]   = m_ref_ratio;
+        header.m_int  ["tag_buffer_size"] = m_p.tag_buffer_size;
+        header.m_real["dx"]          = m_dx;
+        header.m_real["dt"]          = m_dt;
+        header.m_real["time"]        = m_time;
+        header.m_box ["prob_domain"] = m_problem_domain.domainBox();
+
+        // Setup the periodicity info
+        for (int dir=0; dir<SpaceDim; ++dir)
+        {
+            char dir_str[20];
+            sprintf (dir_str, "%d", dir);
+            const std::string periodic_label = std::string ("is_periodic_") + dir_str;
+            header.m_int[periodic_label] = m_problem_domain.isPeriodic(dir);
+        }
+
+        // Write the header for this level
+        header.writeToFile(a_handle);
+
+        if (m_verbosity) pout() << header << endl;
+
+        const DisjointBoxLayout& levelGrids = m_state_new.getBoxes();
+        LevelData<FArrayBox> plot_data(levelGrids, num_states);
+
+        for (int comp=0; comp < num_states; comp++)
+        {
+            Interval currentComp(comp, comp);
+            Interval plotComps(plot_states[comp], plot_states[comp]);
+            m_state_new.copyTo(plotComps, plot_data, currentComp);
+        }
+
+        plot_data.exchange(plot_data.interval());
+
+        // Write the data for this level
+        write (a_handle, levelGrids);
+        write (a_handle, plot_data, "data");
+    }
 }
 
 void
 GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
 {
+    if (m_verbosity) pout() << "GRAMRLevel::writePlotHeader" << endl;
+
+    // number and index of states to print
+    std::vector<int> plot_states;
+    // to be specified in specific Level class
+    specificWritePlotHeader(plot_states);
+    int num_states = plot_states.size();
+
+    if ( num_states > 0 )
+    {
+        // Setup the number of components
+        HDF5HeaderData header;
+        header.m_int["num_components"] = num_states;
+
+        // Setup the component names
+        char compStr[30];
+        for (int comp = 0; comp < num_states; ++comp)
+        {
+            sprintf(compStr,"component_%d", comp);
+            header.m_string[compStr] = UserVariables::variable_names[plot_states[comp]];
+        }
+
+        // Write the header
+        header.writeToFile(a_handle);
+
+        if (m_verbosity) pout() << header << endl;
+    }
+    else
+    {
+        MayDay::Warning("GRAMRLevel::writePlotLevel: A plot interval is provided but no components are selected for plotting. Plot files will be empty.");
+    }
 }
 #endif /*ifdef CH_USE_HDF5*/
 

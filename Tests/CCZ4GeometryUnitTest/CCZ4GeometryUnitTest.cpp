@@ -14,7 +14,7 @@ struct vars_t
 
 int main()
 {
-   int passed = 1;
+   int failed = 0;
 
    vars_t<double> vars;
    vars_t< tensor<1,double> > d1;
@@ -23,7 +23,7 @@ int main()
 
 #include "values1.hpp" //Including the auto generated file with values
 
-   auto h_UU = TensorAlgebra::compute_inverse(vars.h);
+   auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
 
    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
@@ -36,7 +36,7 @@ int main()
       if (diff > 1e-14)
       {
          std::cout << "h_UU wrong in component [" << i << "]["<< j<< "]"<< std::endl;
-         passed = -1;
+         failed = -1;
       }
    }
 
@@ -48,7 +48,7 @@ int main()
          std::cout << "chris wrong in component [" << i << "]["<< j<< "][" << k << "]" << std::endl;
          std::cout << "value: " << chris.ULL[i][j][k] << std::endl;
          std::cout << "correct value: " << chris_known[i][j][k] << std::endl;
-         passed = -1;
+         failed = -1;
       }
    }
 
@@ -60,7 +60,7 @@ int main()
          std::cout << "chris contracted wrong in component [" << i << "]" << std::endl;
          std::cout << "value: " << chris.contracted[i] << std::endl;
          std::cout << "correct value: " << chris_contracted_known[i] << std::endl;
-         passed = -1;
+         failed = -1;
       }
    }
 
@@ -72,7 +72,7 @@ int main()
          std::cout << "ricciZ contracted wrong in component [" << i << "][" << j << "]" << std::endl;
          std::cout << "value: " << ricciZ.LL[i][j] << std::endl;
          std::cout << "correct value: " << ricciZ_known[i][j] << std::endl;
-         passed = -1;
+         failed = -1;
       }
    }
 
@@ -82,12 +82,12 @@ int main()
       std::cout << "ricci scalar wrong" << std::endl;
       std::cout << "value: " << ricciZ.scalar << std::endl;
       std::cout << "correct value: " << ricciZ_scalar_known << std::endl;
-      passed = -1;
+      failed = -1;
    }
 
 
-   if (passed == 1) std::cout << "CCZ4Geometry test passed" << std::endl;
-   else std::cout << "CCZ4Geometry test NOT passed" << std::endl;
+   if (failed == 0) std::cout << "CCZ4Geometry test passed..." << std::endl;
+   else std::cout << "CCZ4Geometry test failed..." << std::endl;
 
-   return passed;
+   return failed;
 }
