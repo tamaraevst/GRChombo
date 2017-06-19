@@ -10,7 +10,6 @@
 
 // Our includes
 
-#include "Array.hpp"
 #include "InterpolationLayout.hpp"
 #include "InterpSource.hpp"
 #include "InterpolationAlgorithm.hpp"
@@ -24,7 +23,7 @@ template <typename InterpAlgo>
 class AMRInterpolator
 {
 public:
-    AMRInterpolator(const AMR& amr, const Array<double, CH_SPACEDIM>& coarsest_origin, const Array<double, CH_SPACEDIM>& coarsest_dx, int verbosity = 0);
+    AMRInterpolator(const AMR& amr, const std::array<double, CH_SPACEDIM>& coarsest_origin, const std::array<double, CH_SPACEDIM>& coarsest_dx, int verbosity = 0);
     void refresh();
     void limit_num_levels(unsigned int num_levels);
     void interp(InterpolationQuery& query);
@@ -41,16 +40,16 @@ private:
     const AMR& m_amr;
 
     // Coordinates of the point represented by IntVect::Zero in coarsest grid
-    const Array<double, CH_SPACEDIM> m_coarsest_origin;
+    const std::array<double, CH_SPACEDIM> m_coarsest_origin;
 
     // Grid spacing in each direction
-    const Array<double, CH_SPACEDIM> m_coarsest_dx;
+    const std::array<double, CH_SPACEDIM> m_coarsest_dx;
 
     int m_num_levels;
     const int m_verbosity;
 
-    vector<Array<double, CH_SPACEDIM> > m_origin;
-    vector<Array<double, CH_SPACEDIM> > m_dx;
+    vector<std::array<double, CH_SPACEDIM> > m_origin;
+    vector<std::array<double, CH_SPACEDIM> > m_dx;
 
     MPIContext m_mpi;
     vector<int> m_mpi_mapping;

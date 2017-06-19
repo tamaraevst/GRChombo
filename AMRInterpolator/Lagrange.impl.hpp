@@ -144,7 +144,7 @@ Lagrange<Order>::Lagrange(const InterpSource& source, bool verbosity) :
 
 template <int Order>
 void
-Lagrange<Order>::setup(const Array<int, CH_SPACEDIM>& deriv, const Array<double, CH_SPACEDIM>& dx, const Array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest)
+Lagrange<Order>::setup(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest)
 {
     pair<vector<IntVect>, vector<double> > result = generateStencil(deriv, dx, evalCoord, nearest);
     m_interp_points = result.first;
@@ -218,7 +218,7 @@ Lagrange<Order>::interpData(const FArrayBox& fab, int comp)
 
 template <int Order>
 pair<vector<IntVect>, vector<double> >
-Lagrange<Order>::generateStencil(const Array<int, CH_SPACEDIM>& deriv, const Array<double, CH_SPACEDIM>& dx, const Array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest, int dim)
+Lagrange<Order>::generateStencil(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest, int dim)
 {
     vector<IntVect> out_points;
     vector<double> out_weights;
@@ -237,7 +237,7 @@ Lagrange<Order>::generateStencil(const Array<int, CH_SPACEDIM>& deriv, const Arr
     int points_min = Order + deriv[dim];
     int points_max = Order + deriv[dim];
 
-    Array<double, CH_SPACEDIM> interp_coord = evalCoord;
+    std::array<double, CH_SPACEDIM> interp_coord = evalCoord;
     int candidate = nearest[dim];
     int grown_direction = (nearest[dim] - evalCoord[dim] < 0) ? DOWN : UP;
 

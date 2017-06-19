@@ -1,7 +1,7 @@
 #ifndef _DERIVATIVE_HPP_
 #define _DERIVATIVE_HPP_
 
-class Derivative : public Array<int, CH_SPACEDIM>
+class Derivative : public std::array<int, CH_SPACEDIM>
 {
 private:
 
@@ -32,7 +32,7 @@ public:
     {
         for (int i = 0; i < CH_SPACEDIM; ++i)
         {
-            Array<int, CH_SPACEDIM>::operator[](i) = 0;
+            std::array<int, CH_SPACEDIM>::operator[](i) = 0;
         }
     }
 

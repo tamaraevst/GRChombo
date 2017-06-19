@@ -36,7 +36,7 @@ class Lagrange
     // Helper function to generate tensor product weights
     // Argument 'dim' is used for recursion over dimensions.
     pair<vector<IntVect>, vector<double> >
-    generateStencil(const Array<int, CH_SPACEDIM>& deriv, const Array<double, CH_SPACEDIM>& dx, const Array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest, int dim = CH_SPACEDIM - 1);
+    generateStencil(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest, int dim = CH_SPACEDIM - 1);
 
     vector<IntVect> m_interp_points;
     vector<double> m_interp_weights;
@@ -49,7 +49,7 @@ class Lagrange
 public:
     Lagrange(const InterpSource& source, bool verbosity = false);
 
-    void setup(const Array<int, CH_SPACEDIM>& deriv, const Array<double, CH_SPACEDIM>& dx, const Array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest);
+    void setup(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest);
     double interpData(const FArrayBox& fab, int comp);
 
     const static string TAG;

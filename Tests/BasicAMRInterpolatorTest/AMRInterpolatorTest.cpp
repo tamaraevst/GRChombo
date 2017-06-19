@@ -37,13 +37,14 @@ using std::endl;
 int
 main(int argc ,char* argv[])
 {
-    auto required_argc = 1;
-    mainSetup(argc, argv, required_argc);
+    mainSetup(argc, argv);
 
     //Load the parameter file and construct the SimulationParameter class
     //To add more parameters edit the SimulationParameters file.
-    char const* in_file = "params.txt";
-    ParmParse  pp(argc-2,argv+2,NULL,in_file);
+    std::string in_string = argv[argc-1];
+    pout () << in_string << std::endl;
+    char const* in_file = argv[argc-1];
+    ParmParse  pp(0,argv+argc,NULL,in_file);
     SimulationParameters sim_params(pp);
 
     DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(sim_params);
@@ -82,13 +83,10 @@ main(int argc ,char* argv[])
         .addComp(c_phi, phi_ptr.get());
 
     auto dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])->get_dx(); //coarsest grid spacing
-    Array<double, 3> dx;
-    Array<double, CH_SPACEDIM> origin;
-    for (int idir=0; idir<CH_SPACEDIM; ++idir)
-    {
-        dx[idir] = dx_scalar;
-        origin[idir] = dx_scalar/2;
-    }
+    std::array<double, 3> dx;
+    dx.fill(dx_scalar);
+    std::array<double, CH_SPACEDIM> origin;
+    origin.fill(dx_scalar/2);
 
     AMRInterpolator<Lagrange<4> > interpolator(amr, origin, dx, 2);
     interpolator.interp(query);

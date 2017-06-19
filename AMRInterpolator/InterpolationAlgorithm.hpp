@@ -8,7 +8,7 @@ public:
 
 class NearestNeighbour : public InterpolationAlgorithm {
 public:
-    static inline double interpPoint(const Array<double, CH_SPACEDIM>& gridCoord, const FArrayBox& fab, int comps, const IntVect& nearest)
+    static inline double interpPoint(const std::array<double, CH_SPACEDIM>& gridCoord, const FArrayBox& fab, int comps, const IntVect& nearest)
     {
         return fab.get(nearest, comps);
     }

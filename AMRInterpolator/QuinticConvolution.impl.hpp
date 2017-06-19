@@ -12,7 +12,7 @@ QuinticConvolution::QuinticConvolution(const InterpSource& source, bool verbosit
 }
 
 void
-QuinticConvolution::setup(const Array<int, CH_SPACEDIM>& deriv, const Array<double, CH_SPACEDIM>& dx, const Array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest)
+QuinticConvolution::setup(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest)
 {
     m_interp_points.clear();
     m_interp_weights.clear();
@@ -56,7 +56,7 @@ QuinticConvolution::setup(const Array<int, CH_SPACEDIM>& deriv, const Array<doub
     	}
     }
 
-    Array<double, CH_SPACEDIM> interp_coord;
+    std::array<double, CH_SPACEDIM> interp_coord;
 
 #if CH_SPACEDIM >= 3
     for (int z = 0; z < 6; ++z)

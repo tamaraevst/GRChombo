@@ -8,7 +8,6 @@
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
 #include "FourthOrderFillPatch.H"
 #include "CoarseAverage.H"
-#include "Array.hpp"
 #include "InterpSource.hpp"
 
 class GRAMRLevel : public AMRLevel, public InterpSource
@@ -29,7 +28,7 @@ public:
     const GRLevelData& getLevelData() const;
 
     bool
-    contains(const Array<double, CH_SPACEDIM>& point) const;
+    contains(const std::array<double, CH_SPACEDIM>& point) const;
 
 private:
     // define

@@ -3,7 +3,6 @@
 
 //TODO: Remove this once tagCells is sorted out!
 #include "GRAMRLevel.hpp"
-#include "Array.hpp"
 #include "BoxLoops.hpp"
 
 GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
@@ -74,7 +73,7 @@ GRAMRLevel::getLevelData() const
 }
 
 bool
-GRAMRLevel::contains(const Array<double, CH_SPACEDIM>& point) const
+GRAMRLevel::contains(const std::array<double, CH_SPACEDIM>& point) const
 {
     const Box& domainBox = problemDomain().domainBox();
     for (int i = 0; i < CH_SPACEDIM; ++i)

@@ -10,7 +10,7 @@ const string
 AMRInterpolator<InterpAlgo>::TAG = "\x1b[32;1m[AMRInterpolator]\x1b[0m ";
 
 template <typename InterpAlgo>
-AMRInterpolator<InterpAlgo>::AMRInterpolator(const AMR& amr, const Array<double, CH_SPACEDIM>& coarsest_origin, const Array<double, CH_SPACEDIM>& coarsest_dx, int verbosity) :
+AMRInterpolator<InterpAlgo>::AMRInterpolator(const AMR& amr, const std::array<double, CH_SPACEDIM>& coarsest_origin, const std::array<double, CH_SPACEDIM>& coarsest_dx, int verbosity) :
     m_amr (amr),
     m_coarsest_origin (coarsest_origin),
     m_coarsest_dx (coarsest_dx),
@@ -192,7 +192,7 @@ AMRInterpolator<InterpAlgo>::findBoxes(InterpolationQuery& query)
     const Vector<AMRLevel*>& levels = const_cast<AMR&>(m_amr).getAMRLevels();
     const int num_levels = m_num_levels; //levels.size();
 
-    Array<double, CH_SPACEDIM> grid_coord;
+    std::array<double, CH_SPACEDIM> grid_coord;
     IntVect nearest;
 
     InterpolationLayout interp_layout(query.m_num_points);
@@ -503,7 +503,7 @@ AMRInterpolator<InterpAlgo>::calculateAnswers(InterpolationQuery& query)
     //const int num_comps = query.numComps();
     const int num_answers = m_mpi.totalAnswerCount();
 
-    Array<double, CH_SPACEDIM> grid_coord;
+    std::array<double, CH_SPACEDIM> grid_coord;
     IntVect nearest;
 
     for (int answer_idx = 0; answer_idx < num_answers; ++answer_idx)
