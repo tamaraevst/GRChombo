@@ -6,7 +6,7 @@
   * NB: \bar{A} as defined in the book is psi^{-6} * \bar{A}_{BSSN}
   */
 
-#include <vector>
+#include <array>
 #include "tensor.hpp"
 #include "Coordinates.hpp"
 
@@ -17,8 +17,8 @@ public:
     struct params_t
     {
         double mass;
-        std::vector<double> center;
-        std::vector<double> momentum;
+        std::array<double, CH_SPACEDIM> center;
+        std::array<double, CH_SPACEDIM> momentum;
     };
 
     const params_t m_params;

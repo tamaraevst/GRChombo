@@ -3,44 +3,44 @@
 #endif
 //TODO: this annoying piece of code will be auto-generated from a list of values, names and default-values. This way we also get proper handling of missing parameters
 
-void auto_read_params(ParmParse& pp)
+void auto_read_params(GRParmParse& pp)
 {
-    pp.get("verbosity", verbosity);
+    pp.load("verbosity", verbosity);
     //Grid setup
-    pp.get("L", L);
-    pp.get("regrid_threshold", regrid_threshold);
-    pp.getarr("isPeriodic", isPeriodic,0, SpaceDim);
-    pp.get("num_ghosts", num_ghosts);
-    pp.get("tag_buffer_size", tag_buffer_size);
-    pp.get("dt_multiplier", dt_multiplier);
+    pp.load("L", L);
+    pp.load("regrid_threshold", regrid_threshold);
+    pp.load("isPeriodic", isPeriodic);
+    pp.load("num_ghosts", num_ghosts);
+    pp.load("tag_buffer_size", tag_buffer_size);
+    pp.load("dt_multiplier", dt_multiplier);
 
     // Lapse evolution
-    pp.get("lapse_advec_coeff",lapse_advec_coeff);
-    pp.get("lapse_coeff", lapse_coeff);
-    pp.get("lapse_power", lapse_power);
+    pp.load("lapse_advec_coeff",lapse_advec_coeff);
+    pp.load("lapse_coeff", lapse_coeff);
+    pp.load("lapse_power", lapse_power);
 
     // Shift Evolution
-    pp.get("shift_advec_coeff",shift_advec_coeff);
-    pp.get("shift_Gamma_coeff",shift_Gamma_coeff);
-    pp.get("eta",eta);
-    pp.get("SpatialBetaDriverRadius",SpatialBetaDriverRadius);
+    pp.load("shift_advec_coeff",shift_advec_coeff);
+    pp.load("shift_Gamma_coeff",shift_Gamma_coeff);
+    pp.load("eta",eta);
+    pp.load("SpatialBetaDriverRadius",SpatialBetaDriverRadius);
 
     //CCZ4 parameters
-    pp.get("kappa1",kappa1);
-    pp.get("kappa2",kappa2);
-    pp.get("kappa3",kappa3);
-    pp.get("covariantZ4",covariantZ4);
+    pp.load("kappa1",kappa1);
+    pp.load("kappa2",kappa2);
+    pp.load("kappa3",kappa3);
+    pp.load("covariantZ4",covariantZ4);
 
     //Dissipation
-    pp.get("sigma",sigma);
+    pp.load("sigma",sigma);
 
     //Initial data
-    pp.get("massA", massA);
-    pp.getarr("centerA", centerA, 0, SpaceDim);
-    pp.getarr("momentumA", momentumA, 0, SpaceDim);
-    pp.get("massB", massB);
-    pp.getarr("centerB", centerB, 0, SpaceDim);
-    pp.getarr("momentumB", momentumB, 0, SpaceDim);
+    pp.load("massA", massA);
+    pp.load("centerA", centerA);
+    pp.load("momentumA", momentumA);
+    pp.load("massB", massB);
+    pp.load("centerB", centerB);
+    pp.load("momentumB", momentumB);
 
     //Fill in BinaryBHParameters
     bh1_params.mass = massA;
@@ -51,9 +51,8 @@ void auto_read_params(ParmParse& pp)
     bh2_params.momentum = momentumB;
 
     //Misc
-    pp.get("nan_check", nan_check);
-    ignore_checkpoint_name_mismatch = false;
-    pp.query("ignore_checkpoint_name_mismatch", ignore_checkpoint_name_mismatch);
+    pp.load("nan_check", nan_check);
+    pp.load("ignore_checkpoint_name_mismatch", ignore_checkpoint_name_mismatch, false);
 }
 
 ////// General parameters
@@ -61,7 +60,7 @@ int verbosity;
 Real L; //Physical sidelength of the grid
 int num_ghosts;
 int tag_buffer_size; //Amount the tagged region is grown by
-std::vector<bool> isPeriodic;
+std::array<bool, CH_SPACEDIM> isPeriodic;
 int nan_check;
 bool ignore_checkpoint_name_mismatch; //ignore mismatch of variable names between restart file and program
 Real dt_multiplier;
@@ -78,5 +77,5 @@ int covariantZ4;
 Real sigma; //Dissipation
 //Initial data
 Real massA, massB;
-std::vector<Real> centerA, centerB;
-std::vector<Real> momentumA, momentumB;
+std::array<double, CH_SPACEDIM> centerA, centerB;
+std::array<double, CH_SPACEDIM> momentumA, momentumB;
