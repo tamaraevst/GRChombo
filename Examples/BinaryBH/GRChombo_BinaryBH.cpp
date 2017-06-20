@@ -18,6 +18,7 @@
 #include "parstream.H" //Gives us pout()
 using std::endl;
 #include "AMR.H"
+#include "GRParmParse.hpp"
 
 #include "SetupFunctions.hpp"
 
@@ -43,7 +44,7 @@ runGRChombo (int argc, char* argv[])
     //Load the parameter file and construct the SimulationParameter class
     //To add more parameters edit the SimulationParameters file.
     char* in_file = argv[1];
-    ParmParse  pp(argc-2,argv+2,NULL,in_file);
+    GRParmParse  pp(argc-2,argv+2,NULL,in_file);
     SimulationParameters sim_params(pp);
 
     //The line below selects the problem that is simulated
