@@ -92,9 +92,8 @@ public:
         );
 
     /// Compute function
-    /** This function orchestrates the calculation of the rhs for one specific grid cell given by the integer
-      * coordinates ix, iy and iz. This function is called by the BoxLoops::loop for each grid cell; there should rarely be a
-      * need to call it directly.
+    /** This function orchestrates the calculation of the rhs for one specific grid cell.
+      * This function is called by the BoxLoops::loop for each grid cell; there should rarely be a need to call it directly.
       */
     template <class data_t>
     void compute(Cell<data_t> current_cell);
