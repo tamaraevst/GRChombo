@@ -6,10 +6,10 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
-ebase := GRChombo_KerrBH
+ebase := AMRInterpolatorTest
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../InitialConditions/BlackHoles ../../BoxUtils ../../GRChomboCore ../../TaggingCriteria ../../AMRInterpolator
+src_dirs := ../../utils ../../simd  ../../BoxUtils ../../GRChomboCore ../../AMRInterpolator
 
 include $(CHOMBO_HOME)/mk/Make.test

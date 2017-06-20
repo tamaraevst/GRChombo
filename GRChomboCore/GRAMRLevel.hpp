@@ -8,14 +8,27 @@
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
 #include "FourthOrderFillPatch.H"
 #include "CoarseAverage.H"
+#include "InterpSource.hpp"
 
-class GRAMRLevel : public AMRLevel
+class GRAMRLevel : public AMRLevel, public InterpSource
 {
 public:
     GRAMRLevel(const SimulationParameters& a_p, int a_verbosity, ProfilingInfo * a_profilingInfo = NULL);
 
     virtual
     ~GRAMRLevel();
+
+public:
+    /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
+    static
+    const GRAMRLevel* gr_cast(const AMRLevel* const amr_level_ptr);
+    static
+    GRAMRLevel* gr_cast(AMRLevel* const amr_level_ptr);
+
+    const GRLevelData& getLevelData() const;
+
+    bool
+    contains(const std::array<double, CH_SPACEDIM>& point) const;
 
 private:
     // define
@@ -26,9 +39,6 @@ private:
     virtual
     void define(AMRLevel* a_coarser_level_ptr, const ProblemDomain& a_problem_domain,
                 int a_level, int a_ref_ratio);
-
-    /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
-    GRAMRLevel* gr_cast(AMRLevel* const amr_level_ptr);
 
     // advance by one timestep
     virtual
@@ -152,10 +162,12 @@ public:
     virtual
     void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt) {}
 
-protected:
+    double get_dx() const;
+
     virtual
     void fillAllGhosts();
 
+protected:
     virtual
     void fillIntralevelGhosts();
 

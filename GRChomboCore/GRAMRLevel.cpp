@@ -50,14 +50,40 @@ GRAMRLevel::define (AMRLevel* a_coarser_level_ptr,
 }
 
 /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
-GRAMRLevel* GRAMRLevel::gr_cast(AMRLevel* const amr_level_ptr)
+const GRAMRLevel* GRAMRLevel::gr_cast(const AMRLevel* const amr_level_ptr)
 {
-    GRAMRLevel* gr_amr_level_ptr = dynamic_cast<GRAMRLevel*> (amr_level_ptr);
+    const GRAMRLevel* gr_amr_level_ptr = dynamic_cast<const GRAMRLevel*> (amr_level_ptr);
     if (gr_amr_level_ptr == nullptr)
     {
         MayDay::Error ("in GRAMRLevel::gr_cast: amr_level_ptr is not castable to GRAMRLevel*");
     }
     return gr_amr_level_ptr;
+}
+
+/// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
+GRAMRLevel* GRAMRLevel::gr_cast(AMRLevel* const amr_level_ptr)
+{
+    return const_cast<GRAMRLevel*>(gr_cast(static_cast<const AMRLevel* const>(amr_level_ptr)));
+}
+
+const GRLevelData&
+GRAMRLevel::getLevelData() const
+{
+    return m_state_new;
+}
+
+bool
+GRAMRLevel::contains(const std::array<double, CH_SPACEDIM>& point) const
+{
+    const Box& domainBox = problemDomain().domainBox();
+    for (int i = 0; i < CH_SPACEDIM; ++i)
+    {
+        if (point[i] < domainBox.smallEnd(i) - m_num_ghosts || point[i] > domainBox.bigEnd(i) + m_num_ghosts)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 // advance by one timestep
@@ -734,6 +760,12 @@ void
 GRAMRLevel::copySolnData(TSoln& dest, const TSoln& src)
 {
     src.copyTo(src.interval(),dest,dest.interval());
+}
+
+double
+GRAMRLevel::get_dx() const
+{
+    return m_dx;
 }
 
 void

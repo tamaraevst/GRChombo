@@ -2,6 +2,7 @@
 #define COMPUTEPACK_HPP_
 
 #include "DebuggingTools.hpp"
+#include "Cell.hpp"
 
 template <typename... compute_ts>
 class ComputePack

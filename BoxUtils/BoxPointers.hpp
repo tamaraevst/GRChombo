@@ -2,6 +2,8 @@
 #define BOXPOINTERS_HPP_
 
 #include "FArrayBox.H"
+#include "UserVariables.hpp"
+#include "CellIndex.hpp"
 
 class BoxPointers
 {
