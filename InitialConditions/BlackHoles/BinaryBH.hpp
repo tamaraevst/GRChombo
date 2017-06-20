@@ -12,15 +12,12 @@
 
 #include <array>
 
-namespace Lapse
+enum Lapse
 {
-    enum
-    {
-        ONE,
-        PRE_COLLAPSED,
-        CHI
-    };
-}
+    ONE,
+    PRE_COLLAPSED,
+    CHI
+};
 
 class BinaryBH
 {
