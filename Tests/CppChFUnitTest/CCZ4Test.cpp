@@ -213,8 +213,8 @@ int main()
         }
     }
 
-    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
-    else std::cout << "Spherical Harmonic test failed..." << std::endl;
+    if (failed == 0) std::cout << "CCZ4 test passed..." << std::endl;
+    else std::cout << "CCZ4 test failed..." << std::endl;
 
     return failed;
 }
