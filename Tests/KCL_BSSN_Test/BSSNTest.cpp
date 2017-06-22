@@ -239,11 +239,12 @@ int main()
         {
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX ERROR = " << out_fab.norm(0, i, 1) << std::endl;
             std::cout << "COMPONENT " << UserVariables::variable_names[i] << " DOES NOT AGREE: MAX CHF Value = " << max_chf << std::endl;
+            failed = -1;
         }
     }
 
-    if (failed == 0) std::cout << "Spherical Harmonic test passed..." << std::endl;
-    else std::cout << "Spherical Harmonic test failed..." << std::endl;
+    if (failed == 0) std::cout << "KCL BSSN test passed..." << std::endl;
+    else std::cout << "KCL BSSN test failed..." << std::endl;
 
     return failed;
 }

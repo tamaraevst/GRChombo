@@ -31,8 +31,8 @@ public:
            mod_d1_K += d1_K[idir]*d1_K[idir];
        }
 
-       data_t criterion = m_dx * (1.0/m_threshold_phi*(sqrt(mod_d1_phi)/pow(phi,2))
-                              + 1.0/m_threshold_K*(sqrt(mod_d1_K)/pow(K,2)));
+       data_t criterion = m_dx * (1.0/m_threshold_phi*(sqrt(mod_d1_phi)/(abs(phi)+1e-6))
+                              + 1.0/m_threshold_K*(sqrt(mod_d1_K)/(abs(K)+1e-6)));
 
        // Write back into the flattened Chombo box
        current_cell.store_vars(criterion, 0);
