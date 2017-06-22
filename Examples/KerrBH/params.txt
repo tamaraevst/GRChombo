@@ -1,4 +1,4 @@
-# Last edited K Clough 20.5.17
+# Last edited K Clough 22.6.17
 
 verbosity = 0
 chk_prefix = KerrBH_
@@ -15,16 +15,18 @@ N3 = 32
 # NB if non cubic, this determines dx for all sides
 L =  128
 
+# Params for Kerr BH
+kerr_mass = 1.0
+kerr_spin = 0.95
+# This is now defaulted to center of the grid so it does not need to be updated
+# when changing L (unless one wants to put the BH somewhere off center)
+#kerr_center = 64 64 64
+
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
-regrid_threshold = 0.3 #not used in this example
-regrid_threshold_K = 0.02
-regrid_threshold_phi = 0.0175
-tag_buffer_size = 3 # How many cells to extend tagged zones by
+regrid_threshold = 0.3
 
 # Level data
-# Number of ghost cells around each box
-num_ghosts = 3 # Need at least 3 for the Kreiss Oliger dissipation
 # Maximum number of times you can regrid above coarsest level
 max_level = 7 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
@@ -38,10 +40,10 @@ ref_ratio = 2 2 2 2 2 2 2 2
 isPeriodic = 1 1 1
 # Max box sizes
 max_grid_size = 16
-# Min grid size
+# Min box size
 block_factor = 16
 # Determines how exactly regridding tries to fit the tagging
-#fill_ratio = 0.75
+fill_ratio = 0.75
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
@@ -51,9 +53,6 @@ plot_interval = 10
 dt_multiplier = 0.25
 stop_time = 100.0
 max_steps = 10000000
-
-# We usually want to check for nans
-nan_check = 1
 
 #Lapse evolution
 lapse_power = 1.0
@@ -77,12 +76,3 @@ covariantZ4 = 0 # 0: default. 1: dampk1 -> dampk1/lapse
 # coefficient for KO numerical dissipation
 # NB must be less than 0.5 for stability
 sigma = 0.3
-
-# Change the gravitational constant of the Universe!
-# Default is 1.0, for standard geometric units
-G_Newton = 1.0
-
-# Params for Kerr BH
-kerr_mass = 1.0
-kerr_spin = 0.95
-kerr_center = 64 64 64

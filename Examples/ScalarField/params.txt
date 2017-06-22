@@ -18,13 +18,10 @@ L =  64
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
 regrid_threshold = 0.5
-regrid_threshold_K = 0.02
-regrid_threshold_phi = 0.02
-tag_buffer_size = 3 # How many cells to extend tagged zones by
+regrid_threshold_K = 0.1
+regrid_threshold_phi = 1.0
 
 # Level data
-# Number of ghost cells around each box
-num_ghosts = 3 # Need at least 3 for the Kreiss Oliger dissipation
 # Maximum number of times you can regrid above coarsest level
 max_level = 6 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
@@ -34,14 +31,12 @@ regrid_interval = 50 50 5 5 5 50 50
 # Ratio of dx_coarse/dx_fine at each level, usually best to stick to 2
 # Need one for each level, ie max_level+1 items
 ref_ratio = 2 2 2 2 2 2 2
-#Periodicity in each direction
-isPeriodic = 1 1 1
 # Max box sizes
 max_grid_size = 16
 # Min grid size
 block_factor = 16
 # Determines how exactly regridding tries to fit the tagging
-#fill_ratio = 0.75
+fill_ratio = 0.75
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
@@ -51,9 +46,6 @@ plot_interval = 1
 dt_multiplier = 0.25
 stop_time = 5.0
 max_steps = 10000000
-
-# We usually want to check for nans
-nan_check = 1
 
 #Lapse evolution
 lapse_power = 1.0
@@ -80,16 +72,16 @@ sigma = 0.3
 
 # Change the gravitational constant of the Universe!
 # Default is 1.0, for standard geometric units
-G_Newton = 1.0
+# G_Newton = 1.0
 
 # SF Initial data
 amplitudeSF = 0.0025
 widthSF = 1.0
 r_zero = 5.0
 scalar_mass = 0.001
-# SF parameter for bubble centre - don't forget to update it
-# if L is changed!
-centerSF = 32 32 32
+# SF parameter for bubble centre - defaulted to center of grid
+# so only uncomment if you want to place it off center
+#centerSF = 32 32 32
 
 # Relaxation paramters
 # how long and how fast to relax
