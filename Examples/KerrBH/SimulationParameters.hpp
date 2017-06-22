@@ -4,7 +4,7 @@
 #define SIMULATIONPARAMETERS_HPP_
 
 //General includes
-#include "ParmParse.H"
+#include "GRParmParse.hpp"
 
 //Problem specific includes:
 #include "CCZ4.hpp"
@@ -13,12 +13,12 @@
 class SimulationParameters
 {
 public:
-    SimulationParameters(ParmParse& pp)
+    SimulationParameters(GRParmParse& pp)
     {
         readParams(pp);
     }
 
-    void readParams(ParmParse &pp)
+    void readParams(GRParmParse &pp)
     {
         //The automatically generated read parameters code defined in SimulationParameters.inc
         auto_read_params(pp);
@@ -40,7 +40,7 @@ public:
         ccz4_params.lapse_advec_coeff = lapse_advec_coeff;
     }
 
-    //SimulationParameters.inc declares all variables and defines auto_read_params(ParmParse& pp)
+    //SimulationParameters.inc declares all variables and defines auto_read_params(GRParmParse& pp)
 #include "SimulationParameters.inc"
 
     //Collection of parameters necessary for the CCZ4 RHS
