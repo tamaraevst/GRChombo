@@ -40,15 +40,25 @@ public:
     void
     load(const char* name, std::vector<data_t>& vector, const int num_comp) const
     {
-        get(name, vector, 0, num_comp);
+        getarr(name, vector, 0, num_comp);
     }
 
     ///Loads a value from the paramter file
     template <class data_t>
-    void
+    typename std::enable_if< !std::is_enum<data_t>::value >::type //Can't use for enum types
     load(const char* name, data_t& parameter) const
     {
         get(name, parameter);
+    }
+
+    ///Loads an enum value from the paramter file
+    template <typename enum_type>
+    typename std::enable_if<std::is_enum<enum_type>::value>::type //Only enabled for enum types
+    load(const char* name, enum_type& parameter) const
+    {
+        int iparam;
+        get(name, iparam);
+        parameter = static_cast<enum_type>(iparam);
     }
 
     ///Loads a value from the paramter file, if the value isn't defined it sets to the supplied default
