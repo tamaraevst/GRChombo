@@ -8,7 +8,7 @@ namespace TensorAlgebra
 {
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_determinant_sym(const tensor<2,data_t,3>& matrix) //This function only works for 3D matrix
     {
         data_t det = matrix[0][0]*matrix[1][1]*matrix[2][2] + 2*matrix[0][1]*matrix[0][2]*matrix[1][2]
@@ -20,7 +20,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_determinant(const tensor<2,data_t,3>& matrix) //This function only works for 3D matrix
     {
         data_t det = matrix[0][0]*(matrix[1][1]*matrix[2][2]-matrix[1][2]*matrix[2][1])-
@@ -30,7 +30,7 @@ namespace TensorAlgebra
     }
 
     template <class data_t>
-    static tensor<2, data_t>
+    tensor<2, data_t>
     compute_inverse_sym(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
     {
         data_t deth = compute_determinant_sym(matrix);
@@ -50,7 +50,7 @@ namespace TensorAlgebra
     }
 
     template <class data_t>
-    static tensor<2, data_t>
+    tensor<2, data_t>
     compute_inverse(const tensor<2,data_t,3>& matrix ) //This function only works for 3D matrix
     {
         data_t deth = compute_determinant(matrix);
@@ -71,7 +71,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_trace(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
     {
         data_t trace = 0.;
@@ -84,7 +84,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_trace(const tensor<2, data_t> &tensor_UL)
     {
         data_t trace = 0.;
@@ -94,7 +94,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_trace(const tensor<1, tensor<1,data_t> > &tensor_UL)
     {
         data_t trace = 0.;
@@ -104,7 +104,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_dot_product(const tensor<1, data_t> &vector_U, const tensor<1, data_t> &covector_L)
     {
         data_t dot_product = 0.;
@@ -114,7 +114,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static data_t
+    data_t
     compute_dot_product(const tensor<1,data_t> &covector1_L, const tensor<1, data_t> &covector2_L, const tensor<2, data_t>& inverse_metric)
     {
         data_t dot_product = 0.;
@@ -127,7 +127,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static void
+    void
     make_trace_free(tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &metric, const tensor<2, data_t> &inverse_metric)
     {
         auto trace = compute_trace(tensor_LL, inverse_metric);
@@ -140,7 +140,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static tensor<1, data_t>
+    tensor<1, data_t>
     raise_all(const tensor<1, data_t> &tensor_L, const tensor<2, data_t> &inverse_metric)
     {
         tensor<1, data_t> tensor_U = 0.;
@@ -153,7 +153,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static tensor<2, data_t>
+    tensor<2, data_t>
     raise_all(const tensor<2, data_t> &tensor_LL, const tensor<2, data_t> &inverse_metric)
     {
         tensor<2, data_t> tensor_UU = 0.;
@@ -166,7 +166,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static tensor<1, data_t>
+    tensor<1, data_t>
     lower_all(const tensor<1, data_t> &tensor_U, const tensor<2, data_t> &metric)
     {   //The code for lowering is exactly the same as for raising
         return raise_all(tensor_U, metric);
@@ -174,7 +174,7 @@ namespace TensorAlgebra
 
     template <class data_t>
     ALWAYS_INLINE
-    static tensor<2, data_t>
+    tensor<2, data_t>
     lower_all(const tensor<2, data_t> &tensor_UU, const tensor<2, data_t> &metric)
     {   //The code for lowering is exactly the same as for raising
         return raise_all(tensor_UU, metric);
