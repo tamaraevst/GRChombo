@@ -163,6 +163,22 @@ namespace TensorAlgebra
         }
         return tensor_UU;
     }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static tensor<1, data_t>
+    lower_all(const tensor<1, data_t> &tensor_U, const tensor<2, data_t> &metric)
+    {   //The code for lowering is exactly the same as for raising
+        return raise_all(tensor_U, metric);
+    }
+
+    template <class data_t>
+    ALWAYS_INLINE
+    static tensor<2, data_t>
+    lower_all(const tensor<2, data_t> &tensor_UU, const tensor<2, data_t> &metric)
+    {   //The code for lowering is exactly the same as for raising
+        return raise_all(tensor_UU, metric);
+    }
 }
 
 #endif /* TENSORALGEBRA_HPP_ */
