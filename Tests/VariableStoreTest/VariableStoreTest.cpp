@@ -2,20 +2,22 @@
 
 #include "UserVariables.hpp"
 #include "Cell.hpp"
-#include "VarsBase.hpp"
+#include "VarsTools.hpp"
 #include "CellIndex.hpp"
 
-struct vars_t : VarsBase<double>
+template<typename data_t>
+struct Vars
 {
-    double var;
-    double symmetric_var_1;
-    double symmetric_var_2;
+    data_t var;
+    data_t symmetric_var_1;
+    data_t symmetric_var_2;
 
-    vars_t()
+    template <typename mapping_function_t>
+    void enum_mapping(mapping_function_t mapping_function)
     {
-        define_enum_mapping(c_var, var);
-        define_enum_mapping(c_sym_var, symmetric_var_1);
-        define_enum_mapping(c_sym_var, symmetric_var_2);
+        VarsTools::define_enum_mapping(mapping_function, c_var, var);
+        VarsTools::define_enum_mapping(mapping_function, c_sym_var, symmetric_var_1);
+        VarsTools::define_enum_mapping(mapping_function, c_sym_var, symmetric_var_2);
     }
 };
 
@@ -23,7 +25,7 @@ int main()
 {
     int failed = 0;
 
-    vars_t vars;
+    Vars<double> vars;
     vars.var = 42.;
     vars.symmetric_var_1 = 84.;
     vars.symmetric_var_2 = 84.;

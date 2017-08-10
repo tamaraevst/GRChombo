@@ -108,7 +108,11 @@ public:
 
     void local_vars(data_t (&out)[c_NUM]) const;
 
-    void local_vars(VarsBase<data_t>& vars) const;
+    template<template<typename> class vars_t>
+    void local_vars(vars_t<data_t>& vars) const;
+
+    template<template<typename> class vars_t>
+    vars_t<data_t> local_vars() const;
 
     void store_vars(const data_t& value, const int icomp) const;
 
@@ -117,9 +121,8 @@ public:
 
     void store_vars(const std::array<data_t, c_NUM>& values) const;
 
-    void store_vars(const VarsBase<data_t>& vars, const Interval a_comps) const;
-
-    void store_vars(const VarsBase<data_t>& vars) const;
+    template<template<typename> class vars_t>
+    void store_vars(vars_t<data_t>& vars) const;
 };
 
 #include "Cell.impl.hpp"

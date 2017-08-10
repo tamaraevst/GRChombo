@@ -32,10 +32,22 @@ Cell<data_t>::local_vars(data_t (&out)[c_NUM]) const
 }
 
 template <class data_t>
+template<template<typename> class vars_t>
 void
-Cell<data_t>::local_vars(VarsBase<data_t>& vars) const
+Cell<data_t>::local_vars(vars_t<data_t>& vars) const
 {
-    FORVARS(i) vars.assign(SIMDIFY<data_t>(m_box_pointers.m_in_ptr[i])[m_in_index], i);
+    vars.enum_mapping([&](const int& ivar, double& var)
+                      { var = SIMDIFY<data_t>(m_box_pointers.m_in_ptr[ivar])[m_in_index]; });
+}
+
+template <class data_t>
+template<template<typename> class vars_t>
+vars_t<data_t>
+Cell<data_t>::local_vars() const
+{
+    vars_t<data_t> vars;
+    local_vars(vars);
+    return vars;
 }
 
 template <class data_t>
@@ -63,30 +75,14 @@ Cell<data_t>::store_vars(const std::array<data_t, c_NUM>& values) const
     FORVARS(i) store_vars(values[i], i);
 }
 
-template <class data_t>
-void
-Cell<data_t>::store_vars(const VarsBase<data_t>& vars, const Interval a_comps) const
-{
-    for (int icomp=a_comps.begin(); icomp<=a_comps.end(); ++icomp)
-    {
-        CH_assert(vars.variable_defined(icomp));
-        store_vars(vars.template read<data_t>(icomp), icomp);
-    }
-}
-
 ///This function stores all variables that have a corresponding value in a VarsBase object.
-/**It will cycle through all components and check whether they have been assigned in the vars object.
-  *Avoid use for vars objects that only contain few components.
-  */
 template <class data_t>
+template<template<typename> class vars_t>
 void
-Cell<data_t>::store_vars(const VarsBase<data_t>& vars) const
+Cell<data_t>::store_vars(vars_t<data_t>& vars) const
 {
-    FORVARS(i)
-    {
-        //Only store the variable if it is defined in vars. Otherwise don't touch.
-        if ( vars.variable_defined(i) ) store_vars(vars.template read<data_t>(i), i);
-    }
+    vars.enum_mapping([&](const int& ivar, double& var)
+                      { SIMDIFY<data_t>(m_box_pointers.m_out_ptr[ivar])[m_out_index] = var; });
 }
 
 #endif /* CELL_IMPL_HPP_ */
