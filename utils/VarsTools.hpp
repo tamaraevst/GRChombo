@@ -13,7 +13,7 @@ namespace VarsTools
 
     template <typename mapping_function_t, typename data_t, int start_var, int end_var>
     void
-    define_enum_mapping(mapping_function_t mapping_function, const GRInterval<start_var, end_var> interval, tensor<1,data_t,end_var-start_var>& tensor)
+    define_enum_mapping(mapping_function_t mapping_function, const GRInterval<start_var, end_var> interval, tensor<1,data_t,end_var-start_var+1>& tensor)
     {
         for (int ivar = 0; ivar < interval.size(); ++ivar) mapping_function(start_var + ivar, tensor[ivar]);
     }
@@ -43,33 +43,34 @@ namespace VarsTools
 #endif
     }
 
-     ///Writes data directly into all variables
+    //--> Begin: Helper for the assign function
+    template <class nested_template>
+    struct _strip_nested_template;
+
+    template <template <typename> class outermost_layer, class inner_part>
+    struct _strip_nested_template< outermost_layer<inner_part> > { using type = inner_part; };
+    //<-- End: Helper for the assign function
+
+    ///Writes data directly into all variables
      /**if this variables has multiple components (e.g. if it is an array of derivatives)
        *the data can be written directly into these components by specifying
        *an arbitrary number of icomps
        */
-     template <class vars_t, typename data_t, typename... Ints>
+     template <class vars_t, typename value_t>
      ALWAYS_INLINE
-     void assign(vars_t& vars, const data_t& data, Ints&&... icomps)
+     void assign(vars_t& vars, const value_t& value)
      {
-         vars.enum_mapping([&data,&icomps...](const int& ivar, double& var)
-                           { IndexApplicator<Ints...>::apply(var, std::forward<Ints>(icomps)...) = data; });
-     }
-
-     ///Adds the input data, otherwise the behaviour is similar to assign
-     template <class vars_t, typename data_t, typename... Ints>
-     ALWAYS_INLINE
-     void plus(vars_t& vars, const data_t& data, Ints&&... icomps)
-     {
-         vars.enum_mapping([&data,&icomps...](const int& ivar, double& var)
-                           { IndexApplicator<Ints...>::apply(var, std::forward<Ints>(icomps)...) += data; });
+         //The template magic below is needed to make sure that we can write assign(vars, 0.)
+         //and 0. gets correctly cast from double to simd<double> if necessary.
+         using data_t = typename _strip_nested_template<vars_t>::type;
+         vars.enum_mapping([&value](const int& ivar, data_t& var) { var = static_cast<data_t>(value); });
      }
 
      ///Prints all elements of the vars element with component names - Useful for debugging.
-     template <class vars_t>
-     void print(const vars_t& vars)
+     template <template <typename> class vars_t, typename data_t>
+     void print(const vars_t<data_t>& vars)
      {
-         vars.enum_mapping([](const int& ivar, double& var)
+         vars.enum_mapping([](const int& ivar, data_t& var)
                            { pout () << UserVariables::variable_names[ivar] << ": " << var << "\n"; });
      }
-};
+}

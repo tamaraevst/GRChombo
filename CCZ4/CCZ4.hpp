@@ -7,7 +7,6 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "VarsBase.hpp"
 #include "Cell.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -37,11 +36,8 @@ public:
       * copy of the variables with values in the Chombo grid.
      **/
     template <class data_t>
-    struct Vars : VarsBase<data_t>
+    struct Vars
     {
-        using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
-        using VarsBase<data_t>::define_symmetric_enum_mapping;
-
         data_t chi; //!< Conformal factor
         tensor<2, data_t> h; //!< Conformal metric
         data_t K; //!< Trace of the extrinsic curvature
@@ -52,11 +48,9 @@ public:
         tensor<1, data_t> shift;
         tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used for second order shift conditions
 
-        /// Constructor
-        /** This constructor sets up the pointers from this local copy of the grid variables to the correct point in the
-          * large array in which Chombo stores all the grid variables for all grid cells.
-         **/
-        Vars();
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
     };
 
     /// Parameters for CCZ4
