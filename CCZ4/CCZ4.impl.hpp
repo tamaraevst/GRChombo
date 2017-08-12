@@ -34,7 +34,7 @@ CCZ4::compute(Cell<data_t> current_cell)
 {
     const auto vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
-    const auto d2 = m_deriv.template diff2<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
     const auto advec = m_deriv.template advection<Vars>(current_cell, vars.shift);
 
     Vars<data_t> rhs;
@@ -45,12 +45,12 @@ CCZ4::compute(Cell<data_t> current_cell)
     current_cell.store_vars(rhs); //Write the rhs into the output FArrayBox
 }
 
-template <class data_t, template<typename> class vars_t>
+template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
 void
 CCZ4::rhs_equation(vars_t<data_t> &rhs,
           const vars_t<data_t> &vars,
           const vars_t< tensor<1,data_t> >& d1,
-          const vars_t< tensor<2,data_t> >& d2,
+          const diff2_vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
 )
 {
@@ -219,6 +219,17 @@ void CCZ4::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
     //Symmetric 2-tensors
     define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
     define_symmetric_enum_mapping(mapping_function, GRInterval<c_A11,c_A33>(), A);
+}
+
+template <class data_t>
+template <typename mapping_function_t>
+void CCZ4::Diff2Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
+{
+    using namespace VarsTools; //define_enum_mapping is part of VarsTools
+    define_enum_mapping(mapping_function, c_chi, chi);
+    define_enum_mapping(mapping_function, c_lapse, lapse);
+    define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
 }
 
 #endif /* CCZ4_IMPL_HPP_ */

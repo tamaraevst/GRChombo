@@ -76,12 +76,12 @@ class CCZ4Geometry
         return out;
     }
 
-    template <class data_t, template <typename> class vars_t>
+    template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     static ricci_t<data_t>
     compute_ricci_Z(
         const vars_t<data_t> &vars,
         const vars_t< tensor<1,data_t> >& d1,
-        const vars_t< tensor<2,data_t> >& d2,
+        const diff2_vars_t< tensor<2,data_t> >& d2,
         const tensor<2, data_t>& h_UU,
         const chris_t<data_t>& chris,
         const tensor<1, data_t>& Z_over_chi
@@ -149,12 +149,12 @@ class CCZ4Geometry
         return out;
     }
 
-    template <class data_t, template <typename> class vars_t>
+    template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     static ricci_t<data_t>
     compute_ricci(
         const vars_t<data_t> &vars,
         const vars_t< tensor<1,data_t> >& d1,
-        const vars_t< tensor<2,data_t> >& d2,
+        const diff2_vars_t< tensor<2,data_t> >& d2,
         const tensor<2, data_t>& h_UU,
         const chris_t<data_t>& chris
     )

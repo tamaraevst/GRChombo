@@ -53,6 +53,20 @@ public:
         void enum_mapping(mapping_function_t mapping_function);
     };
 
+    ///2nd derivatives are only calculated for a small subset defined by Deriv2Vars
+    /** Making this split speeds up the code significantly */
+    template <class data_t>
+    struct Diff2Vars
+    {
+        data_t chi; //!< Conformal factor
+        data_t lapse;
+        tensor<2, data_t> h; //!< Conformal metric
+        tensor<1, data_t> shift;
+
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
+    };
+
     /// Parameters for CCZ4
     /** This struct collects all parameters that are necessary for CCZ4 such as gauge and damping parameters.  */
     struct params_t
@@ -99,12 +113,12 @@ protected:
       * The variables (the template argument vars_t) must contain at least the members:
       * chi, h[i][j], Gamma[i], A[i][j], Theta, lapse and shift[i].
      **/
-    template <class data_t, template<typename> class vars_t>
+    template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
     void rhs_equation(
         vars_t<data_t> &rhs, //!< Reference to the variables into which the output right hand side is written
         const vars_t<data_t> &vars, //!< The values of the current variables
         const vars_t< tensor<1,data_t> > &d1, //!< First derivative of the variables
-        const vars_t< tensor<2,data_t> > &d2, //!< The second derivative the variables
+        const diff2_vars_t< tensor<2,data_t> > &d2, //!< The second derivative the variables
         const vars_t<data_t> &advec //!< The advection derivatives of the variables
     );
 };
