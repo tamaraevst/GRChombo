@@ -95,24 +95,24 @@ public:
 
     ///Returns the box pointers
     ALWAYS_INLINE
-    BoxPointers get_box_pointers() const
+    const BoxPointers& get_box_pointers() const
     {
         return m_box_pointers;
     }
 
     ALWAYS_INLINE
-    data_t local_vars(int icomp) const;
+    data_t load_vars(int icomp) const;
 
     ALWAYS_INLINE
-    void local_vars(data_t& out, int icomp) const;
+    void load_vars(data_t& out, int icomp) const;
 
-    void local_vars(data_t (&out)[c_NUM]) const;
-
-    template<template<typename> class vars_t>
-    void local_vars(vars_t<data_t>& vars) const;
+    void load_vars(data_t (&out)[c_NUM]) const;
 
     template<template<typename> class vars_t>
-    vars_t<data_t> local_vars() const;
+    void load_vars(vars_t<data_t>& vars) const;
+
+    template<template<typename> class vars_t>
+    vars_t<data_t> load_vars() const;
 
     void store_vars(const data_t& value, const int icomp) const;
 

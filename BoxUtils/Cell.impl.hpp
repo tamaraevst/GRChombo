@@ -11,7 +11,7 @@
 template <class data_t>
 ALWAYS_INLINE
 data_t
-Cell<data_t>::local_vars(const int icomp) const
+Cell<data_t>::load_vars(const int icomp) const
 {
     return SIMDIFY<data_t>(m_box_pointers.m_in_ptr[icomp])[m_in_index];
 }
@@ -19,22 +19,22 @@ Cell<data_t>::local_vars(const int icomp) const
 template <class data_t>
 ALWAYS_INLINE
 void
-Cell<data_t>::local_vars(data_t& out, const int icomp) const
+Cell<data_t>::load_vars(data_t& out, const int icomp) const
 {
-    out = local_vars(icomp);
+    out = load_vars(icomp);
 }
 
 template <class data_t>
 void
-Cell<data_t>::local_vars(data_t (&out)[c_NUM]) const
+Cell<data_t>::load_vars(data_t (&out)[c_NUM]) const
 {
-    FORVARS(i) out[i] = local_vars(i);
+    FORVARS(i) out[i] = load_vars(i);
 }
 
 template <class data_t>
 template<template<typename> class vars_t>
 void
-Cell<data_t>::local_vars(vars_t<data_t>& vars) const
+Cell<data_t>::load_vars(vars_t<data_t>& vars) const
 {
     vars.enum_mapping([&](const int& ivar, data_t& var)
                       { var = SIMDIFY<data_t>(m_box_pointers.m_in_ptr[ivar])[m_in_index]; });
@@ -43,10 +43,10 @@ Cell<data_t>::local_vars(vars_t<data_t>& vars) const
 template <class data_t>
 template<template<typename> class vars_t>
 vars_t<data_t>
-Cell<data_t>::local_vars() const
+Cell<data_t>::load_vars() const
 {
     vars_t<data_t> vars;
-    local_vars(vars);
+    load_vars(vars);
     return vars;
 }
 
