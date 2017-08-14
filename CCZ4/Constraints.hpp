@@ -18,18 +18,17 @@ class Constraints
 {
 protected:
     template <class data_t>
-    struct Vars : VarsBase<data_t>
+    struct Vars
     {
-        using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
-        using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
-
         data_t chi;
         tensor<2, data_t> h;
         data_t K;
         tensor<2, data_t> A;
         tensor<1, data_t> Gamma;
 
-        Vars();
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
     };
 
     template <class data_t>
@@ -49,12 +48,12 @@ public:
     void compute(Cell<data_t> current_cell);
 
 protected:
-    template <class data_t, template<typename> class vars_t>
+    template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
     constraints_t<data_t>
     constraint_equations(
-        vars_t<data_t> &vars,
+        const vars_t<data_t> &vars,
         const vars_t< tensor<1,data_t> >& d1,
-        const vars_t< tensor<2,data_t> >& d2
+        const diff2_vars_t< tensor<2,data_t> >& d2
     );
 };
 

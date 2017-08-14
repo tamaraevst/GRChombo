@@ -5,6 +5,9 @@
 #ifndef CONSTRAINTS_IMPL_HPP_
 #define CONSTRAINTS_IMPL_HPP_
 
+#include "GRInterval.hpp"
+#include "VarsTools.hpp"
+
 inline
 Constraints::Constraints(double dx, double cosmological_constant /*defaulted*/) :
     m_deriv (dx),
@@ -15,36 +18,23 @@ template <class data_t>
 void
 Constraints::compute(Cell<data_t> current_cell)
 {
-    Vars<data_t> vars;
-    current_cell.local_vars(vars);
-
-    Vars< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
-
-    Vars< tensor<2,data_t> > d2;
-    // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
-    // Mixed derivatives
-    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
+    const auto vars = current_cell.template load_vars<Vars>();
+    const auto d1 = m_deriv.template diff1<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Vars>(current_cell);
 
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
     //Write the rhs into the output FArrayBox
     current_cell.store_vars(out.Ham, c_Ham);
-    current_cell.store_vars(out.Mom[0], c_Mom1);
-    current_cell.store_vars(out.Mom[1], c_Mom2);
-    current_cell.store_vars(out.Mom[2], c_Mom3);
+    current_cell.store_vars(out.Mom, GRInterval<c_Mom1,c_Mom3>());
 }
 
-template <class data_t, template<typename> class vars_t>
+template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
 auto
 Constraints::constraint_equations(
-      vars_t<data_t> &vars,
+      const vars_t<data_t> &vars,
       const vars_t< tensor<1,data_t> >& d1,
-      const vars_t< tensor<2,data_t> >& d2
+      const diff2_vars_t< tensor<2,data_t> >& d2
 ) -> constraints_t<data_t>
 {
    constraints_t<data_t> out;
@@ -85,18 +75,15 @@ Constraints::constraint_equations(
 }
 
 template <class data_t>
-Constraints::Vars<data_t>::Vars()
+template <typename mapping_function_t>
+void Constraints::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
 {
-    //Scalars
-    define_enum_mapping(c_chi, chi);
-    define_enum_mapping(c_K, K);
-
-    //Vectors
-    define_enum_mapping(Interval(c_Gamma1,c_Gamma3), Gamma);
-
-    //Symmetric 2-tensors
-    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
-    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
+    using namespace VarsTools; //define_enum_mapping is part of VarsTools
+    define_enum_mapping(mapping_function, c_chi, chi);
+    define_enum_mapping(mapping_function, c_K, K);
+    define_enum_mapping(mapping_function, GRInterval<c_Gamma1,c_Gamma3>(), Gamma);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_A11,c_A33>(), A);
 }
 
 #endif /* CONSTRAINTS_IMPL_HPP_ */

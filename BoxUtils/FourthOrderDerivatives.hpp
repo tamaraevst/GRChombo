@@ -3,7 +3,6 @@
 
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "VarsBase.hpp"
 #include "Cell.hpp"
 #include <array>
 
