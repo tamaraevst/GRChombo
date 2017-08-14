@@ -5,7 +5,8 @@
 #include "CellIndex.hpp"
 #include "BoxPointers.hpp"
 #include "IntVect.H"
-#include "VarsBase.hpp"
+#include "GRInterval.hpp"
+#include "tensor.hpp"
 
 ///Encapsulates information about the position of a cell
 /** It contains the position of the cell on the Chombo grid and the index of the flattened Chombo array where the data
@@ -116,8 +117,8 @@ public:
 
     void store_vars(const data_t& value, const int icomp) const;
 
-    template <int num_comp>
-    void store_vars(const tensor<1, data_t, num_comp>& values, const int start_comp) const;
+    template <int start_var, int end_var>
+    void store_vars(const tensor<1, data_t, GRInterval<start_var, end_var>::size()>& values, const GRInterval<start_var, end_var> interval) const;
 
     void store_vars(const std::array<data_t, c_NUM>& values) const;
 
