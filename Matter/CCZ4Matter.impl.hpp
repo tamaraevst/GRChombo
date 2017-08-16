@@ -26,40 +26,23 @@ template <class data_t>
 void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell)
 {
     //copy data from chombo gridpoint into local variables
-    Vars<data_t> matter_vars;
-    current_cell.local_vars(matter_vars);
-
-    //work out first derivatives of variables on grid
-    Vars< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
-
-    // Repeated derivatives
-    // Work out second derivatives of variables on grid
-    Vars< tensor<2,data_t> > d2;
-    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
-    // Mixed derivatives
-    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
-
-    // Calculate advection terms
-    Vars<data_t> advec;
-    advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, current_cell, matter_vars.shift[idir], idir);
+    const auto matter_vars = current_cell.template load_vars<Vars>();
+    const auto d1 = m_deriv.template diff1<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Vars>(current_cell);
+    const auto advec = m_deriv.template advection<Vars>(current_cell, matter_vars.shift);
 
     // Call CCZ4 RHS - work out RHS without matter, no dissipation
-    Vars<data_t> matter_rhs;
+    Vars<data_t> matter_rhs; 
     rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
     //add RHS matter terms from EM tensor
-    add_EMTensor_rhs(matter_rhs, matter_vars, d1, d2, advec);
+    add_EMTensor_rhs(matter_rhs, matter_vars, d1, advec);
 
     //add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
     //Add dissipation to all terms
-    FOR1(idir) m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma, idir);
+    m_deriv.add_dissipation(matter_rhs, current_cell, m_sigma);
 
     //Write the rhs into the output FArrayBox
     current_cell.store_vars(matter_rhs);
@@ -72,10 +55,9 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     Vars<data_t>  &matter_rhs,
     const Vars<data_t>  &matter_vars,
     const Vars< tensor<1,data_t> >& d1,
-    const Vars< tensor<2,data_t> >& d2,
     const Vars<data_t>  &advec) {
 
-  using namespace TensorAlgebra;
+    using namespace TensorAlgebra;
 
     auto h_UU = compute_inverse_sym(matter_vars.h);
     auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);

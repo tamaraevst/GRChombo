@@ -44,6 +44,8 @@ max_grid_size = 16
 block_factor = 16
 # Determines how exactly regridding tries to fit the tagging
 fill_ratio = 0.75
+#number of ghost cells
+num_ghosts = 3
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level

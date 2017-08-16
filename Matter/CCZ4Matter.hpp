@@ -9,7 +9,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "VarsBase.hpp"
+#include "VarsTools.hpp"
 #include "CCZ4.hpp"
 #include "Cell.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -29,11 +29,38 @@
 template <class matter_t>
 class CCZ4Matter : public CCZ4
 {
-    //Use the variable definition in matter_t
-    template<class data_t>
-    using Vars=typename matter_t::template Vars<data_t>;
-
 public:
+    template <class data_t>
+    using MatterVars = typename matter_t::template Vars<data_t>;
+
+    template <class data_t>
+    using MatterDiff2Vars = typename matter_t::template Diff2Vars<data_t>;
+
+    //Inherit the variable definitions from CCZ4 + matter_t
+    template <class data_t>
+    struct Vars : public CCZ4::Vars<data_t>, public MatterVars<data_t> 
+    {
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            CCZ4::Vars<data_t>::enum_mapping(mapping_function);
+            MatterVars<data_t>::enum_mapping(mapping_function);
+        }
+    };
+
+    template <class data_t>
+    struct Diff2Vars : public CCZ4::Diff2Vars<data_t>, public MatterDiff2Vars<data_t> 
+    {
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            CCZ4::Diff2Vars<data_t>::enum_mapping(mapping_function);
+            MatterDiff2Vars<data_t>::enum_mapping(mapping_function);
+        }
+    };
+
     //!  Constructor of class CCZ4Matter
     /*!
        Inputs are the grid spacing, plus the CCZ4 evolution parameters and a matter object.
@@ -56,7 +83,6 @@ protected:
         Vars<data_t> &matter_rhs, //!<the RHS data for each variable at that point.
         const Vars<data_t> &vars, //!<the value of the variables at the point.
         const Vars< tensor<1,data_t> > &d1, //!<the value of the first derivatives of the variables.
-        const Vars< tensor<2,data_t> > &d2, //!<the value of the second derivatives of the variables.
         const Vars<data_t> &advec //!<the value of the advection terms beta^i d_i(var).
     );
 

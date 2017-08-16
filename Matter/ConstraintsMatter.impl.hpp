@@ -21,38 +21,21 @@ template <class matter_t>
 template <class data_t>
 void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)
 {
-    //Calculate non matter contributions to Constraints
-    Vars<data_t> vars;
-    current_cell.local_vars(vars);
+    // Load local vars and calculate derivs
+    const auto vars = current_cell.template load_vars<Vars>();
+    const auto d1 = m_deriv.template diff1<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Vars>(current_cell);
+    const auto advec = m_deriv.template advection<Vars>(current_cell, vars.shift);
 
-    //Calculate first derivatives
-    Vars< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
-
-    //Calculate second derivatives
-    Vars< tensor<2,data_t> > d2;
-    // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
-    // Mixed derivatives
-    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
-
-    // Get the non matter terms
+    // Get the non matter terms for the constraints
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
 
-    //Calculate EM Tensor and add matter terms, need advection and geometric objects
-    Vars<data_t> advec;
-    advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, current_cell, vars.shift[idir], idir);
-
     // Inverse metric and Christoffel symbol
-    auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
+    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     // Energy Momentum tensor
-    auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
 
     //Hamiltonain constraint
     out.Ham += -16.0*M_PI*m_G_Newton*emtensor.rho;
@@ -65,9 +48,7 @@ void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)
 
     //Write the rhs into the output FArrayBox
     current_cell.store_vars(out.Ham, c_Ham);
-    current_cell.store_vars(out.Mom[0], c_Mom1);
-    current_cell.store_vars(out.Mom[1], c_Mom2);
-    current_cell.store_vars(out.Mom[2], c_Mom3);
+    current_cell.store_vars(out.Mom, GRInterval<c_Mom1,c_Mom3>());
 }
 
 #endif /* CONSTRAINTSMATTER_IMPL_HPP_ */

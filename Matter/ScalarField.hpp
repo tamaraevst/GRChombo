@@ -9,9 +9,9 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "VarsBase.hpp"
 #include "CCZ4Matter.hpp"
 #include "CCZ4.hpp"
+#include "VarsTools.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
 #include "DefaultPotential.hpp"
@@ -37,26 +37,27 @@ public:
     //!  Constructor of class ScalarField, inputs are the matter parameters.
     ScalarField(const potential_t a_potential) : my_potential (a_potential) {}
 
-    //! Structure containing all the rhs variables for the gravity and matter fields
+    //! Structure containing the rhs variables for the matter fields
     template <class data_t>
-    struct Vars : VarsBase<data_t> {
+    struct Vars
+    {
+        data_t phi;
+        data_t Pi;
 
-    using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
-    using VarsBase<data_t>::define_symmetric_enum_mapping;
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
+    };
 
-    data_t chi;
-    tensor<2, data_t> h;
-    data_t K;
-    tensor<2, data_t> A;
-    tensor<1, data_t> Gamma;
-    data_t Theta;
-    data_t lapse;
-    tensor<1, data_t> shift;
-    tensor<1, data_t> B;
-    data_t phi;
-    data_t Pi;
+    //! Structure containing the rhs variables for the matter fields requiring 2nd derivs
+    template <class data_t>
+    struct Diff2Vars
+    {
+        data_t phi;
 
-    Vars();
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
     };
 
     //! The function which calculates the EM Tensor, given the vars and derivatives
@@ -65,17 +66,17 @@ public:
         const vars_t<data_t> &vars,//!< the value of the variables at the point.
         const vars_t< tensor<1,data_t> >& d1,//!< the value of the first derivatives of the variables.
         const tensor<2, data_t>& h_UU,//!< the inverse metric (raised indices)
-        const tensor<3, data_t>& chris_ULL,//!< the conformal chrisoffel symbol in ULL form.
+        const tensor<3, data_t>& chris_ULL,//!< the conformal christoffel symbol in ULL form.
         const vars_t<data_t> &advec//!< the value of the advection terms beta^i d_i(var)
     );
 
     //! The function which adds in the RHS for the matter field vars
-    template <class data_t, template<typename> class vars_t>
+    template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
     void add_matter_rhs(
         vars_t<data_t> &total_rhs, //!< contains the value of the RHS terms for all vars.
         const vars_t<data_t> &vars, //!< the value of the variables at the point.
         const vars_t< tensor<1,data_t> >& d1, //!< the value of the first derivatives of the variables.
-        const vars_t< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
+        const diff2_vars_t< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
         const vars_t<data_t> &advec); //!< the value of the advection terms beta^i d_i(var).
 
 };

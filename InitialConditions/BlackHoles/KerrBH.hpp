@@ -4,7 +4,7 @@
 #define KERRBH_HPP_
 
 #include "simd.hpp"
-#include "VarsBase.hpp"
+#include "VarsTools.hpp"
 #include "tensor.hpp"
 #include "Coordinates.hpp"
 #include "CCZ4.hpp"
@@ -12,7 +12,6 @@
 #include "TensorAlgebra.hpp"
 #include "InitialDataTools.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
-
 #include <array>
 
 //! Class which computes the Kerr initial conditions per arXiv 1401.1548

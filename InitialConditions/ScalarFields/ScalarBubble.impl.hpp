@@ -14,8 +14,8 @@ ScalarBubble::ScalarBubble(params_t a_params, double a_dx)
 template <class data_t>
 void ScalarBubble::compute(Cell<data_t> current_cell)
 {
-    ScalarField<>::Vars<data_t> vars;
-    vars.assign(0.); //Set only the non-zero components explicitly below
+    CCZ4Matter<ScalarField<> >::Vars<data_t> vars;
+    VarsTools::assign(vars, 0.); //Set only the non-zero components explicitly below
     Coordinates<data_t> coords(current_cell, m_dx, m_params.centerSF);
 
     //set the field vars

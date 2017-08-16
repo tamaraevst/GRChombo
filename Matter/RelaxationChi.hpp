@@ -9,7 +9,8 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "VarsBase.hpp"
+#include "CCZ4Matter.hpp"
+#include "VarsTools.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
 #include <array>
 #include "Cell.hpp"
@@ -31,9 +32,12 @@
 template <class matter_t>
 class RelaxationChi {
 
-    //Use the variable definition in matter_t
+    //Use the variable definition in CCZ4Matter
+    template <class data_t>
+    using Vars = typename CCZ4Matter<matter_t>::Vars<data_t>;
+
     template<class data_t>
-    using Vars=typename matter_t::template Vars<data_t>;
+    using Diff2Vars = typename CCZ4Matter<matter_t>::Diff2Vars<data_t>;
 
 public:
     //! Constructor of class RelaxationChi
@@ -61,7 +65,7 @@ protected:
         Vars<data_t> &rhs,//!<the RHS data for each variable at that point.
         const Vars<data_t> &vars,//!< the value of the variables at the point.
         const Vars< tensor<1,data_t> > &d1,//!< the value of the first derivatives of the variables.
-        const Vars< tensor<2,data_t> > &d2,//!< the value of the second derivatives of the variables.
+        const Diff2Vars< tensor<2,data_t> > &d2,//!< the value of the second derivatives of the variables.
         const Vars<data_t> &advec);//!< advec the value of the advection terms beta^i d_i(var)
 
 };

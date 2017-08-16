@@ -15,11 +15,11 @@ public:
    template <class data_t>
    void compute(Cell<data_t> current_cell)
    {
-       auto phi = current_cell.local_vars(c_phi);
+       auto phi = current_cell.load_vars(c_phi);
        tensor<1,data_t> d1_phi;
        FOR1(idir) m_deriv.diff1(d1_phi, current_cell, idir, c_phi);
 
-       auto K = current_cell.local_vars(c_K);
+       auto K = current_cell.load_vars(c_K);
        tensor<1,data_t> d1_K;
        FOR1(idir) m_deriv.diff1(d1_K, current_cell, idir, c_K);
 

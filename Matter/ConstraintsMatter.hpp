@@ -8,9 +8,12 @@
 #include "GRUtils.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "CCZ4Geometry.hpp"
+#include "GRInterval.hpp"
 #include "Constraints.hpp"
 #include <array>
 #include "Cell.hpp"
+
+#include "ScalarField.hpp"
 
 //!  Calculates the Hamiltonain and Momentum constraints with matter fields
 /*!
@@ -24,9 +27,26 @@
 template <class matter_t>
 class ConstraintsMatter : public Constraints
 {
-    //Use the variable definition in matter_t
-    template<class data_t>
-    using Vars=typename matter_t::template Vars<data_t>;
+    template <class data_t>
+    using MatterVars = typename matter_t::template Vars<data_t>;
+
+    //Inherit the variable definitions from CCZ4 + matter_t
+    template <class data_t>
+    struct Vars : public Constraints::Vars<data_t>, public MatterVars<data_t> 
+    {
+        data_t lapse;
+        tensor<1, data_t> shift;
+
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            Constraints::Vars<data_t>::enum_mapping(mapping_function);
+            MatterVars<data_t>::enum_mapping(mapping_function);
+            VarsTools::define_enum_mapping(mapping_function, c_lapse, lapse);
+            VarsTools::define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
+        }
+    };
 
 public:
     //!  Constructor of class ConstraintsMatter
