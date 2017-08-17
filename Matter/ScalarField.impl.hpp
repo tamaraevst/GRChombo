@@ -96,8 +96,8 @@ void ScalarField<potential_t>::add_matter_rhs(
 
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto h_UU = compute_inverse_sym(vars.h);
+    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //set the potential values
     data_t V_of_phi = 0.0;
@@ -122,31 +122,6 @@ void ScalarField<potential_t>::add_matter_rhs(
                           * chris.ULL[k][i][j] * d1.phi[k];
         }
     }
-}
-
-template <class potential_t>
-template <class data_t>
-template <typename mapping_function_t>
-void ScalarField<potential_t>::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
-{
-    //Define the mapping from components of chombo grid to elements in Vars.
-    //This allows to read/write data from the chombo grid into local
-    //variables in Vars (which only exist for the current cell).
-    VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
-    VarsTools::define_enum_mapping(mapping_function, c_Pi, Pi);
-
-}
-
-template <class potential_t>
-template <class data_t>
-template <typename mapping_function_t>
-void ScalarField<potential_t>::Diff2Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
-{
-    //Define the mapping from components of chombo grid to elements in Vars.
-    //This allows to read/write data from the chombo grid into local
-    //variables in Diff2Vars (which only exist for the current cell).
-    VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
-
 }
 
 #endif /* SCALARFIELD_IMPL_HPP_ */

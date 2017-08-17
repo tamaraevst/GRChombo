@@ -59,11 +59,11 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
 
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse_sym(matter_vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto h_UU = compute_inverse_sym(matter_vars.h);
+    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //Calculate elements of the decomposed stress energy tensor
-    auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
 
     //Update RHS for K and Theta depending on formulation
     if (m_formulation == USE_BSSN)

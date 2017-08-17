@@ -13,8 +13,8 @@ void auto_read_params(GRParmParse& pp)
     pp.load("regrid_threshold", regrid_threshold);
     pp.load("regrid_threshold_K", regrid_threshold_K);
     pp.load("regrid_threshold_phi", regrid_threshold_phi);
-    pp.load("isPeriodic", isPeriodic, {true, true, true});
-    pp.load("num_ghosts", num_ghosts, 3);
+    pp.load("isPeriodic", isPeriodic);
+    pp.load("num_ghosts", num_ghosts);
     pp.load("tag_buffer_size", tag_buffer_size, 3);
     pp.load("dt_multiplier", dt_multiplier);
 

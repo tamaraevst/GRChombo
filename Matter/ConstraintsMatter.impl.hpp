@@ -16,7 +16,6 @@ ConstraintsMatter<matter_t>::ConstraintsMatter(
       my_matter (a_matter),
       m_G_Newton (G_Newton) {}
 
-
 template <class matter_t>
 template <class data_t>
 void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)

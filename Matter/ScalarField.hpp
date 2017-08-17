@@ -46,7 +46,11 @@ public:
 
         /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
         template <typename mapping_function_t>
-        void enum_mapping(mapping_function_t mapping_function);
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
+            VarsTools::define_enum_mapping(mapping_function, c_Pi, Pi);
+        }
     };
 
     //! Structure containing the rhs variables for the matter fields requiring 2nd derivs
@@ -57,7 +61,10 @@ public:
 
         /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
         template <typename mapping_function_t>
-        void enum_mapping(mapping_function_t mapping_function);
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
+        }
     };
 
     //! The function which calculates the EM Tensor, given the vars and derivatives

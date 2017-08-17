@@ -13,8 +13,6 @@
 #include <array>
 #include "Cell.hpp"
 
-#include "ScalarField.hpp"
-
 //!  Calculates the Hamiltonain and Momentum constraints with matter fields
 /*!
      The class calculates the Hamiltonian and Momentum constraints at each point in a
@@ -27,6 +25,7 @@
 template <class matter_t>
 class ConstraintsMatter : public Constraints
 {
+public:
     template <class data_t>
     using MatterVars = typename matter_t::template Vars<data_t>;
 
@@ -34,6 +33,8 @@ class ConstraintsMatter : public Constraints
     template <class data_t>
     struct Vars : public Constraints::Vars<data_t>, public MatterVars<data_t> 
     {
+        // whilst the gauge vars should not affect the constraints, for certain matter classes 
+        // they will enter into the calculation as the time derivatives are defined wrt coordinate time
         data_t lapse;
         tensor<1, data_t> shift;
 
@@ -48,14 +49,12 @@ class ConstraintsMatter : public Constraints
         }
     };
 
-public:
     //!  Constructor of class ConstraintsMatter
     /*!
          Takes in the grid spacing, and matter object plus
          optionally the value of Newton's constant, which is set to one by default.
     */
-    ConstraintsMatter(const matter_t a_matter,
-                      double dx, double G_Newton = 1.0);
+    ConstraintsMatter(const matter_t a_matter, double dx, double G_Newton = 1.0);
 
     //! The compute member which calculates the constraints at each point in the box
     template <class data_t>
