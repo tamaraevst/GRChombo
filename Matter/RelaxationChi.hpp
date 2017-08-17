@@ -35,10 +35,10 @@ class RelaxationChi {
 
     //Use the variable definitions in CCZ4Matter
     template <class data_t>
-    using Vars = typename CCZ4Matter<matter_t>::Vars<data_t>;
+    using Vars = typename CCZ4Matter<matter_t>::template Vars<data_t>;
 
     template<class data_t>
-    using Diff2Vars = typename CCZ4Matter<matter_t>::Diff2Vars<data_t>;
+    using Diff2Vars = typename CCZ4Matter<matter_t>::template Diff2Vars<data_t>;
 
 public:
     //! Constructor of class RelaxationChi
