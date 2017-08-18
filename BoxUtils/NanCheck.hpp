@@ -26,7 +26,7 @@ public:
       FORVARS(i)
       {
           double val;
-          current_cell.local_vars(val,i);
+          current_cell.load_vars(val,i);
           if ( std::isnan(val) || abs(val) > m_max_abs) stop = true;
       }
       if (stop)
@@ -36,7 +36,7 @@ public:
               pout() << m_error_info << "::Values have become nan. The current state is: " << endl;
               FORVARS(i)
               {
-                  pout() << UserVariables::variable_names[i] << ": " << current_cell.local_vars(i) << endl;
+                  pout() << UserVariables::variable_names[i] << ": " << current_cell.load_vars(i) << endl;
               }
               pout() << "Integer coordinates: " << current_cell.get_int_vect() << endl;
           }

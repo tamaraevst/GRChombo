@@ -2,7 +2,7 @@
 #define SCALARBUBBLE_HPP_
 
 #include "simd.hpp"
-#include "VarsBase.hpp"
+#include "VarsTools.hpp"
 #include "tensor.hpp"
 #include "Coordinates.hpp"
 #include <vector>

@@ -6,12 +6,12 @@
 #define CELL_IMPL_HPP_
 
 #include "simd.hpp"
-#include "Interval.H"
+#include "GRInterval.hpp"
 
 template <class data_t>
 ALWAYS_INLINE
 data_t
-Cell<data_t>::local_vars(const int icomp) const
+Cell<data_t>::load_vars(const int icomp) const
 {
     return SIMDIFY<data_t>(m_box_pointers.m_in_ptr[icomp])[m_in_index];
 }
@@ -19,23 +19,35 @@ Cell<data_t>::local_vars(const int icomp) const
 template <class data_t>
 ALWAYS_INLINE
 void
-Cell<data_t>::local_vars(data_t& out, const int icomp) const
+Cell<data_t>::load_vars(data_t& out, const int icomp) const
 {
-    out = local_vars(icomp);
+    out = load_vars(icomp);
 }
 
 template <class data_t>
 void
-Cell<data_t>::local_vars(data_t (&out)[c_NUM]) const
+Cell<data_t>::load_vars(data_t (&out)[c_NUM]) const
 {
-    FORVARS(i) out[i] = local_vars(i);
+    FORVARS(i) out[i] = load_vars(i);
 }
 
 template <class data_t>
+template<template<typename> class vars_t>
 void
-Cell<data_t>::local_vars(VarsBase<data_t>& vars) const
+Cell<data_t>::load_vars(vars_t<data_t>& vars) const
 {
-    FORVARS(i) vars.assign(SIMDIFY<data_t>(m_box_pointers.m_in_ptr[i])[m_in_index], i);
+    vars.enum_mapping([&](const int& ivar, data_t& var)
+                      { var = SIMDIFY<data_t>(m_box_pointers.m_in_ptr[ivar])[m_in_index]; });
+}
+
+template <class data_t>
+template<template<typename> class vars_t>
+vars_t<data_t>
+Cell<data_t>::load_vars() const
+{
+    vars_t<data_t> vars;
+    load_vars(vars);
+    return vars;
 }
 
 template <class data_t>
@@ -47,12 +59,12 @@ Cell<data_t>::store_vars(const data_t& value, const int icomp) const
 }
 
 template <class data_t>
-template <int num_comp>
+template <int start_var, int end_var>
 ALWAYS_INLINE
 void
-Cell<data_t>::store_vars(const tensor<1, data_t, num_comp>& values, const int start_comp) const
+Cell<data_t>::store_vars(const tensor<1, data_t, GRInterval<start_var,end_var>::size()>& values, GRInterval<start_var,end_var> interval) const
 {
-    for (int i = 0; i < num_comp; ++i) store_vars(values[i], start_comp + i);
+    for (int i = 0; i < interval.size(); ++i) store_vars(values[i], interval.begin() + i);
 }
 
 template <class data_t>
@@ -63,30 +75,14 @@ Cell<data_t>::store_vars(const std::array<data_t, c_NUM>& values) const
     FORVARS(i) store_vars(values[i], i);
 }
 
-template <class data_t>
-void
-Cell<data_t>::store_vars(const VarsBase<data_t>& vars, const Interval a_comps) const
-{
-    for (int icomp=a_comps.begin(); icomp<=a_comps.end(); ++icomp)
-    {
-        CH_assert(vars.variable_defined(icomp));
-        store_vars(vars.template read<data_t>(icomp), icomp);
-    }
-}
-
 ///This function stores all variables that have a corresponding value in a VarsBase object.
-/**It will cycle through all components and check whether they have been assigned in the vars object.
-  *Avoid use for vars objects that only contain few components.
-  */
 template <class data_t>
+template<template<typename> class vars_t>
 void
-Cell<data_t>::store_vars(const VarsBase<data_t>& vars) const
+Cell<data_t>::store_vars(vars_t<data_t>& vars) const
 {
-    FORVARS(i)
-    {
-        //Only store the variable if it is defined in vars. Otherwise don't touch.
-        if ( vars.variable_defined(i) ) store_vars(vars.template read<data_t>(i), i);
-    }
+    vars.enum_mapping([&](const int& ivar, data_t& var)
+                      { SIMDIFY<data_t>(m_box_pointers.m_out_ptr[ivar])[m_out_index] = var; });
 }
 
 #endif /* CELL_IMPL_HPP_ */

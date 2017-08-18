@@ -8,6 +8,7 @@
 #include "TensorAlgebra.hpp"
 #include "Interval.H"
 #include "Cell.hpp"
+#include "VarsTools.hpp"
 
 #include <array>
 
@@ -15,35 +16,33 @@ class EnforceTfA
 {
 public:
     template <class data_t>
-    struct Vars : VarsBase<data_t>
+    struct Vars
     {
-        using VarsBase<data_t>::define_symmetric_enum_mapping; //Saves us some writing later
-        Vars();
-
         tensor<2, data_t> h;
         tensor<2, data_t> A;
+
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
     };
 
     template <class data_t>
     void compute(Cell<data_t> current_cell)
     {
-        Vars<data_t> vars;
-        current_cell.local_vars(vars);
+        auto vars = current_cell.template load_vars<Vars>();
 
-        auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
+        const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
         TensorAlgebra::make_trace_free(vars.A, vars.h, h_UU);
 
-        current_cell.store_vars(vars, Interval(c_A11, c_A33));
+        current_cell.store_vars(vars);
     }
 };
 
-
 template <class data_t>
-EnforceTfA::Vars<data_t>::Vars()
+template <typename mapping_function_t>
+void EnforceTfA::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
 {
-    //Symmetric 2-tensors
-    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
-    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
+    VarsTools::define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
+    VarsTools::define_symmetric_enum_mapping(mapping_function, GRInterval<c_A11,c_A33>(), A);
 }
 
 #endif /* FIXTFA_HPP_ */

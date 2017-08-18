@@ -8,6 +8,7 @@
 #include "GRUtils.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "CCZ4Geometry.hpp"
+#include "GRInterval.hpp"
 #include "Constraints.hpp"
 #include <array>
 #include "Cell.hpp"
@@ -24,18 +25,36 @@
 template <class matter_t>
 class ConstraintsMatter : public Constraints
 {
-    //Use the variable definition in matter_t
-    template<class data_t>
-    using Vars=typename matter_t::template Vars<data_t>;
-
 public:
+    template <class data_t>
+    using MatterVars = typename matter_t::template Vars<data_t>;
+
+    //Inherit the variable definitions from CCZ4 + matter_t
+    template <class data_t>
+    struct Vars : public Constraints::Vars<data_t>, public MatterVars<data_t> 
+    {
+        // whilst the gauge vars should not affect the constraints, for certain matter classes 
+        // they will enter into the calculation as the time derivatives are defined wrt coordinate time
+        data_t lapse;
+        tensor<1, data_t> shift;
+
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            Constraints::Vars<data_t>::enum_mapping(mapping_function);
+            MatterVars<data_t>::enum_mapping(mapping_function);
+            VarsTools::define_enum_mapping(mapping_function, c_lapse, lapse);
+            VarsTools::define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
+        }
+    };
+
     //!  Constructor of class ConstraintsMatter
     /*!
          Takes in the grid spacing, and matter object plus
          optionally the value of Newton's constant, which is set to one by default.
     */
-    ConstraintsMatter(const matter_t a_matter,
-                      double dx, double G_Newton = 1.0);
+    ConstraintsMatter(const matter_t a_matter, double dx, double G_Newton = 1.0);
 
     //! The compute member which calculates the constraints at each point in the box
     template <class data_t>

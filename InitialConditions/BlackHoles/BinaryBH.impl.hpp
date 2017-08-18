@@ -8,12 +8,13 @@
 #include "BinaryBH.hpp"
 #include "CCZ4.hpp"
 #include "simd.hpp"
+#include "VarsTools.hpp"
 
 template <class data_t>
 void BinaryBH::compute(Cell<data_t> current_cell)
 {
     CCZ4::Vars<data_t> vars;
-    vars.assign(0.); //Set only the non-zero components explicitly below
+    VarsTools::assign(vars, 0.); //Set only the non-zero components explicitly below
     Coordinates<data_t> coords(current_cell,m_dx);
 
     vars.chi = compute_chi(coords);

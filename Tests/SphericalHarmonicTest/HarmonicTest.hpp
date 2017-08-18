@@ -2,7 +2,6 @@
 #define HARMONICTEST_HPP_
 
 #include "simd.hpp"
-#include "VarsBase.hpp"
 #include "BoxLoops.hpp"
 #include "tensor.hpp"
 #include "Coordinates.hpp"

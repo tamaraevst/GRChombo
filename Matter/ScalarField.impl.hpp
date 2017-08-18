@@ -86,18 +86,18 @@ auto ScalarField<potential_t>::compute_emtensor(
 
 // Adds in the RHS for the matter vars
 template <class potential_t>
-template <class data_t, template<typename> class vars_t>
+template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
 void ScalarField<potential_t>::add_matter_rhs(
     vars_t<data_t> &total_rhs,
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
-    const vars_t< tensor<2,data_t> >& d2,
+    const diff2_vars_t< tensor<2,data_t> >& d2,
     const vars_t<data_t> &advec) {
 
     using namespace TensorAlgebra;
 
-    auto h_UU = compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto h_UU = compute_inverse_sym(vars.h);
+    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //set the potential values
     data_t V_of_phi = 0.0;
@@ -122,35 +122,6 @@ void ScalarField<potential_t>::add_matter_rhs(
                           * chris.ULL[k][i][j] * d1.phi[k];
         }
     }
-}
-
-template <class potential_t>
-template <class data_t>
-ScalarField<potential_t>::Vars<data_t>::Vars()
-{
-    //Define the mapping from components of chombo grid to elements in Vars.
-    //This allows to read/write data from the chombo grid into local
-    //variables in Vars (which only exist for the current cell).
-
-    //Scalars
-    define_enum_mapping(c_chi, chi);
-    define_enum_mapping(c_K, K);
-    define_enum_mapping(c_Theta, Theta);
-    define_enum_mapping(c_lapse, lapse);
-
-    //Vectors
-    define_enum_mapping(Interval(c_Gamma1,c_Gamma3), Gamma);
-    define_enum_mapping(Interval(c_shift1,c_shift3), shift);
-    define_enum_mapping(Interval(c_B1,c_B3), B);
-
-    //Symmetric 2-tensors
-    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
-    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
-
-    //Scalars - matter
-    define_enum_mapping(c_phi, phi);   //Note that the matter fields are added here
-    define_enum_mapping(c_Pi, Pi);
-
 }
 
 #endif /* SCALARFIELD_IMPL_HPP_ */

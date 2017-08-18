@@ -7,7 +7,6 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "VarsBase.hpp"
 #include "Cell.hpp"
 
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -37,11 +36,8 @@ public:
       * copy of the variables with values in the Chombo grid.
      **/
     template <class data_t>
-    struct Vars : VarsBase<data_t>
+    struct Vars
     {
-        using VarsBase<data_t>::define_enum_mapping; //Saves us some writing later
-        using VarsBase<data_t>::define_symmetric_enum_mapping;
-
         data_t chi; //!< Conformal factor
         tensor<2, data_t> h; //!< Conformal metric
         data_t K; //!< Trace of the extrinsic curvature
@@ -52,11 +48,23 @@ public:
         tensor<1, data_t> shift;
         tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used for second order shift conditions
 
-        /// Constructor
-        /** This constructor sets up the pointers from this local copy of the grid variables to the correct point in the
-          * large array in which Chombo stores all the grid variables for all grid cells.
-         **/
-        Vars();
+        /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
+    };
+
+    ///2nd derivatives are only calculated for a small subset defined by Deriv2Vars
+    /** Making this split speeds up the code significantly */
+    template <class data_t>
+    struct Diff2Vars
+    {
+        data_t chi; //!< Conformal factor
+        data_t lapse;
+        tensor<2, data_t> h; //!< Conformal metric
+        tensor<1, data_t> shift;
+
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function);
     };
 
     /// Parameters for CCZ4
@@ -105,12 +113,12 @@ protected:
       * The variables (the template argument vars_t) must contain at least the members:
       * chi, h[i][j], Gamma[i], A[i][j], Theta, lapse and shift[i].
      **/
-    template <class data_t, template<typename> class vars_t>
+    template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
     void rhs_equation(
         vars_t<data_t> &rhs, //!< Reference to the variables into which the output right hand side is written
         const vars_t<data_t> &vars, //!< The values of the current variables
         const vars_t< tensor<1,data_t> > &d1, //!< First derivative of the variables
-        const vars_t< tensor<2,data_t> > &d2, //!< The second derivative the variables
+        const diff2_vars_t< tensor<2,data_t> > &d2, //!< The second derivative the variables
         const vars_t<data_t> &advec //!< The advection derivatives of the variables
     );
 };

@@ -3,7 +3,6 @@
 
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "VarsBase.hpp"
 #include "Cell.hpp"
 #include <array>
 
@@ -41,16 +40,31 @@ public:
     }
 
     //Writes directly into the vars object - use this wherever possible
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void
-    diff1(VarsBase< tensor<1, data_t> >& d1, const Cell<data_t>& current_cell, int direction) const
+    diff1(vars_t< tensor<1, data_t> >& d1, const Cell<data_t>& current_cell, int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
-        {
-            d1.assign(diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride), i, direction);
-        }
+        d1.enum_mapping([&](const int& ivar, tensor<1,data_t>& var)
+                        { var[direction] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride); });
+    }
+
+    ///Calculates all first derivatives and returns as variable type specified by the template parameter
+    template <template<typename> class vars_t, class data_t>
+    vars_t< tensor<1, data_t> >
+    diff1(const Cell<data_t>& current_cell) const
+    {
+        const auto in_index = current_cell.get_in_index();
+        const auto strides = current_cell.get_box_pointers().m_in_stride;
+        vars_t< tensor<1, data_t> > d1;
+        d1.enum_mapping([&](const int& ivar, tensor<1,data_t>& var) {
+                            FOR1(idir)
+                            {
+                                var[idir] = diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, strides[idir]);
+                            }
+                        });
+        return d1;
     }
 
     template <class data_t>
@@ -93,16 +107,14 @@ public:
     }
 
     //Writes 2nd deriv directly into the vars object - use this wherever possible
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void
-    diff2(VarsBase< tensor<2,data_t> >& d2, const Cell<data_t>& current_cell, int direction) const
+    diff2(vars_t< tensor<2, data_t> >& d2, const Cell<data_t>& current_cell, int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
-        {
-            d2.assign(diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride), i, direction, direction);
-        }
+        d2.enum_mapping([&](const int& ivar, tensor<2,data_t>& var)
+                        { var[direction][direction] = diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride); });
     }
 
     template <class data_t>
@@ -149,19 +161,17 @@ public:
                       + weight_far_far   * in[idx + 2*stride1 + 2*stride2]) * m_one_over_dx2;
     }
 
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void
-    mixed_diff2(VarsBase< tensor<2,data_t> >& d2, const Cell<data_t>& current_cell, int direction1, int direction2) const
+    mixed_diff2(vars_t< tensor<2, data_t> >& d2, const Cell<data_t>& current_cell, int direction1, int direction2) const
     {
         const int stride1 = current_cell.get_box_pointers().m_in_stride[direction1];
         const int stride2 = current_cell.get_box_pointers().m_in_stride[direction2];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
-        {
-            data_t tmp = mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i], in_index, stride1, stride2);
-            d2.assign(tmp, i, direction1, direction2);
-            d2.assign(tmp, i, direction2, direction1);
-        }
+        d2.enum_mapping([&](const int& ivar, tensor<2,data_t>& var) {
+                        auto tmp = mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride1, stride2);
+                        var[direction1][direction2] = tmp;
+                        var[direction2][direction1] = tmp; });
     }
 
     template <class data_t>
@@ -177,6 +187,31 @@ public:
             diffArray[i][direction1][direction2] = diff2_value;
             diffArray[i][direction2][direction1] = diff2_value;
         }
+    }
+
+    template <typename data_t>
+    struct Detector;
+
+    ///Calculates all second derivatives and returns as variable type specified by the template parameter
+    template <template<typename> class vars_t, class data_t>
+    vars_t< tensor<2, data_t> >
+    diff2(const Cell<data_t>& current_cell) const
+    {
+        vars_t< tensor<2, data_t> > d2;
+        const auto in_index = current_cell.get_in_index();
+        const auto strides = current_cell.get_box_pointers().m_in_stride;
+        d2.enum_mapping([&](const int& ivar, tensor<2,data_t>& var) {
+                    FOR1(dir1) //First calculate the repeated derivatives
+                    {
+                        var[dir1][dir1] = diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, strides[dir1]);
+                        for (int dir2 = 0; dir2 < dir1; ++dir2)
+                        {
+                            auto tmp = mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, strides[dir1], strides[dir2]);
+                            var[dir1][dir2] = tmp;
+                            var[dir2][dir1] = tmp;
+                        }
+                    } });
+        return d2;
     }
 
 protected: //Let's keep this protected ... we may want to change the advection calculation
@@ -214,17 +249,15 @@ protected: //Let's keep this protected ... we may want to change the advection c
     }
 
 public:
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void
-    add_advection(VarsBase<data_t>& vars, const Cell<data_t>& current_cell, const data_t& vec_comp, const int dir) const
+    add_advection(vars_t<data_t>& vars, const Cell<data_t>& current_cell, const data_t& vec_comp, const int dir) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
         const int in_index = current_cell.get_in_index();
-        FORVARS(ivar)
-        {
-            vars.plus(advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive),ivar);
-        }
+        vars.enum_mapping([&](const int& ivar, data_t& var) { var +=
+                        advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive); });
     }
 
     template <class data_t>
@@ -238,6 +271,24 @@ public:
         {
             out[ivar] += advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vec_comp, stride, shift_positive);
         }
+    }
+
+    ///Calculates all second derivatives and returns as variable type specified by the template parameter
+    template <template<typename> class vars_t, class data_t>
+    vars_t<data_t>
+    advection(const Cell<data_t>& current_cell, const tensor<1, data_t>& vector) const
+    {
+        const auto in_index = current_cell.get_in_index();
+        const auto strides = current_cell.get_box_pointers().m_in_stride;
+        vars_t<data_t> advec;
+        advec.enum_mapping([&](const int& ivar, data_t& var) {
+                      var = 0.;
+                      FOR1(dir)
+                      {
+                          const auto shift_positive = simd_compare_gt(vector[dir], 0.0);
+                          var += advection_term(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, vector[dir], strides[dir], shift_positive);
+                      } });
+        return advec;
     }
 
     template <class data_t>
@@ -260,16 +311,27 @@ public:
                  + weight_vfar  * in[idx + 3*stride]) * m_one_over_dx;
     }
 
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void
-    add_dissipation(VarsBase<data_t>& vars, const Cell<data_t>& current_cell, const double factor, const int direction) const
+    add_dissipation(vars_t<data_t>& vars, const Cell<data_t>& current_cell, const double factor, const int direction) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(ivar)
-        {
-            vars.plus(factor*dissipation_term<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride), ivar);
-        }
+        vars.enum_mapping([&](const int& ivar, data_t& var) { var +=
+                          factor*dissipation_term<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride); });
+    }
+
+    template <class data_t, template<typename> class vars_t>
+    void
+    add_dissipation(vars_t<data_t>& vars, const Cell<data_t>& current_cell, const double factor) const
+    {
+        const auto in_index = current_cell.get_in_index();
+        vars.enum_mapping([&](const int& ivar, data_t& var) {
+                      FOR1(dir)
+                      {
+                          const auto stride = current_cell.get_box_pointers().m_in_stride[dir];
+                          var += factor*dissipation_term<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride);
+                      } });
     }
 
     template <class data_t>

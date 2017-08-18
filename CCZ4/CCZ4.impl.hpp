@@ -6,6 +6,8 @@
 #define CCZ4_IMPL_HPP_
 
 #define COVARIANTZ4
+#include "VarsTools.hpp"
+#include "GRInterval.hpp"
 
 inline
 CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation, double cosmological_constant) :
@@ -30,40 +32,25 @@ template <class data_t>
 void
 CCZ4::compute(Cell<data_t> current_cell)
 {
-    Vars<data_t> vars;
-    current_cell.local_vars(vars);
-
-    Vars< tensor<1, data_t> > d1;
-    FOR1(idir) m_deriv.diff1(d1, current_cell, idir);
-
-    Vars< tensor<2,data_t> > d2;
-    // Repeated derivatives
-    FOR1(idir) m_deriv.diff2(d2, current_cell, idir);
-    // Mixed derivatives
-    // Note: no need to symmetrise explicitely, this is done in mixed_diff2
-    m_deriv.mixed_diff2(d2, current_cell, 1, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 0);
-    m_deriv.mixed_diff2(d2, current_cell, 2, 1);
-
-    Vars<data_t> advec;
-    advec.assign(0.);
-    FOR1(idir) m_deriv.add_advection(advec, current_cell, vars.shift[idir], idir);
+    const auto vars = current_cell.template load_vars<Vars>();
+    const auto d1 = m_deriv.template diff1<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
+    const auto advec = m_deriv.template advection<Vars>(current_cell, vars.shift);
 
     Vars<data_t> rhs;
     rhs_equation(rhs, vars, d1, d2, advec);
 
-    FOR1(idir) m_deriv.add_dissipation(rhs, current_cell, m_sigma,idir);
+    m_deriv.add_dissipation(rhs, current_cell, m_sigma);
 
-    //Write the rhs into the output FArrayBox
-    current_cell.store_vars(rhs);
+    current_cell.store_vars(rhs); //Write the rhs into the output FArrayBox
 }
 
-template <class data_t, template<typename> class vars_t>
+template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
 void
 CCZ4::rhs_equation(vars_t<data_t> &rhs,
           const vars_t<data_t> &vars,
           const vars_t< tensor<1,data_t> >& d1,
-          const vars_t< tensor<2,data_t> >& d2,
+          const diff2_vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
 )
 {
@@ -210,26 +197,39 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
 }
 
 template <class data_t>
-CCZ4::Vars<data_t>::Vars()
+template <typename mapping_function_t>
+void CCZ4::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
 {
     //Define the mapping from components of chombo grid to elements in Vars.
     //This allows to read/write data from the chombo grid into local
     //variables in Vars (which only exist for the current cell).
 
+    using namespace VarsTools; //define_enum_mapping is part of VarsTools
     //Scalars
-    define_enum_mapping(c_chi, chi);
-    define_enum_mapping(c_K, K);
-    define_enum_mapping(c_Theta, Theta);
-    define_enum_mapping(c_lapse, lapse);
+    define_enum_mapping(mapping_function, c_chi, chi);
+    define_enum_mapping(mapping_function, c_K, K);
+    define_enum_mapping(mapping_function, c_Theta, Theta);
+    define_enum_mapping(mapping_function, c_lapse, lapse);
 
     //Vectors
-    define_enum_mapping(Interval(c_Gamma1,c_Gamma3), Gamma);
-    define_enum_mapping(Interval(c_shift1,c_shift3), shift);
-    define_enum_mapping(Interval(c_B1,c_B3), B);
+    define_enum_mapping(mapping_function, GRInterval<c_Gamma1,c_Gamma3>(), Gamma);
+    define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
+    define_enum_mapping(mapping_function, GRInterval<c_B1,c_B3>(), B);
 
     //Symmetric 2-tensors
-    define_symmetric_enum_mapping(Interval(c_h11,c_h33), h);
-    define_symmetric_enum_mapping(Interval(c_A11,c_A33), A);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_A11,c_A33>(), A);
+}
+
+template <class data_t>
+template <typename mapping_function_t>
+void CCZ4::Diff2Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
+{
+    using namespace VarsTools; //define_enum_mapping is part of VarsTools
+    define_enum_mapping(mapping_function, c_chi, chi);
+    define_enum_mapping(mapping_function, c_lapse, lapse);
+    define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
+    define_symmetric_enum_mapping(mapping_function, GRInterval<c_h11,c_h33>(), h);
 }
 
 #endif /* CCZ4_IMPL_HPP_ */
