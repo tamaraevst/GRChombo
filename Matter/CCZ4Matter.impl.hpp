@@ -36,7 +36,7 @@ void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell)
     rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
     //add RHS matter terms from EM tensor
-    add_EMTensor_rhs(matter_rhs, matter_vars, d1, advec);
+    add_EMTensor_rhs(matter_rhs, matter_vars, d1);
 
     //add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
@@ -54,16 +54,15 @@ template <class data_t>
 void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     Vars<data_t>  &matter_rhs,
     const Vars<data_t>  &matter_vars,
-    const Vars< tensor<1,data_t> >& d1,
-    const Vars<data_t>  &advec) {
-
+    const Vars< tensor<1,data_t> >& d1)
+{
     using namespace TensorAlgebra;
 
     const auto h_UU = compute_inverse_sym(matter_vars.h);
     const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //Calculate elements of the decomposed stress energy tensor
-    const auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor =  my_matter.compute_emtensor(matter_vars, d1, h_UU, chris.ULL);
 
     //Update RHS for K and Theta depending on formulation
     if (m_formulation == USE_BSSN)

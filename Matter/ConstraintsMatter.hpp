@@ -33,19 +33,12 @@ public:
     template <class data_t>
     struct Vars : public Constraints::Vars<data_t>, public MatterVars<data_t> 
     {
-        // whilst the gauge vars should not affect the constraints, for certain matter classes 
-        // they will enter into the calculation as the time derivatives are defined wrt coordinate time
-        data_t lapse;
-        tensor<1, data_t> shift;
-
         /// Defines the mapping between members of Vars and Chombo grid variables (enum in User_Variables)
         template <typename mapping_function_t>
         void enum_mapping(mapping_function_t mapping_function)
         {
             Constraints::Vars<data_t>::enum_mapping(mapping_function);
             MatterVars<data_t>::enum_mapping(mapping_function);
-            VarsTools::define_enum_mapping(mapping_function, c_lapse, lapse);
-            VarsTools::define_enum_mapping(mapping_function, GRInterval<c_shift1,c_shift3>(), shift);
         }
     };
 

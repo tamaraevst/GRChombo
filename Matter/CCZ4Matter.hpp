@@ -82,8 +82,7 @@ protected:
     void add_EMTensor_rhs(
         Vars<data_t> &matter_rhs, //!<the RHS data for each variable at that point.
         const Vars<data_t> &vars, //!<the value of the variables at the point.
-        const Vars< tensor<1,data_t> > &d1, //!<the value of the first derivatives of the variables.
-        const Vars<data_t> &advec //!<the value of the advection terms beta^i d_i(var).
+        const Vars< tensor<1,data_t> > &d1 //!<the value of the first derivatives of the variables.
     );
 
     // Class members

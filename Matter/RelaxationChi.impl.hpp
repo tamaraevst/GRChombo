@@ -23,10 +23,10 @@ template <class data_t>
 void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) {
 
     //copy data from chombo gridpoint into local variable and calculate derivs
-    const auto vars = current_cell.template load_vars<Vars>();
-    const auto d1 = m_deriv.template diff1<Vars>(current_cell);
-    const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
-    const auto advec = m_deriv.template advection<Vars>(current_cell, vars.shift);
+    const auto vars = current_cell.template load_vars<CCZ4Matter<matter_t>::Vars>();
+    const auto d1 = m_deriv.template diff1<CCZ4Matter<matter_t>::Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<CCZ4Matter<matter_t>::Diff2Vars>(current_cell);
+    const auto advec = m_deriv.template advection<CCZ4Matter<matter_t>::Vars>(current_cell, vars.shift);
 
     //work out RHS including advection
     Vars<data_t> rhs;
@@ -52,7 +52,7 @@ void RelaxationChi<matter_t>::rhs_equation(
     const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //Calculate elements of the decomposed stress energy tensor and ricci tensor
-    const auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
     const auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
     const auto A_UU       = raise_all(vars.A, h_UU);
     const data_t tr_AA    = compute_trace(vars.A, A_UU);
