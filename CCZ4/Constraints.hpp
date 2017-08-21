@@ -16,7 +16,7 @@
 
 class Constraints
 {
-protected:
+public:
     template <class data_t>
     struct Vars
     {
@@ -38,16 +38,15 @@ protected:
         tensor<1, data_t> Mom;
     };
 
-    const FourthOrderDerivatives m_deriv;
-    double m_cosmological_constant;
-
-public:
     Constraints(double dx, double cosmological_constant = 0);
 
     template <class data_t>
     void compute(Cell<data_t> current_cell);
 
 protected:
+    const FourthOrderDerivatives m_deriv;
+    double m_cosmological_constant;
+
     template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
     constraints_t<data_t>
     constraint_equations(
