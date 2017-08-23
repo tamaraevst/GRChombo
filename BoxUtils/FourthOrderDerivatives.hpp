@@ -52,7 +52,7 @@ public:
 
     ///Calculates all first derivatives and returns as variable type specified by the template parameter
     template <template<typename> class vars_t, class data_t>
-    vars_t< tensor<1, data_t> >
+    auto
     diff1(const Cell<data_t>& current_cell) const
     {
         const auto in_index = current_cell.get_in_index();
@@ -194,7 +194,7 @@ public:
 
     ///Calculates all second derivatives and returns as variable type specified by the template parameter
     template <template<typename> class vars_t, class data_t>
-    vars_t< tensor<2, data_t> >
+    auto
     diff2(const Cell<data_t>& current_cell) const
     {
         vars_t< tensor<2, data_t> > d2;
@@ -275,7 +275,7 @@ public:
 
     ///Calculates all second derivatives and returns as variable type specified by the template parameter
     template <template<typename> class vars_t, class data_t>
-    vars_t<data_t>
+    auto
     advection(const Cell<data_t>& current_cell, const tensor<1, data_t>& vector) const
     {
         const auto in_index = current_cell.get_in_index();
