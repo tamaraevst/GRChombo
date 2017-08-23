@@ -34,7 +34,8 @@ int main()
     Box box(IntVect(0,0,0), IntVect(0,0,0));
     FArrayBox fab_in(box, 3);
     FArrayBox fab_out(box, 3);
-    Cell<double> current_cell(IntVect(0,0,0), BoxPointers(fab_in, fab_out));
+    auto box_pointers = BoxPointers {fab_in, fab_out};
+    Cell<double> current_cell(IntVect(0,0,0), box_pointers);
 
     current_cell.store_vars(vars);
 

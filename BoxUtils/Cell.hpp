@@ -35,6 +35,9 @@ public:
         m_box_pointers (box_pointers)
     {}
 
+    //Don't accept rvalues in constructor since we only store reference to box_pointers
+    Cell(const IntVect integer_coords, BoxPointers&& box_pointers) = delete;
+
     ///Allows implicit conversion from Cell to CellIndexIn.
     //!As a result of this definition one may pass a Cell to a function expecting a CellIndexIn
     ALWAYS_INLINE
