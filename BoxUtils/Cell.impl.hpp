@@ -42,7 +42,7 @@ Cell<data_t>::load_vars(vars_t<data_t>& vars) const
 
 template <class data_t>
 template<template<typename> class vars_t>
-vars_t<data_t>
+auto
 Cell<data_t>::load_vars() const
 {
     vars_t<data_t> vars;
