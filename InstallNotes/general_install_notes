@@ -1,7 +1,7 @@
 GRChombo has been compiled and tested with gcc-4.9 and higher and
 intel icc-16.0.3 and higher. For icc note that the gcc compatibility has to be set to gcc-4.9 or higher.
 
-GRChombo requires c++ standard 11 or higher so the compiler should be invoked with -std=c++11 (or higher)
+GRChombo requires c++ standard 14 or higher so the compiler should be invoked with -std=c++14 (or higher)
 
 This folder also contains specific install notes for a collection of machines GRChombo has been run on.
 

@@ -113,7 +113,7 @@ public:
     void load_vars(vars_t<data_t>& vars) const;
 
     template<template<typename> class vars_t>
-    vars_t<data_t> load_vars() const;
+    auto load_vars() const;
 
     void store_vars(const data_t& value, const int icomp) const;
 

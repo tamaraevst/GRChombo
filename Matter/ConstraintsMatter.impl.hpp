@@ -24,7 +24,6 @@ void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)
     const auto vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
     const auto d2 = m_deriv.template diff2<Vars>(current_cell);
-    const auto advec = m_deriv.template advection<Vars>(current_cell, vars.shift);
 
     // Get the non matter terms for the constraints
     constraints_t<data_t> out = constraint_equations(vars, d1, d2);
@@ -34,7 +33,7 @@ void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)
     const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     // Energy Momentum tensor
-    const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
     //Hamiltonain constraint
     out.Ham += -16.0*M_PI*m_G_Newton*emtensor.rho;

@@ -23,8 +23,6 @@ namespace InitialDataTools
         data_t r = sqrt(r2);
 
         //And the sines and cosines of phi and theta
-        data_t cos_theta = z/r;
-        data_t sin_theta = rho/r;
         data_t cos_phi = x/rho;
         data_t sin_phi = y/rho;
 
@@ -68,7 +66,6 @@ namespace InitialDataTools
         data_t r = sqrt(r2);
 
         //And the sines and cosines of phi and theta
-        data_t cos_theta = z/r;
         data_t sin_theta = rho/r;
         data_t cos_phi = x/rho;
         data_t sin_phi = y/rho;

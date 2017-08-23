@@ -52,7 +52,7 @@ void RelaxationChi<matter_t>::rhs_equation(
     const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
 
     //Calculate elements of the decomposed stress energy tensor and ricci tensor
-    const auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL, advec);
+    const auto emtensor =  my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
     const auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
     const auto A_UU       = raise_all(vars.A, h_UU);
     const data_t tr_AA    = compute_trace(vars.A, A_UU);

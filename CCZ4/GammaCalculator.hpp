@@ -21,10 +21,9 @@ using Vars=CCZ4::Vars<data_t>;
 
 protected:
     const FourthOrderDerivatives m_deriv;//!< An object for calculating derivatives of the variables
-    double m_dx;
 
 public:
-    GammaCalculator(double a_dx) :  m_dx (a_dx), m_deriv (a_dx) {}
+    GammaCalculator(double a_dx) :  m_deriv (a_dx) {}
 
     template <class data_t>
     void compute(Cell<data_t> current_cell)
