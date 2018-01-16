@@ -28,7 +28,7 @@ public:
 
     //! Function to compute the value of all the initial vars on the grid
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     double m_dx;
@@ -36,7 +36,7 @@ protected:
 
     //! Function to compute the value of phi at each point
     template<class data_t>
-    data_t compute_phi(Coordinates<data_t> coords);
+    data_t compute_phi(Coordinates<data_t> coords) const;
 };
 
 #include "ScalarBubble.impl.hpp"

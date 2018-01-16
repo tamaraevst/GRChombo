@@ -12,7 +12,7 @@
 #include "DebuggingTools.hpp"
 
 template <class data_t>
-void HarmonicTest::compute(Cell<data_t> current_cell) {
+void HarmonicTest::compute(Cell<data_t> current_cell) const {
 
     ScalarField<>::Vars<data_t> vars;
     Coordinates<data_t> coords(current_cell, m_dx, m_center_vector);
@@ -27,7 +27,7 @@ void HarmonicTest::compute(Cell<data_t> current_cell) {
 }
 
 template <class data_t>
-data_t HarmonicTest::compute_harmonic(Coordinates<data_t> coords) {
+data_t HarmonicTest::compute_harmonic(Coordinates<data_t> coords) const {
 
     //Add in el, em spherical harmonics here, spin weight es
     using namespace SphericalHarmonics;

@@ -12,7 +12,7 @@ ScalarBubble::ScalarBubble(params_t a_params, double a_dx)
 
 // Compute the value of the initial vars on the grid
 template <class data_t>
-void ScalarBubble::compute(Cell<data_t> current_cell)
+void ScalarBubble::compute(Cell<data_t> current_cell) const
 {
     CCZ4Matter<ScalarField<> >::Vars<data_t> vars;
     VarsTools::assign(vars, 0.); //Set only the non-zero components explicitly below
@@ -35,7 +35,7 @@ void ScalarBubble::compute(Cell<data_t> current_cell)
 
 // Compute the value of phi at the current point
 template <class data_t>
-data_t ScalarBubble::compute_phi(Coordinates<data_t> coords)
+data_t ScalarBubble::compute_phi(Coordinates<data_t> coords) const
 {
     data_t rr = coords.get_radius();
     data_t rr2 = rr*rr;

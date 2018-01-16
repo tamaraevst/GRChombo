@@ -30,7 +30,7 @@ CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation, double cos
 
 template <class data_t>
 void
-CCZ4::compute(Cell<data_t> current_cell)
+CCZ4::compute(Cell<data_t> current_cell) const
 {
     const auto vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
@@ -52,7 +52,7 @@ CCZ4::rhs_equation(vars_t<data_t> &rhs,
           const vars_t< tensor<1,data_t> >& d1,
           const diff2_vars_t< tensor<2,data_t> >& d2,
           const vars_t<data_t> &advec
-)
+) const
 {
 //    Might want to work through the code and eliminate chi divisions where possible to allow chi to go to zero.
 //    const data_t chi_regularised = simd_max(1e-6, vars.chi);

@@ -10,11 +10,11 @@
 // Calculate the stress energy tensor elements
 template <class potential_t>
 template <class data_t, template<typename> class vars_t>
-auto ScalarField<potential_t>::compute_emtensor(
+emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
     const tensor<2, data_t> &h_UU,
-    const tensor<3, data_t> &chris_ULL) -> emtensor_t<data_t> {
+    const tensor<3, data_t> &chris_ULL) const {
 
     emtensor_t<data_t> out;
 
@@ -62,7 +62,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     const vars_t<data_t> &vars,
     const vars_t< tensor<1,data_t> >& d1,
     const diff2_vars_t< tensor<2,data_t> >& d2,
-    const vars_t<data_t> &advec) {
+    const vars_t<data_t> &advec) const {
 
     using namespace TensorAlgebra;
 

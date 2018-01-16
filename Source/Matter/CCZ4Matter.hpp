@@ -74,7 +74,7 @@ public:
 
     //!  The compute member which calculates the RHS at each point in the box \sa matter_rhs_equation()
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     //! The function which adds in the EM Tensor terms to the CCZ4 rhs \sa compute()
@@ -83,7 +83,7 @@ protected:
         Vars<data_t> &matter_rhs, //!<the RHS data for each variable at that point.
         const Vars<data_t> &vars, //!<the value of the variables at the point.
         const Vars< tensor<1,data_t> > &d1 //!<the value of the first derivatives of the variables.
-    );
+    ) const;
 
     // Class members
     matter_t my_matter;//!< The matter object, e.g. a scalar field.

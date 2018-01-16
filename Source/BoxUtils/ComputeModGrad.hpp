@@ -20,7 +20,7 @@ public:
    {};
 
    template <class data_t>
-   void compute(Cell<data_t> current_cell)
+   void compute(Cell<data_t> current_cell) const
    {
        tensor<1,data_t> d1_arr[c_NUM];
        FOR1(idir) m_deriv.diff1(d1_arr, current_cell, idir);

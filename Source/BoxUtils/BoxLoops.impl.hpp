@@ -13,7 +13,7 @@
 template <typename... compute_ts>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
+BoxLoops::innermost_loop(const ComputePack<compute_ts...>& compute_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x)
 {
     int simd_width = simd<double>::simd_len;
@@ -35,7 +35,7 @@ BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPoint
 template <typename... compute_ts>
 ALWAYS_INLINE
 void
-BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPointers& box_pointers,
+BoxLoops::innermost_loop(const ComputePack<compute_ts...>& compute_pack, const BoxPointers& box_pointers,
                          const int iy, const int iz, const int loop_lo_x, const int loop_hi_x, disable_simd)
 {
     for (int ix = loop_lo_x; ix <= loop_hi_x; ++ix)
@@ -46,7 +46,7 @@ BoxLoops::innermost_loop(ComputePack<compute_ts...> compute_pack, const BoxPoint
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
+BoxLoops::loop(const ComputePack<compute_ts...>& compute_pack, const FArrayBox& in, FArrayBox& out, const Box& loop_box, simd_info... info)
 {
     //Makes sure we are not requesting data outside the box of 'out'
     CH_assert(out.box().contains(loop_box));
@@ -74,7 +74,7 @@ BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FAr
 }
 
 template <typename compute_t, typename... simd_info>
-void
+std::enable_if_t<!is_compute_pack<compute_t>::value, void>
 BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, const Box & loop_box, simd_info... info)
 {
     loop(make_compute_pack(compute_class), in, out, loop_box, std::forward<simd_info>(info)...);
@@ -82,13 +82,13 @@ BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, con
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
+BoxLoops::loop(const ComputePack<compute_ts...>& compute_pack, const FArrayBox& in, FArrayBox& out, simd_info... info)
 {
     loop(compute_pack, in,out,out.box(), std::forward<simd_info>(info)...);
 }
 
 template <typename compute_t, typename... simd_info>
-void
+std::enable_if_t<!is_compute_pack<compute_t>::value, void>
 BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, simd_info... info)
 {
     loop(make_compute_pack(compute_class), in, out, std::forward<simd_info>(info)...);
@@ -96,7 +96,7 @@ BoxLoops::loop(compute_t compute_class, const FArrayBox& in, FArrayBox& out, sim
 
 template <typename... compute_ts, typename... simd_info>
 void
-BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
+BoxLoops::loop(const ComputePack<compute_ts...>& compute_pack, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
     DataIterator dit0  = in.dataIterator();
     int nbox = dit0.size();
@@ -115,9 +115,10 @@ BoxLoops::loop(ComputePack<compute_ts...> compute_pack, const LevelData<FArrayBo
 }
 
 template <typename compute_t, typename... simd_info>
-void
+std::enable_if_t<!is_compute_pack<compute_t>::value, void>
 BoxLoops::loop(compute_t compute_class, const LevelData<FArrayBox>& in, LevelData<FArrayBox>& out, bool fill_ghosts, simd_info... info)
 {
+    //TODO think about perfect forwarding of compute_class
     loop(make_compute_pack(compute_class), in, out, fill_ghosts, std::forward<simd_info>(info)...);
 }
 

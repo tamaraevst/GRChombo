@@ -16,7 +16,7 @@ Constraints::Constraints(double dx, double cosmological_constant /*defaulted*/) 
 
 template <class data_t>
 void
-Constraints::compute(Cell<data_t> current_cell)
+Constraints::compute(Cell<data_t> current_cell) const
 {
     const auto vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
@@ -30,12 +30,11 @@ Constraints::compute(Cell<data_t> current_cell)
 }
 
 template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
-auto
-Constraints::constraint_equations(
+Constraints::constraints_t<data_t> Constraints::constraint_equations(
       const vars_t<data_t> &vars,
       const vars_t< tensor<1,data_t> >& d1,
       const diff2_vars_t< tensor<2,data_t> >& d2
-) -> constraints_t<data_t>
+) const
 {
    constraints_t<data_t> out;
 

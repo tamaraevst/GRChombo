@@ -20,7 +20,7 @@ public:
    NanCheck(const std::string a_error_info, const double a_max_abs) :
        m_error_info (a_error_info), m_max_abs (a_max_abs) {}
 
-   void compute( Cell<double> current_cell )
+   void compute( Cell<double> current_cell ) const
    {
       bool stop = false;
       FORVARS(i)

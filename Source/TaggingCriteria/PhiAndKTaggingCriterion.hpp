@@ -13,7 +13,7 @@ public:
     : m_dx (dx), m_deriv (dx), m_threshold_phi (threshold_phi), m_threshold_K (threshold_K) {};
 
    template <class data_t>
-   void compute(Cell<data_t> current_cell)
+   void compute(Cell<data_t> current_cell) const
    {
        auto phi = current_cell.load_vars(c_phi);
        tensor<1,data_t> d1_phi;

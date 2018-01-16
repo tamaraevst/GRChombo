@@ -14,14 +14,14 @@ class HarmonicTest {
         : m_dx (a_dx), m_center_vector (a_center_vector) {}
 
   template <class data_t>
-  void compute(Cell<data_t> current_cell);
+  void compute(Cell<data_t> current_cell) const;
 
  protected:
   double m_dx;
   std::array<double, CH_SPACEDIM> m_center_vector;
 
   template<class data_t>
-  data_t compute_harmonic(Coordinates<data_t> coords);
+  data_t compute_harmonic(Coordinates<data_t> coords) const;
 
 };
 

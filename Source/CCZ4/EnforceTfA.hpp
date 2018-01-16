@@ -26,7 +26,7 @@ public:
     };
 
     template <class data_t>
-    void compute(Cell<data_t> current_cell)
+    void compute(Cell<data_t> current_cell) const
     {
         auto vars = current_cell.template load_vars<Vars>();
 
