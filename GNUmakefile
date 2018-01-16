@@ -5,6 +5,8 @@ ExampleDirs := $(wildcard Examples/*/.)
 
 test: $(TestDirs)
 
+examples: $(ExampleDirs)
+
 all: $(TestDirs) $(ExampleDirs)
 
 $(TestDirs):
