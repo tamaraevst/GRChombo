@@ -6,8 +6,10 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally(e.g. export CHOMBO_HOME=... in bash)
 
-ebase := SimdFunctionsUnitTest
+ebase := CCZ4GeometryUnitTest
 
-src_dirs := ../../simd ../../utils
+LibNames := BoxTools
+
+src_dirs := $(GRCHOMBO_SOURCE)/utils $(GRCHOMBO_SOURCE)/CCZ4
 
 include $(CHOMBO_HOME)/mk/Make.test
