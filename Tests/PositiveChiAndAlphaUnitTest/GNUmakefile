@@ -10,6 +10,9 @@ ebase := PositiveChiAndAlphaUnitTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../BoxUtils
+src_dirs := $(GRCHOMBO_SOURCE)/utils \
+            $(GRCHOMBO_SOURCE)/simd \
+		   	$(GRCHOMBO_SOURCE)/CCZ4 \
+		   	$(GRCHOMBO_SOURCE)/BoxUtils
 
 include $(CHOMBO_HOME)/mk/Make.test

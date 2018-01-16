@@ -10,6 +10,10 @@ ebase := SphericalHarmonicTest
 
 LibNames := BoxTools
 
-src_dirs := ../../utils ../../simd ../../CCZ4 ../../Matter ../../BoxUtils
+src_dirs := $(GRCHOMBO_SOURCE)/utils \
+            $(GRCHOMBO_SOURCE)/simd \
+		   	$(GRCHOMBO_SOURCE)/CCZ4 \
+		   	$(GRCHOMBO_SOURCE)/Matter \
+		   	$(GRCHOMBO_SOURCE)/BoxUtils
 
 include $(CHOMBO_HOME)/mk/Make.test
