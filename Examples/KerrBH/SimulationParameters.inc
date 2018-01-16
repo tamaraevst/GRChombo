@@ -1,9 +1,8 @@
-// Last edited K Clough 16.10.16
+// Last edited K Clough 1.1.18
 
 #ifndef SIMULATIONPARAMETERS_HPP_
 #error  "This file must only be included through SimulationParameters.hpp"
 #endif
-//TODO: this annoying piece of code will be auto-generated from a list of values, names and default-values. This way we also get proper handling of missing parameters
 
 void auto_read_params(GRParmParse& pp)
 {
@@ -11,8 +10,6 @@ void auto_read_params(GRParmParse& pp)
     //Grid setup
     pp.load("L", L);
     pp.load("regrid_threshold", regrid_threshold);
-    pp.load("regrid_threshold_K", regrid_threshold_K);
-    pp.load("regrid_threshold_phi", regrid_threshold_phi);
     pp.load("isPeriodic", isPeriodic);
     pp.load("num_ghosts", num_ghosts);
     pp.load("tag_buffer_size", tag_buffer_size, 3);
@@ -49,7 +46,7 @@ void auto_read_params(GRParmParse& pp)
     pp.load("ignore_checkpoint_name_mismatch", ignore_checkpoint_name_mismatch, false);
 }
 
-////// General parameters
+// General parameters
 int verbosity;
 Real L; //Physical sidelength of the grid
 int num_ghosts; //Need min 3 for KO dissipation
@@ -59,7 +56,7 @@ int nan_check;
 bool ignore_checkpoint_name_mismatch; //ignore mismatch of variable names between restart file and program
 Real dt_multiplier;
 
-///// Problem specific parameters
+// Problem specific parameters
 Real regrid_threshold_K, regrid_threshold_phi, regrid_threshold;
 //Lapse evolution
 Real lapse_power, lapse_coeff, lapse_advec_coeff;
@@ -71,6 +68,5 @@ double kappa1, kappa2, kappa3;
 int covariantZ4;
 Real sigma; //Dissipation
 //Initial data for Kerr
-double G_Newton;
 Real kerr_mass, kerr_spin;
 std::array<double, CH_SPACEDIM> kerr_center;
