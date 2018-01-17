@@ -6,6 +6,7 @@
 
 #include "BoxLoops.hpp"
 #include "CCZ4Matter.hpp"
+#include "ConstraintsMatter.hpp"
 #include "FArrayBox.H"
 #include "Potential.hpp"
 #include "ScalarField.hpp"
@@ -40,6 +41,10 @@ int main()
     FArrayBox in_fab(ghosted_box, NUM_VARS);
     FArrayBox out_fab(box, NUM_VARS);
     FArrayBox out_fab_chf(box, NUM_VARS);
+    FArrayBox out_fab_ccz4constraints(box, NUM_VARS);
+    out_fab.setVal(0.);
+    out_fab_chf.setVal(0.);
+    out_fab_ccz4constraints.setVal(0.);
 
     const double dx = 1.0 / N_GRID;
 
@@ -229,6 +234,11 @@ int main()
                                                         dx, sigma, formulation,
                                                         G_Newton),
                    in_fab, out_fab);
+    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(my_scalar_field,
+                                                               dx, G_Newton),
+                   in_fab, out_fab);
+    BoxLoops::loop(Constraints(dx), in_fab, out_fab_ccz4constraints);
+    out_fab -= out_fab_ccz4constraints; //so as to test only matter additions
 
     gettimeofday(&end, NULL);
 
@@ -264,6 +274,23 @@ int main()
         CHF_CONST_REAL(params.kappa1), CHF_CONST_REAL(params.kappa2),
         CHF_CONST_REAL(params.kappa3), CHF_CONST_REAL(params.eta),
         CHF_CONST_REAL(params.shift_Gamma_coeff), CHF_CONST_REAL(sigma),
+        CHF_CONST_REAL(potential_params.scalar_mass),
+        CHF_BOX(box));
+
+    FORT_GETBSSNCONSTRF(
+        CHF_FRA1(out_fab_chf, c_Ham),
+        CHF_FRAn(out_fab_chf, c_Mom1, THREE),
+        CHF_CONST_FRA1(in_fab, c_chi2),
+        CHF_CONST_FRAn(in_fab, c_h, SIX),
+        CHF_CONST_FRA1(in_fab, c_K),
+        CHF_CONST_FRAn(in_fab, c_A, SIX),
+        CHF_CONST_FRAn(in_fab, c_Gamma, THREE),
+        CHF_CONST_FRA1(in_fab, c_lapse),
+        CHF_CONST_FRAn(in_fab, c_shift, THREE),
+        CHF_CONST_FRA1(in_fab, c_phi),
+        CHF_CONST_FRA1(in_fab, c_Pi),
+        CHF_CONST_REAL(dx),
+        CHF_CONST_REAL(potential_params.scalar_mass),
         CHF_BOX(box));
 
     gettimeofday(&end, NULL);

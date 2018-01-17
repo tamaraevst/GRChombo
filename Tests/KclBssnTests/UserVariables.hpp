@@ -50,12 +50,12 @@ enum
 
     c_chi2,
 
-    //    c_Ham,
+    c_Ham,
 
-    //    c_Mom,
-    //    c_Mom1 = c_Mom,
-    //    c_Mom2,
-    //    c_Mom3,
+    c_Mom,
+    c_Mom1 = c_Mom,
+    c_Mom2,
+    c_Mom3,
 
     NUM_VARS
 };
@@ -83,12 +83,11 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "phi",    "Pi",
 
-    "chi2"
+    "chi2",
 
-    //        "Ham",
-    //        "Mom1",
-    //        "Mom2",
-    //        "Mom3"
+    "Ham",
+
+    "Mom1",   "Mom2",   "Mom3"
 };
 }
 
