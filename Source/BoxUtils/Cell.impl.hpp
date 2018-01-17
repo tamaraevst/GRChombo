@@ -20,9 +20,9 @@ ALWAYS_INLINE void Cell<data_t>::load_vars(data_t &out, const int icomp) const
     out = load_vars(icomp);
 }
 
-template <class data_t> void Cell<data_t>::load_vars(data_t (&out)[c_NUM]) const
+template <class data_t> void Cell<data_t>::load_vars(data_t (&out)[NUM_VARS]) const
 {
-    for (int ivar = 0; ivar < c_NUM; ++ivar) { out[ivar] = load_vars(ivar); }
+    for (int ivar = 0; ivar < NUM_VARS; ++ivar) { out[ivar] = load_vars(ivar); }
 }
 
 template <class data_t>
@@ -62,9 +62,9 @@ ALWAYS_INLINE void Cell<data_t>::store_vars(
 
 template <class data_t>
 ALWAYS_INLINE void
-Cell<data_t>::store_vars(const std::array<data_t, c_NUM> &values) const
+Cell<data_t>::store_vars(const std::array<data_t, NUM_VARS> &values) const
 {
-    for (int ivar = 0; ivar < c_NUM; ++ivar) { store_vars(values[ivar], ivar); }
+    for (int ivar = 0; ivar < NUM_VARS; ++ivar) { store_vars(values[ivar], ivar); }
 }
 
 /// This function stores all variables that have a corresponding value in a

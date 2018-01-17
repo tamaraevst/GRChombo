@@ -258,17 +258,17 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
 
     // reshape state with new grids
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
-    m_state_new.define(level_domain, c_NUM, iv_ghosts);
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
 
     // maintain interlevel stuff
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define(level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define(level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, c_NUM,
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
                          coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
                          m_num_ghosts);
 
@@ -279,7 +279,7 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     // copy from old state
     m_state_old.copyTo(m_state_old.interval(), m_state_new,
                        m_state_new.interval());
-    m_state_old.define(level_domain, c_NUM, iv_ghosts);
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 }
 
 // initialize grid
@@ -295,17 +295,17 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
     const DisjointBoxLayout level_domain = m_grids = loadBalance(a_new_grids);
 
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
-    m_state_new.define(level_domain, c_NUM, iv_ghosts);
-    m_state_old.define(level_domain, c_NUM, iv_ghosts);
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define(level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define(level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, c_NUM,
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
                          coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
                          m_num_ghosts);
     }
@@ -366,9 +366,9 @@ void GRAMRLevel::writeCheckpointHeader(HDF5Handle &a_handle) const
         pout() << "GRAMRLevel::writeCheckpointHeader" << endl;
 
     HDF5HeaderData header;
-    header.m_int["num_components"] = c_NUM;
+    header.m_int["num_components"] = NUM_VARS;
     char comp_str[30];
-    for (int comp = 0; comp < c_NUM; ++comp)
+    for (int comp = 0; comp < NUM_VARS; ++comp)
     {
         sprintf(comp_str, "component_%d", comp);
         header.m_string[comp_str] = UserVariables::variable_names[comp];
@@ -442,7 +442,7 @@ void GRAMRLevel::readCheckpointHeader(HDF5Handle &a_handle)
                       "not have num_components");
     }
     int num_comps = header.m_int["num_components"];
-    if (num_comps != c_NUM)
+    if (num_comps != NUM_VARS)
     {
         MayDay::Error("GRAMRLevel::readCheckpointHeader: num_components in "
                       "checkpoint file does not match solver");
@@ -451,7 +451,7 @@ void GRAMRLevel::readCheckpointHeader(HDF5Handle &a_handle)
     // read component names
     std::string state_name;
     char comp_str[60];
-    for (int comp = 0; comp < c_NUM; ++comp)
+    for (int comp = 0; comp < NUM_VARS; ++comp)
     {
         sprintf(comp_str, "component_%d", comp);
         if (header.m_string.find(comp_str) == header.m_string.end())
@@ -584,19 +584,19 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
     // maintain interlevel stuff
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define(level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define(level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, c_NUM,
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
                          coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
                          m_num_ghosts);
     }
 
     // reshape state with new grids
-    m_state_new.define(level_domain, c_NUM, iv_ghosts);
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
     const int data_status =
         read<FArrayBox>(a_handle, m_state_new, "data", level_domain);
     if (data_status != 0)
@@ -604,7 +604,7 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
         MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain "
                       "state data");
     }
-    m_state_old.define(level_domain, c_NUM, iv_ghosts);
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 }
 
 void GRAMRLevel::writePlotLevel(HDF5Handle &a_handle) const
@@ -752,7 +752,7 @@ void GRAMRLevel::evalRHS(
             MayDay::Error("GRAMRLevel::evalRHS: alpha > 1.0");
 
         // Interpolate ghost cells from next coarser level in space and time
-        m_patcher.fillInterp(soln, alpha, 0, 0, c_NUM);
+        m_patcher.fillInterp(soln, alpha, 0, 0, NUM_VARS);
     }
     // Time and count the RHS if possible
     if (m_profilingInfo != nullptr)
@@ -803,7 +803,7 @@ void GRAMRLevel::fillAllGhosts()
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
         m_patcher.fillInterp(m_state_new, coarser_gr_amr_level_ptr->m_state_new,
-                             0, 0, c_NUM);
+                             0, 0, NUM_VARS);
     }
     fillIntralevelGhosts();
 }

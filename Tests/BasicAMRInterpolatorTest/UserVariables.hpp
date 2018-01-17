@@ -9,12 +9,12 @@ enum
     c_chi,
     c_phi,
 
-    c_NUM
+    NUM_VARS
 };
 
 namespace UserVariables
 {
-static constexpr char const *variable_names[c_NUM] = {"chi", "phi"};
+static constexpr char const *variable_names[NUM_VARS] = {"chi", "phi"};
 }
 
 #endif /* USERVARIABLES_HPP */

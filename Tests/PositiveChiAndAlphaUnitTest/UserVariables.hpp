@@ -5,12 +5,12 @@ enum
 {
     c_chi,
     c_lapse,
-    c_NUM
+    NUM_VARS
 };
 
 namespace UserVariables
 {
-static constexpr char const *variable_names[c_NUM] = {
+static constexpr char const *variable_names[NUM_VARS] = {
     "chi", "lapse",
 };
 }

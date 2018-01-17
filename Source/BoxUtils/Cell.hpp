@@ -93,7 +93,7 @@ template <class data_t> class Cell
     ALWAYS_INLINE
     void load_vars(data_t &out, int icomp) const;
 
-    void load_vars(data_t (&out)[c_NUM]) const;
+    void load_vars(data_t (&out)[NUM_VARS]) const;
 
     template <template <typename> class vars_t>
     void load_vars(vars_t<data_t> &vars) const;
@@ -107,7 +107,7 @@ template <class data_t> class Cell
         const tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
         const GRInterval<start_var, end_var> interval) const;
 
-    void store_vars(const std::array<data_t, c_NUM> &values) const;
+    void store_vars(const std::array<data_t, NUM_VARS> &values) const;
 
     template <template <typename> class vars_t>
     void store_vars(vars_t<data_t> &vars) const;

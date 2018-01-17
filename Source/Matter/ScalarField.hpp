@@ -10,7 +10,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
-#include "UserVariables.hpp" //This files needs c_NUM - total number of components
+#include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"

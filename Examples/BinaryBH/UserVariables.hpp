@@ -47,12 +47,12 @@ enum
     c_Mom2,
     c_Mom3,
 
-    c_NUM
+    NUM_VARS
 };
 
 namespace UserVariables
 {
-static constexpr char const *variable_names[c_NUM] = {
+static constexpr char const *variable_names[NUM_VARS] = {
     "chi",
 
     "h11",    "h12",    "h13",    "h22", "h23", "h33",

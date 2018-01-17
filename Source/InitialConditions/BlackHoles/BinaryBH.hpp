@@ -7,7 +7,7 @@
 #include "simd.hpp"
 #include "tensor.hpp"
 
-#include "UserVariables.hpp" //This files needs c_NUM - total number of components
+#include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 
 #include <array>
 

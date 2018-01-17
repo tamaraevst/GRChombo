@@ -21,9 +21,9 @@ int main()
 
     const int N_GRID = 64;
     Box box(IntVect(0, 0, 0), IntVect(N_GRID - 1, N_GRID - 1, N_GRID - 1));
-    FArrayBox in_fab(box, c_NUM);
+    FArrayBox in_fab(box, NUM_VARS);
     BoxLoops::loop(make_compute_pack(SetValue(0.0)), in_fab, in_fab);
-    FArrayBox out_fab(box, c_NUM);
+    FArrayBox out_fab(box, NUM_VARS);
     BoxLoops::loop(make_compute_pack(SetValue(0.0)), out_fab, out_fab);
     double length = 64.0;
 
@@ -70,7 +70,7 @@ int main()
 
     int failed = 0;
 
-    for (int i = 0; i < c_NUM; ++i)
+    for (int i = 0; i < NUM_VARS; ++i)
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_act = in_fab.norm(0, i, 1);

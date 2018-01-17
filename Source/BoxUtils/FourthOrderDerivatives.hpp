@@ -134,13 +134,13 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void diff2(tensor<2, data_t> (&diffArray)[c_NUM],
+    void diff2(tensor<2, data_t> (&diffArray)[NUM_VARS],
                const Cell<data_t> &current_cell, int direction) const
     {
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        for (int ivar = 0; ivar < c_NUM; ++ivar)
+        for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
             diffArray[ivar][direction][direction] = diff2<data_t>(
                 current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride);
@@ -199,7 +199,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void mixed_diff2(tensor<2, data_t> (&diffArray)[c_NUM],
+    void mixed_diff2(tensor<2, data_t> (&diffArray)[NUM_VARS],
                      const Cell<data_t> &current_cell, int direction1,
                      int direction2) const
     {
@@ -208,7 +208,7 @@ class FourthOrderDerivatives
         const int stride2 =
             current_cell.get_box_pointers().m_in_stride[direction2];
         const int in_index = current_cell.get_in_index();
-        for (int ivar = 0; ivar < c_NUM; ++ivar)
+        for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
             data_t diff2_value =
                 mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
@@ -299,13 +299,13 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void add_advection(data_t (&out)[c_NUM], const Cell<data_t> &current_cell,
+    void add_advection(data_t (&out)[NUM_VARS], const Cell<data_t> &current_cell,
                        const data_t &vec_comp, const int dir) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
         const int in_index = current_cell.get_in_index();
-        for (int ivar = 0; ivar < c_NUM; ++ivar)
+        for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
             out[ivar] +=
                 advection_term(current_cell.get_box_pointers().m_in_ptr[ivar],
@@ -387,13 +387,13 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void add_dissipation(data_t (&out)[c_NUM], const Cell<data_t> &current_cell,
+    void add_dissipation(data_t (&out)[NUM_VARS], const Cell<data_t> &current_cell,
                          const double factor, const int direction) const
     {
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        for (int ivar = 0; ivar < c_NUM; ++ivar)
+        for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
             out[ivar] +=
                 factor * dissipation_term<data_t>(

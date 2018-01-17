@@ -14,7 +14,7 @@ int main()
 
     const int N_GRID = 8;
     Box box(IntVect(0, 0, 0), IntVect(N_GRID - 1, N_GRID - 1, N_GRID - 1));
-    FArrayBox in_fab(box, c_NUM);
+    FArrayBox in_fab(box, NUM_VARS);
 
     double value = 42.;
     BoxLoops::loop(SetValue(42.), in_fab, in_fab);

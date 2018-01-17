@@ -31,8 +31,8 @@ int main()
     Box box(IntVect(0, 0, 0), IntVect(N_GRID - 1, N_GRID - 1, N_GRID - 1));
     Box ghosted_box(IntVect(-3, -3, -3),
                     IntVect(N_GRID + 2, N_GRID + 2, N_GRID + 2));
-    FArrayBox in_fab(ghosted_box, c_NUM);
-    FArrayBox in_fab_cpp_result(ghosted_box, c_NUM);
+    FArrayBox in_fab(ghosted_box, NUM_VARS);
+    FArrayBox in_fab_cpp_result(ghosted_box, NUM_VARS);
 
     const double dx = 1.0 / (N_GRID - 1);
 
@@ -235,7 +235,7 @@ int main()
 
     int error = 0;
 
-    for (int i = c_Ham; i < c_NUM; ++i)
+    for (int i = c_Ham; i < NUM_VARS; ++i)
     {
         BoxIterator bit(box);
         double max_err = 0;

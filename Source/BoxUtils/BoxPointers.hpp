@@ -8,12 +8,12 @@
 class BoxPointers
 {
   public:
-    const double *m_in_ptr[c_NUM];
+    const double *m_in_ptr[NUM_VARS];
     const int *m_in_lo;
     const int *m_in_hi;
     int m_in_stride[3];
 
-    double *m_out_ptr[c_NUM];
+    double *m_out_ptr[NUM_VARS];
     const int *m_out_lo;
     const int *m_out_hi;
     int m_out_stride[3];
@@ -22,7 +22,7 @@ class BoxPointers
     {
         // dataPtr in Chombo does CH_assert bound check
         // which we don't want to do in a loop
-        for (int i = 0; i < c_NUM; ++i)
+        for (int i = 0; i < NUM_VARS; ++i)
             m_in_ptr[i] = in.dataPtr(i);
         // If the output FArrayBox doesn't have all components, just don't set
         // the pointers

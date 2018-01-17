@@ -5,12 +5,12 @@ enum
 {
     c_var,
     c_sym_var,
-    c_NUM
+    NUM_VARS
 };
 
 namespace UserVariables
 {
-static constexpr char const *variable_names[c_NUM] = {
+static constexpr char const *variable_names[NUM_VARS] = {
     "var", "sym_var",
 };
 }

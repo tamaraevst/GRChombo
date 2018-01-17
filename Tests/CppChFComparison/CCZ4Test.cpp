@@ -31,9 +31,9 @@ int main()
     Box box(IntVect(0, 0, 0), IntVect(N_GRID - 1, N_GRID - 1, N_GRID - 1));
     Box ghosted_box(IntVect(-3, -3, -3),
                     IntVect(N_GRID + 2, N_GRID + 2, N_GRID + 2));
-    FArrayBox in_fab(ghosted_box, c_NUM);
-    FArrayBox out_fab(box, c_NUM);
-    FArrayBox out_fab_chf(box, c_NUM);
+    FArrayBox in_fab(ghosted_box, NUM_VARS);
+    FArrayBox out_fab(box, NUM_VARS);
+    FArrayBox out_fab_chf(box, NUM_VARS);
 
     const double dx = 1.0 / (N_GRID - 1);
 
@@ -246,7 +246,7 @@ int main()
     int failed = 0;
 
     out_fab -= out_fab_chf;
-    for (int i = 0; i < c_NUM; ++i)
+    for (int i = 0; i < NUM_VARS; ++i)
     {
         double max_err = out_fab.norm(0, i, 1);
         double max_chf = out_fab_chf.norm(0, i, 1);

@@ -25,7 +25,7 @@ class NanCheck
     void compute(Cell<double> current_cell) const
     {
         bool stop = false;
-        for (int ivar = 0; ivar < c_NUM; ++ivar)
+        for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
             double val;
             current_cell.load_vars(val, ivar);
@@ -39,7 +39,7 @@ class NanCheck
                 pout() << m_error_info
                        << "::Values have become nan. The current state is: "
                        << endl;
-                for (int ivar = 0; ivar < c_NUM; ++ivar)
+                for (int ivar = 0; ivar < NUM_VARS; ++ivar)
                 {
                     pout() << UserVariables::variable_names[ivar] << ": "
                         << current_cell.load_vars(ivar) << endl;

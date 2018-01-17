@@ -18,7 +18,7 @@ class SetValue
     Interval m_interval;
 
   public:
-    SetValue(double a_value, Interval a_interval = Interval(0, c_NUM - 1))
+    SetValue(double a_value, Interval a_interval = Interval(0, NUM_VARS - 1))
         : m_value(a_value), m_interval(a_interval)
     {
     }
