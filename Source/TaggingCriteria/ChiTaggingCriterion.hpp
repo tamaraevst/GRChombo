@@ -13,7 +13,7 @@ public:
    ChiTaggingCriterion(double dx) : m_dx (dx), m_deriv (dx) {};
 
    template <class data_t>
-   void compute(Cell<data_t> current_cell)
+   void compute(Cell<data_t> current_cell) const
    {
        auto chi = current_cell.load_vars(c_chi);
        tensor<1,data_t> d1_chi;

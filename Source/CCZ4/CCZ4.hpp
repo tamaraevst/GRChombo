@@ -104,7 +104,7 @@ public:
       * This function is called by the BoxLoops::loop for each grid cell; there should rarely be a need to call it directly.
       */
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     /// Calculates the rhs for CCZ4
@@ -120,7 +120,7 @@ protected:
         const vars_t< tensor<1,data_t> > &d1, //!< First derivative of the variables
         const diff2_vars_t< tensor<2,data_t> > &d2, //!< The second derivative the variables
         const vars_t<data_t> &advec //!< The advection derivatives of the variables
-    );
+    ) const;
 };
 
 #include "CCZ4.impl.hpp"

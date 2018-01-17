@@ -24,8 +24,8 @@ public:
 
     //! Set the potential function for the scalar field here
     template <class data_t>
-    void 
-    compute_potential(data_t &V_of_phi, data_t &dVdphi, data_t phi_here) 
+    void
+    compute_potential(data_t &V_of_phi, data_t &dVdphi, data_t phi_here) const
     {
         //The potential value at phi
         V_of_phi = pow(m_params.scalar_mass*phi_here, 2.0); // e.g. m^2 phi^2

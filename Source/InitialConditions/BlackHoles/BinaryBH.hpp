@@ -33,14 +33,14 @@ public:
         m_initial_lapse (a_initial_lapse) {}
 
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     template <class data_t>
-    data_t compute_chi(Coordinates<data_t> coords);
+    data_t compute_chi(Coordinates<data_t> coords) const;
 
     template <class data_t>
-    tensor<2,data_t> compute_A(data_t chi, Coordinates<data_t> coords);
+    tensor<2,data_t> compute_A(data_t chi, Coordinates<data_t> coords) const;
 
 };
 

@@ -12,7 +12,7 @@
 // Computes semi-isotropic Kerr solution as detailed in Liu, Etienne and Shapiro 2010,
 // arxiv gr-qc/1001.4077
 template <class data_t>
-void KerrBH::compute(Cell<data_t> current_cell)
+void KerrBH::compute(Cell<data_t> current_cell) const
 {
     // set up vars for the metric and extrinsic curvature, shift and lapse in spherical coords
     tensor<2,data_t> spherical_g;
@@ -72,7 +72,7 @@ void KerrBH::compute_kerr(tensor<2,data_t> &spherical_g,
                           tensor<2,data_t> &spherical_K,
                           tensor<1,data_t> &spherical_shift,
                           data_t &kerr_lapse,
-                          const Coordinates<data_t> coords)
+                          const Coordinates<data_t> coords) const
 {
     //Kerr black hole params - mass M and spin a
     double M = m_params.mass;

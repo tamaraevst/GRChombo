@@ -18,7 +18,7 @@ ConstraintsMatter<matter_t>::ConstraintsMatter(
 
 template <class matter_t>
 template <class data_t>
-void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell)
+void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell) const
 {
     // Load local vars and calculate derivs
     const auto vars = current_cell.template load_vars<Vars>();

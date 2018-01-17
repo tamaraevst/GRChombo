@@ -41,7 +41,7 @@ public:
     Constraints(double dx, double cosmological_constant = 0);
 
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     const FourthOrderDerivatives m_deriv;
@@ -53,7 +53,7 @@ protected:
         const vars_t<data_t> &vars,
         const vars_t< tensor<1,data_t> >& d1,
         const diff2_vars_t< tensor<2,data_t> >& d2
-    );
+    ) const;
 };
 
 #include "Constraints.impl.hpp"

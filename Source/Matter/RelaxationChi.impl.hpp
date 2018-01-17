@@ -20,7 +20,7 @@ RelaxationChi<matter_t>::RelaxationChi(
 
 template <class matter_t>
 template <class data_t>
-void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) {
+void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) const {
 
     //copy data from chombo gridpoint into local variable and calculate derivs
     const auto vars = current_cell.template load_vars<Vars>();
@@ -44,7 +44,7 @@ void RelaxationChi<matter_t>::rhs_equation(
     const Vars<data_t> &vars,
     const Vars< tensor<1,data_t> >& d1,
     const Diff2Vars< tensor<2,data_t> >& d2,
-    const Vars<data_t> &advec) {
+    const Vars<data_t> &advec) const {
 
     using namespace TensorAlgebra;
 

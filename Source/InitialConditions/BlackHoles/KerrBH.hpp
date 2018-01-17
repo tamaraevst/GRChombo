@@ -46,7 +46,7 @@ public:
     }
 
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     //! Function which computes the components of the metric in spherical coords
@@ -55,7 +55,8 @@ protected:
                       tensor<2,data_t> &spherical_K,//!<< The extrinsic curvature in spherical coords
                       tensor<1,data_t> &spherical_shift,//!<< The spherical components of the shift
                       data_t &kerr_lapse,//!<< The lapse for the kerr solution
-                      const Coordinates<data_t> coords);//!<< Coords of current cell
+                      const Coordinates<data_t> coords //!<< Coords of current cell
+                      ) const;
 
 };
 

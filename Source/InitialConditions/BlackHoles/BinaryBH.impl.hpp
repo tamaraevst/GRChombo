@@ -11,7 +11,7 @@
 #include "VarsTools.hpp"
 
 template <class data_t>
-void BinaryBH::compute(Cell<data_t> current_cell)
+void BinaryBH::compute(Cell<data_t> current_cell) const
 {
     CCZ4::Vars<data_t> vars;
     VarsTools::assign(vars, 0.); //Set only the non-zero components explicitly below
@@ -43,14 +43,14 @@ void BinaryBH::compute(Cell<data_t> current_cell)
 }
 
 template <class data_t>
-data_t BinaryBH::compute_chi(Coordinates<data_t> coords)
+data_t BinaryBH::compute_chi(Coordinates<data_t> coords) const
 {
     const data_t psi = 1. + bh1.psi_minus_one(coords) + bh2.psi_minus_one(coords);
     return pow(psi, -4);
 }
 
 template <class data_t>
-tensor<2,data_t> BinaryBH::compute_A(data_t chi, Coordinates<data_t> coords)
+tensor<2,data_t> BinaryBH::compute_A(data_t chi, Coordinates<data_t> coords) const
 {
 
     tensor<2,data_t> Aij1 = bh1.Aij(coords);

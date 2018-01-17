@@ -10,30 +10,38 @@ class ComputePack
     std::tuple<compute_ts...> m_compute_tuple;
 
     //Begin: Helper functions for calling 'compute' for several compute classes -->
-    template<std::size_t ID = 0, typename... helper_compute_ts, class data_t>
+    template<std::size_t ID = 0, class data_t>
     ALWAYS_INLINE
-    typename std::enable_if<ID == sizeof...(helper_compute_ts), void>::type
-    call_compute_helper(std::tuple<helper_compute_ts...>&, Cell<data_t> current_cell) { } //If we have reached the end of the tuple do nothing
+    typename std::enable_if<ID == sizeof...(compute_ts), void>::type
+    call_compute_helper(Cell<data_t> current_cell) const { } //If we have reached the end of the tuple do nothing
 
-    template<std::size_t ID = 0, typename... helper_compute_ts, class data_t>
+    template<std::size_t ID = 0, class data_t>
     ALWAYS_INLINE
-    typename std::enable_if<ID < sizeof...(helper_compute_ts), void>::type
-    call_compute_helper(std::tuple<helper_compute_ts...>& compute_pack, Cell<data_t> current_cell)
+    typename std::enable_if<ID < sizeof...(compute_ts), void>::type
+    call_compute_helper(Cell<data_t> current_cell) const
     {
-        std::get<ID>(compute_pack).compute(current_cell); //Call compute for the current component
-        call_compute_helper<ID + 1, helper_compute_ts...>(compute_pack, current_cell); //call again for next component
+        std::get<ID>(m_compute_tuple).compute(current_cell); //Call compute for the current component
+        call_compute_helper<ID + 1>(current_cell); //call again for next component
     }
     //End: Helper functions for calling 'compute' for several compute classes
 
 public:
     ComputePack(const std::tuple<compute_ts...>& compute_tuple) : m_compute_tuple (compute_tuple) {}
 
-    template <class data_t, typename... simd_info>
-    void call_compute(const Cell<data_t>& current_cell, simd_info... info)
+    template <class data_t>
+    void call_compute(const Cell<data_t>& current_cell) const
     {
-        call_compute_helper(m_compute_tuple, current_cell, std::forward<simd_info>(info)...);
+        call_compute_helper(current_cell);
     }
 };
+
+///Helper struct for checking whether a given template argument is a compute pack
+template <typename... Ts>
+struct is_compute_pack : public std::false_type {};
+
+template <typename... Ts>
+struct is_compute_pack<ComputePack<Ts...>> : public std::true_type {};
+//End: Helper struct for checking whether a given template argument is a compute pack
 
 template <typename... compute_ts>
 ComputePack<compute_ts...> make_compute_pack(compute_ts... compute_classes)

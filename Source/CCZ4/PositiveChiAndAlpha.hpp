@@ -11,7 +11,7 @@ class PositiveChiAndAlpha
 {
 public:
    template <class data_t>
-   void compute(Cell<data_t> current_cell)
+   void compute(Cell<data_t> current_cell) const
    {
       auto chi = current_cell.load_vars(c_chi);
       auto lapse = current_cell.load_vars(c_lapse);

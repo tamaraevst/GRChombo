@@ -74,7 +74,7 @@ public:
         const vars_t< tensor<1,data_t> >& d1,//!< the value of the first derivatives of the variables.
         const tensor<2, data_t>& h_UU,//!< the inverse metric (raised indices)
         const tensor<3, data_t>& chris_ULL//!< the conformal christoffel symbol in ULL form.
-    );
+    ) const;
 
     //! The function which adds in the RHS for the matter field vars
     template <class data_t, template<typename> class vars_t, template<typename> class diff2_vars_t>
@@ -83,7 +83,8 @@ public:
         const vars_t<data_t> &vars, //!< the value of the variables at the point.
         const vars_t< tensor<1,data_t> >& d1, //!< the value of the first derivatives of the variables.
         const diff2_vars_t< tensor<2,data_t> >& d2, //!< the value of the second derivatives of the variables.
-        const vars_t<data_t> &advec); //!< the value of the advection terms beta^i d_i(var).
+        const vars_t<data_t> &advec //!< the value of the advection terms beta^i d_i(var).
+        ) const;
 
 };
 

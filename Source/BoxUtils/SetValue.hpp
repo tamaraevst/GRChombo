@@ -21,7 +21,7 @@ public:
         m_value (a_value), m_interval (a_interval) {}
 
     template <class data_t>
-    void compute(Cell<data_t> current_cell)
+    void compute(Cell<data_t> current_cell) const
     {
         for(int i = m_interval.begin(); i<=m_interval.end(); ++i)
         {

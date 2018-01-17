@@ -25,7 +25,7 @@
      It is extremely inefficient and takes a long time to converge, but it works
      provided that there is indeed a sensible solution (note that it can converge
      to \chi = 0 everywhere if there is not, so one must always check it is converging
-     on something sensible). Note that the relaxation speed should be set to 
+     on something sensible). Note that the relaxation speed should be set to
      a value less than 2/15*dx_min/courant_factor for numerical stability.
      \sa m_relax_speed()
 */
@@ -50,7 +50,7 @@ public:
 
     //! The compute member which calculates the RHS at each point in the box \sa rhs_equation()
     template <class data_t>
-    void compute(Cell<data_t> current_cell);
+    void compute(Cell<data_t> current_cell) const;
 
 protected:
     matter_t my_matter;//!< The matter object, e.g. a scalar field.
@@ -65,7 +65,9 @@ protected:
         const Vars<data_t> &vars,//!< the value of the variables at the point.
         const Vars< tensor<1,data_t> > &d1,//!< the value of the first derivatives of the variables.
         const Diff2Vars< tensor<2,data_t> > &d2,//!< the value of the second derivatives of the variables.
-        const Vars<data_t> &advec);//!< advec the value of the advection terms beta^i d_i(var)
+        const Vars<data_t> &advec //!< advec the value of the advection terms beta^i d_i(var)
+        )
+    const;
 
 };
 

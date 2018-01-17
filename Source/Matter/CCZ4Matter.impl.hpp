@@ -23,7 +23,7 @@ CCZ4Matter<matter_t>::CCZ4Matter(
 
 template <class matter_t>
 template <class data_t>
-void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell)
+void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell) const
 {
     //copy data from chombo gridpoint into local variables
     const auto matter_vars = current_cell.template load_vars<Vars>();
@@ -54,7 +54,7 @@ template <class data_t>
 void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     Vars<data_t>  &matter_rhs,
     const Vars<data_t>  &matter_vars,
-    const Vars< tensor<1,data_t> >& d1)
+    const Vars< tensor<1,data_t> >& d1) const
 {
     using namespace TensorAlgebra;
 
