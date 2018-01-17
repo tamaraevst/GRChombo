@@ -8,11 +8,11 @@
  */
 #endif
 
-//General includes:
-#include <cmath>
+// General includes:
 #include <algorithm>
-#include <iostream>
+#include <cmath>
 #include <cstdlib>
+#include <iostream>
 #include <sys/time.h>
 
 #include "parstream.H" //Gives us pout()
@@ -22,85 +22,90 @@ using std::endl;
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
 
-//Problem specific includes:
-#include "UserVariables.hpp"
-#include "DefaultLevelFactory.hpp"
+// Problem specific includes:
 #include "AMRInterpolator.hpp"
-#include "Lagrange.hpp"
+#include "DefaultLevelFactory.hpp"
 #include "InterpolationQuery.hpp"
 #include "InterpolatorTestLevel.hpp"
+#include "Lagrange.hpp"
+#include "UserVariables.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-int
-main(int argc ,char* argv[])
+int main(int argc, char *argv[])
 {
     mainSetup(argc, argv);
 
-    //Load the parameter file and construct the SimulationParameter class
-    //To add more parameters edit the SimulationParameters file.
-    std::string in_string = argv[argc-1];
-    pout () << in_string << std::endl;
-    char const* in_file = argv[argc-1];
-    ParmParse  pp(0,argv+argc,NULL,in_file);
+    // Load the parameter file and construct the SimulationParameter class
+    // To add more parameters edit the SimulationParameters file.
+    std::string in_string = argv[argc - 1];
+    pout() << in_string << std::endl;
+    char const *in_file = argv[argc - 1];
+    ParmParse pp(0, argv + argc, NULL, in_file);
     SimulationParameters sim_params(pp);
 
-    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(sim_params);
+    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(
+        sim_params);
     AMR amr;
     setupAMRObject(amr, interpolator_test_level_fact);
 
-    //Setup the AMRInterpolator
+    // Setup the AMRInterpolator
     int num_points = 2;
     pp.query("num_points", num_points);
 
-    std::unique_ptr<double[]> chi_ptr {new double[num_points]};
-    std::unique_ptr<double[]> phi_ptr {new double[num_points]};
-    std::unique_ptr<double[]> interp_x {new double[num_points]};
-    std::unique_ptr<double[]> interp_y {new double[num_points]};
-    std::unique_ptr<double[]> interp_z {new double[num_points]};
+    std::unique_ptr<double[]> chi_ptr{new double[num_points]};
+    std::unique_ptr<double[]> phi_ptr{new double[num_points]};
+    std::unique_ptr<double[]> interp_x{new double[num_points]};
+    std::unique_ptr<double[]> interp_y{new double[num_points]};
+    std::unique_ptr<double[]> interp_z{new double[num_points]};
 
     double L;
     pp.get("L", L);
-    double extract_center[3] = {L/2,L/2,L/2};
-    double extract_radius = L/4;
+    double extract_center[3] = {L / 2, L / 2, L / 2};
+    double extract_radius = L / 4;
 
-    for (int iPhi=0; iPhi<num_points; ++iPhi)
+    for (int iPhi = 0; iPhi < num_points; ++iPhi)
     {
-        double extract_angle = iPhi*M_PI/num_points;
-        interp_x[iPhi] = extract_center[0] + extract_radius*cos(extract_angle);
-        interp_y[iPhi] = extract_center[1] + extract_radius*sin(extract_angle);
+        double extract_angle = iPhi * M_PI / num_points;
+        interp_x[iPhi] =
+            extract_center[0] + extract_radius * cos(extract_angle);
+        interp_y[iPhi] =
+            extract_center[1] + extract_radius * sin(extract_angle);
         interp_z[iPhi] = extract_center[2];
     }
 
     InterpolationQuery query(num_points);
-    query
-        .setCoords(0, interp_x.get())
+    query.setCoords(0, interp_x.get())
         .setCoords(1, interp_y.get())
         .setCoords(2, interp_z.get())
         .addComp(c_chi, chi_ptr.get())
         .addComp(c_phi, phi_ptr.get());
 
-    auto dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])->get_dx(); //coarsest grid spacing
+    auto dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])
+                         ->get_dx(); // coarsest grid spacing
     std::array<double, 3> dx;
     dx.fill(dx_scalar);
     std::array<double, CH_SPACEDIM> origin;
-    origin.fill(dx_scalar/2);
+    origin.fill(dx_scalar / 2);
 
-    AMRInterpolator<Lagrange<4> > interpolator(amr, origin, dx, 2);
+    AMRInterpolator<Lagrange<4>> interpolator(amr, origin, dx, 2);
     interpolator.interp(query);
 
     int status = 0;
 
-    for (int ipoint=0; ipoint<num_points; ++ipoint)
+    for (int ipoint = 0; ipoint < num_points; ++ipoint)
     {
         status |= (abs(chi_ptr[ipoint] - 42.) > 1e-10);
         status |= (abs(phi_ptr[ipoint] - 42.) > 1e-10);
     }
 
-    if ( status == 0 ) pout() << "AMRInterpolator test passed." << endl ;
-    else pout() << "AMRInterpolator test failed with return code " << status << endl ;
+    if (status == 0)
+        pout() << "AMRInterpolator test passed." << endl;
+    else
+        pout() << "AMRInterpolator test failed with return code " << status
+               << endl;
 
     mainFinalize();
     return status;

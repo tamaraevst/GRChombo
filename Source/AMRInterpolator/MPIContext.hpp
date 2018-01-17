@@ -5,7 +5,7 @@
 
 class MPIContext
 {
-public:
+  public:
     const int m_num_process;
     const int m_rank;
 
@@ -29,8 +29,8 @@ public:
 #ifdef CH_MPI
     // MPI asynchronous comms
     void asyncBegin();
-    void asyncExchangeQuery(void* sendbuf, void* recvbuf, MPI_Datatype type);
-    void asyncExchangeAnswer(void* sendbuf, void* recvbuf, MPI_Datatype type);
+    void asyncExchangeQuery(void *sendbuf, void *recvbuf, MPI_Datatype type);
+    void asyncExchangeAnswer(void *sendbuf, void *recvbuf, MPI_Datatype type);
     void asyncEnd();
 #endif
 
@@ -38,7 +38,7 @@ public:
     static int comm_size();
     static int comm_rank();
 
-private:
+  private:
     MPILayout m_query;
     MPILayout m_answer;
 
@@ -48,11 +48,9 @@ private:
 #ifdef CH_MPI
     vector<MPI_Request> m_mpi_requests;
 #endif
-
 };
 
-int
-MPIContext::comm_size()
+int MPIContext::comm_size()
 {
     int out = 1;
 #ifdef CH_MPI
@@ -61,8 +59,7 @@ MPIContext::comm_size()
     return out;
 }
 
-int
-MPIContext::comm_rank()
+int MPIContext::comm_rank()
 {
     int out = 0;
 #ifdef CH_MPI

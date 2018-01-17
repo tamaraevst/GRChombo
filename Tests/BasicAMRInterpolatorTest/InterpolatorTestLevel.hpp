@@ -6,21 +6,19 @@
 class InterpolatorTestLevel : public GRAMRLevel
 {
     friend class DefaultLevelFactory<InterpolatorTestLevel>;
-    //Inherit the contructors from GRAMRLevel
+    // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
     // initialize data
-    virtual
-    void initialData()
+    virtual void initialData() { m_state_new.setVal(42.); }
+
+    virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                 const double a_time)
     {
-        m_state_new.setVal(42.);
     }
 
-    virtual
-    void specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time) {}
-
-    virtual
-    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state) {};
+    virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
+                                         const FArrayBox &current_state){};
 };
 
 #endif /* INTERPOLATORTESTLEVEL_HPP_ */

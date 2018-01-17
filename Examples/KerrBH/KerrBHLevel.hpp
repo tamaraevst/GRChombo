@@ -6,31 +6,27 @@
 class KerrBHLevel : public GRAMRLevel
 {
     friend class DefaultLevelFactory<KerrBHLevel>;
-    //Inherit the contructors from GRAMRLevel
+    // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
-    virtual
-    void specificAdvance();
+    virtual void specificAdvance();
 
     // initialize data
-    virtual
-    void initialData();
+    virtual void initialData();
 
-    virtual
-    void preCheckpointLevel();
+    virtual void preCheckpointLevel();
 
-    virtual
-    void specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time);
+    virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                 const double a_time);
 
-    virtual
-    void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
+    virtual void specificUpdateODE(GRLevelData &a_soln,
+                                   const GRLevelData &a_rhs, Real a_dt);
 
     // Specify which variables to write at plot intervals
-    virtual
-    void specificWritePlotHeader(std::vector<int> &plot_states) const;
+    virtual void specificWritePlotHeader(std::vector<int> &plot_states) const;
 
-    virtual
-    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
+    virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
+                                         const FArrayBox &current_state);
 };
 
 #include "KerrBHLevel.impl.hpp"

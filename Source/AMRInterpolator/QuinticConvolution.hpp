@@ -6,17 +6,20 @@
 
 class QuinticConvolution
 {
-    const InterpSource& m_source;
+    const InterpSource &m_source;
     bool m_verbosity;
 
     vector<IntVect> m_interp_points;
     vector<double> m_interp_weights;
 
-public:
-    QuinticConvolution(const InterpSource& source, bool verbosity = false);
+  public:
+    QuinticConvolution(const InterpSource &source, bool verbosity = false);
 
-    void setup(const std::array<int, CH_SPACEDIM>& deriv, const std::array<double, CH_SPACEDIM>& dx, const std::array<double, CH_SPACEDIM>& evalCoord, const IntVect& nearest);
-    double interpData(const FArrayBox& fab, int comp);
+    void setup(const std::array<int, CH_SPACEDIM> &deriv,
+               const std::array<double, CH_SPACEDIM> &dx,
+               const std::array<double, CH_SPACEDIM> &evalCoord,
+               const IntVect &nearest);
+    double interpData(const FArrayBox &fab, int comp);
 
     const static string TAG;
 };

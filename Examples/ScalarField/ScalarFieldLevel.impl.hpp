@@ -7,50 +7,55 @@
 #ifndef SCALARFIELDLEVEL_IMPL_HPP_
 #define SCALARFIELDLEVEL_IMPL_HPP_
 
-//General includes common to most GR problems
-#include "ScalarFieldLevel.hpp"
+// General includes common to most GR problems
 #include "BoxLoops.hpp"
 #include "EnforceTfA.hpp"
-#include "PositiveChiAndAlpha.hpp"
 #include "NanCheck.hpp"
+#include "PositiveChiAndAlpha.hpp"
+#include "ScalarFieldLevel.hpp"
 
-//For RHS update
+// For RHS update
 #include "CCZ4Matter.hpp"
 
-//For constraints calculation
+// For constraints calculation
 #include "ConstraintsMatter.hpp"
 
-//For tag cells
+// For tag cells
 #include "PhiAndKTaggingCriterion.hpp"
 
-//Problem specific includes
-#include "Potential.hpp"
-#include "ScalarField.hpp"
-#include "ScalarBubble.hpp"
-#include "RelaxationChi.hpp"
+// Problem specific includes
 #include "ComputePack.hpp"
+#include "Potential.hpp"
+#include "RelaxationChi.hpp"
+#include "ScalarBubble.hpp"
+#include "ScalarField.hpp"
 #include "SetValue.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
 {
-    //Enforce trace free A_ij and positive chi and alpha
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
+    // Enforce trace free A_ij and positive chi and alpha
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+                   m_state_new, m_state_new, FILL_GHOST_CELLS);
 
-    //Check for nan's
-    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, disable_simd());
+    // Check for nan's
+    if (m_p.nan_check)
+        BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS,
+                       disable_simd());
 }
 
 // Initial data for field and metric variables
 void ScalarFieldLevel::initialData()
 {
     CH_TIME("ScalarFieldLevel::initialData");
-    if (m_verbosity) pout () << "ScalarFieldLevel::initialData " << m_level << endl;
+    if (m_verbosity)
+        pout() << "ScalarFieldLevel::initialData " << m_level << endl;
 
-    //First set everything to zero ... we don't want undefined values in constraints etc, then
-    //initial conditions for scalar field - here a bubble
-    BoxLoops::loop(make_compute_pack(SetValue(0.0), ScalarBubble(m_p.initial_params, m_dx)),
-                                                        m_state_new, m_state_new, FILL_GHOST_CELLS);
+    // First set everything to zero ... we don't want undefined values in
+    // constraints etc, then  initial conditions for scalar field - here a bubble
+    BoxLoops::loop(make_compute_pack(SetValue(0.0),
+                                     ScalarBubble(m_p.initial_params, m_dx)),
+                   m_state_new, m_state_new, FILL_GHOST_CELLS);
 }
 
 // Things to do before outputting a checkpoint file
@@ -59,61 +64,76 @@ void ScalarFieldLevel::preCheckpointLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential);
-    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(scalar_field, m_dx, m_p.G_Newton),
-                                                        m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(
+                       scalar_field, m_dx, m_p.G_Newton),
+                   m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
 
 // Things to do in RHS update, at each RK4 step
-void ScalarFieldLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
+void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                       const double a_time)
 {
 
-    //Relaxation function for chi - this will eventually be done separately with hdf5 as input
+    // Relaxation function for chi - this will eventually be done separately
+    // with hdf5 as input
     if (m_time < m_p.relaxtime)
     {
-        //Calculate chi relaxation right hand side
-        //Note this assumes conformal chi and Mom constraint trivially satisfied
-        //No evolution in other variables, which are assumed to satisfy constraints per initial conditions
+        // Calculate chi relaxation right hand side
+        // Note this assumes conformal chi and Mom constraint trivially
+        // satisfied  No evolution in other variables, which are assumed to
+        // satisfy constraints per initial conditions
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        RelaxationChi<ScalarFieldWithPotential> relaxation(scalar_field, m_dx, m_p.relaxspeed, m_p.G_Newton);
+        RelaxationChi<ScalarFieldWithPotential> relaxation(
+            scalar_field, m_dx, m_p.relaxspeed, m_p.G_Newton);
         SetValue set_other_values_zero(0.0, Interval(c_h11, c_Mom3));
-        auto compute_pack1 = make_compute_pack(relaxation, set_other_values_zero);
+        auto compute_pack1 =
+            make_compute_pack(relaxation, set_other_values_zero);
         BoxLoops::loop(compute_pack1, a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
     else
     {
 
-        //Enforce trace free A_ij and positive chi and alpha
-        BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
+        // Enforce trace free A_ij and positive chi and alpha
+        BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+                       a_soln, a_soln, FILL_GHOST_CELLS);
 
-        //Calculate CCZ4Matter right hand side with matter_t = ScalarField
-        //We don't want undefined values floating around in the constraints so zero these
+        // Calculate CCZ4Matter right hand side with matter_t = ScalarField
+        // We don't want undefined values floating around in the constraints so
+        // zero these
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        CCZ4Matter<ScalarFieldWithPotential> my_ccz4_matter(scalar_field, 
-                                                m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation, m_p.G_Newton); 
+        CCZ4Matter<ScalarFieldWithPotential> my_ccz4_matter(
+            scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
+            m_p.G_Newton);
         SetValue set_constraints_zero(0.0, Interval(c_Ham, c_Mom3));
-        auto compute_pack2 = make_compute_pack(my_ccz4_matter, set_constraints_zero);
+        auto compute_pack2 =
+            make_compute_pack(my_ccz4_matter, set_constraints_zero);
         BoxLoops::loop(compute_pack2, a_soln, a_rhs, SKIP_GHOST_CELLS);
     }
 }
 
 // Things to do at ODE update, after soln + rhs
-void ScalarFieldLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
+void ScalarFieldLevel::specificUpdateODE(GRLevelData &a_soln,
+                                         const GRLevelData &a_rhs, Real a_dt)
 {
-    //Enforce trace free A_ij
+    // Enforce trace free A_ij
     BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
 // Specify if you want any plot files to be written, with which vars
-void ScalarFieldLevel::specificWritePlotHeader(std::vector<int> &plot_states) const
+void ScalarFieldLevel::specificWritePlotHeader(
+    std::vector<int> &plot_states) const
 {
     plot_states = {c_chi, c_K};
 }
 
-void ScalarFieldLevel::computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state)
+void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
+                                               const FArrayBox &current_state)
 {
-    BoxLoops::loop(PhiAndKTaggingCriterion(m_dx, m_p.regrid_threshold_phi, m_p.regrid_threshold_K), current_state, tagging_criterion);
+    BoxLoops::loop(PhiAndKTaggingCriterion(m_dx, m_p.regrid_threshold_phi,
+                                           m_p.regrid_threshold_K),
+                   current_state, tagging_criterion);
 }
 
 #endif
