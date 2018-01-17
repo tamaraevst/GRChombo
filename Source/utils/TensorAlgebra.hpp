@@ -1,7 +1,7 @@
 #ifndef TENSORALGEBRA_HPP_
 #define TENSORALGEBRA_HPP_
 
-#include "always_inline.hpp"
+#include "AlwaysInline.hpp"
 #include "tensor.hpp"
 
 namespace TensorAlgebra

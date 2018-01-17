@@ -2,7 +2,7 @@
 #define INITIALDATATOOLS_HPP_
 
 #include "MiscUtils.hpp"
-#include "always_inline.hpp"
+#include "AlwaysInline.hpp"
 #include "tensor.hpp"
 
 namespace InitialDataTools

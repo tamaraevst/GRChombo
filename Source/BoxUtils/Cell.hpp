@@ -5,7 +5,7 @@
 #include "CellIndex.hpp"
 #include "GRInterval.hpp"
 #include "IntVect.H"
-#include "always_inline.hpp"
+#include "AlwaysInline.hpp"
 #include "tensor.hpp"
 
 /// Encapsulates information about the position of a cell

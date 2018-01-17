@@ -2,7 +2,7 @@
 #define SIMD_HPP_
 
 #include "MayDay.H"
-#include "always_inline.hpp"
+#include "AlwaysInline.hpp"
 #include <cmath>
 #include <iostream>
 

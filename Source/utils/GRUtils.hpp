@@ -1,5 +1,5 @@
-#ifndef GRUTILS_H_
-#define GRUTILS_H_
+#ifndef GRUTILS_HPP_
+#define GRUTILS_HPP_
 
 #define GR_SPACEDIM 3
 #define DEFAULT_TENSOR_DIM 3
@@ -9,4 +9,4 @@
 #define FOR3(IDX1, IDX2, IDX3) FOR2(IDX1, IDX2) FOR1(IDX3)
 #define FOR4(IDX1, IDX2, IDX3, IDX4) FOR2(IDX1, IDX2) FOR2(IDX3, IDX4)
 
-#endif /* GRUTILS_H_*/
+#endif /* GRUTILS_HPP_*/
