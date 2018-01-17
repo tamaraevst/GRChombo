@@ -27,9 +27,9 @@ void define_symmetric_enum_mapping(
     mapping_function_t mapping_function,
     const GRInterval<start_var, end_var> interval, tensor<2, data_t> &tensor)
 {
-    static_assert(interval.size() == IDX_SPACEDIM * (IDX_SPACEDIM + 1) / 2,
+    static_assert(interval.size() == DEFAULT_TENSOR_DIM * (DEFAULT_TENSOR_DIM + 1) / 2,
                   "Interval has wrong size");
-#if IDX_SPACEDIM == 3
+#if DEFAULT_TENSOR_DIM == 3
     mapping_function(start_var, tensor[0][0]);
 
     mapping_function(start_var + 1, tensor[0][1]);
@@ -45,7 +45,7 @@ void define_symmetric_enum_mapping(
 
     mapping_function(start_var + 5, tensor[2][2]);
 #else
-#error IDX_SPACEDIM not equal to three not implemented yet...
+#error DEFAULT_TENSOR_DIM not equal to three not implemented yet...
 #endif
 }
 

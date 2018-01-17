@@ -9,7 +9,7 @@
 // Each subobject is assigned in the manner appropriate to its type:
 // - if the subobject is an array, EACH ELEMENT IS ASSIGNED, in the manner
 // appropriate to the element type;
-template <int rank, class data_t, int size = IDX_SPACEDIM> class tensor
+template <int rank, class data_t, int size = DEFAULT_TENSOR_DIM> class tensor
 {
     template <int, class, int> friend class tensor;
     typedef typename tensor<rank - 1, data_t>::arr_t arr_t[size];

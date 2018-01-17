@@ -20,10 +20,10 @@ template <class data_t> class Coordinates
         compute_coord(x, integer_coords[0], dx, center[0]);
 
 // The below code allows for 2D Cartoon reduction:
-#if IDX_SPACEDIM == CH_SPACEDIM && CH_SPACEDIM == 3
+#if DEFAULT_TENSOR_DIM == CH_SPACEDIM && CH_SPACEDIM == 3
         compute_coord(y, integer_coords[1], dx, center[1]);
         compute_coord(z, integer_coords[2], dx, center[2]);
-#elif IDX_SPACEDIM == CH_SPACEDIM + 1 && CH_SPACEDIM == 2
+#elif DEFAULT_TENSOR_DIM == CH_SPACEDIM + 1 && CH_SPACEDIM == 2
         y = 0;
         compute_coord(z, integer_coords[1], dx, center[1]);
 #else
