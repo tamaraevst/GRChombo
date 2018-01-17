@@ -1,8 +1,8 @@
 #ifndef SIMD_HPP_
 #define SIMD_HPP_
 
-#include "MayDay.H"
 #include "AlwaysInline.hpp"
+#include "MayDay.H"
 #include <cmath>
 #include <iostream>
 

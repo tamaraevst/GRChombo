@@ -8,8 +8,7 @@
 template <class level_t> class DefaultLevelFactory : public AMRLevelFactory
 {
   public:
-    DefaultLevelFactory(SimulationParameters &a_sim_params)
-        : m_p(a_sim_params)
+    DefaultLevelFactory(SimulationParameters &a_sim_params) : m_p(a_sim_params)
     {
     }
 

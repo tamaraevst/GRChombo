@@ -1,8 +1,8 @@
 #ifndef TENSOR_HPP_
 #define TENSOR_HPP_
 
-#include "GRUtils.hpp"
 #include "AlwaysInline.hpp"
+#include "GRUtils.hpp"
 //#include <initializer_list>
 
 // C++ standard, 12.8 Copying class objects:

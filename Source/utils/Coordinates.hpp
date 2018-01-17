@@ -1,9 +1,9 @@
 #ifndef COORDINATES_HPP_
 #define COORDINATES_HPP_
 
+#include "GRUtils.hpp"
 #include "MiscUtils.hpp"
 #include "simd.hpp"
-#include "GRUtils.hpp"
 
 template <class data_t> class Coordinates
 {

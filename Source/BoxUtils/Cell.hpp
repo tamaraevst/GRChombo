@@ -1,11 +1,11 @@
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+#include "AlwaysInline.hpp"
 #include "BoxPointers.hpp"
 #include "CellIndex.hpp"
 #include "GRInterval.hpp"
 #include "IntVect.H"
-#include "AlwaysInline.hpp"
 #include "tensor.hpp"
 
 /// Encapsulates information about the position of a cell

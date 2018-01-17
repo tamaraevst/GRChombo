@@ -42,7 +42,7 @@ class NanCheck
                 for (int ivar = 0; ivar < NUM_VARS; ++ivar)
                 {
                     pout() << UserVariables::variable_names[ivar] << ": "
-                        << current_cell.load_vars(ivar) << endl;
+                           << current_cell.load_vars(ivar) << endl;
                 }
                 pout() << "Integer coordinates: " << current_cell.get_int_vect()
                        << endl;

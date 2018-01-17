@@ -1,8 +1,8 @@
 #ifndef INITIALDATATOOLS_HPP_
 #define INITIALDATATOOLS_HPP_
 
-#include "MiscUtils.hpp"
 #include "AlwaysInline.hpp"
+#include "MiscUtils.hpp"
 #include "tensor.hpp"
 
 namespace InitialDataTools

@@ -266,9 +266,9 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
 
         // interpolate from coarser level
         m_fine_interp.interpToFine(m_state_new,
@@ -303,9 +303,9 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
     }
 }
 
@@ -588,9 +588,9 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
     }
 
     // reshape state with new grids
