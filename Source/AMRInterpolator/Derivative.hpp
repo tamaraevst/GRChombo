@@ -1,5 +1,5 @@
-#ifndef _DERIVATIVE_HPP_
-#define _DERIVATIVE_HPP_
+#ifndef DERIVATIVE_HPP_
+#define DERIVATIVE_HPP_
 
 class Derivative : public std::array<int, CH_SPACEDIM>
 {
@@ -117,4 +117,4 @@ const Derivative Derivative::dxdy(0, 1);
 const Derivative Derivative::dxdz(0, 2);
 const Derivative Derivative::dydz(1, 2);
 
-#endif /* _DERIVATIVE_HPP_ */
+#endif /* DERIVATIVE_HPP_ */

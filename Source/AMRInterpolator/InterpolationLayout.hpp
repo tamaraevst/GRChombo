@@ -1,5 +1,5 @@
-#ifndef _INTERPOLATIONLAYOUT_HPP_
-#define _INTERPOLATIONLAYOUT_HPP_
+#ifndef INTERPOLATIONLAYOUT_HPP_
+#define INTERPOLATIONLAYOUT_HPP_
 
 class InterpolationLayout
 {
@@ -17,4 +17,4 @@ class InterpolationLayout
     }
 };
 
-#endif /* _INTERPOLATIONLAYOUT_HPP_ */
+#endif /* INTERPOLATIONLAYOUT_HPP_ */

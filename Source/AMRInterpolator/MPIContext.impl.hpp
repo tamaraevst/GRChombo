@@ -1,5 +1,5 @@
-#ifndef _MPICONTEXT_IMPL_HPP_
-#define _MPICONTEXT_IMPL_HPP_
+#ifndef MPICONTEXT_IMPL_HPP_
+#define MPICONTEXT_IMPL_HPP_
 
 MPIContext::MPIContext()
     : m_num_process(comm_size()), m_rank(comm_rank()), m_query(m_num_process),
@@ -105,4 +105,4 @@ void MPIContext::asyncEnd()
 }
 #endif /* ifdef CH_MPI */
 
-#endif /* _MPICONTEXT_IMPL_HPP_ */
+#endif /* MPICONTEXT_IMPL_HPP_ */

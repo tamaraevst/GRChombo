@@ -1,5 +1,5 @@
-#ifndef _INTERPOLATIONQUERY_HPP_
-#define _INTERPOLATIONQUERY_HPP_
+#ifndef INTERPOLATIONQUERY_HPP_
+#define INTERPOLATIONQUERY_HPP_
 
 #include "Derivative.hpp"
 
@@ -72,4 +72,4 @@ class InterpolationQuery
     inline iterator compsEnd() { return m_comps.end(); }
 };
 
-#endif /* _INTERPOLATIONQUERY_HPP_ */
+#endif /* INTERPOLATIONQUERY_HPP_ */

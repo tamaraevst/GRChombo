@@ -1,5 +1,5 @@
-#ifndef _DEBUGGINGTOOLS_HPP
-#define _DEBUGGINGTOOLS_HPP
+#ifndef DEBUGGINGTOOLS_HPP_
+#define DEBUGGINGTOOLS_HPP_
 
 #include "parstream.H" //Gives us pout()
 #include <string.h>
@@ -68,4 +68,4 @@ inline void set_global_cell_coordinates(const IntVect current_integer_coords)
 }
 #endif
 
-#endif /* _DEBUGGINGTOOLS_HPP */
+#endif /* DEBUGGINGTOOLS_HPP_ */

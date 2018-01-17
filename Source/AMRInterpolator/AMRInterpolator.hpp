@@ -1,5 +1,5 @@
-#ifndef _AMRINTERPOLATOR_HPP_
-#define _AMRINTERPOLATOR_HPP_
+#ifndef AMRINTERPOLATOR_HPP_
+#define AMRINTERPOLATOR_HPP_
 
 // Chombo includes
 
@@ -78,4 +78,4 @@ template <typename InterpAlgo> class AMRInterpolator
 
 #include "AMRInterpolator.impl.hpp"
 
-#endif /* _AMRINTERPOLATOR_HPP_ */
+#endif /* AMRINTERPOLATOR_HPP_ */

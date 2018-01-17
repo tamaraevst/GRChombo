@@ -1,5 +1,5 @@
-#ifndef _QUINTICCONVOLUTION_HPP_
-#define _QUINTICCONVOLUTION_HPP_
+#ifndef QUINTICCONVOLUTION_HPP_
+#define QUINTICCONVOLUTION_HPP_
 
 #include "InterpSource.hpp"
 #include <utility>
@@ -26,4 +26,4 @@ class QuinticConvolution
 
 #include "QuinticConvolution.impl.hpp"
 
-#endif /* _QUINTICCONVOLUTION_HPP_ */
+#endif /* QUINTICCONVOLUTION_HPP_ */

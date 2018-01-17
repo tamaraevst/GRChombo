@@ -1,5 +1,5 @@
-#ifndef _AMRINTERPOLATOR_IMPL_HPP_
-#define _AMRINTERPOLATOR_IMPL_HPP_
+#ifndef AMRINTERPOLATOR_IMPL_HPP_
+#define AMRINTERPOLATOR_IMPL_HPP_
 
 #include <sstream>
 
@@ -681,4 +681,4 @@ void AMRInterpolator<InterpAlgo>::exchangeMPIAnswer()
     }
 }
 
-#endif /* _AMRINTERPOLATOR_IMPL_HPP_ */
+#endif /* AMRINTERPOLATOR_IMPL_HPP_ */

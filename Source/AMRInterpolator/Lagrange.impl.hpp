@@ -1,5 +1,5 @@
-#ifndef _LAGRANGE_IMPL_HPP_
-#define _LAGRANGE_IMPL_HPP_
+#ifndef LAGRANGE_IMPL_HPP_
+#define LAGRANGE_IMPL_HPP_
 
 template <int Order>
 const string Lagrange<Order>::TAG = "\x1b[36;1m[Lagrange]\x1b[0m ";
@@ -357,4 +357,4 @@ pair<vector<IntVect>, vector<double>> Lagrange<Order>::generateStencil(
     return pair<vector<IntVect>, vector<double>>(out_points, out_weights);
 }
 
-#endif /* _LAGRANGE_IMPL_HPP_ */
+#endif /* LAGRANGE_IMPL_HPP_ */

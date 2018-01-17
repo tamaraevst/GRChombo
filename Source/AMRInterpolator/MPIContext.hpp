@@ -1,5 +1,5 @@
-#ifndef _MPICONTEXT_HPP_
-#define _MPICONTEXT_HPP_
+#ifndef MPICONTEXT_HPP_
+#define MPICONTEXT_HPP_
 
 #include "MPILayout.hpp"
 
@@ -70,4 +70,4 @@ int MPIContext::comm_rank()
 
 #include "MPIContext.impl.hpp"
 
-#endif /* _MPICONTEXT_HPP_ */
+#endif /* MPICONTEXT_HPP_ */

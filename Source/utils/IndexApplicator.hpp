@@ -1,5 +1,5 @@
-#ifndef INDEX_APPLICATOR_HPP
-#define INDEX_APPLICATOR_HPP
+#ifndef INDEX_APPLICATOR_HPP_
+#define INDEX_APPLICATOR_HPP_
 
 #include <utility>
 
@@ -62,4 +62,4 @@ template <> class IndexApplicator<>
     }
 };
 
-#endif /* INDEX_APPLICATOR_HPP */
+#endif /* INDEX_APPLICATOR_HPP_ */

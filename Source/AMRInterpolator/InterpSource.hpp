@@ -1,5 +1,5 @@
-#ifndef _INTERPSOURCE_H_
-#define _INTERPSOURCE_H_
+#ifndef INTERPSOURCE_H_
+#define INTERPSOURCE_H_
 
 // Abstrace base class to get the FABs out of an AMRLevel
 class InterpSource
@@ -11,4 +11,4 @@ class InterpSource
     virtual void fillAllGhosts() = 0;
 };
 
-#endif /* _INTERPSOURCE_H_ */
+#endif /* INTERPSOURCE_H_ */

@@ -1,5 +1,5 @@
-#ifndef _MPILAYOUT_HPP_
-#define _MPILAYOUT_HPP_
+#ifndef MPILAYOUT_HPP_
+#define MPILAYOUT_HPP_
 
 class MPILayout
 {
@@ -34,4 +34,4 @@ class MPILayout
 
 #include "MPILayout.impl.hpp"
 
-#endif /* _MPILAYOUT_HPP_ */
+#endif /* MPILAYOUT_HPP_ */

@@ -1,8 +1,8 @@
 // MK: This class implements the possibility of basic profiling info for
 // GRChombo using PAPI  It works as a quick profiling tool but not much though has
 // been put into this.
-#ifndef _PAPIPROFILINGINFO_HPP
-#define _PAPIPROFILINGINFO_HPP
+#ifndef PAPIPROFILINGINFO_HPP
+#define PAPIPROFILINGINFO_HPP
 #ifdef USE_PAPI
 #include "papi.h"
 #endif
@@ -266,4 +266,4 @@ bool PapiProfilingInfo::noError(int errorCode, bool shutdownOnError)
     }
     return true;
 }
-#endif //_PAPIPROFILINGINFO_HPP
+#endif /* PAPIPROFILINGINFO_HPP */

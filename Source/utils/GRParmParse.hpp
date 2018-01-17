@@ -1,24 +1,24 @@
-#ifndef _GRPARMPARSE_HPP
-#define _GRPARMPARSE_HPP
+#ifndef GRPARMPARSE_HPP_
+#define GRPARMPARSE_HPP_
 
 #include "ParmParse.H"
 #include <memory>
 
 // Begin: Helper structs to translate a dataype into a Chombo ParmParse data
 // type
-template <class T> struct _ParmParseTranslator;
+template <class T> struct ParmParseTranslator;
 
-template <> struct _ParmParseTranslator<double>
+template <> struct ParmParseTranslator<double>
 {
     static constexpr ParmParse::PPType pp_type = ParmParse::ppDouble;
 };
 
-template <> struct _ParmParseTranslator<int>
+template <> struct ParmParseTranslator<int>
 {
     static constexpr ParmParse::PPType pp_type = ParmParse::ppInt;
 };
 
-template <> struct _ParmParseTranslator<bool>
+template <> struct ParmParseTranslator<bool>
 {
     static constexpr ParmParse::PPType pp_type = ParmParse::ppBool;
 };
@@ -38,7 +38,7 @@ class GRParmParse : public ParmParse
     void load(const char *name, std::array<data_t, n_comp> &array) const
     {
         std::unique_ptr<data_t[]> c_array{new data_t[n_comp]};
-        getarr(name, _ParmParseTranslator<data_t>::pp_type, c_array.get(), 0,
+        getarr(name, ParmParseTranslator<data_t>::pp_type, c_array.get(), 0,
                n_comp, -1);
         for (int i = 0; i < n_comp; ++i)
             array[i] = c_array[i];
@@ -91,4 +91,4 @@ class GRParmParse : public ParmParse
     }
 };
 
-#endif /* _GRPARMPARSE_HPP */
+#endif /* GRPARMPARSE_HPP_ */

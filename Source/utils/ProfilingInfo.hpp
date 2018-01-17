@@ -2,8 +2,8 @@
 // GRChombo.  It worked as a quick profiling hook for PAPI but not much thought
 // has been put into this.
 
-#ifndef _PROFILINGINFO_HPP
-#define _PROFILINGINFO_HPP
+#ifndef PROFILINGINFO_HPP_
+#define PROFILINGINFO_HPP_
 
 class ProfilingInfo
 {
@@ -19,4 +19,4 @@ class ProfilingInfo
     virtual int resetCounters() = 0;
     virtual int readTotalTimes() = 0;
 };
-#endif //_PROFILINGINFO_HPP
+#endif /* PROFILINGINFO_HPP_ */

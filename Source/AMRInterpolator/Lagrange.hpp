@@ -1,5 +1,5 @@
-#ifndef _LAGRANGE_HPP_
-#define _LAGRANGE_HPP_
+#ifndef LAGRANGE_HPP_
+#define LAGRANGE_HPP_
 
 #include "InterpSource.hpp"
 #include <utility>
@@ -64,4 +64,4 @@ template <int Order> class Lagrange
 
 #include "Lagrange.impl.hpp"
 
-#endif /* _LAGRANGE_HPP_ */
+#endif /* LAGRANGE_HPP_ */

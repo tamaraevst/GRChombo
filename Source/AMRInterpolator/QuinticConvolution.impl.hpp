@@ -1,5 +1,5 @@
-#ifndef _QUINTICCONVOLUTION_IMPL_HPP_
-#define _QUINTICCONVOLUTION_IMPL_HPP_
+#ifndef QUINTICCONVOLUTION_IMPL_HPP_
+#define QUINTICCONVOLUTION_IMPL_HPP_
 
 const string QuinticConvolution::TAG = "\x1b[36;1m[QuinticConvolution]\x1b[0m ";
 
@@ -135,7 +135,7 @@ double QuinticConvolution::interpData(const FArrayBox &fab, int comp)
     return accum;
 }
 
-#endif /* _QUINTICCONVOLUTION_IMPL_HPP_ */
+#endif /* QUINTICCONVOLUTION_IMPL_HPP_ */
 
 /*
 HIGHER ORDER WEIGHTS

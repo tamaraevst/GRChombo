@@ -1,5 +1,5 @@
-#ifndef _INTERPOLATIONALGORITHM_HPP_
-#define _INTERPOLATIONALGORITHM_HPP_
+#ifndef INTERPOLATIONALGORITHM_HPP_
+#define INTERPOLATIONALGORITHM_HPP_
 
 class InterpolationAlgorithm
 {
@@ -18,4 +18,4 @@ class NearestNeighbour : public InterpolationAlgorithm
     }
 };
 
-#endif
+#endif /* INTERPOLATIONALGORITHM_HPP_ */

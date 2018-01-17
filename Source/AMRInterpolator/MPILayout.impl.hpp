@@ -1,5 +1,5 @@
-#ifndef _MPILAYOUT_IMPL_HPP_
-#define _MPILAYOUT_IMPL_HPP_
+#ifndef MPILAYOUT_IMPL_HPP_
+#define MPILAYOUT_IMPL_HPP_
 
 MPILayout::MPILayout(int num_process)
     : m_num_process(num_process), m_counts(m_num_process, 0),
@@ -63,4 +63,4 @@ inline int *MPILayout::displsPtr()
     return &m_displs[0];
 }
 
-#endif /* _MPILAYOUT_IMPL_HPP_ */
+#endif /* MPILAYOUT_IMPL_HPP_ */
