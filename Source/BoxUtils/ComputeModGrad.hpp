@@ -23,7 +23,7 @@ class ComputeModGrad
         FOR1(idir) m_deriv.diff1(d1_arr, current_cell, idir);
 
         std::array<data_t, c_NUM> mod_d1_arr = {0.};
-        FORVARS(ivar)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
             FOR1(idir)
             {

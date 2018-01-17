@@ -25,10 +25,10 @@ class NanCheck
     void compute(Cell<double> current_cell) const
     {
         bool stop = false;
-        FORVARS(i)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
             double val;
-            current_cell.load_vars(val, i);
+            current_cell.load_vars(val, ivar);
             if (std::isnan(val) || abs(val) > m_max_abs)
                 stop = true;
         }
@@ -39,10 +39,10 @@ class NanCheck
                 pout() << m_error_info
                        << "::Values have become nan. The current state is: "
                        << endl;
-                FORVARS(i)
+                for (int ivar = 0; ivar < c_NUM; ++ivar)
                 {
-                    pout() << UserVariables::variable_names[i] << ": "
-                           << current_cell.load_vars(i) << endl;
+                    pout() << UserVariables::variable_names[ivar] << ": "
+                        << current_cell.load_vars(ivar) << endl;
                 }
                 pout() << "Integer coordinates: " << current_cell.get_int_vect()
                        << endl;

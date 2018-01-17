@@ -140,10 +140,10 @@ class FourthOrderDerivatives
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
-            diffArray[i][direction][direction] = diff2<data_t>(
-                current_cell.get_box_pointers().m_in_ptr[i], in_index, stride);
+            diffArray[ivar][direction][direction] = diff2<data_t>(
+                current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride);
         }
     }
 
@@ -208,13 +208,13 @@ class FourthOrderDerivatives
         const int stride2 =
             current_cell.get_box_pointers().m_in_stride[direction2];
         const int in_index = current_cell.get_in_index();
-        FORVARS(i)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
             data_t diff2_value =
-                mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[i],
+                mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
                                     in_index, stride1, stride2);
-            diffArray[i][direction1][direction2] = diff2_value;
-            diffArray[i][direction2][direction1] = diff2_value;
+            diffArray[ivar][direction1][direction2] = diff2_value;
+            diffArray[ivar][direction2][direction1] = diff2_value;
         }
     }
 
@@ -305,7 +305,7 @@ class FourthOrderDerivatives
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
         const int in_index = current_cell.get_in_index();
-        FORVARS(ivar)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
             out[ivar] +=
                 advection_term(current_cell.get_box_pointers().m_in_ptr[ivar],
@@ -393,7 +393,7 @@ class FourthOrderDerivatives
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        FORVARS(ivar)
+        for (int ivar = 0; ivar < c_NUM; ++ivar)
         {
             out[ivar] +=
                 factor * dissipation_term<data_t>(
