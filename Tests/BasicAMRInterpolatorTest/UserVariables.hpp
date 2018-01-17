@@ -1,8 +1,8 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
-//TODO: This file can be auto-generated from a list of variable names
-//Also, we should probably scope this enum too...
+// TODO: This file can be auto-generated from a list of variable names
+// Also, we should probably scope this enum too...
 //
 enum
 {
@@ -14,11 +14,7 @@ enum
 
 namespace UserVariables
 {
-    static constexpr char const * variable_names[c_NUM] =
-    {
-        "chi",
-        "phi"
-    };
+static constexpr char const *variable_names[c_NUM] = {"chi", "phi"};
 }
 
 #endif /* USERVARIABLES_HPP */

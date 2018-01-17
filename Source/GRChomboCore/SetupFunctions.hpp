@@ -1,41 +1,42 @@
 #ifndef SETUP_FUNCTIONS_HPP_
 #define SETUP_FUNCTIONS_HPP_
-//This file incldues several functions that need to be called to
-//set up the runs but aren't very interesting for the normal user.
+// This file incldues several functions that need to be called to
+// set up the runs but aren't very interesting for the normal user.
 
 #include "parstream.H" //Gives us pout()
 #include <iostream>
 using std::endl;
 using std::cerr;
-#include "ParmParse.H"
 #include "AMR.H"
 #include "AMRLevelFactory.H"
+#include "ParmParse.H"
 
 #ifdef EQUATION_DEBUG_MODE
 #include "DebuggingTools.hpp"
 #endif
 
-//This function calls MPI_Init, makes sure a parameter file is supplied etc...
-void mainSetup(int argc ,char* argv[]);
+// This function calls MPI_Init, makes sure a parameter file is supplied etc...
+void mainSetup(int argc, char *argv[]);
 
-//This function calls all finalisations
+// This function calls all finalisations
 void mainFinalize();
 
-//Sets up the grid parameters, problem domain and AMR object
-void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory);
+// Sets up the grid parameters, problem domain and AMR object
+void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory);
 
-//TODO (MK): There is a lot of clutter still in this file ... get rid of everything that's not necessary
-//and comment on the rest (so that we don't carry around useless code forever
+// TODO (MK): There is a lot of clutter still in this file ... get rid of
+// everything that's not necessary  and comment on the rest (so that we don't
+// carry around useless code forever
 
-void mainSetup(int argc, char* argv[])
+void mainSetup(int argc, char *argv[])
 {
 #ifdef CH_MPI
     // Start MPI
-    MPI_Init(&argc,&argv);
+    MPI_Init(&argc, &argv);
 #ifdef CH_AIX
     H5dont_atexit();
 #endif
-    // setChomboMPIErrorHandler();
+// setChomboMPIErrorHandler();
 #endif
 
     int rank, number_procs;
@@ -49,7 +50,9 @@ void mainSetup(int argc, char* argv[])
 
 #ifdef EQUATION_DEBUG_MODE
     EquationDebugging::check_no_omp();
-    MayDay::Warning("GRChombo is running in equation debug mode. This mode is intended only for debugging and leads to significantly worse performance.");
+    MayDay::Warning("GRChombo is running in equation debug mode. This mode is "
+                    "intended only for debugging and leads to significantly "
+                    "worse performance.");
 #endif
 
     if (rank == 0)
@@ -77,37 +80,38 @@ void mainFinalize()
 #endif
 }
 
-void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
+void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
 {
-    //Some hard-coded parameters:
-    //The buffer is width of ghost cells + additional_grid_buffer
-    //and defines the minimum number of level l cells there have to be
-    //between level l+1 and level l-1
+    // Some hard-coded parameters:
+    // The buffer is width of ghost cells + additional_grid_buffer
+    // and defines the minimum number of level l cells there have to be
+    // between level l+1 and level l-1
     const int additional_grid_buffer = 3;
 
     ParmParse pp;
 
-    //TODO: All the parameter loading code in this function is really verbose and ugly.
-    //Could consider moving it to some base form of SimulationParameters.
+    // TODO: All the parameter loading code in this function is really verbose
+    // and ugly.  Could consider moving it to some base form of
+    // SimulationParameters.
 
     IntVect ivN = IntVect::Unit;
     // Setup the grid size
-    for (int dir=0; dir<SpaceDim; ++dir)
+    for (int dir = 0; dir < SpaceDim; ++dir)
     {
         char dir_str[20];
-        sprintf (dir_str, "N%d", dir+1);
+        sprintf(dir_str, "N%d", dir + 1);
         int N;
         pp.get(dir_str, N);
-        ivN[dir] = N-1;
+        ivN[dir] = N - 1;
     }
 
-    Box problem_domain (IntVect::Zero, ivN);
+    Box problem_domain(IntVect::Zero, ivN);
     ProblemDomain physdomain(problem_domain);
 
     // set periodicity
     std::vector<bool> isPeriodic;
     pp.getarr("isPeriodic", isPeriodic, 0, SpaceDim);
-    for (int dir=0; dir<SpaceDim; dir++)
+    for (int dir = 0; dir < SpaceDim; dir++)
     {
         physdomain.setPeriodic(dir, isPeriodic[dir]);
     }
@@ -116,24 +120,23 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
     pp.get("max_level", max_level);
 
     Vector<int> ref_ratios;
-    pp.getarr("ref_ratio",ref_ratios,0,max_level+1);
+    pp.getarr("ref_ratio", ref_ratios, 0, max_level + 1);
 
-    //Define the AMR object
+    // Define the AMR object
     amr.define(max_level, ref_ratios, physdomain, &a_factory);
 
     // To preserve proper nesting we need to know the maximum ref_ratio.
     int max_ref_ratio = ref_ratios[0];
-    for (int i = 1; i < max_level+1; ++i)
+    for (int i = 1; i < max_level + 1; ++i)
     {
         max_ref_ratio = std::max(max_ref_ratio, ref_ratios[i]);
     }
 
-
     int num_ghosts;
     pp.get("num_ghosts", num_ghosts);
-    int grid_buffer_size = std::ceil(
-                                     ((double) num_ghosts)/ (double) max_ref_ratio
-                                    ) + additional_grid_buffer;
+    int grid_buffer_size =
+        std::ceil(((double)num_ghosts) / (double)max_ref_ratio) +
+        additional_grid_buffer;
     amr.gridBufferSize(grid_buffer_size);
 
     int checkpoint_interval;
@@ -142,7 +145,7 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
 
     // Number of coarse time steps from one regridding to the next
     Vector<int> regrid_intervals;
-    pp.getarr("regrid_interval",regrid_intervals,0,max_level+1);
+    pp.getarr("regrid_interval", regrid_intervals, 0, max_level + 1);
     amr.regridIntervals(regrid_intervals);
 
     if (pp.contains("max_grid_size"))
@@ -183,7 +186,7 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
     if (pp.contains("chk_prefix"))
     {
         std::string prefix;
-        pp.query("chk_prefix",prefix);
+        pp.query("chk_prefix", prefix);
         amr.checkpointPrefix(prefix);
     }
 
@@ -197,7 +200,7 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
     if (pp.contains("plot_prefix"))
     {
         std::string prefix;
-        pp.query("plot_prefix",prefix);
+        pp.query("plot_prefix", prefix);
         amr.plotPrefix(prefix);
     }
 
@@ -213,10 +216,10 @@ void setupAMRObject(AMR& amr, AMRLevelFactory& a_factory)
     else
     {
         std::string restart_file;
-        pp.query("restart_file",restart_file);
+        pp.query("restart_file", restart_file);
 
 #ifdef CH_USE_HDF5
-        HDF5Handle handle(restart_file,HDF5Handle::OPEN_RDONLY);
+        HDF5Handle handle(restart_file, HDF5Handle::OPEN_RDONLY);
         // read from checkpoint file
         amr.setupForRestart(handle);
         handle.close();

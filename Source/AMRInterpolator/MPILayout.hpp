@@ -4,7 +4,7 @@
 class MPILayout
 {
 
-public:
+  public:
     // Getters
     inline int count(int rank) const;
     inline int totalCount() const;
@@ -15,7 +15,7 @@ public:
     inline void incrementCount(int rank);
     inline void clearCounts();
 
-private:
+  private:
     friend class MPIContext;
 
     MPILayout(int num_process);
@@ -28,11 +28,9 @@ private:
     mutable bool m_dirty;
 
     inline void updateDirty() const;
-    inline int* countsPtr();
-    inline int* displsPtr();
-
+    inline int *countsPtr();
+    inline int *displsPtr();
 };
-
 
 #include "MPILayout.impl.hpp"
 

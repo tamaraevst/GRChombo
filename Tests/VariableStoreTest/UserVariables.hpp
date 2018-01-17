@@ -10,11 +10,9 @@ enum
 
 namespace UserVariables
 {
-    static constexpr char const * variable_names[c_NUM] =
-    {
-        "var",
-        "sym_var",
-    };
+static constexpr char const *variable_names[c_NUM] = {
+    "var", "sym_var",
+};
 }
 
 #endif /* USERVARIABLES_HPP_ */

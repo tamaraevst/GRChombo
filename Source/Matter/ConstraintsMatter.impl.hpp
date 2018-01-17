@@ -8,13 +8,12 @@
 #define CONSTRAINTSMATTER_IMPL_HPP_
 
 template <class matter_t>
-ConstraintsMatter<matter_t>::ConstraintsMatter(
-    const matter_t a_matter,
-    double dx,
-    double G_Newton)
-    : Constraints(dx, 0.0 /*No cosmological constant*/),
-      my_matter (a_matter),
-      m_G_Newton (G_Newton) {}
+ConstraintsMatter<matter_t>::ConstraintsMatter(const matter_t a_matter,
+                                               double dx, double G_Newton)
+    : Constraints(dx, 0.0 /*No cosmological constant*/), my_matter(a_matter),
+      m_G_Newton(G_Newton)
+{
+}
 
 template <class matter_t>
 template <class data_t>
@@ -35,18 +34,15 @@ void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell) const
     // Energy Momentum tensor
     const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
-    //Hamiltonain constraint
-    out.Ham += -16.0*M_PI*m_G_Newton*emtensor.rho;
+    // Hamiltonain constraint
+    out.Ham += -16.0 * M_PI * m_G_Newton * emtensor.rho;
 
-    //Momentum constraints
-    FOR1(i)
-    {
-        out.Mom[i] += -8.0*M_PI*m_G_Newton*emtensor.Si[i];
-    }
+    // Momentum constraints
+    FOR1(i) { out.Mom[i] += -8.0 * M_PI * m_G_Newton * emtensor.Si[i]; }
 
-    //Write the rhs into the output FArrayBox
+    // Write the rhs into the output FArrayBox
     current_cell.store_vars(out.Ham, c_Ham);
-    current_cell.store_vars(out.Mom, GRInterval<c_Mom1,c_Mom3>());
+    current_cell.store_vars(out.Mom, GRInterval<c_Mom1, c_Mom3>());
 }
 
 #endif /* CONSTRAINTSMATTER_IMPL_HPP_ */

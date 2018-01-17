@@ -1,14 +1,15 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
-//TODO: This file can be auto-generated from a list of variable names
-//Also, we should probably scope this enum too...
+// TODO: This file can be auto-generated from a list of variable names
+// Also, we should probably scope this enum too...
 //
 enum
 {
     c_chi,
 
-    c_h11, //Symmetric tensor must be declared in this order TODO: make this error proof by autogeneration or a macro.
+    c_h11, // Symmetric tensor must be declared in this order TODO: make this
+           // error proof by autogeneration or a macro.
     c_h12,
     c_h13,
     c_h22,
@@ -51,47 +52,26 @@ enum
 
 namespace UserVariables
 {
-    static constexpr char const * variable_names[c_NUM] =
-    {
-        "chi",
+static constexpr char const *variable_names[c_NUM] = {
+    "chi",
 
-        "h11",
-        "h12",
-        "h13",
-        "h22",
-        "h23",
-        "h33",
+    "h11",    "h12",    "h13",    "h22", "h23", "h33",
 
-        "K",
+    "K",
 
-        "A11",
-        "A12",
-        "A13",
-        "A22",
-        "A23",
-        "A33",
+    "A11",    "A12",    "A13",    "A22", "A23", "A33",
 
-        "Theta",
+    "Theta",
 
-        "Gamma1",
-        "Gamma2",
-        "Gamma3",
+    "Gamma1", "Gamma2", "Gamma3",
 
-        "lapse",
+    "lapse",
 
-        "shift1",
-        "shift2",
-        "shift3",
+    "shift1", "shift2", "shift3",
 
-        "B1",
-        "B2",
-        "B3",
+    "B1",     "B2",     "B3",
 
-        "Ham",
-        "Mom1",
-        "Mom2",
-        "Mom3"
-    };
+    "Ham",    "Mom1",   "Mom2",   "Mom3"};
 }
 
 #endif /* USERVARIABLES_HPP */

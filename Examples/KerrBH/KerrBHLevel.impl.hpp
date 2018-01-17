@@ -5,77 +5,89 @@
 #ifndef KERRBHLEVEL_IMPL_HPP_
 #define KERRBHLEVEL_IMPL_HPP_
 
-#include "KerrBHLevel.hpp"
 #include "BoxLoops.hpp"
-#include "EnforceTfA.hpp"
-#include "PositiveChiAndAlpha.hpp"
-#include "NanCheck.hpp"
-#include "Constraints.hpp"
 #include "CCZ4.hpp"
-#include "ComputePack.hpp"
-#include "SetValue.hpp"
 #include "ChiTaggingCriterion.hpp"
+#include "ComputePack.hpp"
+#include "Constraints.hpp"
+#include "EnforceTfA.hpp"
+#include "KerrBHLevel.hpp"
+#include "NanCheck.hpp"
+#include "PositiveChiAndAlpha.hpp"
+#include "SetValue.hpp"
 
-//Initial data
-#include "KerrBH.hpp"
+// Initial data
 #include "GammaCalculator.hpp"
+#include "KerrBH.hpp"
 
 void KerrBHLevel::specificAdvance()
 {
-    //Enforce the trace free A_ij condition and positive chi and alpha
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), m_state_new, m_state_new, FILL_GHOST_CELLS);
+    // Enforce the trace free A_ij condition and positive chi and alpha
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+                   m_state_new, m_state_new, FILL_GHOST_CELLS);
 
-    //Check for nan's
-    if (m_p.nan_check) BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS, disable_simd());
+    // Check for nan's
+    if (m_p.nan_check)
+        BoxLoops::loop(NanCheck(), m_state_new, m_state_new, SKIP_GHOST_CELLS,
+                       disable_simd());
 }
 
 void KerrBHLevel::initialData()
 {
     CH_TIME("KerrBHLevel::initialData");
-    if (m_verbosity) pout () << "KerrBHLevel::initialData " << m_level << endl;
+    if (m_verbosity)
+        pout() << "KerrBHLevel::initialData " << m_level << endl;
 
-    //First set everything to zero (to avoid undefinded values on constraints) then calculate initial data
-    //Get the Kerr solution in the variables, then calculate the \tilde\Gamma^i numerically as these 
-    //are non zero and not calculated in the Kerr ICs
-    BoxLoops::loop(make_compute_pack(SetValue(0.), KerrBH(m_p.kerr_params, m_dx)), 
-                                                      m_state_new, m_state_new, FILL_GHOST_CELLS);
+    // First set everything to zero (to avoid undefinded values on constraints)
+    // then calculate initial data  Get the Kerr solution in the variables, then
+    // calculate the \tilde\Gamma^i numerically as these  are non zero and not
+    // calculated in the Kerr ICs
+    BoxLoops::loop(
+        make_compute_pack(SetValue(0.), KerrBH(m_p.kerr_params, m_dx)),
+        m_state_new, m_state_new, FILL_GHOST_CELLS);
 
-    fillAllGhosts(); 
-    BoxLoops::loop(GammaCalculator(m_dx), m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    fillAllGhosts();
+    BoxLoops::loop(GammaCalculator(m_dx), m_state_new, m_state_new,
+                   SKIP_GHOST_CELLS);
 }
 
 void KerrBHLevel::preCheckpointLevel()
 {
     fillAllGhosts();
-    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new, SKIP_GHOST_CELLS);
+    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
+                   SKIP_GHOST_CELLS);
 }
 
-void KerrBHLevel::specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time)
+void KerrBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                  const double a_time)
 {
-    //Enforce the trace free A_ij condition and positive chi and alpha
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()), a_soln, a_soln, FILL_GHOST_CELLS);
+    // Enforce the trace free A_ij condition and positive chi and alpha
+    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+                   a_soln, a_soln, FILL_GHOST_CELLS);
 
-
-    //Calculate CCZ4 right hand side and set constraints to zero to avoid undefined values
-    BoxLoops::loop(make_compute_pack(CCZ4(m_p.ccz4_params, m_dx, m_p.sigma), SetValue(0, Interval(c_Ham, c_Mom3)) ),
+    // Calculate CCZ4 right hand side and set constraints to zero to avoid
+    // undefined values
+    BoxLoops::loop(make_compute_pack(CCZ4(m_p.ccz4_params, m_dx, m_p.sigma),
+                                     SetValue(0, Interval(c_Ham, c_Mom3))),
                    a_soln, a_rhs, SKIP_GHOST_CELLS);
-
 }
 
-void KerrBHLevel::specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt)
+void KerrBHLevel::specificUpdateODE(GRLevelData &a_soln,
+                                    const GRLevelData &a_rhs, Real a_dt)
 {
-    //Enforce the trace free A_ij condition
+    // Enforce the trace free A_ij condition
     BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
 // Specify which variables to write at plot intervals
-void KerrBHLevel::specificWritePlotHeader(std::vector<int>& plot_states) const
+void KerrBHLevel::specificWritePlotHeader(std::vector<int> &plot_states) const
 {
-    //Specify the variables we want to output as plot
-    plot_states = {c_chi, c_K, c_lapse, c_shift1};    
+    // Specify the variables we want to output as plot
+    plot_states = {c_chi, c_K, c_lapse, c_shift1};
 }
 
-void KerrBHLevel::computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state)
+void KerrBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
+                                          const FArrayBox &current_state)
 {
     BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
