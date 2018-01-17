@@ -43,7 +43,7 @@ template <class data_t> class Coordinates
     // MK: I passed 'out' as argument because overloading by return type doesn't
     // work
     template <typename t>
-    ALWAYS_INLINE static
+    static
         typename std::enable_if<(simd_traits<double>::simd_len > 1), void>::type
         compute_coord(simd<t> &out, int position, double dx,
                       double center_distance = 0)
