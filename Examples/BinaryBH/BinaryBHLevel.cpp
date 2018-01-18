@@ -30,10 +30,10 @@ void BinaryBHLevel::initialData()
     if (m_verbosity)
         pout() << "BinaryBHLevel::initialData " << m_level << endl;
 
-    BinaryBH binary(
-        m_p.bh1_params, m_p.bh2_params,
-        m_dx); // Set up the compute class for the BinaryBH initial data
-    // First set everything to zero (to avoid undefinded values on constraints)
+    // Set up the compute class for the BinaryBH initial data
+    BinaryBH binary( m_p.bh1_params, m_p.bh2_params, m_dx);
+
+    // First set everything to zero (to avoid undefinded values in constraints)
     // then calculate initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.), binary), m_state_new,
                    m_state_new, FILL_GHOST_CELLS);
