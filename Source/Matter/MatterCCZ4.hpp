@@ -1,7 +1,5 @@
-// Last edited K Clough 16.02.17
-
-#ifndef CCZ4MATTER_HPP_
-#define CCZ4MATTER_HPP_
+#ifndef MATTERCCZ4_HPP_
+#define MATTERCCZ4_HPP_
 
 #include "CCZ4.hpp"
 #include "CCZ4Geometry.hpp"
@@ -12,7 +10,6 @@
 #include "VarsTools.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
-#include <array>
 
 //!  Calculates RHS using CCZ4 including matter terms, and matter variable
 //!  evolution
@@ -26,7 +23,7 @@
    an example of a matter_t. \sa CCZ4(), ScalarField()
 */
 
-template <class matter_t> class CCZ4Matter : public CCZ4
+template <class matter_t> class MatterCCZ4 : public CCZ4
 {
   public:
     template <class data_t>
@@ -63,7 +60,7 @@ template <class matter_t> class CCZ4Matter : public CCZ4
         }
     };
 
-    //!  Constructor of class CCZ4Matter
+    //!  Constructor of class MatterCCZ4
     /*!
        Inputs are the grid spacing, plus the CCZ4 evolution parameters and a
        matter object. It also takes the dissipation parameter sigma, and allows
@@ -71,7 +68,7 @@ template <class matter_t> class CCZ4Matter : public CCZ4
        It allows the user to set the value of Newton's constant, which is set to
        one by default.
     */
-    CCZ4Matter(matter_t a_matter, params_t params, double dx, double sigma,
+    MatterCCZ4(matter_t a_matter, params_t params, double dx, double sigma,
                int formulation = CCZ4::USE_CCZ4, double G_Newton = 1.0);
 
     //!  The compute member which calculates the RHS at each point in the box
@@ -95,6 +92,6 @@ template <class matter_t> class CCZ4Matter : public CCZ4
     const double m_G_Newton; //!<Newton's constant, set to one by default.
 };
 
-#include "CCZ4Matter.impl.hpp"
+#include "MatterCCZ4.impl.hpp"
 
-#endif /* CCZ4MATTER_HPP_ */
+#endif /* MATTERCCZ4_HPP_ */

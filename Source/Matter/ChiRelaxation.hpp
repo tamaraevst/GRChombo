@@ -1,10 +1,8 @@
-// Last edited K Clough 17.05.17
-
-#ifndef RELAXATIONCHI_HPP_
-#define RELAXATIONCHI_HPP_
+#ifndef CHIRELAXATION_HPP_
+#define CHIRELAXATION_HPP_
 
 #include "CCZ4Geometry.hpp"
-#include "CCZ4Matter.hpp"
+#include "MatterCCZ4.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
@@ -12,7 +10,6 @@
 #include "VarsTools.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
-#include <array>
 
 //!  Calculates RHS for relaxation of the conformal factor, for initial
 //!  conditions
@@ -30,23 +27,23 @@
    stability. \sa m_relax_speed()
 */
 
-template <class matter_t> class RelaxationChi
+template <class matter_t> class ChiRelaxation
 {
 
-    // Use the variable definitions in CCZ4Matter
+    // Use the variable definitions in MatterCCZ4
     template <class data_t>
-    using Vars = typename CCZ4Matter<matter_t>::template Vars<data_t>;
+    using Vars = typename MatterCCZ4<matter_t>::template Vars<data_t>;
 
     template <class data_t>
-    using Diff2Vars = typename CCZ4Matter<matter_t>::template Diff2Vars<data_t>;
+    using Diff2Vars = typename MatterCCZ4<matter_t>::template Diff2Vars<data_t>;
 
   public:
-    //! Constructor of class RelaxationChi
+    //! Constructor of class ChiRelaxation
     /*!
         Takes in the grid spacing, plus the relaxation speed, a matter object
         and the value of Newton's constant, which is set to one by default.
     */
-    RelaxationChi(matter_t a_matter, double dx, double relax_speed,
+    ChiRelaxation(matter_t a_matter, double dx, double relax_speed,
                   double G_Newton = 1.0);
 
     //! The compute member which calculates the RHS at each point in the box \sa
@@ -76,6 +73,6 @@ template <class matter_t> class RelaxationChi
         ) const;
 };
 
-#include "RelaxationChi.impl.hpp"
+#include "ChiRelaxation.impl.hpp"
 
-#endif /* RELAXATIONCHI_HPP_ */
+#endif /* CHIRELAXATION_HPP_ */

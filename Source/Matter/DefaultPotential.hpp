@@ -5,7 +5,6 @@
 
 #include "simd.hpp"
 #include "tensor.hpp"
-#include <array>
 
 class DefaultPotential
 {

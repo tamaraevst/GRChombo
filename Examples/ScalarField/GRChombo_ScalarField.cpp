@@ -47,9 +47,9 @@ int runGRChombo(int argc, char *argv[])
     // The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
-    DefaultLevelFactory<ScalarFieldLevel> matter_sf_level_fact(sim_params);
+    DefaultLevelFactory<ScalarFieldLevel> scalar_field_level_fact(sim_params);
     AMR amr;
-    setupAMRObject(amr, matter_sf_level_fact);
+    setupAMRObject(amr, scalar_field_level_fact);
 
     Real stop_time;
     pp.get("stop_time", stop_time);

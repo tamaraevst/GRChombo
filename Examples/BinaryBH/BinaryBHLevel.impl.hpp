@@ -11,7 +11,7 @@
 #include "ChiTaggingCriterion.hpp"
 #include "ComputePack.hpp"
 #include "Constraints.hpp"
-#include "EnforceTfA.hpp"
+#include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "SetValue.hpp"
@@ -22,7 +22,7 @@
 void BinaryBHLevel::specificAdvance()
 {
     // Enforce the trace free A_ij condition and positive chi and alpha
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+    BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
                    m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     // Check for nan's
@@ -57,7 +57,7 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                                     const double a_time)
 {
     // Enforce positive chi and alpha and trace free A
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+    BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
                    a_soln, a_soln, FILL_GHOST_CELLS);
 
     // Calculate CCZ4 right hand side and set constraints to zero to avoid
@@ -71,7 +71,7 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
                                       const GRLevelData &a_rhs, Real a_dt)
 {
     // Enforce the trace free A_ij condition
-    BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
+    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
