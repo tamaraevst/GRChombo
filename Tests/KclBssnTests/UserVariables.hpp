@@ -87,8 +87,7 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "Ham",
 
-    "Mom1",   "Mom2",   "Mom3"
-};
+    "Mom1",   "Mom2",   "Mom3"};
 }
 
 #endif /* USERVARIABLES_HPP */

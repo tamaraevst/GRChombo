@@ -39,15 +39,14 @@ class CCZ4
      **/
     template <class data_t> struct Vars
     {
-        data_t chi;          //!< Conformal factor
-        tensor<2, data_t> h; //!< Conformal metric
-        data_t K;            //!< Trace of the extrinsic curvature
-        tensor<2, data_t> A; //!< trace-free part of the rescale extrinsic
-                             //! curvature, i.e. \f$\chi
-                             //!(K_{ij})^{\mathrm{TF}}\f$
+        data_t chi;              //!< Conformal factor
+        tensor<2, data_t> h;     //!< Conformal metric
+        data_t K;                //!< Trace of the extrinsic curvature
+        tensor<2, data_t> A;     //!< trace-free part of the rescale extrinsic
+                                 //! curvature, i.e. \f$\chi
+                                 //!(K_{ij})^{\mathrm{TF}}\f$
         tensor<1, data_t> Gamma; //!< Conformal connection functions
-        data_t
-            Theta; //!< CCZ4 quantity associated to the hamiltonian constraint
+        data_t Theta; //!< CCZ4 quantity associated to hamiltonian constraint
         data_t lapse;
         tensor<1, data_t> shift;
         tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used
@@ -78,18 +77,15 @@ class CCZ4
      * gauge and damping parameters.  */
     struct params_t
     {
-        double
-            kappa1; //!< Damping parameter kappa1 as defined in arXiv:1106.2254
-        double
-            kappa2; //!< Damping parameter kappa2 as defined in arXiv:1106.2254
-        double
-            kappa3; //!< Damping parameter kappa3 as defined in arXiv:1106.2254
-        double shift_Gamma_coeff =
-            0.75; //!< Gives the F in \f$\partial_t \beta^i =  F B^i\f$
-        double lapse_advec_coeff =
-            0.; //!< Switches advection terms in the lapse condition on/off
-        double shift_advec_coeff =
-            0.; //!< Switches advection terms in the shift condition on/off
+        double kappa1; //!< Damping parameter kappa1 as in arXiv:1106.2254
+        double kappa2; //!< Damping parameter kappa2 as in arXiv:1106.2254
+        double kappa3; //!< Damping parameter kappa3 as in arXiv:1106.2254
+        double shift_Gamma_coeff = 0.75; //!< Gives the F in \f$\partial_t
+                                         //!  \beta^i =  F B^i\f$
+        double lapse_advec_coeff = 0.;   //!< Switches advection terms in
+                                         //! the lapse condition on/off
+        double shift_advec_coeff = 0.;   //!< Switches advection terms in the
+                                         //! shift condition on/off
         double eta = 1.; //!< The eta in \f$\partial_t B^i = \partial_t \tilde
                          //!\Gamma - \eta B^i\f$
         double lapse_power = 1.; //!< The power p in \f$\partial_t \alpha = - c
@@ -107,13 +103,11 @@ class CCZ4
 
   public:
     /// Constructor
-    CCZ4(params_t params, //!< The CCZ4 parameters
-         double dx,       //!< The grid spacing
-         double sigma,    //!< Kreiss-Oliger dissipation coefficient
-         int formulation =
-             USE_CCZ4, //!< Can be used to switch between CCZ4, BSSN,...
-         double cosmological_constant =
-             0 //!< Value for the cosmological constant in Einstein's equations
+    CCZ4(params_t params,            //!< The CCZ4 parameters
+         double dx,                  //!< The grid spacing
+         double sigma,               //!< Kreiss-Oliger dissipation coefficient
+         int formulation = USE_CCZ4, //!< Switches between CCZ4, BSSN,...
+         double cosmological_constant = 0 //!< Value of the cosmological const.
          );
 
     /// Compute function

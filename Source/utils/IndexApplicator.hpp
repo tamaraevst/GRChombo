@@ -39,9 +39,8 @@ template <typename t, typename... Ts> class IndexApplicator<t, Ts...>
 {
   public:
     template <typename data_t>
-    static ALWAYS_INLINE
-        typename GetIndexTraits<data_t &, t, Ts...>::type
-        apply(data_t &obj, t dir0, Ts... dirs)
+    static ALWAYS_INLINE typename GetIndexTraits<data_t &, t, Ts...>::type
+    apply(data_t &obj, t dir0, Ts... dirs)
     {
         // Let the compiler iterate until there are no indices left (at which
         // point we go to the  specialisation below).

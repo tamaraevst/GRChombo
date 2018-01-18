@@ -1,9 +1,9 @@
 #ifndef SCALARBUBBLE_HPP_
 #define SCALARBUBBLE_HPP_
 
+#include "CCZ4Matter.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
-#include "CCZ4Matter.hpp"
 #include "ScalarField.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"

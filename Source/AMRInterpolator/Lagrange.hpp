@@ -28,21 +28,21 @@ template <int Order> class Lagrange
         inline const double &operator[](unsigned int i) const;
     };
 
-    typedef vector<Stencil> stencil_collection_t;
+    typedef std::vector<Stencil> stencil_collection_t;
     stencil_collection_t m_memoized_stencils;
 
     Stencil getStencil(int width, int deriv, double point_offset, double dx);
 
     // Helper function to generate tensor product weights
     // Argument 'dim' is used for recursion over dimensions.
-    pair<vector<IntVect>, vector<double>>
+    pair<std::vector<IntVect>, std::vector<double>>
     generateStencil(const std::array<int, CH_SPACEDIM> &deriv,
                     const std::array<double, CH_SPACEDIM> &dx,
                     const std::array<double, CH_SPACEDIM> &evalCoord,
                     const IntVect &nearest, int dim = CH_SPACEDIM - 1);
 
-    vector<IntVect> m_interp_points;
-    vector<double> m_interp_weights;
+    std::vector<IntVect> m_interp_points;
+    std::vector<double> m_interp_weights;
 
     // We are adding 216+ numbers at roughly the same magnitudes but alternating
     // signs. Let's keep track of positive and negative terms separately to make

@@ -100,7 +100,7 @@ void AMRInterpolator<InterpAlgo>::interp(InterpolationQuery &query)
     for (typename InterpolationQuery::iterator deriv_it = query.compsBegin();
          deriv_it != query.compsEnd(); ++deriv_it)
     {
-        typedef vector<typename InterpolationQuery::out_t> comps_t;
+        typedef std::vector<typename InterpolationQuery::out_t> comps_t;
         comps_t &comps = deriv_it->second;
 
         for (typename comps_t::iterator it = comps.begin(); it != comps.end();
@@ -460,7 +460,7 @@ void AMRInterpolator<InterpAlgo>::prepareMPI(InterpolationQuery &query,
 
     // Reorder query data for MPI_Ialltoallv
     m_mpi_mapping.resize(query.m_num_points);
-    vector<int> rank_counter(m_mpi.m_num_process, 0);
+    std::vector<int> rank_counter(m_mpi.m_num_process, 0);
     for (int point_idx = 0; point_idx < query.m_num_points; ++point_idx)
     {
         int rank = layout.rank[point_idx];
@@ -633,7 +633,7 @@ void AMRInterpolator<InterpAlgo>::calculateAnswers(InterpolationQuery &query)
         {
             const Derivative deriv = deriv_it->first;
 
-            typedef vector<typename InterpolationQuery::out_t> comps_t;
+            typedef std::vector<typename InterpolationQuery::out_t> comps_t;
             comps_t &comps = deriv_it->second;
             algo.setup(deriv, m_dx[level_idx], grid_coord, nearest);
 

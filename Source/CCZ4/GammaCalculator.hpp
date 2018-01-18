@@ -34,7 +34,7 @@ class GammaCalculator
 
         using namespace TensorAlgebra;
         const auto h_UU = compute_inverse_sym(vars.h);
-        const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+        const auto chris = compute_christoffel(d1.h, h_UU);
 
         // assign values of Gamma^k = h_UU^ij * \tilde{Gamma}^k_ij in the output
         // FArrayBox

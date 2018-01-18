@@ -2,9 +2,9 @@
 #define FOURTHORDERDERIVATIVES_HPP_
 
 #include "Cell.hpp"
+#include "MiscUtils.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "MiscUtils.hpp"
 #include <array>
 
 class FourthOrderDerivatives
