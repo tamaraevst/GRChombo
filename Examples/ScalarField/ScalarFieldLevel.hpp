@@ -3,8 +3,8 @@
 #ifndef SCALARFIELDLEVEL_HPP_
 #define SCALARFIELDLEVEL_HPP_
 
-#include "GRAMRLevel.hpp"
 #include "DefaultLevelFactory.hpp"
+#include "GRAMRLevel.hpp"
 // Problem specific includes
 #include "Potential.hpp"
 #include "ScalarField.hpp"

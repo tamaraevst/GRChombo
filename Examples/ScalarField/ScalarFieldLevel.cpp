@@ -1,11 +1,11 @@
 // Last edited K Clough 17.05.17
 
 // General includes common to most GR problems
+#include "ScalarFieldLevel.hpp"
 #include "BoxLoops.hpp"
 #include "EnforceTfA.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
-#include "ScalarFieldLevel.hpp"
 
 // For RHS update
 #include "CCZ4Matter.hpp"

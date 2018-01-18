@@ -1,8 +1,8 @@
 #ifndef BINARYBHLEVEL_HPP_
 #define BINARYBHLEVEL_HPP_
 
-#include "GRAMRLevel.hpp"
 #include "DefaultLevelFactory.hpp"
+#include "GRAMRLevel.hpp"
 
 class BinaryBHLevel : public GRAMRLevel
 {

@@ -1,8 +1,8 @@
 #ifndef KERRBHLEVEL_HPP_
 #define KERRBHLEVEL_HPP_
 
-#include "GRAMRLevel.hpp"
 #include "DefaultLevelFactory.hpp"
+#include "GRAMRLevel.hpp"
 
 class KerrBHLevel : public GRAMRLevel
 {
