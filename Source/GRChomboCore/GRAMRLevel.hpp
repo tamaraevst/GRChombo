@@ -7,14 +7,12 @@
 #include "GRLevelData.hpp"
 #include "InterpSource.hpp"
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
-#include "ProfilingInfo.hpp"
 #include "SimulationParameters.hpp"
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {
   public:
-    GRAMRLevel(const SimulationParameters &a_p, int a_verbosity,
-               ProfilingInfo *a_profilingInfo = NULL);
+    GRAMRLevel(const SimulationParameters &a_p, int a_verbosity);
 
     virtual ~GRAMRLevel();
 
@@ -166,9 +164,6 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     // params
     SimulationParameters m_p;
     int m_verbosity;
-
-    // Profiling info
-    ProfilingInfo *m_profilingInfo;
 
     // exchange copier
     Copier m_exchange_copier;

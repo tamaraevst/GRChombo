@@ -8,6 +8,7 @@
 #define COVARIANTZ4
 #include "GRInterval.hpp"
 #include "VarsTools.hpp"
+#include "MiscUtils.hpp"
 
 inline CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation,
                   double cosmological_constant)

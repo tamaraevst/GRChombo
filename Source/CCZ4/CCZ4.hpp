@@ -4,7 +4,6 @@
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
@@ -40,19 +39,19 @@ class CCZ4
      **/
     template <class data_t> struct Vars
     {
-        data_t chi;              //!< Conformal factor
-        tensor<2, data_t> h;     //!< Conformal metric
-        data_t K;                //!< Trace of the extrinsic curvature
-        tensor<2, data_t> A;     //!< trace-free part of the rescale extrinsic
-                                 //!curvature, i.e. \f$\chi
-                                 //!(K_{ij})^{\mathrm{TF}}\f$
+        data_t chi;          //!< Conformal factor
+        tensor<2, data_t> h; //!< Conformal metric
+        data_t K;            //!< Trace of the extrinsic curvature
+        tensor<2, data_t> A; //!< trace-free part of the rescale extrinsic
+                             //! curvature, i.e. \f$\chi
+                             //!(K_{ij})^{\mathrm{TF}}\f$
         tensor<1, data_t> Gamma; //!< Conformal connection functions
         data_t
             Theta; //!< CCZ4 quantity associated to the hamiltonian constraint
         data_t lapse;
         tensor<1, data_t> shift;
         tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used
-                             //!for second order shift conditions
+                             //! for second order shift conditions
 
         /// Defines the mapping between members of Vars and Chombo grid
         /// variables (enum in User_Variables)
@@ -91,8 +90,8 @@ class CCZ4
             0.; //!< Switches advection terms in the lapse condition on/off
         double shift_advec_coeff =
             0.; //!< Switches advection terms in the shift condition on/off
-        double eta = 1.;         //!< The eta in \f$\partial_t B^i = \partial_t \tilde
-                                 //!\Gamma - \eta B^i\f$
+        double eta = 1.; //!< The eta in \f$\partial_t B^i = \partial_t \tilde
+                         //!\Gamma - \eta B^i\f$
         double lapse_power = 1.; //!< The power p in \f$\partial_t \alpha = - c
                                  //!\alpha^p(K-2\Theta)\f$
         double lapse_coeff = 2.; //!< The coefficient c in \f$\partial_t \alpha
@@ -134,8 +133,8 @@ class CCZ4
     template <class data_t, template <typename> class vars_t,
               template <typename> class diff2_vars_t>
     void rhs_equation(
-        vars_t<data_t> &rhs,        //!< Reference to the variables into which the
-                                    //!output right hand side is written
+        vars_t<data_t> &rhs, //!< Reference to the variables into which the
+                             //! output right hand side is written
         const vars_t<data_t> &vars, //!< The values of the current variables
         const vars_t<tensor<1, data_t>>
             &d1, //!< First derivative of the variables

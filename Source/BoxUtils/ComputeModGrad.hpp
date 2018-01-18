@@ -6,6 +6,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
+#include "MiscUtils.hpp"
 
 #include <array>
 

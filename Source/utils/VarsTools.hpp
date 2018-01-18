@@ -1,4 +1,5 @@
-#pragma once
+#ifndef VARSTOOLS_HPP_
+#define VARSTOOLS_HPP_
 
 #include "GRInterval.hpp"
 
@@ -27,7 +28,8 @@ void define_symmetric_enum_mapping(
     mapping_function_t mapping_function,
     const GRInterval<start_var, end_var> interval, tensor<2, data_t> &tensor)
 {
-    static_assert(interval.size() == DEFAULT_TENSOR_DIM * (DEFAULT_TENSOR_DIM + 1) / 2,
+    static_assert(interval.size() ==
+                      DEFAULT_TENSOR_DIM * (DEFAULT_TENSOR_DIM + 1) / 2,
                   "Interval has wrong size");
 #if DEFAULT_TENSOR_DIM == 3
     mapping_function(start_var, tensor[0][0]);
@@ -50,10 +52,10 @@ void define_symmetric_enum_mapping(
 }
 
 //--> Begin: Helper for the assign function
-template <class nested_template> struct _strip_nested_template;
+template <class nested_template> struct strip_nested_template;
 
 template <template <typename> class outermost_layer, class inner_part>
-struct _strip_nested_template<outermost_layer<inner_part>>
+struct strip_nested_template<outermost_layer<inner_part>>
 {
     using type = inner_part;
 };
@@ -68,16 +70,16 @@ template <class vars_t, typename value_t>
 ALWAYS_INLINE void assign(vars_t &vars, const value_t &value)
 {
     // The template magic below is needed to make sure that we can write
-    // assign(vars, 0.)  and 0. gets correctly cast from double to simd<double> if
-    // necessary.
-    using data_t = typename _strip_nested_template<vars_t>::type;
+    // assign(vars, 0.)  and 0. gets correctly cast from double to simd<double>
+    // if necessary.
+    using data_t = typename strip_nested_template<vars_t>::type;
     vars.enum_mapping([&value](const int &ivar, data_t &var) {
         var = static_cast<data_t>(value);
     });
 }
 
-/// Prints all elements of the vars element with component names - Useful for
-/// debugging.
+/// Prints all elements of the vars element with component names
+/// (Very useful for debugging)
 template <template <typename> class vars_t, typename data_t>
 void print(const vars_t<data_t> &vars)
 {
@@ -86,3 +88,5 @@ void print(const vars_t<data_t> &vars)
     });
 }
 }
+
+#endif /* VARSTOOLS_HPP_ */

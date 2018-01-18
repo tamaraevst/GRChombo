@@ -3,6 +3,7 @@
 
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "MiscUtils.hpp"
 
 class ChiTaggingCriterion
 {

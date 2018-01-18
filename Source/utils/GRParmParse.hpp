@@ -3,9 +3,9 @@
 
 #include "ParmParse.H"
 #include <memory>
+#include <algorithm>
 
-// Begin: Helper structs to translate a dataype into a Chombo ParmParse data
-// type
+/// Helper structs to translate a dataype into a Chombo ParmParse data type
 template <class T> struct ParmParseTranslator;
 
 template <> struct ParmParseTranslator<double>
@@ -29,7 +29,7 @@ class GRParmParse : public ParmParse
   public:
     using ParmParse::ParmParse; // Just use ParmParse's constructor
 
-    // Note (MK): I called the functions below "load" rather than "get" to avoid
+    // (MK): I called the functions below "load" rather than "get" to avoid
     // clashes with the many  different overloads of "get" in ParmParse. Also, I
     // think load is a more intuitive name.
 
@@ -37,11 +37,8 @@ class GRParmParse : public ParmParse
     template <class data_t, long unsigned int n_comp>
     void load(const char *name, std::array<data_t, n_comp> &array) const
     {
-        std::unique_ptr<data_t[]> c_array{new data_t[n_comp]};
-        getarr(name, ParmParseTranslator<data_t>::pp_type, c_array.get(), 0,
+        getarr(name, ParmParseTranslator<data_t>::pp_type, array.data(), 0,
                n_comp, -1);
-        for (int i = 0; i < n_comp; ++i)
-            array[i] = c_array[i];
     }
 
     /// Loads a vector with num_comp components from the parameter file

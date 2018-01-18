@@ -3,9 +3,7 @@
 #ifndef SCALARFIELD_HPP_
 #define SCALARFIELD_HPP_
 
-#include "simd.hpp"
 #include "tensor.hpp"
-#include "GRUtils.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"

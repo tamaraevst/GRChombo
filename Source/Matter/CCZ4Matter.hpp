@@ -7,7 +7,6 @@
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"

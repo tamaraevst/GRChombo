@@ -1,5 +1,4 @@
 #include "FArrayBox.H"
-#include "GRUtils.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "tensor.hpp"
 #include <iostream>
