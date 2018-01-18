@@ -14,9 +14,9 @@ class DefaultPotential
     DefaultPotential() {}
 
     //! Set the potential function for the scalar field here to zero
-    template <class data_t>
+    template <class data_t, template<typename> class vars_t>
     void compute_potential(data_t &V_of_phi, data_t &dVdphi,
-                           const data_t phi_here) const
+                           const vars_t<data_t> &vars) const
     {
         // The potential value at phi
         V_of_phi = 0.0;

@@ -30,10 +30,7 @@ c     -------------------------------------------------------------
      &    CHF_CONST_REAL[eps],
      &  )
 
-        V = 1.1*1.1*phi*phi
-
-c               s/alp*(1/(4*phi0**4)*(phi**2 - phi0**2)**2 
-c     &         + phi*eps/phi0)
+        V = 0.5*s*s*phi*phi
 
         return
         end
@@ -51,66 +48,11 @@ c     ---------------------------------------------------------------
      &    CHF_CONST_REAL[eps],
      &  )
 
-       Vphi = 1.1*1.1*2.0*phi
-
-c             s/alp/(phi0**4)*(phi**3 - phi*(phi0**2) 
-c     &             + eps*phi0**3)
+       Vphi = s*s*phi
 
         return
         end
 
-c     ----------------------------------------------------------
-c       Computes the vector magnitude over the grid.
-c     ----------------------------------------------------------
- 
-        subroutine MAGNITUDEF(
-     &    CHF_FRA1[magdata],
-     &    CHF_CONST_FRA[data],
-     &    CHF_BOX[box])
-
-        integer CHF_DDECL[i;j;k]
-        integer iv
-        real_t cur,sum
-
-        CHF_MULTIDO[box;i;j;k]
-          sum = zero
-
-          do iv = 0,CHF_NCOMP[data]-1
-            cur = data(CHF_IX[i;j;k],iv)
-            sum = sum + cur*cur
-          enddo
-
-          magdata(CHF_IX[i;j;k]) = sqrt(sum)
-        CHF_ENDDO
-
-        return
-        end
-
-c     ----------------------------------------------------------------------
-c      Compute the undivided gradient over the grid (no boundary handling).
-c      (derived from AMRTimeDependent/GodunovUtilitiesF.ChF)
-c     ----------------------------------------------------------------------
-
-      subroutine GETGRADCENTERF(
-     &     CHF_FRA1[du],
-     &     CHF_CONST_FRA1[u],
-     &     CHF_CONST_INT[idir],
-     &     CHF_BOX[box])
-
-      integer CHF_AUTODECL[i]
-      integer CHF_AUTODECL[ioff]
-
-      CHF_AUTOID[ioff; idir]
-
-      CHF_AUTOMULTIDO[box;i]
-         du(CHF_AUTOIX[i]) = half*(u(CHF_OFFSETIX[i; +ioff])
-     &                           - u(CHF_OFFSETIX[i; -ioff]))
-c         du(CHF_AUTOIX[i]) = du(CHF_AUTOIX[i])/u(CHF_AUTOIX[i])
-
-      CHF_ENDDO
-
-      return
-      end
 
 c     ------------------------------------------------
 c      Compute the BSSN evolution
@@ -147,6 +89,7 @@ c     ------------------------------------------------
      &     CHF_CONST_REAL[eta],
      &     CHF_CONST_REAL[mubeta1],
      &     CHF_CONST_REAL[sigma],
+     &     CHF_CONST_REAL[s],
      &     CHF_BOX[box])
 
       integer CHF_AUTODECL[i], CHF_AUTODECL[ii], CHF_AUTODECL[jj]
@@ -166,12 +109,10 @@ c     Reference: http://arXiv.org/abs/gr-qc/0505055v2
       REAL_T dalphadx(0:CH_SPACEDIM-1)
       REAL_T dBdx(0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
       REAL_T d2alphadxdy(0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
-c      REAL_T Kplus2Theta
       REAL_T Gamma1d(0:2), R(0:2,0:2), Rchi(0:2,0:2), Rscalar
       REAL_T dGamma1dx(0:2,0:CH_SPACEDIM-1)
       REAL_T dAdx(0:2,0:2,0:CH_SPACEDIM-1)
       REAL_T dKdx(0:CH_SPACEDIM-1)
-c      REAL_T muL, muS
       REAL_T dphidx(0:CH_SPACEDIM-1), dphiMdx(0:CH_SPACEDIM-1)
       REAL_T d2phidxdy(0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
       REAL_T Sten(0:2,0:2), trSten, Svec(0:2), rho, Vphi, Vphiphi
@@ -179,7 +120,7 @@ c      REAL_T muL, muS
       REAL_T n(0:3), nu(0:3), T(0:3,0:3)
       REAL_T pstn(0:CH_SPACEDIM-1), pstnr, f_0, dfdx
 
-      REAL_T phi0, alp, s, eps, centerx, centery, centerz
+      REAL_T phi0, alp, eps, centerx, centery, centerz
 
       REAL_T DEBUG
 
@@ -187,18 +128,13 @@ c      REAL_T muL, muS
       integer IDX(0:2, 0:2), boundaries
       data IDX / _11, _12, _13, _12, _22, _23, _13, _23, _33  /
 
-c      Not using shock avoidance for now
-c      REAL_T gradf, lapphi, cL, ddetgdx(0:CH_SPACEDIM-1)
-c      integer shock
-c      shock = 1
-
 c     note that this has not been extended to work for DIM > 3
 #if CH_SPACEDIM > 3
       call MAYDAY_ERROR()
 #else
 
       boundaries = 0
-      eps = 0; phi0 = 0; alp = 0; s = 0;
+      eps = 0; phi0 = 0; alp = 0;
       centerx = 0; centery = 0; centerz = 0;
       dxinv  = one/dx
       dxinv2 = one/(dx*dx)
@@ -810,11 +746,6 @@ c	    trSten = gamma_space^ijT_ij, Eqn 2.104 and 2.138 BS
          do d0 = 0,2; do d1 = 0,2
            trSten = trSten + gu(d0,d1)*chi2*T(d0,d1)
          enddo; enddo
-
-c	       Kplus2Theta is not used for the moment until we really implement CCZ4
-c
-c         Kplus2Theta = K(CHF_AUTOIX[i]) + 2*Theta(CHF_AUTOIX[i])
-
 
 c	    Equations of motion start here
 c        ------------------------------
@@ -1566,7 +1497,7 @@ c  Outputs values at gridpoint (60,60,60) when activated
 
 c	if (CHF_DTERM[i0*dx .eq. 60.0; .and. i1*dx .eq. 60.0; .and. i2*dx .eq. 60.0]) then
 c
-c	write (*,*) 'dchidt = ', dchidt(CHF_AUTOIX[i])
+c	       write (*,*) 'dchidt = ', dchidt(CHF_AUTOIX[i])
 c        do d0 = 0,2; do d1 = 0,2
 c           write (*,*) d0, d1, 'dgammadt = ', dgammadt(CHF_AUTOIX[i], IDX(d0,d1))
 c        enddo; enddo
@@ -1601,29 +1532,17 @@ c     ---------------------------------------------------
       subroutine GETBSSNCONSTRF(
      &     CHF_FRA1[H],
      &     CHF_FRA[M],
-     &     CHF_FRA1[rho],
-c     &     CHF_FRA1[M_ADM],
-c     &     CHF_FRA[P_ADM],
-c     &     CHF_FRA[J_ADM],
      &     CHF_CONST_FRA1[chi],
      &     CHF_CONST_FRA[gamma],
      &     CHF_CONST_FRA1[K],
      &     CHF_CONST_FRA[A], 
-c     &     CHF_CONST_FRA1[Theta],
      &     CHF_CONST_FRA[Gamma1],
      &     CHF_CONST_FRA1[alpha],
      &     CHF_CONST_FRA[beta],
      &     CHF_CONST_FRA1[phi],
      &     CHF_CONST_FRA1[phiM],
      &     CHF_CONST_REAL[dx],
-     &     CHF_CONST_REAL[phi0],
-     &     CHF_CONST_REAL[alp],
      &     CHF_CONST_REAL[s],
-     &     CHF_CONST_REAL[eps],
-c     &     CHF_CONST_REAL[L_adm],
-     &     CHF_CONST_REAL[centerx],
-     &     CHF_CONST_REAL[centery],
-     &     CHF_CONST_REAL[centerz],
      &     CHF_BOX[box])
 
       integer CHF_AUTODECL[i], CHF_AUTODECL[ii], CHF_AUTODECL[jj]
@@ -1632,25 +1551,14 @@ c     &     CHF_CONST_REAL[L_adm],
       REAL_T g(0:2,0:2), gu(0:2,0:2)
       REAL_T dgammadx(0:2,0:2,0:CH_SPACEDIM-1)
       REAL_T d2gammadxdy(0:2,0:2,0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
-      REAL_T chris(0:2,0:2,0:2), chriss(0:2,0:2,0:2), chris1st(0:2,0:2,0:2)
       REAL_T dchidx(0:CH_SPACEDIM-1)
-      REAL_T d2chidxdy(0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
-      REAL_T Gamma1d(0:2), R(0:2,0:2), Rchi(0:2,0:2), Rscalar
-      REAL_T dGamma1dx(0:2,0:CH_SPACEDIM-1)
-      REAL_T dAdx(0:2,0:2,0:CH_SPACEDIM-1)
-      REAL_T dKdx(0:CH_SPACEDIM-1)
-      REAL_T Kscalar, Ktsr(0:2,0:2)
-      REAL_T dKscalardx(0:CH_SPACEDIM-1)
-      REAL_T dKtsrdx(0:2,0:2,0:CH_SPACEDIM-1)
       REAL_T dphidx(0:CH_SPACEDIM-1)
-      REAL_T Sten(0:2,0:2), trSten, Svec(0:2), Vphi
+      REAL_T Sten(0:2,0:2), trSten, Svec(0:2), Vphi, rho
       REAL_T dphidt2, beta2, Vt, betaidiphi, chi2, chi1, lapse
       REAL_T n(0:3), nu(0:3), T(0:3,0:3)
-c      REAL_T dS(0:CH_SPACEDIM-1), pstn(0:CH_SPACEDIM-1)
-c      REAL_T levi(0:2,0:2,0:2), deltaij(0:CH_SPACEDIM-1,0:CH_SPACEDIM-1)
+      REAL_T alp, phi0, eps
 
       integer d0, d1, d2, d3, d4, d5
-c     integer ADMsurface1, ADMsurface2
       integer IDX(0:2, 0:2)
       data IDX / _11, _12, _13, _12, _22, _23, _13, _23, _33  /
 
@@ -1664,23 +1572,29 @@ c     note that this has not been extended to work for DIM > 3
 
       CHF_AUTOMULTIDO[box;i]
 
-c        Create local variables for frequently used values
-c        alpha and chi >=0 enforced in FIXBSSNCONST
-c	       NB: gamma_ij= chi^2 gamma_spatial_ij
-c        ------------------------------------------------------
+c      Copied code from RHS calc which is adjusted for chi
+c      ---------------------------------------------------
+
+c      make local variables for frequent quantities
+c      NB floor for lapse and chi set in cpp file so always > 0
+c	     NB: gamma_ij= chi^2 gamma_spatial_ij
+c         ------------------------------------------------------
 
          lapse = alpha(CHF_AUTOIX[i])
-         chi1 = chi(CHF_AUTOIX[i])
+         chi1 = chi(CHF_AUTOIX[i])         
          chi2 = chi1**2
 
-c        read in metric, invert and calculate derivatives
+c        read in metric and invert, calculate derivatives
 c        ------------------------------------------------
 
          do d0 = 0,2; do d1 = 0,2
            g(d0,d1) = gamma(CHF_AUTOIX[i], IDX(d0,d1))
          enddo; enddo
 
-c        invert the spatial metric, see:
+c	       Metric convention is gamma_ij (conformal) = chi^2 gamma_ij(space)
+c	       We use chi instead of phi because we reserve phi for scalar matter
+
+c        invert the conformal metric, see:
 c        http://en.wikipedia.org/wiki/Invertible_matrix
          detg = g(0,0)*(g(1,1)*g(2,2)-g(1,2)*g(2,1))-
      &          g(0,1)*(g(2,2)*g(1,0)-g(1,2)*g(2,0))+
@@ -1712,73 +1626,14 @@ c        http://en.wikipedia.org/wiki/Invertible_matrix
      &       )
          enddo; enddo; enddo
 
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,CH_SPACEDIM-1; do d3 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d2,0);
-             ii1 = CHF_ID(d2,1);
-             ii2 = CHF_ID(d2,2)]
-           CHF_DTERM[
-             jj0 = CHF_ID(d3,0);
-             jj1 = CHF_ID(d3,1);
-             jj2 = CHF_ID(d3,2)]
-
-           if (d2 .eq. d3) cycle
-
-           d2gammadxdy(d0,d1,d2,d3) = dxinv2/144 * (
-     &         gamma(CHF_IX[i0-2*ii0-2*jj0;i1-2*ii1-2*jj1;i2-2*ii2-2*jj2],IDX(d0,d1))
-     &     - 8*gamma(CHF_IX[i0-ii0-2*jj0;i1-ii1-2*jj1;i2-ii2-2*jj2]      ,IDX(d0,d1))
-     &     + 8*gamma(CHF_IX[i0+ii0-2*jj0;i1+ii1-2*jj1;i2+ii2-2*jj2]      ,IDX(d0,d1))
-     &     -   gamma(CHF_IX[i0+2*ii0-2*jj0;i1+2*ii1-2*jj1;i2+2*ii2-2*jj2],IDX(d0,d1))
-     &     - 8*gamma(CHF_IX[i0-2*ii0-jj0;i1-2*ii1-jj1;i2-2*ii2-jj2]      ,IDX(d0,d1))
-     &     +64*gamma(CHF_IX[i0-ii0-jj0;i1-ii1-jj1;i2-ii2-jj2]            ,IDX(d0,d1))
-     &     -64*gamma(CHF_IX[i0+ii0-jj0;i1+ii1-jj1;i2+ii2-jj2]            ,IDX(d0,d1))
-     &     + 8*gamma(CHF_IX[i0+2*ii0-jj0;i1+2*ii1-jj1;i2+2*ii2-jj2]      ,IDX(d0,d1))
-     &     + 8*gamma(CHF_IX[i0-2*ii0+jj0;i1-2*ii1+jj1;i2-2*ii2+jj2]      ,IDX(d0,d1))
-     &     -64*gamma(CHF_IX[i0-ii0+jj0;i1-ii1+jj1;i2-ii2+jj2]            ,IDX(d0,d1))
-     &     +64*gamma(CHF_IX[i0+ii0+jj0;i1+ii1+jj1;i2+ii2+jj2]            ,IDX(d0,d1))
-     &     - 8*gamma(CHF_IX[i0+2*ii0+jj0;i1+2*ii1+jj1;i2+2*ii2+jj2]      ,IDX(d0,d1))
-     &     -   gamma(CHF_IX[i0-2*ii0+2*jj0;i1-2*ii1+2*jj1;i2-2*ii2+2*jj2],IDX(d0,d1))
-     &     + 8*gamma(CHF_IX[i0-ii0+2*jj0;i1-ii1+2*jj1;i2-ii2+2*jj2]      ,IDX(d0,d1))
-     &     - 8*gamma(CHF_IX[i0+ii0+2*jj0;i1+ii1+2*jj1;i2+ii2+2*jj2]      ,IDX(d0,d1))
-     &     +   gamma(CHF_IX[i0+2*ii0+2*jj0;i1+2*ii1+2*jj1;i2+2*ii2+2*jj2],IDX(d0,d1))
-     &       )
-         enddo; enddo; enddo; enddo
-
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d2,0);
-             ii1 = CHF_ID(d2,1);
-             ii2 = CHF_ID(d2,2)]
-
-           d2gammadxdy(d0,d1,d2,d2) = dxinv2/12 * (
-     &         -gamma(CHF_OFFSETIX[i;-2*ii],IDX(d0,d1))
-     &     + 16*gamma(CHF_OFFSETIX[i;-ii]  ,IDX(d0,d1))
-     &     - 30*gamma(CHF_AUTOIX[i]        ,IDX(d0,d1))
-     &     + 16*gamma(CHF_OFFSETIX[i;+ii]  ,IDX(d0,d1))
-     &     -    gamma(CHF_OFFSETIX[i;+2*ii],IDX(d0,d1))
-     &       )
-         enddo; enddo; enddo
-
-         do d0 = 0,2; do d1 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d1,0);
-             ii1 = CHF_ID(d1,1);
-             ii2 = CHF_ID(d1,2)]
-
-           dGamma1dx(d0,d1) = dxinv/12 * (
-     &         Gamma1(CHF_OFFSETIX[i;-2*ii],d0)
-     &     - 8*Gamma1(CHF_OFFSETIX[i;-ii]  ,d0)
-     &     + 8*Gamma1(CHF_OFFSETIX[i;+ii]  ,d0)
-     &     -   Gamma1(CHF_OFFSETIX[i;+2*ii],d0)
-     &       )
-         enddo; enddo
-
-
          do d0 = 0,CH_SPACEDIM-1
            CHF_DTERM[
              ii0 = CHF_ID(d0,0);
              ii1 = CHF_ID(d0,1);
              ii2 = CHF_ID(d0,2)]
+
+c         NEED TO FUDGE THIS TO MAKE COMPARABLE - TRUE IN LIMIT
+c         BUT NOT TRUE DUE TO CHI INSTEAD OF CHI2
 
            dchidx(d0) = dxinv/12 * (
      &         chi(CHF_OFFSETIX[i;-2*ii])**2.0*0.5/chi1
@@ -1787,82 +1642,6 @@ c        http://en.wikipedia.org/wiki/Invertible_matrix
      &     -   chi(CHF_OFFSETIX[i;+2*ii])**2.0*0.5/chi1
      &       )
 
-           enddo
-
-         do d0 = 0,CH_SPACEDIM-1; do d1 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d0,0);
-             ii1 = CHF_ID(d0,1);
-             ii2 = CHF_ID(d0,2)]
-           CHF_DTERM[
-             jj0 = CHF_ID(d1,0);
-             jj1 = CHF_ID(d1,1);
-             jj2 = CHF_ID(d1,2)]
-
-           if (d0 .eq. d1) cycle
-
-           d2chidxdy(d0,d1) = dxinv2/144 * (
-     &         chi(CHF_IX[i0-2*ii0-2*jj0;i1-2*ii1-2*jj1;i2-2*ii2-2*jj2])
-     &     - 8*chi(CHF_IX[i0-ii0-2*jj0;i1-ii1-2*jj1;i2-ii2-2*jj2]      )
-     &     + 8*chi(CHF_IX[i0+ii0-2*jj0;i1+ii1-2*jj1;i2+ii2-2*jj2]      )
-     &     -   chi(CHF_IX[i0+2*ii0-2*jj0;i1+2*ii1-2*jj1;i2+2*ii2-2*jj2])
-     &     - 8*chi(CHF_IX[i0-2*ii0-jj0;i1-2*ii1-jj1;i2-2*ii2-jj2]      )
-     &     +64*chi(CHF_IX[i0-ii0-jj0;i1-ii1-jj1;i2-ii2-jj2]            )
-     &     -64*chi(CHF_IX[i0+ii0-jj0;i1+ii1-jj1;i2+ii2-jj2]            )
-     &     + 8*chi(CHF_IX[i0+2*ii0-jj0;i1+2*ii1-jj1;i2+2*ii2-jj2]      )
-     &     + 8*chi(CHF_IX[i0-2*ii0+jj0;i1-2*ii1+jj1;i2-2*ii2+jj2]      )
-     &     -64*chi(CHF_IX[i0-ii0+jj0;i1-ii1+jj1;i2-ii2+jj2]            )
-     &     +64*chi(CHF_IX[i0+ii0+jj0;i1+ii1+jj1;i2+ii2+jj2]            )
-     &     - 8*chi(CHF_IX[i0+2*ii0+jj0;i1+2*ii1+jj1;i2+2*ii2+jj2]      )
-     &     -   chi(CHF_IX[i0-2*ii0+2*jj0;i1-2*ii1+2*jj1;i2-2*ii2+2*jj2])
-     &     + 8*chi(CHF_IX[i0-ii0+2*jj0;i1-ii1+2*jj1;i2-ii2+2*jj2]      )
-     &     - 8*chi(CHF_IX[i0+ii0+2*jj0;i1+ii1+2*jj1;i2+ii2+2*jj2]      )
-     &     +   chi(CHF_IX[i0+2*ii0+2*jj0;i1+2*ii1+2*jj1;i2+2*ii2+2*jj2])
-     &       )
-         enddo; enddo
-
-
-         do d0 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d0,0);
-             ii1 = CHF_ID(d0,1);
-             ii2 = CHF_ID(d0,2)]
-
-           d2chidxdy(d0,d0) = dxinv2/12 * (
-     &         -chi(CHF_OFFSETIX[i;-2*ii])
-     &     + 16*chi(CHF_OFFSETIX[i;-ii]  )
-     &     - 30*chi(CHF_AUTOIX[i]        )
-     &     + 16*chi(CHF_OFFSETIX[i;+ii]  )
-     &     -    chi(CHF_OFFSETIX[i;+2*ii])
-     &       )
-         enddo
-
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d2,0);
-             ii1 = CHF_ID(d2,1);
-             ii2 = CHF_ID(d2,2)]
-
-           dAdx(d0,d1,d2) = dxinv/12 * (
-     &         A(CHF_OFFSETIX[i;-2*ii],IDX(d0,d1))
-     &     - 8*A(CHF_OFFSETIX[i;-ii]  ,IDX(d0,d1))
-     &     + 8*A(CHF_OFFSETIX[i;+ii]  ,IDX(d0,d1))
-     &     -   A(CHF_OFFSETIX[i;+2*ii],IDX(d0,d1))
-     &       )
-         enddo; enddo; enddo
-
-         do d0 = 0,CH_SPACEDIM-1
-           CHF_DTERM[
-             ii0 = CHF_ID(d0,0);
-             ii1 = CHF_ID(d0,1);
-             ii2 = CHF_ID(d0,2)]
-
-           dKdx(d0) = dxinv/12 * (
-     &         K(CHF_OFFSETIX[i;-2*ii])
-     &     - 8*K(CHF_OFFSETIX[i;-ii]  )
-     &     + 8*K(CHF_OFFSETIX[i;+ii]  )
-     &     -   K(CHF_OFFSETIX[i;+2*ii])
-     &       )
          enddo
 
          do d0 = 0,CH_SPACEDIM-1
@@ -1879,138 +1658,8 @@ c        http://en.wikipedia.org/wiki/Invertible_matrix
      &       )
          enddo
 
-c        Compute Christoffel symbols and components of R, R_ij etc
-c        ---------------------------------------------------------
-
-c        Christoffel symbol of the second kind (one raised, two lower indices)
-c        See: http://en.wikipedia.org/wiki/Christoffel_symbols
-c        [This computes both the conformal and spatial elements]
-
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,2
-           chris(d0,d1,d2) = 0; chriss(d0,d1,d2) = 0
-           do d3 = 0,2
-             if (d2 .lt. CH_SPACEDIM) then
-               chris(d0,d1,d2) = chris(d0,d1,d2) +
-     &           half*gu(d0,d3)*dgammadx(d3,d1,d2)
-               chriss(d0,d1,d2) = chriss(d0,d1,d2) +
-     &           gu(d0,d3)*(half*dgammadx(d3,d1,d2)*chi1
-     &              - g(d3,d1)*dchidx(d2))/chi1
-             endif
-             if (d1 .lt. CH_SPACEDIM) then
-               chris(d0,d1,d2) = chris(d0,d1,d2) +
-     &           half*gu(d0,d3)*dgammadx(d3,d2,d1)
-               chriss(d0,d1,d2) = chriss(d0,d1,d2) +
-     &           gu(d0,d3)*(half*dgammadx(d3,d2,d1)*chi1
-     &              - g(d3,d2)*dchidx(d1))/chi1
-             endif
-             if (d3 .lt. CH_SPACEDIM) then
-               chris(d0,d1,d2) = chris(d0,d1,d2) -
-     &           half*gu(d0,d3)*dgammadx(d1,d2,d3)
-               chriss(d0,d1,d2) = chriss(d0,d1,d2) -
-     &           gu(d0,d3)*(half*dgammadx(d1,d2,d3)*chi1
-     &              - g(d1,d2)*dchidx(d3))/chi1
-             endif
-           enddo
-         enddo; enddo; enddo
-
-c	       chris1st is chris with all lowered (via conformal) indices
-c        Note that chris1st(i,j,k) =gamma_ijk  (i.e first index is the one lowered)
-
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,2
-           chris1st(d0,d1,d2) = 0
-           do d3 = 0,2
-             chris1st(d0,d1,d2) = chris1st(d0,d1,d2) + g(d0,d3)*chris(d3,d1,d2)
-           enddo
-         enddo; enddo; enddo
-
-c  	     Gamma1d is tilde{Gamma^i} in usual BSSN (above Eqn 11.54 BS)
-c        (and in CCZ4, Eqn 13, Alic et al 1106.2254
-
-         do d0 = 0,2
-           Gamma1d(d0) = 0
-           do d1 = 0,2; do d2 = 0,2
-             Gamma1d(d0) = Gamma1d(d0) + chris(d0,d1,d2)*gu(d1,d2)
-           enddo; enddo
-         enddo
-
-c        R here is tilde{R_ij}, ie the conformal metric part
-
-         do d0 = 0,2; do d1 = 0,2
-           R(d0,d1) = 0
-           do d2 = 0,CH_SPACEDIM-1; do d3 = 0,CH_SPACEDIM-1
-             R(d0,d1) = R(d0,d1) - half*gu(d2,d3)*d2gammadxdy(d0,d1,d2,d3)
-           enddo; enddo
-
-           do d2 = 0,2
-             if (d1 .lt. CH_SPACEDIM) then
-               R(d0,d1) = R(d0,d1) + half*g(d2,d0)*dGamma1dx(d2,d1)
-             endif
-
-             if (d0 .lt. CH_SPACEDIM) then
-               R(d0,d1) = R(d0,d1) + half*g(d2,d1)*dGamma1dx(d2,d0)
-             endif
-           enddo
-
-           do d2 = 0,2
-             R(d0,d1) = R(d0,d1)
-     &       + half*Gamma1d(d2)*chris1st(d0,d1,d2)
-     &       + half*Gamma1d(d2)*chris1st(d1,d0,d2)
-             do d3 = 0,2; do d4 = 0,2
-               R(d0,d1) = R(d0,d1)
-     &         + gu(d3,d4)*chris(d2,d3,d0)*chris1st(d1,d2,d4)
-     &         + gu(d3,d4)*chris(d2,d3,d1)*chris1st(d0,d2,d4)
-     &         + gu(d3,d4)*chris(d2,d0,d4)*chris1st(d2,d3,d1)
-             enddo; enddo
-           enddo
-
-         enddo; enddo
-
-c        In evaluating Rchi, note that the covariant derivatives here are
-c        defined w.r.t. the conformal metric (most of the other equations
-c        involve the spatial covariant derivative).
-
-         do d0 = 0,2; do d1 = 0,2
-           Rchi(d0,d1) = 0
-           do d2 = 0,2; do d3 = 0,2
-             Rchi(d0,d1) = Rchi(d0,d1) - g(d0,d1)*gu(d2,d3)*dchidx(d2)*dchidx(d3)
-           enddo; enddo
-           Rchi(d0,d1) = 2*Rchi(d0,d1)/chi1
-
-c          Next is the Laplace-Beltrami operator
-
-           do d2 = 0,CH_SPACEDIM-1; do d3 = 0,CH_SPACEDIM-1
-             Rchi(d0,d1) = Rchi(d0,d1)
-     &       + (
-     &           g(d0,d1)*gu(d2,d3)*d2chidxdy(d2,d3)
-     &         )
-           enddo; enddo
-
-           do d2 = 0,2; do d3 = 0,2; do d4 = 0,CH_SPACEDIM-1
-             Rchi(d0,d1) = Rchi(d0,d1)
-     &       - (
-     &           g(d0,d1)*gu(d2,d3)*chris(d4,d2,d3)*dchidx(d4)
-     &         )
-           enddo; enddo; enddo
-
-           Rchi(d0,d1) = Rchi(d0,d1) + d2chidxdy(d0,d1)
-
-           do d2 = 0,2;
-             Rchi(d0,d1) = Rchi(d0,d1) - chris(d2,d0,d1)*dchidx(d2)
-           enddo 
-           Rchi(d0,d1) = Rchi(d0,d1)/chi1
-         enddo; enddo
-
-c        Rscalar is the actual spatial scalar R
-
-         Rscalar = 0
-         do d0 = 0,2; do d1 = 0,2; 
-           Rscalar = Rscalar
-     &       + (R(d0,d1)+Rchi(d0,d1))*gu(d0,d1)*chi2
-
-         enddo; enddo;
-
-c        Compute the terms for the stress energy tensor
-c        ----------------------------------------------
+c        Calculate elements of stress energy tensor and SF
+c        -------------------------------------------------
 
          call GETV(Vphi, phi(CHF_AUTOIX[i]), phi0, alp, s, eps)
 
@@ -2027,7 +1676,7 @@ c        ----------------------------------------------
              ii2 = CHF_ID(d0,2)]
 
            if (beta(CHF_AUTOIX[i],d0) .lt. 0) then
-           betaidiphi =
+            betaidiphi =
      &            betaidiphi
      &          + dxinv/12*beta(CHF_AUTOIX[i],d0)*(
      &                -phi(CHF_OFFSETIX[i;-3*ii])
@@ -2037,7 +1686,7 @@ c        ----------------------------------------------
      &            +  3*phi(CHF_OFFSETIX[i;+ii]  )
      &            )
            else
-           betaidiphi =
+            betaidiphi =
      &            betaidiphi
      &          + dxinv/12*beta(CHF_AUTOIX[i],d0)*(
      &                 phi(CHF_OFFSETIX[i;+3*ii])
@@ -2052,6 +1701,8 @@ c        ----------------------------------------------
          dphidt2 = lapse*phiM(CHF_AUTOIX[i]) + betaidiphi
          dphidt2 = dphidt2**2
 
+c	    beta2 is contraction of beta^i with spatial metric
+
          beta2 = 0
          do d0 = 0,2; do d1 = 0,2
            beta2 = beta2 + g(d0,d1)/chi2*
@@ -2060,11 +1711,13 @@ c        ----------------------------------------------
 
 c        Note that, for consistency with the spatial-only quantities, the
 c        time index here is 3 (not zero).
+c        2.116 + 2.117 BS
+
          n(0) = 0; n(1) = 0; n(2) = 0; n(3) = -lapse
          do d0 = 0,2
            nu(d0) = -beta(CHF_AUTOIX[i],d0)/lapse
          enddo
-         nu(3) = 1./lapse
+         nu(3) = 1.0/lapse
 
          T(3,3) = dphidt2 + half*(lapse**2 - beta2)*Vt
 
@@ -2083,99 +1736,44 @@ c        time index here is 3 (not zero).
            T(3,d0) = T(d0,3)
          enddo
 
-c	 This is rho_adm
+c	    This is rho_adm
 
-         rho(CHF_AUTOIX[i]) = 0;
+         rho = 0;
          do d0 = 0,3; do d1 = 0,3
-           rho(CHF_AUTOIX[i]) = rho(CHF_AUTOIX[i]) + nu(d0)*nu(d1)*T(d0,d1)
+           rho = rho + nu(d0)*nu(d1)*T(d0,d1)
          enddo; enddo
 
-c	 Svec = S_i = n^a T_ai, where a loops over space and time, since nu is already upper
-c	 we do not need gammas
+c	    Svec = S_i = -n^a T_ai, where a loops over space and time, since nu is already upper
+c	    we do not need gammas. Eqn. 2.95 in BS
 
          do d0 = 0,2
            Svec(d0) = 0
            do d1 = 0,3
-             Svec(d0) = Svec(d0)
-     &         - nu(d1)*T(d1,d0)
+             Svec(d0) = Svec(d0) - nu(d1)*T(d1,d0)
            enddo
          enddo
 
+c	    Sten is S_ij, Eqn 2.104 in BS, so set equal to T for the moment
+
          do d0 = 0,2; do d1 = 0,2
-             Sten(d0,d1) = T(d0,d1)
+          Sten(d0,d1) = T(d0,d1)
          enddo; enddo
+
+c	    trSten = gamma_space^ijT_ij, Eqn 2.104 and 2.138 BS
 
          trSten = 0
          do d0 = 0,2; do d1 = 0,2
            trSten = trSten + gu(d0,d1)*chi2*T(d0,d1)
          enddo; enddo
 
-c        The code below here is unique to this function...
-c        -------------------------------------------------
-
-c        Calculate spatial K values, rather than conformal versions
-c        -----------------------------------------------------------
-
-         Kscalar = K(CHF_AUTOIX[i]) 
-
-         do d0 = 0,CH_SPACEDIM-1
-           dKscalardx(d0) = dKdx(d0)
-         enddo
-
-         do d0 = 0,2; do d1 = 0,2
-           Ktsr(d0,d1) = A(CHF_AUTOIX[i],IDX(d0,d1))/chi2
-     &       + third*g(d0,d1)*Kscalar/chi2
-           do d2 = 0,CH_SPACEDIM-1
-             dKtsrdx(d0,d1,d2) =
-     &           dAdx(d0,d1,d2)
-     &         - 2*dchidx(d2)*(A(CHF_AUTOIX[i],IDX(d0,d1))
-     &         + third*g(d0,d1)*K(CHF_AUTOIX[i]))/chi1
-     &         + third*dgammadx(d0,d1,d2)*Kscalar
-     &         + third*g(d0,d1)*dKscalardx(d2)
-             dKtsrdx(d0,d1,d2) = dKtsrdx(d0,d1,d2)/chi2
-           enddo
-         enddo; enddo
-
-c        Note that the constraint monitor wants Z^i (not Z_i used to define the system)
-c        (Not yet implemented)
-         
-c         do d0 = 0,2
-c            Z(d0) = 0            
-c           Z(d0) = Gamma1(CHF_AUTOIX[i],d0)
-c           do d1 = 0,2; do d2 = 0,2; do d3 = 0,CH_SPACEDIM-1
-c             Z(d0) = Z(d0) - gu(d0,d1)*gu(d2,d3)*dgammadx(d1,d2,d3)
-c           enddo; enddo; enddo
-c           Z(d0) = half*Z(d0)
-c
-c         enddo
-
 c        Calculate Hamiltonian and Momentum constraints per BS eqn 2.132, 2.133
 c        ----------------------------------------------------------------------
 
-         H(CHF_AUTOIX[i]) = Rscalar + Kscalar**2 - 16*Pi*rho(CHF_AUTOIX[i])
-         do d0 = 0,2; do d1 = 0,2; do d2 = 0,2; do d3 = 0,2
-           H(CHF_AUTOIX[i]) = H(CHF_AUTOIX[i])
-     &       - Ktsr(d0,d1)*gu(d0,d2)*gu(d1,d3)*Ktsr(d2,d3)*chi2**2
-         enddo; enddo; enddo; enddo
+         H(CHF_AUTOIX[i]) = - 16*Pi*rho
 
-c        M_i = D^i [ K_{ij} - gamma_{ij} K ] - 8pi S_i
-c        Using that D^i gamma_{ij} = 0, we have:
-c        M_i = gamma^{jk} D_k [ K_{ij} - gamma_{ij} K ] - 8pi S_i
- 
          do d0 = 0,2
-           M(CHF_AUTOIX[i],d0) = -8*Pi*Svec(d0)
-           do d1 = 0,2; do d2 = 0,CH_SPACEDIM-1
-             M(CHF_AUTOIX[i],d0) = M(CHF_AUTOIX[i],d0)
-     &         + gu(d1,d2)*dKtsrdx(d0,d1,d2)*chi2
-     &         - gu(d1,d2)*dKtsrdx(d1,d2,d0)*chi2
-           enddo; enddo
-           do d1 = 0,2; do d2 = 0,2; do d3 = 0,2
-             M(CHF_AUTOIX[i],d0) = M(CHF_AUTOIX[i],d0)
-     &         - gu(d1,d2)*chriss(d3,d1,d2)*Ktsr(d3,d0)*chi2
-     &         + gu(d1,d2)*chriss(d3,d0,d1)*Ktsr(d2,d3)*chi2
-           enddo; enddo; enddo
+           M(CHF_AUTOIX[i],d0) = - 8*Pi*Svec(d0)
          enddo
-
 
       CHF_ENDDO
 

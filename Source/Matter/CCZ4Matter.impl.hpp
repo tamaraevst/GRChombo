@@ -25,7 +25,7 @@ void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell) const
     // copy data from chombo gridpoint into local variables
     const auto matter_vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
-    const auto d2 = m_deriv.template diff2<Vars>(current_cell);
+    const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
     const auto advec =
         m_deriv.template advection<Vars>(current_cell, matter_vars.shift);
 
