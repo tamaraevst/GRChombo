@@ -4,6 +4,19 @@
 #include "Cell.hpp"
 #include "DebuggingTools.hpp"
 
+/// This class can be use to bundle up several compute classes so that their
+/// tasks can all be done in one loop through box
+template <typename... compute_ts> class ComputePack;
+
+/// This function bundles up all its arguments into a compute pack.
+/// In general this will be easier to call than the constructors of ComputePack
+template <typename... compute_ts>
+ComputePack<compute_ts...> make_compute_pack(compute_ts... compute_classes)
+{
+    return ComputePack<compute_ts...>(
+        std::make_tuple(std::forward<compute_ts>(compute_classes)...));
+}
+
 template <typename... compute_ts> class ComputePack
 {
     std::tuple<compute_ts...> m_compute_tuple;
@@ -42,8 +55,7 @@ template <typename... compute_ts> class ComputePack
     }
 };
 
-/// Helper struct for checking whether a given template argument is a compute
-/// pack
+/// Helper struct that checks whether a given argument is a compute pack
 template <typename... Ts> struct is_compute_pack : public std::false_type
 {
 };
@@ -54,12 +66,5 @@ struct is_compute_pack<ComputePack<Ts...>> : public std::true_type
 };
 // End: Helper struct for checking whether a given template argument is a
 // compute pack
-
-template <typename... compute_ts>
-ComputePack<compute_ts...> make_compute_pack(compute_ts... compute_classes)
-{
-    return ComputePack<compute_ts...>(
-        std::make_tuple(std::forward<compute_ts>(compute_classes)...));
-}
 
 #endif /* COMPUTEPACK_HPP_ */
