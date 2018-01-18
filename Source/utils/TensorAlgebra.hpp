@@ -214,6 +214,25 @@ ALWAYS_INLINE tensor<2, data_t> lower_all(const tensor<2, data_t> &tensor_UU,
 /// Computes the (i,j) component of the Kronecker delta
 constexpr int delta(int i, int j) { return (i == j); }
 
+/// Computes the levi-civita symbol (3D, NB, symbol, not the tensor)
+tensor<3,double> epsilon() 
+{
+    tensor<3, double> epsilon;
+    FOR3(i,j,k)
+    {
+       epsilon[i][j][k] = 0.0;
+    } 
+    epsilon[0][1][2] = 1.0;
+    epsilon[1][2][0] = 1.0;
+    epsilon[2][0][1] = 1.0;
+    epsilon[0][2][1] = -1.0;
+    epsilon[2][1][0] = -1.0;
+    epsilon[1][0][2] = -1.0;
+
+    return epsilon;
+}
+
+/// Computes the conformal christoffel symbol
 template <class data_t>
 chris_t<data_t>
 compute_christoffel(const tensor<2, tensor<1, data_t>> &d1_metric,
