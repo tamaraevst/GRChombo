@@ -1,7 +1,7 @@
 #ifndef CELLINDEX_HPP_
 #define CELLINDEX_HPP_
 
-#include "always_inline.hpp"
+#include "AlwaysInline.hpp"
 
 /// Represents an index in the flattened Chombo array
 /** CellIndex only stores one integer (the position in the flattened Chombo

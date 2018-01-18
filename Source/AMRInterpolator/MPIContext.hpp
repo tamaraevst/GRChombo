@@ -46,7 +46,7 @@ class MPIContext
 
     bool m_async_active;
 #ifdef CH_MPI
-    vector<MPI_Request> m_mpi_requests;
+    std::vector<MPI_Request> m_mpi_requests;
 #endif
 };
 

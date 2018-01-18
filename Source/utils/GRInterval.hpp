@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GRINTERVAL_HPP_
+#define GRINTERVAL_HPP_
 
 /// A templated version of Chombo's Interval - allows compile time checking.
 /**Note: iend is included in the interval, i.e. the interval <1,3> has
@@ -21,3 +22,4 @@ template <int ibegin, int iend> struct GRInterval
         return ((i > ibegin) && (i <= iend));
     }
 };
+#endif /* GRINTERVAL_HPP_ */

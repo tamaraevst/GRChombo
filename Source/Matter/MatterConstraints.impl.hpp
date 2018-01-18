@@ -4,6 +4,7 @@
 
 #ifndef MATTERCONSTRAINTS_IMPL_HPP_
 #define MATTERCONSTRAINTS_IMPL_HPP_
+#include "MiscUtils.hpp"
 
 template <class matter_t>
 MatterConstraints<matter_t>::MatterConstraints(const matter_t a_matter,
@@ -27,7 +28,7 @@ void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
 
     // Inverse metric and Christoffel symbol
     const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
-    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto chris = TensorAlgebra::compute_christoffel(d1.h, h_UU);
 
     // Energy Momentum tensor
     const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);

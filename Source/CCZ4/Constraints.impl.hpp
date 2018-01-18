@@ -6,6 +6,7 @@
 #define CONSTRAINTS_IMPL_HPP_
 
 #include "GRInterval.hpp"
+#include "MiscUtils.hpp"
 #include "VarsTools.hpp"
 
 inline Constraints::Constraints(double dx,
@@ -39,7 +40,7 @@ Constraints::constraints_t<data_t> Constraints::constraint_equations(
     const data_t chi_regularised = simd_max(1e-6, vars.chi);
 
     auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    auto chris = TensorAlgebra::compute_christoffel(d1.h, h_UU);
 
     auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
 

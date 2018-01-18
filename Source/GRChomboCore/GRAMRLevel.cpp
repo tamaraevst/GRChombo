@@ -5,10 +5,8 @@
 #include "BoxLoops.hpp"
 #include "GRAMRLevel.hpp"
 
-GRAMRLevel::GRAMRLevel(const SimulationParameters &a_p, int a_verbosity,
-                       ProfilingInfo *a_profilingInfo)
-    : m_num_ghosts(a_p.num_ghosts), m_p(a_p), m_verbosity(a_verbosity),
-      m_profilingInfo(a_profilingInfo)
+GRAMRLevel::GRAMRLevel(const SimulationParameters &a_p, int a_verbosity)
+    : m_num_ghosts(a_p.num_ghosts), m_p(a_p), m_verbosity(a_verbosity)
 {
     if (m_verbosity)
         pout() << "GRAMRLevel default constructor" << endl;
@@ -268,9 +266,9 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
 
         // interpolate from coarser level
         m_fine_interp.interpToFine(m_state_new,
@@ -305,9 +303,9 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
     }
 }
 
@@ -590,9 +588,9 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
     if (m_coarser_level_ptr != nullptr)
     {
         GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, NUM_VARS,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio,
-                         m_num_ghosts);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
     }
 
     // reshape state with new grids
@@ -754,14 +752,8 @@ void GRAMRLevel::evalRHS(
         // Interpolate ghost cells from next coarser level in space and time
         m_patcher.fillInterp(soln, alpha, 0, 0, NUM_VARS);
     }
-    // Time and count the RHS if possible
-    if (m_profilingInfo != nullptr)
-        m_profilingInfo->resetCounters();
 
     specificEvalRHS(soln, rhs, time); // Call the problem specific rhs
-
-    if (m_profilingInfo != nullptr)
-        m_profilingInfo->readCounters();
 }
 
 // implements soln += dt*rhs

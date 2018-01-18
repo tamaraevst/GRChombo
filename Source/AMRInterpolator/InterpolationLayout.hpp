@@ -6,9 +6,9 @@ class InterpolationLayout
   private:
     template <typename InterpAlgo> friend class AMRInterpolator;
 
-    vector<int> rank;
-    vector<int> level_idx;
-    vector<int> box_idx;
+    std::vector<int> rank;
+    std::vector<int> level_idx;
+    std::vector<int> box_idx;
 
     InterpolationLayout(int num_points)
         : rank(num_points, -1), level_idx(num_points, -1),

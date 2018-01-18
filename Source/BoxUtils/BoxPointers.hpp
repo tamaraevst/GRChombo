@@ -4,21 +4,35 @@
 #include "CellIndex.hpp"
 #include "FArrayBox.H"
 #include "UserVariables.hpp"
+#include <array>
 
+/// This class provides information about where a Chombo box lies in memory and
+/// how it is laid out.
 class BoxPointers
 {
-  public:
-    const double *m_in_ptr[NUM_VARS];
+  private:
     const int *m_in_lo;
     const int *m_in_hi;
-    int m_in_stride[3];
 
-    double *m_out_ptr[NUM_VARS];
     const int *m_out_lo;
     const int *m_out_hi;
-    int m_out_stride[3];
+
+  public:
+    std::array<const double *, NUM_VARS> m_in_ptr;
+    std::array<int, CH_SPACEDIM> m_in_stride; //!< Distance in memory between
+                                              //! two values corresponding to
+                                              //! adjacent coordinates in all
+                                              //! directions.
+
+    std::array<double *, NUM_VARS> m_out_ptr;
+    std::array<int, CH_SPACEDIM> m_out_stride; //!< Distance in memory between
+                                               //! two values corresponding to
+                                               //! adjacent coordinates in all
+                                               //! directions.
 
     BoxPointers(const FArrayBox &in, FArrayBox &out)
+        : m_in_lo(in.loVect()), m_in_hi(in.hiVect()), m_out_lo(out.loVect()),
+          m_out_hi(out.hiVect())
     {
         // dataPtr in Chombo does CH_assert bound check
         // which we don't want to do in a loop
@@ -29,8 +43,6 @@ class BoxPointers
         for (int i = 0; i < out.nComp(); ++i)
             m_out_ptr[i] = out.dataPtr(i);
 
-        m_in_lo = in.loVect();
-        m_in_hi = in.hiVect();
         m_in_stride[0] = 1;
         m_in_stride[1] = m_in_hi[0] - m_in_lo[0] + 1;
 #if CH_SPACEDIM >= 3
@@ -39,9 +51,6 @@ class BoxPointers
 #if CH_SPACEDIM >= 4
 #error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
-
-        m_out_lo = out.loVect();
-        m_out_hi = out.hiVect();
 
         m_out_stride[0] = 1;
         m_out_stride[1] = m_out_hi[0] - m_out_lo[0] + 1;

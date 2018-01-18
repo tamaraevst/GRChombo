@@ -7,15 +7,15 @@ class InterpolationQuery
 {
   public:
     typedef pair<int, double *> out_t;
-    typedef map<Derivative, vector<out_t>> comp_map_t;
-    typedef typename map<Derivative, vector<out_t>>::iterator iterator;
+    typedef map<Derivative, std::vector<out_t>> comp_map_t;
+    typedef typename map<Derivative, std::vector<out_t>>::iterator iterator;
 
     const int m_num_points;
 
   private:
     template <typename InterpAlgo> friend class AMRInterpolator;
 
-    vector<const double *> m_coords;
+    std::vector<const double *> m_coords;
     comp_map_t m_comps;
 
   public:
@@ -40,8 +40,8 @@ class InterpolationQuery
         if (result == m_comps.end())
         {
             result = m_comps
-                         .insert(pair<Derivative, vector<out_t>>(
-                             deriv, vector<out_t>()))
+                         .insert(pair<Derivative, std::vector<out_t>>(
+                             deriv, std::vector<out_t>()))
                          .first;
         }
 

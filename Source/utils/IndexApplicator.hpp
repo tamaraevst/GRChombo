@@ -6,8 +6,8 @@
 // The whole purpose of GetIndexTraits is to get around a limitation in c++
 // whereby  variadic templates weren't allowed to be used inside decltype.  We
 // could have gone to c++14 and removed the return type specification altogether
-// but  GetIndexTraits allows one to get the return type of IndexApplicator::apply
-// within c++11
+// but  GetIndexTraits allows one to get the return type of
+// IndexApplicator::apply within c++11
 
 template <typename data_t, typename... Ts> struct GetIndexTraits;
 
@@ -39,10 +39,8 @@ template <typename t, typename... Ts> class IndexApplicator<t, Ts...>
 {
   public:
     template <typename data_t>
-    static ALWAYS_INLINE // Always inlined so this iteration trick doesn't ruin
-                         // performance
-        typename GetIndexTraits<data_t &, t, Ts...>::type
-        apply(data_t &obj, t dir0, Ts... dirs)
+    static ALWAYS_INLINE typename GetIndexTraits<data_t &, t, Ts...>::type
+    apply(data_t &obj, t dir0, Ts... dirs)
     {
         // Let the compiler iterate until there are no indices left (at which
         // point we go to the  specialisation below).

@@ -5,7 +5,6 @@
 #include "MatterCCZ4.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
@@ -54,7 +53,7 @@ template <class matter_t> class ChiRelaxation
   protected:
     matter_t my_matter;         //!< The matter object, e.g. a scalar field.
     const double m_relax_speed; //!< The coefficient of the Hamiltonian used to
-                                //!set relaxation speed.
+                                //! set relaxation speed.
     const double m_G_Newton;    //!< Newton's constant, set to one by default.
     const FourthOrderDerivatives
         m_deriv; //!< An object for calculating derivatives of the variables

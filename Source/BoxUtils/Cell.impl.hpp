@@ -9,20 +9,24 @@
 #include "simd.hpp"
 
 template <class data_t>
-ALWAYS_INLINE data_t Cell<data_t>::load_vars(const int icomp) const
+ALWAYS_INLINE data_t Cell<data_t>::load_vars(const int ivar) const
 {
-    return SIMDIFY<data_t>(m_box_pointers.m_in_ptr[icomp])[m_in_index];
+    return SIMDIFY<data_t>(m_box_pointers.m_in_ptr[ivar])[m_in_index];
 }
 
 template <class data_t>
-ALWAYS_INLINE void Cell<data_t>::load_vars(data_t &out, const int icomp) const
+ALWAYS_INLINE void Cell<data_t>::load_vars(data_t &out, const int ivar) const
 {
-    out = load_vars(icomp);
+    out = load_vars(ivar);
 }
 
-template <class data_t> void Cell<data_t>::load_vars(data_t (&out)[NUM_VARS]) const
+template <class data_t>
+void Cell<data_t>::load_vars(data_t (&out)[NUM_VARS]) const
 {
-    for (int ivar = 0; ivar < NUM_VARS; ++ivar) { out[ivar] = load_vars(ivar); }
+    for (int ivar = 0; ivar < NUM_VARS; ++ivar)
+    {
+        out[ivar] = load_vars(ivar);
+    }
 }
 
 template <class data_t>
@@ -45,9 +49,9 @@ auto Cell<data_t>::load_vars() const
 
 template <class data_t>
 ALWAYS_INLINE void Cell<data_t>::store_vars(const data_t &value,
-                                            const int icomp) const
+                                            const int ivar) const
 {
-    SIMDIFY<data_t>(m_box_pointers.m_out_ptr[icomp])[m_out_index] = value;
+    SIMDIFY<data_t>(m_box_pointers.m_out_ptr[ivar])[m_out_index] = value;
 }
 
 template <class data_t>
@@ -64,11 +68,12 @@ template <class data_t>
 ALWAYS_INLINE void
 Cell<data_t>::store_vars(const std::array<data_t, NUM_VARS> &values) const
 {
-    for (int ivar = 0; ivar < NUM_VARS; ++ivar) { store_vars(values[ivar], ivar); }
+    for (int ivar = 0; ivar < NUM_VARS; ++ivar)
+    {
+        store_vars(values[ivar], ivar);
+    }
 }
 
-/// This function stores all variables that have a corresponding value in a
-/// VarsBase object.
 template <class data_t>
 template <template <typename> class vars_t>
 void Cell<data_t>::store_vars(vars_t<data_t> &vars) const

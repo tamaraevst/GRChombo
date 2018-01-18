@@ -1,11 +1,11 @@
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+#include "AlwaysInline.hpp"
 #include "BoxPointers.hpp"
 #include "CellIndex.hpp"
 #include "GRInterval.hpp"
 #include "IntVect.H"
-#include "always_inline.hpp"
 #include "tensor.hpp"
 
 /// Encapsulates information about the position of a cell
@@ -87,28 +87,37 @@ template <class data_t> class Cell
     ALWAYS_INLINE
     const BoxPointers &get_box_pointers() const { return m_box_pointers; }
 
+    /// Loads the variable of a given variable from the Chombo grid
     ALWAYS_INLINE
-    data_t load_vars(int icomp) const;
+    data_t load_vars(int ivar) const;
 
+    /// Loads the variable of a given variable from the Chombo grid into out
     ALWAYS_INLINE
-    void load_vars(data_t &out, int icomp) const;
+    void load_vars(data_t &out, int ivar) const;
 
+    /// Loads all variables into an array
     void load_vars(data_t (&out)[NUM_VARS]) const;
 
+    /// Loads all variables defined in a vars class
     template <template <typename> class vars_t>
     void load_vars(vars_t<data_t> &vars) const;
 
+    /// Loads all variables defined in a vars class; returns instance of class
     template <template <typename> class vars_t> auto load_vars() const;
 
-    void store_vars(const data_t &value, const int icomp) const;
+    /// Stores a value into a given componenent of the chombo grid
+    void store_vars(const data_t &value, const int ivar) const;
 
+    /// Stores a value of a tensor into a variable range on the chombo grid
     template <int start_var, int end_var>
     void store_vars(
         const tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
         const GRInterval<start_var, end_var> interval) const;
 
+    /// Stores an array of all variables to the chombo grid
     void store_vars(const std::array<data_t, NUM_VARS> &values) const;
 
+    /// Stores all variables defined in the vars object to the chombo grid
     template <template <typename> class vars_t>
     void store_vars(vars_t<data_t> &vars) const;
 };

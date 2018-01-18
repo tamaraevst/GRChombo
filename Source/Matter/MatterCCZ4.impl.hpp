@@ -4,6 +4,7 @@
 
 #ifndef MATTERCCZ4_IMPL_HPP_
 #define MATTERCCZ4_IMPL_HPP_
+#include "MiscUtils.hpp"
 
 template <class matter_t>
 MatterCCZ4<matter_t>::MatterCCZ4(matter_t a_matter, params_t params, double dx,
@@ -51,7 +52,7 @@ void MatterCCZ4<matter_t>::add_EMTensor_rhs(
     using namespace TensorAlgebra;
 
     const auto h_UU = compute_inverse_sym(matter_vars.h);
-    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto chris = compute_christoffel(d1.h, h_UU);
 
     // Calculate elements of the decomposed stress energy tensor
     const auto emtensor =

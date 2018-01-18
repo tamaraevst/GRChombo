@@ -21,8 +21,8 @@ class MPILayout
     MPILayout(int num_process);
 
     const int m_num_process;
-    vector<int> m_counts;
-    mutable vector<int> m_displs;
+    std::vector<int> m_counts;
+    mutable std::vector<int> m_displs;
 
     mutable int m_total_count;
     mutable bool m_dirty;

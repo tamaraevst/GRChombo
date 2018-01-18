@@ -1,9 +1,9 @@
 #ifndef COORDINATES_HPP_
 #define COORDINATES_HPP_
 
+#include "DimensionDefinitions.hpp"
 #include "MiscUtils.hpp"
 #include "simd.hpp"
-#include "GRUtils.hpp"
 
 template <class data_t> class Coordinates
 {
@@ -33,31 +33,27 @@ template <class data_t> class Coordinates
 #endif
     }
 
-    template <typename t>
-    ALWAYS_INLINE static void compute_coord(t &out, int position, double dx,
+    ALWAYS_INLINE static void compute_coord(double &out, int position,
+                                            double dx,
                                             double center_distance = 0)
     {
         out = (position + 0.5) * dx - center_distance;
     }
 
-    // MK: I passed 'out' as argument because overloading by return type doesn't
-    // work
-    template <typename t>
-    ALWAYS_INLINE static
-        typename std::enable_if<(simd_traits<double>::simd_len > 1), void>::type
-        compute_coord(simd<t> &out, int position, double dx,
-                      double center_distance = 0)
+    static typename std::enable_if_t<(simd_traits<double>::simd_len > 1), void>
+    compute_coord(simd<double> &out, int position, double dx,
+                  double center_distance = 0)
     {
-        t out_arr[simd_traits<t>::simd_len];
-        for (int i = 0; i < simd_traits<t>::simd_len; ++i)
+        double out_arr[simd_traits<double>::simd_len];
+        for (int i = 0; i < simd_traits<double>::simd_len; ++i)
         {
             out_arr[i] = (position + i + 0.5) * dx - center_distance;
         }
-        out = simd<t>::load(out_arr);
+        out = simd<double>::load(out_arr);
     }
 
-    // function which returns the radius subject to a floor
-    // for when a Coordinates object exists
+    /// This function returns the radius subject to a floor for a given
+    /// Coordinates object.
     data_t get_radius() const
     {
         // Note that this is not currently dimension independent
@@ -68,10 +64,10 @@ template <class data_t> class Coordinates
         return r;
     }
 
-    // static function which returns radius subject to a floor
-    // for when no coordinates object exists
+    /// This static function returns the radius subject to a floor
+    /// for when no coordinates object exists.
     static data_t get_radius(IntVect integer_coords, double dx,
-                             std::array<double, GR_SPACEDIM> center = {0})
+                             std::array<double, CH_SPACEDIM> center = {0})
     {
         data_t xx;
         double yy;

@@ -9,8 +9,8 @@ class QuinticConvolution
     const InterpSource &m_source;
     bool m_verbosity;
 
-    vector<IntVect> m_interp_points;
-    vector<double> m_interp_weights;
+    std::vector<IntVect> m_interp_points;
+    std::vector<double> m_interp_weights;
 
   public:
     QuinticConvolution(const InterpSource &source, bool verbosity = false);

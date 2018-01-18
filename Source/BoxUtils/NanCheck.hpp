@@ -1,11 +1,11 @@
 #ifndef NANCHECK_HPP_
 #define NANCHECK_HPP_
 
-// This class offers a nan-check including debugging information when it happens
-
 #include "Cell.hpp"
 #include "UserVariables.hpp"
 
+/// This compute class checks for nans or very large values and aborts the
+/// execution when they appear displying a custom or default error message.
 class NanCheck
 {
   protected:
@@ -15,6 +15,7 @@ class NanCheck
   public:
     NanCheck() {}
 
+    /// This constructor takes a string which will be displayed when nans happen
     NanCheck(const std::string a_error_info) : m_error_info(a_error_info) {}
 
     NanCheck(const std::string a_error_info, const double a_max_abs)
@@ -37,15 +38,14 @@ class NanCheck
 #pragma omp single
             {
                 pout() << m_error_info
-                       << "::Values have become nan. The current state is: "
-                       << endl;
+                       << "::Values have become nan. The current state is: \n";
                 for (int ivar = 0; ivar < NUM_VARS; ++ivar)
                 {
                     pout() << UserVariables::variable_names[ivar] << ": "
-                        << current_cell.load_vars(ivar) << endl;
+                           << current_cell.load_vars(ivar) << std::endl;
                 }
                 pout() << "Integer coordinates: " << current_cell.get_int_vect()
-                       << endl;
+                       << std::endl;
             }
             MayDay::Error("Values have become nan.");
         }

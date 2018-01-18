@@ -2,6 +2,7 @@
 #define FOURTHORDERDERIVATIVES_HPP_
 
 #include "Cell.hpp"
+#include "MiscUtils.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
 #include <array>
@@ -142,8 +143,9 @@ class FourthOrderDerivatives
         const int in_index = current_cell.get_in_index();
         for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
-            diffArray[ivar][direction][direction] = diff2<data_t>(
-                current_cell.get_box_pointers().m_in_ptr[ivar], in_index, stride);
+            diffArray[ivar][direction][direction] =
+                diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
+                              in_index, stride);
         }
     }
 
@@ -210,9 +212,9 @@ class FourthOrderDerivatives
         const int in_index = current_cell.get_in_index();
         for (int ivar = 0; ivar < NUM_VARS; ++ivar)
         {
-            data_t diff2_value =
-                mixed_diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
-                                    in_index, stride1, stride2);
+            data_t diff2_value = mixed_diff2<data_t>(
+                current_cell.get_box_pointers().m_in_ptr[ivar], in_index,
+                stride1, stride2);
             diffArray[ivar][direction1][direction2] = diff2_value;
             diffArray[ivar][direction2][direction1] = diff2_value;
         }
@@ -299,8 +301,9 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void add_advection(data_t (&out)[NUM_VARS], const Cell<data_t> &current_cell,
-                       const data_t &vec_comp, const int dir) const
+    void add_advection(data_t (&out)[NUM_VARS],
+                       const Cell<data_t> &current_cell, const data_t &vec_comp,
+                       const int dir) const
     {
         const int stride = current_cell.get_box_pointers().m_in_stride[dir];
         auto shift_positive = simd_compare_gt(vec_comp, 0.0);
@@ -387,8 +390,9 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void add_dissipation(data_t (&out)[NUM_VARS], const Cell<data_t> &current_cell,
-                         const double factor, const int direction) const
+    void add_dissipation(data_t (&out)[NUM_VARS],
+                         const Cell<data_t> &current_cell, const double factor,
+                         const int direction) const
     {
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];

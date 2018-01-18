@@ -6,7 +6,6 @@
 #include "Constraints.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "GRInterval.hpp"
-#include "GRUtils.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
 #include <array>

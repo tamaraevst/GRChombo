@@ -7,6 +7,7 @@
 
 #define COVARIANTZ4
 #include "GRInterval.hpp"
+#include "MiscUtils.hpp"
 #include "VarsTools.hpp"
 
 inline CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation,
@@ -14,8 +15,7 @@ inline CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation,
     : m_params(params), m_sigma(sigma), m_formulation(formulation),
       m_cosmological_constant(cosmological_constant), m_deriv(dx)
 {
-    // Sanity check: a user who wants to use BSSN should also have damping
-    // paramters = 0
+    // A user who wants to use BSSN should also have damping paramters = 0
     if (m_formulation == USE_BSSN)
     {
         if ((m_params.kappa1 != 0.) || (params.kappa2 != 0.) ||
@@ -52,13 +52,10 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
                         const diff2_vars_t<tensor<2, data_t>> &d2,
                         const vars_t<data_t> &advec) const
 {
-    //    Might want to work through the code and eliminate chi divisions where
-    //    possible to allow chi to go to zero. const data_t chi_regularised =
-    //    simd_max(1e-6, vars.chi);
     using namespace TensorAlgebra;
 
     auto h_UU = compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    auto chris = compute_christoffel(d1.h, h_UU);
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
