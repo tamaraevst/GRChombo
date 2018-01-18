@@ -5,8 +5,8 @@
 #ifndef CONSTRAINTS_IMPL_HPP_
 #define CONSTRAINTS_IMPL_HPP_
 
-#include "GRInterval.hpp"
 #include "DimensionDefinitions.hpp"
+#include "GRInterval.hpp"
 #include "VarsTools.hpp"
 
 inline Constraints::Constraints(double dx,

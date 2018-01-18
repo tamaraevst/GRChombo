@@ -31,7 +31,7 @@ void BinaryBHLevel::initialData()
         pout() << "BinaryBHLevel::initialData " << m_level << endl;
 
     // Set up the compute class for the BinaryBH initial data
-    BinaryBH binary( m_p.bh1_params, m_p.bh2_params, m_dx);
+    BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
 
     // First set everything to zero (to avoid undefinded values in constraints)
     // then calculate initial data

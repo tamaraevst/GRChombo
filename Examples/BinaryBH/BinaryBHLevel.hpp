@@ -26,11 +26,13 @@ class BinaryBHLevel : public GRAMRLevel
 
     /// Things to do after dt*rhs has been added to the solution
     virtual void specificUpdateODE(GRLevelData &a_soln,
-                                   const GRLevelData &a_rhs, Real a_dt) override;
+                                   const GRLevelData &a_rhs,
+                                   Real a_dt) override;
 
     /// Identify and tag the cells that need higher resolution
-    virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
-                                         const FArrayBox &current_state) override;
+    virtual void
+    computeTaggingCriterion(FArrayBox &tagging_criterion,
+                            const FArrayBox &current_state) override;
 };
 
 #endif /* BINARYBHLEVEL_HPP_ */

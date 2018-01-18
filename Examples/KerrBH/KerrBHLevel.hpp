@@ -26,14 +26,16 @@ class KerrBHLevel : public GRAMRLevel
 
     /// Things to do after dt*rhs has been added to the solution
     virtual void specificUpdateODE(GRLevelData &a_soln,
-                                   const GRLevelData &a_rhs, Real a_dt) override;
-
+                                   const GRLevelData &a_rhs,
+                                   Real a_dt) override;
 
     /// Specify which variables to write at plot intervals
-    virtual void specificWritePlotHeader(std::vector<int> &plot_states) const override;
+    virtual void
+    specificWritePlotHeader(std::vector<int> &plot_states) const override;
 
-    virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
-                                         const FArrayBox &current_state) override;
+    virtual void
+    computeTaggingCriterion(FArrayBox &tagging_criterion,
+                            const FArrayBox &current_state) override;
 };
 
 #endif /* KERRBHLEVEL_HPP_ */
