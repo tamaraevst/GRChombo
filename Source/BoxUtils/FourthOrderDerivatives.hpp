@@ -4,7 +4,7 @@
 #include "Cell.hpp"
 #include "MiscUtils.hpp"
 #include "UserVariables.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <array>
 
 class FourthOrderDerivatives
@@ -43,13 +43,13 @@ class FourthOrderDerivatives
 
     // Writes directly into the vars object - use this wherever possible
     template <class data_t, template <typename> class vars_t>
-    void diff1(vars_t<tensor<1, data_t>> &d1, const Cell<data_t> &current_cell,
+    void diff1(vars_t<Tensor<1, data_t>> &d1, const Cell<data_t> &current_cell,
                int direction) const
     {
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        d1.enum_mapping([&](const int &ivar, tensor<1, data_t> &var) {
+        d1.enum_mapping([&](const int &ivar, Tensor<1, data_t> &var) {
             var[direction] =
                 diff1<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
                               in_index, stride);
@@ -63,8 +63,8 @@ class FourthOrderDerivatives
     {
         const auto in_index = current_cell.get_in_index();
         const auto strides = current_cell.get_box_pointers().m_in_stride;
-        vars_t<tensor<1, data_t>> d1;
-        d1.enum_mapping([&](const int &ivar, tensor<1, data_t> &var) {
+        vars_t<Tensor<1, data_t>> d1;
+        d1.enum_mapping([&](const int &ivar, Tensor<1, data_t> &var) {
             FOR1(idir)
             {
                 var[idir] = diff1<data_t>(
@@ -76,7 +76,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void diff1(tensor<1, data_t> &diff_value, const Cell<data_t> &current_cell,
+    void diff1(Tensor<1, data_t> &diff_value, const Cell<data_t> &current_cell,
                int direction, int ivar) const
     {
         const int stride =
@@ -87,7 +87,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t, int num_vars>
-    void diff1(tensor<1, data_t> (&diff_array)[num_vars],
+    void diff1(Tensor<1, data_t> (&diff_array)[num_vars],
                const Cell<data_t> &current_cell, int direction,
                int start_var = 0) const
     {
@@ -121,13 +121,13 @@ class FourthOrderDerivatives
     // Writes 2nd deriv directly into the vars object - use this wherever
     // possible
     template <class data_t, template <typename> class vars_t>
-    void diff2(vars_t<tensor<2, data_t>> &d2, const Cell<data_t> &current_cell,
+    void diff2(vars_t<Tensor<2, data_t>> &d2, const Cell<data_t> &current_cell,
                int direction) const
     {
         const int stride =
             current_cell.get_box_pointers().m_in_stride[direction];
         const int in_index = current_cell.get_in_index();
-        d2.enum_mapping([&](const int &ivar, tensor<2, data_t> &var) {
+        d2.enum_mapping([&](const int &ivar, Tensor<2, data_t> &var) {
             var[direction][direction] =
                 diff2<data_t>(current_cell.get_box_pointers().m_in_ptr[ivar],
                               in_index, stride);
@@ -135,7 +135,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void diff2(tensor<2, data_t> (&diffArray)[NUM_VARS],
+    void diff2(Tensor<2, data_t> (&diffArray)[NUM_VARS],
                const Cell<data_t> &current_cell, int direction) const
     {
         const int stride =
@@ -182,7 +182,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t, template <typename> class vars_t>
-    void mixed_diff2(vars_t<tensor<2, data_t>> &d2,
+    void mixed_diff2(vars_t<Tensor<2, data_t>> &d2,
                      const Cell<data_t> &current_cell, int direction1,
                      int direction2) const
     {
@@ -191,7 +191,7 @@ class FourthOrderDerivatives
         const int stride2 =
             current_cell.get_box_pointers().m_in_stride[direction2];
         const int in_index = current_cell.get_in_index();
-        d2.enum_mapping([&](const int &ivar, tensor<2, data_t> &var) {
+        d2.enum_mapping([&](const int &ivar, Tensor<2, data_t> &var) {
             auto tmp = mixed_diff2<data_t>(
                 current_cell.get_box_pointers().m_in_ptr[ivar], in_index,
                 stride1, stride2);
@@ -201,7 +201,7 @@ class FourthOrderDerivatives
     }
 
     template <class data_t>
-    void mixed_diff2(tensor<2, data_t> (&diffArray)[NUM_VARS],
+    void mixed_diff2(Tensor<2, data_t> (&diffArray)[NUM_VARS],
                      const Cell<data_t> &current_cell, int direction1,
                      int direction2) const
     {
@@ -227,10 +227,10 @@ class FourthOrderDerivatives
     template <template <typename> class vars_t, class data_t>
     auto diff2(const Cell<data_t> &current_cell) const
     {
-        vars_t<tensor<2, data_t>> d2;
+        vars_t<Tensor<2, data_t>> d2;
         const auto in_index = current_cell.get_in_index();
         const auto strides = current_cell.get_box_pointers().m_in_stride;
-        d2.enum_mapping([&](const int &ivar, tensor<2, data_t> &var) {
+        d2.enum_mapping([&](const int &ivar, Tensor<2, data_t> &var) {
             FOR1(dir1) // First calculate the repeated derivatives
             {
                 var[dir1][dir1] = diff2<data_t>(
@@ -320,7 +320,7 @@ class FourthOrderDerivatives
     /// by the template parameter
     template <template <typename> class vars_t, class data_t>
     auto advection(const Cell<data_t> &current_cell,
-                   const tensor<1, data_t> &vector) const
+                   const Tensor<1, data_t> &vector) const
     {
         const auto in_index = current_cell.get_in_index();
         const auto strides = current_cell.get_box_pointers().m_in_stride;

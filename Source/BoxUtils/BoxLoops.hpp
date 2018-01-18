@@ -5,7 +5,6 @@
 #include "ComputePack.hpp"
 #include "FArrayBox.H"
 #include "LevelData.H"
-#include "tensor.hpp"
 
 enum
 {

@@ -4,7 +4,7 @@
 #define DEFAULTPOTENTIAL_HPP_
 
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 class DefaultPotential
 {

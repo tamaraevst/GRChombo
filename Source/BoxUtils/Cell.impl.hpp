@@ -7,6 +7,7 @@
 
 #include "GRInterval.hpp"
 #include "simd.hpp"
+#include "Tensor.hpp"
 
 template <class data_t>
 ALWAYS_INLINE data_t Cell<data_t>::load_vars(const int ivar) const
@@ -57,7 +58,7 @@ ALWAYS_INLINE void Cell<data_t>::store_vars(const data_t &value,
 template <class data_t>
 template <int start_var, int end_var>
 ALWAYS_INLINE void Cell<data_t>::store_vars(
-    const tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
+    const Tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
     GRInterval<start_var, end_var> interval) const
 {
     for (int i = 0; i < interval.size(); ++i)

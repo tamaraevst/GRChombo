@@ -2,6 +2,7 @@
 #define VARSTOOLS_HPP_
 
 #include "GRInterval.hpp"
+#include "Tensor.hpp"
 
 namespace VarsTools
 {
@@ -16,7 +17,7 @@ template <typename mapping_function_t, typename data_t, int start_var,
           int end_var>
 void define_enum_mapping(mapping_function_t mapping_function,
                          const GRInterval<start_var, end_var> interval,
-                         tensor<1, data_t, end_var - start_var + 1> &tensor)
+                         Tensor<1, data_t, end_var - start_var + 1> &tensor)
 {
     for (int ivar = 0; ivar < interval.size(); ++ivar)
         mapping_function(start_var + ivar, tensor[ivar]);
@@ -26,7 +27,7 @@ template <typename mapping_function_t, typename data_t, int start_var,
           int end_var>
 void define_symmetric_enum_mapping(
     mapping_function_t mapping_function,
-    const GRInterval<start_var, end_var> interval, tensor<2, data_t> &tensor)
+    const GRInterval<start_var, end_var> interval, Tensor<2, data_t> &tensor)
 {
     static_assert(interval.size() ==
                       DEFAULT_TENSOR_DIM * (DEFAULT_TENSOR_DIM + 1) / 2,

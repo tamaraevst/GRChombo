@@ -9,15 +9,15 @@
 //! 3+1D
 template <class data_t> struct emtensor_t
 {
-    tensor<2, data_t> Sij; //!< S_ij = T_ij
-    tensor<1, data_t> Si;  //!< S_i = T_ia_n^a
+    Tensor<2, data_t> Sij; //!< S_ij = T_ij
+    Tensor<1, data_t> Si;  //!< S_i = T_ia_n^a
     data_t S;              //!< S = S^i_i
     data_t rho;            //!< rho = T_ab n^a n^b
 };
 
 template <class data_t> struct ricci_t
 {
-    tensor<2, data_t> LL; // Ricci with two indices down
+    Tensor<2, data_t> LL; // Ricci with two indices down
     data_t scalar;        // Ricci scalar
 };
 
@@ -28,16 +28,16 @@ class CCZ4Geometry
               template <typename> class diff2_vars_t>
     static ricci_t<data_t>
     compute_ricci_Z(const vars_t<data_t> &vars,
-                    const vars_t<tensor<1, data_t>> &d1,
-                    const diff2_vars_t<tensor<2, data_t>> &d2,
-                    const tensor<2, data_t> &h_UU, const chris_t<data_t> &chris,
-                    const tensor<1, data_t> &Z_over_chi)
+                    const vars_t<Tensor<1, data_t>> &d1,
+                    const diff2_vars_t<Tensor<2, data_t>> &d2,
+                    const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris,
+                    const Tensor<1, data_t> &Z_over_chi)
     {
         ricci_t<data_t> out;
 
         data_t boxtildechi = 0;
 
-        tensor<2, data_t> covdtilde2chi;
+        Tensor<2, data_t> covdtilde2chi;
         FOR2(k, l)
         {
             covdtilde2chi[k][l] = d2.chi[k][l];
@@ -106,11 +106,11 @@ class CCZ4Geometry
               template <typename> class diff2_vars_t>
     static ricci_t<data_t>
     compute_ricci(const vars_t<data_t> &vars,
-                  const vars_t<tensor<1, data_t>> &d1,
-                  const diff2_vars_t<tensor<2, data_t>> &d2,
-                  const tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+                  const vars_t<Tensor<1, data_t>> &d1,
+                  const diff2_vars_t<Tensor<2, data_t>> &d2,
+                  const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
     {
-        tensor<1, data_t> Z0 = 0.;
+        Tensor<1, data_t> Z0 = 0.;
         return compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
     }
 };

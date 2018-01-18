@@ -253,7 +253,7 @@ int main()
 
     // NB I had to fudge the chi derivatives in the ChF code to get the same
     // result because of the use of chi^2 rather than chi as conformal factor.
-    // Also in the calculation of R(d0,d1) the conformal Ricci tensor, we used
+    // Also in the calculation of R(d0,d1) the conformal Ricci Tensor, we used
     // to use the calculated Gamma^i, not the evolved one. In theory they would
     // be the same, but in this test The Gamma^i data is random, so it won't
     // work, so I changed it to match the new form

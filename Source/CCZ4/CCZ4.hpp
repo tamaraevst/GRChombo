@@ -6,7 +6,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "TensorAlgebra.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 
@@ -40,16 +40,16 @@ class CCZ4
     template <class data_t> struct Vars
     {
         data_t chi;              //!< Conformal factor
-        tensor<2, data_t> h;     //!< Conformal metric
+        Tensor<2, data_t> h;     //!< Conformal metric
         data_t K;                //!< Trace of the extrinsic curvature
-        tensor<2, data_t> A;     //!< trace-free part of the rescale extrinsic
+        Tensor<2, data_t> A;     //!< trace-free part of the rescale extrinsic
                                  //! curvature, i.e. \f$\chi
                                  //!(K_{ij})^{\mathrm{TF}}\f$
-        tensor<1, data_t> Gamma; //!< Conformal connection functions
+        Tensor<1, data_t> Gamma; //!< Conformal connection functions
         data_t Theta; //!< CCZ4 quantity associated to hamiltonian constraint
         data_t lapse;
-        tensor<1, data_t> shift;
-        tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used
+        Tensor<1, data_t> shift;
+        Tensor<1, data_t> B; //!< \f$B^i = \partial_t \beta^i\f$, this is used
                              //! for second order shift conditions
 
         /// Defines the mapping between members of Vars and Chombo grid
@@ -65,8 +65,8 @@ class CCZ4
     {
         data_t chi; //!< Conformal factor
         data_t lapse;
-        tensor<2, data_t> h; //!< Conformal metric
-        tensor<1, data_t> shift;
+        Tensor<2, data_t> h; //!< Conformal metric
+        Tensor<1, data_t> shift;
 
         template <typename mapping_function_t>
         void enum_mapping(mapping_function_t mapping_function);
@@ -130,9 +130,9 @@ class CCZ4
         vars_t<data_t> &rhs, //!< Reference to the variables into which the
                              //! output right hand side is written
         const vars_t<data_t> &vars, //!< The values of the current variables
-        const vars_t<tensor<1, data_t>>
+        const vars_t<Tensor<1, data_t>>
             &d1, //!< First derivative of the variables
-        const diff2_vars_t<tensor<2, data_t>>
+        const diff2_vars_t<Tensor<2, data_t>>
             &d2, //!< The second derivative the variables
         const vars_t<data_t>
             &advec //!< The advection derivatives of the variables

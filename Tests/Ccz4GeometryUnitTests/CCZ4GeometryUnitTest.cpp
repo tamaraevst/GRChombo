@@ -1,13 +1,13 @@
 #include "CCZ4Geometry.hpp"
 #include "MiscUtils.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <iostream>
 
 template <class data_t> struct vars_t
 {
     data_t chi;
-    tensor<2, data_t> h;
-    tensor<1, data_t> Gamma;
+    Tensor<2, data_t> h;
+    Tensor<1, data_t> Gamma;
 };
 
 int main()
@@ -15,9 +15,9 @@ int main()
     int failed = 0;
 
     vars_t<double> vars;
-    vars_t<tensor<1, double>> d1;
-    vars_t<tensor<2, double>> d2;
-    tensor<1, double> Z_over_chi;
+    vars_t<Tensor<1, double>> d1;
+    vars_t<Tensor<2, double>> d2;
+    Tensor<1, double> Z_over_chi;
 
 #include "values1.hpp" //Including the auto generated file with values
 

@@ -7,7 +7,7 @@
 #include "FourthOrderDerivatives.hpp"
 #include "GRInterval.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <array>
 
 //!  Calculates the Hamiltonain and Momentum constraints with matter fields
@@ -15,7 +15,7 @@
      The class calculates the Hamiltonian and Momentum constraints at each point
    in a box. It inherits from the Constraints class which calculates the
    constraints without the matter terms. It adds in the matter terms for a given
-   matter class matter_t, which must provide it with the Energy Momentum tensor.
+   matter class matter_t, which must provide it with the Energy Momentum Tensor.
    For an example of a matter_t class see ScalarField. \sa Constraints(),
    ScalarField()
 */

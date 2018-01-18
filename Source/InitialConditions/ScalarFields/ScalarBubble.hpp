@@ -8,7 +8,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total no. components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial
 //! matter config

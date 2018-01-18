@@ -6,7 +6,7 @@
 #include "CellIndex.hpp"
 #include "GRInterval.hpp"
 #include "IntVect.H"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 /// Encapsulates information about the position of a cell
 /** It contains the position of the cell on the Chombo grid and the index of the
@@ -108,10 +108,10 @@ template <class data_t> class Cell
     /// Stores a value into a given componenent of the chombo grid
     void store_vars(const data_t &value, const int ivar) const;
 
-    /// Stores a value of a tensor into a variable range on the chombo grid
+    /// Stores a value of a Tensor into a variable range on the chombo grid
     template <int start_var, int end_var>
     void store_vars(
-        const tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
+        const Tensor<1, data_t, GRInterval<start_var, end_var>::size()> &values,
         const GRInterval<start_var, end_var> interval) const;
 
     /// Stores an array of all variables to the chombo grid

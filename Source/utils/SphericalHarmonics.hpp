@@ -4,7 +4,7 @@
 #include "Combinatorics.hpp"
 #include "Coordinates.hpp"
 #include "MiscUtils.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 // Functions for the spin weighted spherical harmonics
 // See paper arXiv:gr-qc/0610128 eqn 40

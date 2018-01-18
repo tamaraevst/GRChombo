@@ -10,8 +10,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
-#include <array>
+#include "Tensor.hpp"
 
 class GammaCalculator
 {
