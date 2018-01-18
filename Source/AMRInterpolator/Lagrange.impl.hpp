@@ -159,7 +159,7 @@ void Lagrange<Order>::setup(const std::array<int, CH_SPACEDIM> &deriv,
                             const std::array<double, CH_SPACEDIM> &evalCoord,
                             const IntVect &nearest)
 {
-    pair<vector<IntVect>, vector<double>> result =
+    pair<std::vector<IntVect>, std::vector<double>> result =
         generateStencil(deriv, dx, evalCoord, nearest);
     m_interp_points = result.first;
     m_interp_weights = result.second;
@@ -233,21 +233,21 @@ double Lagrange<Order>::interpData(const FArrayBox &fab, int comp)
 }
 
 template <int Order>
-pair<vector<IntVect>, vector<double>> Lagrange<Order>::generateStencil(
+pair<std::vector<IntVect>, std::vector<double>> Lagrange<Order>::generateStencil(
     const std::array<int, CH_SPACEDIM> &deriv,
     const std::array<double, CH_SPACEDIM> &dx,
     const std::array<double, CH_SPACEDIM> &evalCoord, const IntVect &nearest,
     int dim)
 {
-    vector<IntVect> out_points;
-    vector<double> out_weights;
+    std::vector<IntVect> out_points;
+    std::vector<double> out_weights;
 
     /*
      * SCAN ALONG THIS DIRECTION TO FIND THE LARGEST CONTIGUOUS CHUNK OF VALID
      * POINTS
      */
 
-    // Allocate a vector twice as big as we can possibly need
+    // Allocate a std::vector twice as big as we can possibly need
     // This way we insert to either direction without shifting/growing
     std::vector<int> my_points(2 * (Order + deriv[dim]));
 
@@ -314,7 +314,7 @@ pair<vector<IntVect>, vector<double>> Lagrange<Order>::generateStencil(
         pout() << "}" << endl;
     }
 
-    // There is going to be potentially a LOT of temporary vectors getting
+    // There is going to be potentially a LOT of temporary std::vectors getting
     // allocated in here. If things get slow this will be a good place to look
     // first.
     for (int i = 0; i < stencil_width; ++i)
@@ -324,10 +324,10 @@ pair<vector<IntVect>, vector<double>> Lagrange<Order>::generateStencil(
         if (dim > 0)
         {
             // Descend to the next dimension
-            pair<vector<IntVect>, vector<double>> sub_result =
+            pair<std::vector<IntVect>, std::vector<double>> sub_result =
                 generateStencil(deriv, dx, interp_coord, nearest, dim - 1);
-            vector<IntVect> &sub_points = sub_result.first;
-            vector<double> &sub_weights = sub_result.second;
+            std::vector<IntVect> &sub_points = sub_result.first;
+            std::vector<double> &sub_weights = sub_result.second;
 
             // Take tensor product weights
             for (int j = 0; j < sub_points.size(); ++j)
@@ -354,7 +354,7 @@ pair<vector<IntVect>, vector<double>> Lagrange<Order>::generateStencil(
 
     // TODO: Now we are at the mercy of NRVO gods. Use move semantics when we do
     // C++11.
-    return pair<vector<IntVect>, vector<double>>(out_points, out_weights);
+    return pair<std::vector<IntVect>, std::vector<double>>(out_points, out_weights);
 }
 
 #endif /* LAGRANGE_IMPL_HPP_ */
