@@ -23,7 +23,7 @@ int main()
 
     auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
 
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    auto chris = TensorAlgebra::compute_christoffel(d1.h, h_UU);
 
     auto ricciZ =
         CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);

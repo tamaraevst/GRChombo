@@ -20,15 +20,15 @@ class BoxPointers
   public:
     std::array<const double *, NUM_VARS> m_in_ptr;
     std::array<int, CH_SPACEDIM> m_in_stride; //!< Distance in memory between
-                                              //!two values corresponding to
-                                              //!adjacent coordinates in all
-                                              //!directions.
+                                              //! two values corresponding to
+                                              //! adjacent coordinates in all
+                                              //! directions.
 
     std::array<double *, NUM_VARS> m_out_ptr;
     std::array<int, CH_SPACEDIM> m_out_stride; //!< Distance in memory between
-                                               //!two values corresponding to
-                                               //!adjacent coordinates in all
-                                               //!directions.
+                                               //! two values corresponding to
+                                               //! adjacent coordinates in all
+                                               //! directions.
 
     BoxPointers(const FArrayBox &in, FArrayBox &out)
         : m_in_lo(in.loVect()), m_in_hi(in.hiVect()), m_out_lo(out.loVect()),

@@ -5,6 +5,13 @@
 #include "MiscUtils.hpp"
 #include "tensor.hpp"
 
+template <class data_t> struct chris_t
+{
+    tensor<3, data_t> ULL;        //!<standard christoffel symbols
+    tensor<3, data_t> LLL;        //!<3 lower indices
+    tensor<1, data_t> contracted; //!<contracted christoffel
+};
+
 namespace TensorAlgebra
 {
 /// Computes determinant of a symmetric 3x3 matrix
@@ -145,8 +152,8 @@ ALWAYS_INLINE data_t compute_dot_product(
 }
 
 /// Removes the trace of a 2-tensor with lower indices given a metric and an
-/// inverse metric.  Or a tensor with upper indices given an inverse metric and a
-/// metric.
+/// inverse metric.  Or a tensor with upper indices given an inverse metric and
+/// a metric.
 template <class data_t>
 ALWAYS_INLINE void make_trace_free(tensor<2, data_t> &tensor_LL,
                                    const tensor<2, data_t> &metric,
@@ -202,6 +209,35 @@ ALWAYS_INLINE tensor<2, data_t> lower_all(const tensor<2, data_t> &tensor_UU,
                                           const tensor<2, data_t> &metric)
 { // The code for lowering is exactly the same as for raising
     return raise_all(tensor_UU, metric);
+}
+
+/// Computes the (i,j) component of the Kronecker delta
+constexpr int delta(int i, int j) { return (i == j); }
+
+template <class data_t>
+chris_t<data_t>
+compute_christoffel(const tensor<2, tensor<1, data_t>> &d1_metric,
+                    const tensor<2, data_t> &h_UU)
+{
+    chris_t<data_t> out;
+
+    FOR3(i, j, k)
+    {
+        out.LLL[i][j][k] = 0.5 * (d1_metric[j][i][k] + d1_metric[k][i][j] -
+                                  d1_metric[j][k][i]);
+    }
+    FOR3(i, j, k)
+    {
+        out.ULL[i][j][k] = 0;
+        FOR1(l) { out.ULL[i][j][k] += h_UU[i][l] * out.LLL[l][j][k]; }
+    }
+    FOR1(i)
+    {
+        out.contracted[i] = 0;
+        FOR2(j, k) { out.contracted[i] += h_UU[j][k] * out.ULL[i][j][k]; }
+    }
+
+    return out;
 }
 }
 

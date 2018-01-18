@@ -15,13 +15,6 @@ template <class data_t> struct emtensor_t
     data_t rho;            //!< rho = T_ab n^a n^b
 };
 
-template <class data_t> struct chris_t
-{
-    tensor<3, data_t> LLL; // 3 lower indices
-    tensor<3, data_t> ULL;
-    tensor<1, data_t> contracted; // chris contracted
-};
-
 template <class data_t> struct ricci_t
 {
     tensor<2, data_t> LL; // Ricci with two indices down
@@ -31,43 +24,6 @@ template <class data_t> struct ricci_t
 class CCZ4Geometry
 {
   public:
-    template <class data_t, template <typename> class vars_t>
-    static chris_t<data_t>
-    compute_christoffel(const vars_t<tensor<1, data_t>> &d1,
-                        const tensor<2, data_t> &h_UU)
-    {
-        chris_t<data_t> out;
-
-        FOR3(i, j, k)
-        {
-            out.LLL[i][j][k] =
-                0.5 * (d1.h[j][i][k] + d1.h[k][i][j] - d1.h[j][k][i]);
-        }
-        FOR3(i, j, k)
-        {
-            out.ULL[i][j][k] = 0;
-            FOR1(l) { out.ULL[i][j][k] += h_UU[i][l] * out.LLL[l][j][k]; }
-        }
-
-        // Technically we can write out.contracted[i] +=
-        // h_UU[j][k]*chris.ULL[i][j][k], but sometimes people write:
-        // out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1.h[k][j][l];
-        // In theory h_UU[j][k]*d1.h[j][k][i] should be zero due to det h = 1
-        // but in practice this term can deviate from zero.
-        // For PRL 116, 071102 we used the former and it seemed to work well.
-        FOR1(i)
-        {
-            out.contracted[i] = 0;
-            FOR2(j, k) { out.contracted[i] += h_UU[j][k] * out.ULL[i][j][k]; }
-            // FOR3(j,k,l)
-            //{
-            //     //out.contracted[i] += h_UU[i][j]*h_UU[k][l]*d1.h[k][j][l];
-            //}
-        }
-
-        return out;
-    }
-
     template <class data_t, template <typename> class vars_t,
               template <typename> class diff2_vars_t>
     static ricci_t<data_t>

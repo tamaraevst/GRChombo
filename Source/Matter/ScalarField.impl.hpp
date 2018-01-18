@@ -120,7 +120,7 @@ void ScalarField<potential_t>::matter_rhs_excl_potential(
     using namespace TensorAlgebra;
 
     const auto h_UU = compute_inverse_sym(vars.h);
-    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto chris = compute_christoffel(d1.h, h_UU);
 
     // evolution equations for scalar field and (minus) its conjugate momentum
     rhs_sf.phi = vars.lapse * vars_sf.Pi + advec_sf.phi;

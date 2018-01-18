@@ -56,7 +56,7 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     using namespace TensorAlgebra;
 
     const auto h_UU = compute_inverse_sym(matter_vars.h);
-    const auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    const auto chris = compute_christoffel(d1.h, h_UU);
 
     // Calculate elements of the decomposed stress energy tensor
     const auto emtensor =

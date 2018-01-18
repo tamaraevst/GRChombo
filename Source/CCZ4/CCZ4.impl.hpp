@@ -55,7 +55,7 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
     using namespace TensorAlgebra;
 
     auto h_UU = compute_inverse_sym(vars.h);
-    auto chris = CCZ4Geometry::compute_christoffel(d1, h_UU);
+    auto chris = compute_christoffel(d1.h, h_UU);
 
     tensor<1, data_t> Z_over_chi;
     tensor<1, data_t> Z;
