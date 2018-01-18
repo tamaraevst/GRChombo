@@ -8,7 +8,7 @@
 #define CCZ4MATTER_IMPL_HPP_
 
 #define COVARIANTZ4
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 
 template <class matter_t>
 CCZ4Matter<matter_t>::CCZ4Matter(matter_t a_matter, params_t params, double dx,

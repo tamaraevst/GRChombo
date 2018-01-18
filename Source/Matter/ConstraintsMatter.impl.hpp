@@ -6,7 +6,7 @@
 
 #ifndef CONSTRAINTSMATTER_IMPL_HPP_
 #define CONSTRAINTSMATTER_IMPL_HPP_
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 
 template <class matter_t>
 ConstraintsMatter<matter_t>::ConstraintsMatter(const matter_t a_matter,

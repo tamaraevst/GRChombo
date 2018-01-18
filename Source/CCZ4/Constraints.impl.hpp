@@ -6,7 +6,7 @@
 #define CONSTRAINTS_IMPL_HPP_
 
 #include "GRInterval.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "VarsTools.hpp"
 
 inline Constraints::Constraints(double dx,

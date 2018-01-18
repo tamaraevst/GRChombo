@@ -7,7 +7,7 @@
 
 #define COVARIANTZ4
 #include "GRInterval.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "VarsTools.hpp"
 
 inline CCZ4::CCZ4(params_t params, double dx, double sigma, int formulation,

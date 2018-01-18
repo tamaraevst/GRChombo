@@ -4,7 +4,7 @@
 
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
 
