@@ -6,8 +6,8 @@
 #define CONSTRAINTS_IMPL_HPP_
 
 #include "GRInterval.hpp"
-#include "VarsTools.hpp"
 #include "MiscUtils.hpp"
+#include "VarsTools.hpp"
 
 inline Constraints::Constraints(double dx,
                                 double cosmological_constant /*defaulted*/)

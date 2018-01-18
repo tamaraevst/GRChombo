@@ -4,13 +4,14 @@
 
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "MiscUtils.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
-#include "MiscUtils.hpp"
 
 #include <array>
 
-/// Compute class to compute the modulus of the gradient of all variables in the chombo grid
+/// Compute class to compute the modulus of the gradient of all variables in the
+/// chombo grid
 class ComputeModGrad
 {
   protected:

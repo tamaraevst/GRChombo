@@ -6,10 +6,11 @@
 #include "UserVariables.hpp"
 #include <array>
 
-/// This class provides information about where a Chombo box lies in memory and how it is laid out.
+/// This class provides information about where a Chombo box lies in memory and
+/// how it is laid out.
 class BoxPointers
 {
-private:
+  private:
     const int *m_in_lo;
     const int *m_in_hi;
 
@@ -17,14 +18,21 @@ private:
     const int *m_out_hi;
 
   public:
-    std::array<const double*, NUM_VARS> m_in_ptr;
-    std::array<int, CH_SPACEDIM> m_in_stride; //!< Distance in memory between two values corresponding to adjacent coordinates in all directions.
+    std::array<const double *, NUM_VARS> m_in_ptr;
+    std::array<int, CH_SPACEDIM> m_in_stride; //!< Distance in memory between
+                                              //!two values corresponding to
+                                              //!adjacent coordinates in all
+                                              //!directions.
 
-    std::array<double*, NUM_VARS> m_out_ptr;
-    std::array<int, CH_SPACEDIM> m_out_stride; //!< Distance in memory between two values corresponding to adjacent coordinates in all directions.
+    std::array<double *, NUM_VARS> m_out_ptr;
+    std::array<int, CH_SPACEDIM> m_out_stride; //!< Distance in memory between
+                                               //!two values corresponding to
+                                               //!adjacent coordinates in all
+                                               //!directions.
 
-    BoxPointers(const FArrayBox &in, FArrayBox &out) :
-        m_in_lo (in.loVect()), m_in_hi (in.hiVect()), m_out_lo (out.loVect()), m_out_hi (out.hiVect())
+    BoxPointers(const FArrayBox &in, FArrayBox &out)
+        : m_in_lo(in.loVect()), m_in_hi(in.hiVect()), m_out_lo(out.loVect()),
+          m_out_hi(out.hiVect())
     {
         // dataPtr in Chombo does CH_assert bound check
         // which we don't want to do in a loop

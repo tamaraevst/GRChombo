@@ -2,8 +2,8 @@
 #define GRPARMPARSE_HPP_
 
 #include "ParmParse.H"
-#include <memory>
 #include <algorithm>
+#include <memory>
 
 /// Helper structs to translate a dataype into a Chombo ParmParse data type
 template <class T> struct ParmParseTranslator;

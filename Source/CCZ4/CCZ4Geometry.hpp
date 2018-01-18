@@ -2,8 +2,8 @@
 #ifndef CCZ4GEOMETRY_HPP_
 #define CCZ4GEOMETRY_HPP_
 
-#include "TensorAlgebra.hpp"
 #include "MiscUtils.hpp"
+#include "TensorAlgebra.hpp"
 
 //! A structure for the decomposed elements of the Energy Momentum Tensor in
 //! 3+1D

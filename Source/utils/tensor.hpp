@@ -4,8 +4,8 @@
 #include "AlwaysInline.hpp"
 #include "DimensionDefinitions.hpp"
 
-///This class implements a tensor with given rank, element data type, and dimension.
-///By default the dimension is equal to DEFAULT_TENSOR_DIM.
+/// This class implements a tensor with given rank, element data type, and
+/// dimension.  By default the dimension is equal to DEFAULT_TENSOR_DIM.
 template <int rank, class data_t, int size = DEFAULT_TENSOR_DIM> class tensor
 {
     template <int, class, int> friend class tensor;

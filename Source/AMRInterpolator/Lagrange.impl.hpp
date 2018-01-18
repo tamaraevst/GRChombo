@@ -233,7 +233,8 @@ double Lagrange<Order>::interpData(const FArrayBox &fab, int comp)
 }
 
 template <int Order>
-pair<std::vector<IntVect>, std::vector<double>> Lagrange<Order>::generateStencil(
+pair<std::vector<IntVect>, std::vector<double>>
+Lagrange<Order>::generateStencil(
     const std::array<int, CH_SPACEDIM> &deriv,
     const std::array<double, CH_SPACEDIM> &dx,
     const std::array<double, CH_SPACEDIM> &evalCoord, const IntVect &nearest,
@@ -354,7 +355,8 @@ pair<std::vector<IntVect>, std::vector<double>> Lagrange<Order>::generateStencil
 
     // TODO: Now we are at the mercy of NRVO gods. Use move semantics when we do
     // C++11.
-    return pair<std::vector<IntVect>, std::vector<double>>(out_points, out_weights);
+    return pair<std::vector<IntVect>, std::vector<double>>(out_points,
+                                                           out_weights);
 }
 
 #endif /* LAGRANGE_IMPL_HPP_ */

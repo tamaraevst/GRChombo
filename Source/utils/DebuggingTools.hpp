@@ -11,7 +11,8 @@
 /// This file contains a collection of helpful #defines and other definitions
 /// that are hepful for debugging.
 
-// Unfortunately, most of the functionality can only be achieved with macros (e.g. including the variable and filename).
+// Unfortunately, most of the functionality can only be achieved with macros
+// (e.g. including the variable and filename).
 
 #define __FILENAME__                                                           \
     (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)

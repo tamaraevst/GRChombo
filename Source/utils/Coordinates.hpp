@@ -33,16 +33,16 @@ template <class data_t> class Coordinates
 #endif
     }
 
-    ALWAYS_INLINE static void compute_coord(double &out, int position, double dx,
+    ALWAYS_INLINE static void compute_coord(double &out, int position,
+                                            double dx,
                                             double center_distance = 0)
     {
         out = (position + 0.5) * dx - center_distance;
     }
 
-    static
-        typename std::enable_if_t<(simd_traits<double>::simd_len > 1), void>
-        compute_coord(simd<double> &out, int position, double dx,
-                      double center_distance = 0)
+    static typename std::enable_if_t<(simd_traits<double>::simd_len > 1), void>
+    compute_coord(simd<double> &out, int position, double dx,
+                  double center_distance = 0)
     {
         double out_arr[simd_traits<double>::simd_len];
         for (int i = 0; i < simd_traits<double>::simd_len; ++i)

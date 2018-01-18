@@ -1,7 +1,6 @@
 #ifndef NANCHECK_HPP_
 #define NANCHECK_HPP_
 
-
 #include "Cell.hpp"
 #include "UserVariables.hpp"
 
