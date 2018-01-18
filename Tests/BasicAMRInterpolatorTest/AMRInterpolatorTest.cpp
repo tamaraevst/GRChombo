@@ -34,10 +34,8 @@ using std::endl;
 #include <omp.h>
 #endif
 
-int main(int argc, char *argv[])
+int runInterpolatorTest(int argc, char *argv[])
 {
-    mainSetup(argc, argv);
-
     // Load the parameter file and construct the SimulationParameter class
     // To add more parameters edit the SimulationParameters file.
     std::string in_string = argv[argc - 1];
@@ -101,12 +99,21 @@ int main(int argc, char *argv[])
         status |= (abs(phi_ptr[ipoint] - 42.) > 1e-10);
     }
 
+    return status;
+}
+
+int main(int argc ,char* argv[])
+{
+    mainSetup(argc, argv);
+
+    int status = runInterpolatorTest(argc, argv);
+
     if (status == 0)
-        pout() << "AMRInterpolator test passed." << endl;
+        pout() << "BasicAMRInterpolator test passed." << endl;
     else
-        pout() << "AMRInterpolator test failed with return code " << status
+        pout() << "BasicAMRInterpolator test failed with return code " << status
                << endl;
 
     mainFinalize();
-    return status;
+    return status ;
 }

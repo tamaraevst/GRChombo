@@ -23,7 +23,7 @@
      user must specify in a class, although a default is provided which
      sets dVdphi and V_of_phi to zero.
      It assumes minimal coupling of the field to gravity.
-     \sa CCZ4Matter(), ConstraintsMatter()
+     \sa MatterCCZ4(), ConstraintsMatter()
 */
 template <class potential_t = DefaultPotential> class ScalarField
 {

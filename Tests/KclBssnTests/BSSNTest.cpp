@@ -5,8 +5,8 @@
 #endif
 
 #include "BoxLoops.hpp"
-#include "CCZ4Matter.hpp"
-#include "ConstraintsMatter.hpp"
+#include "MatterCCZ4.hpp"
+#include "MatterConstraints.hpp"
 #include "FArrayBox.H"
 #include "Potential.hpp"
 #include "ScalarField.hpp"
@@ -230,11 +230,11 @@ int main()
     typedef ScalarField<Potential> ScalarFieldWithPotential;
     Potential my_potential(potential_params);
     ScalarFieldWithPotential my_scalar_field(my_potential);
-    BoxLoops::loop(CCZ4Matter<ScalarFieldWithPotential>(my_scalar_field, params,
+    BoxLoops::loop(MatterCCZ4<ScalarFieldWithPotential>(my_scalar_field, params,
                                                         dx, sigma, formulation,
                                                         G_Newton),
                    in_fab, out_fab);
-    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(my_scalar_field,
+    BoxLoops::loop(MatterConstraints<ScalarFieldWithPotential>(my_scalar_field,
                                                                dx, G_Newton),
                    in_fab, out_fab);
     BoxLoops::loop(Constraints(dx), in_fab, out_fab_ccz4constraints);

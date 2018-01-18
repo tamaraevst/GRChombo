@@ -1,17 +1,13 @@
-// Last edited K Clough 16.02.17
-
-#if !defined(CCZ4MATTER_HPP_)
-#error "This file should only be included through CCZ4Matter.hpp"
+#if !defined(MATTERCCZ4_HPP_)
+#error "This file should only be included through MatterCCZ4.hpp"
 #endif
 
-#ifndef CCZ4MATTER_IMPL_HPP_
-#define CCZ4MATTER_IMPL_HPP_
-
-#define COVARIANTZ4
+#ifndef MATTERCCZ4_IMPL_HPP_
+#define MATTERCCZ4_IMPL_HPP_
 #include "DimensionDefinitions.hpp"
 
 template <class matter_t>
-CCZ4Matter<matter_t>::CCZ4Matter(matter_t a_matter, params_t params, double dx,
+MatterCCZ4<matter_t>::MatterCCZ4(matter_t a_matter, params_t params, double dx,
                                  double sigma, int formulation, double G_Newton)
     : CCZ4(params, dx, sigma, formulation, 0.0 /*No cosmological constant*/),
       my_matter(a_matter), m_G_Newton(G_Newton)
@@ -20,7 +16,7 @@ CCZ4Matter<matter_t>::CCZ4Matter(matter_t a_matter, params_t params, double dx,
 
 template <class matter_t>
 template <class data_t>
-void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell) const
+void MatterCCZ4<matter_t>::compute(Cell<data_t> current_cell) const
 {
     // copy data from chombo gridpoint into local variables
     const auto matter_vars = current_cell.template load_vars<Vars>();
@@ -49,7 +45,7 @@ void CCZ4Matter<matter_t>::compute(Cell<data_t> current_cell) const
 // Function to add in EM Tensor matter terms to CCZ4 rhs
 template <class matter_t>
 template <class data_t>
-void CCZ4Matter<matter_t>::add_EMTensor_rhs(
+void MatterCCZ4<matter_t>::add_EMTensor_rhs(
     Vars<data_t> &matter_rhs, const Vars<data_t> &matter_vars,
     const Vars<tensor<1, data_t>> &d1) const
 {
@@ -101,4 +97,4 @@ void CCZ4Matter<matter_t>::add_EMTensor_rhs(
     }
 }
 
-#endif /* CCZ4MATTER_IMPL_HPP_ */
+#endif /* MATTERCCZ4_IMPL_HPP_ */

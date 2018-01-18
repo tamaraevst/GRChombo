@@ -1,15 +1,13 @@
-// Last edited K Clough 16.02.17
-
-#if !defined(CONSTRAINTSMATTER_HPP_)
-#error "This file should only be included through ConstraintsMatter.hpp"
+#if !defined(MATTERCONSTRAINTS_HPP_)
+#error "This file should only be included through MatterConstraints.hpp"
 #endif
 
-#ifndef CONSTRAINTSMATTER_IMPL_HPP_
-#define CONSTRAINTSMATTER_IMPL_HPP_
+#ifndef MATTERCONSTRAINTS_IMPL_HPP_
+#define MATTERCONSTRAINTS_IMPL_HPP_
 #include "DimensionDefinitions.hpp"
 
 template <class matter_t>
-ConstraintsMatter<matter_t>::ConstraintsMatter(const matter_t a_matter,
+MatterConstraints<matter_t>::MatterConstraints(const matter_t a_matter,
                                                double dx, double G_Newton)
     : Constraints(dx, 0.0 /*No cosmological constant*/), my_matter(a_matter),
       m_G_Newton(G_Newton)
@@ -18,7 +16,7 @@ ConstraintsMatter<matter_t>::ConstraintsMatter(const matter_t a_matter,
 
 template <class matter_t>
 template <class data_t>
-void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell) const
+void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
 {
     // Load local vars and calculate derivs
     const auto vars = current_cell.template load_vars<Vars>();
@@ -46,4 +44,4 @@ void ConstraintsMatter<matter_t>::compute(Cell<data_t> current_cell) const
     current_cell.store_vars(out.Mom, GRInterval<c_Mom1, c_Mom3>());
 }
 
-#endif /* CONSTRAINTSMATTER_IMPL_HPP_ */
+#endif /* MATTERCONSTRAINTS_IMPL_HPP_ */

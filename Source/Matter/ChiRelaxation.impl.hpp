@@ -1,14 +1,12 @@
-// Last edited K Clough 16.02.17
-
-#if !defined(RELAXATIONCHI_HPP_)
-#error "This file should only be included through RelaxationChi.hpp"
+#if !defined(CHIRELAXATION_HPP_)
+#error "This file should only be included through ChiRelaxation.hpp"
 #endif
 
-#ifndef RELAXATIONCHI_IMPL_HPP_
-#define RELAXATIONCHI_IMPL_HPP_
+#ifndef CHIRELAXATION_IMPL_HPP_
+#define CHIRELAXATION_IMPL_HPP_
 
 template <class matter_t>
-RelaxationChi<matter_t>::RelaxationChi(matter_t a_matter, double dx,
+ChiRelaxation<matter_t>::ChiRelaxation(matter_t a_matter, double dx,
                                        double relax_speed, double G_Newton)
     : my_matter(a_matter), m_relax_speed(relax_speed), m_G_Newton(G_Newton),
       m_deriv(dx)
@@ -17,7 +15,7 @@ RelaxationChi<matter_t>::RelaxationChi(matter_t a_matter, double dx,
 
 template <class matter_t>
 template <class data_t>
-void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) const
+void ChiRelaxation<matter_t>::compute(Cell<data_t> current_cell) const
 {
 
     // copy data from chombo gridpoint into local variable and calculate derivs
@@ -40,7 +38,7 @@ void RelaxationChi<matter_t>::compute(Cell<data_t> current_cell) const
 
 template <class matter_t>
 template <class data_t>
-void RelaxationChi<matter_t>::rhs_equation(
+void ChiRelaxation<matter_t>::rhs_equation(
     Vars<data_t> &rhs, const Vars<data_t> &vars,
     const Vars<tensor<1, data_t>> &d1, const Diff2Vars<tensor<2, data_t>> &d2,
     const Vars<data_t> &advec) const
@@ -60,10 +58,11 @@ void RelaxationChi<matter_t>::rhs_equation(
 
     // Calculate the relaxation RHS for chi, all other vars RHS zero
     // Could have called ConstraintsMatter here, but it is hardly worth it
+    // The division by chi prevents it (usually) from doing chi=0 as a solution
     rhs.chi =
         m_relax_speed *
         (ricci.scalar + (GR_SPACEDIM - 1.) * vars.K * vars.K / GR_SPACEDIM -
-         tr_AA - 16.0 * M_PI * m_G_Newton * emtensor.rho);
+         tr_AA - 16.0 * M_PI * m_G_Newton * emtensor.rho) / vars.chi;
 }
 
-#endif /* RELAXATIONCHI_IMPL_HPP_ */
+#endif /* CHIRELAXATION_IMPL_HPP_ */

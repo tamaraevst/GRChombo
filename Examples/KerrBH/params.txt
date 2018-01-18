@@ -1,4 +1,4 @@
-# Last edited K Clough 22.6.17
+#Params for runtime inputs
 
 verbosity = 0
 chk_prefix = KerrBH_
@@ -7,9 +7,9 @@ plot_prefix = KerrBHp_
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
-N1 = 32
-N2 = 32
-N3 = 32
+N1 = 64
+N2 = 64
+N3 = 64
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
