@@ -2,6 +2,7 @@
 #define BINARYBHLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
+#include "DefaultLevelFactory.hpp"
 
 class BinaryBHLevel : public GRAMRLevel
 {
@@ -25,7 +26,5 @@ class BinaryBHLevel : public GRAMRLevel
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
 };
-
-#include "BinaryBHLevel.impl.hpp"
 
 #endif /* BINARYBHLEVEL_HPP_ */

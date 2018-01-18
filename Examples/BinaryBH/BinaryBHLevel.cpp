@@ -1,10 +1,3 @@
-#if !defined(BINARYBHLEVEL_HPP_)
-#error "This file should only be included through BinaryBHLevel.hpp"
-#endif
-
-#ifndef BINARYBHLEVEL_IMPL_HPP_
-#define BINARYBHLEVEL_IMPL_HPP_
-
 #include "BinaryBHLevel.hpp"
 #include "BoxLoops.hpp"
 #include "CCZ4.hpp"
@@ -79,5 +72,3 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 {
     BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
-
-#endif

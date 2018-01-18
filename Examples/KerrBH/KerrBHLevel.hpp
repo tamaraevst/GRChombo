@@ -2,6 +2,7 @@
 #define KERRBHLEVEL_HPP_
 
 #include "GRAMRLevel.hpp"
+#include "DefaultLevelFactory.hpp"
 
 class KerrBHLevel : public GRAMRLevel
 {
@@ -28,7 +29,5 @@ class KerrBHLevel : public GRAMRLevel
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
 };
-
-#include "KerrBHLevel.impl.hpp"
 
 #endif /* KERRBHLEVEL_HPP_ */
