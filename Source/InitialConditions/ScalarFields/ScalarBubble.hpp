@@ -3,7 +3,7 @@
 
 #include "Cell.hpp"
 #include "Coordinates.hpp"
-#include "CCZ4Matter.hpp"
+#include "MatterCCZ4.hpp"
 #include "ScalarField.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"

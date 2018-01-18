@@ -1,5 +1,3 @@
-// Last edited K Clough 16.10.16
-
 #ifndef SIMULATIONPARAMETERS_HPP_
 #define SIMULATIONPARAMETERS_HPP_
 

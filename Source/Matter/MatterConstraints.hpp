@@ -1,7 +1,5 @@
-// Last edited K Clough 08.05.17
-
-#ifndef CONSTRAINTSMATTER_HPP_
-#define CONSTRAINTSMATTER_HPP_
+#ifndef MATTERCONSTRAINTS_HPP_
+#define MATTERCONSTRAINTS_HPP_
 
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
@@ -22,7 +20,7 @@
    For an example of a matter_t class see ScalarField. \sa Constraints(),
    ScalarField()
 */
-template <class matter_t> class ConstraintsMatter : public Constraints
+template <class matter_t> class MatterConstraints : public Constraints
 {
   public:
     template <class data_t>
@@ -42,13 +40,13 @@ template <class matter_t> class ConstraintsMatter : public Constraints
         }
     };
 
-    //!  Constructor of class ConstraintsMatter
+    //!  Constructor of class MatterConstraints
     /*!
          Takes in the grid spacing, and matter object plus
          optionally the value of Newton's constant, which is set to one by
        default.
     */
-    ConstraintsMatter(const matter_t a_matter, double dx,
+    MatterConstraints(const matter_t a_matter, double dx,
                       double G_Newton = 1.0);
 
     //! The compute member which calculates the constraints at each point in the
@@ -60,6 +58,6 @@ template <class matter_t> class ConstraintsMatter : public Constraints
     double m_G_Newton;  //!< Newton's constant, set to one by default.
 };
 
-#include "ConstraintsMatter.impl.hpp"
+#include "MatterConstraints.impl.hpp"
 
-#endif /* CONSTRAINTSMATTER_HPP_ */
+#endif /* MATTERCONSTRAINTS_HPP_ */

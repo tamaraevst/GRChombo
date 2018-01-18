@@ -1,5 +1,3 @@
-// Last edited K Clough 17.05.17
-
 #if !defined(SCALARFIELDLEVEL_HPP_)
 #error "This file should only be included through ScalarFieldLevel.hpp"
 #endif
@@ -9,16 +7,15 @@
 
 // General includes common to most GR problems
 #include "BoxLoops.hpp"
-#include "EnforceTfA.hpp"
+#include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
-#include "ScalarFieldLevel.hpp"
 
 // For RHS update
-#include "CCZ4Matter.hpp"
+#include "MatterCCZ4.hpp"
 
 // For constraints calculation
-#include "ConstraintsMatter.hpp"
+#include "MatterConstraints.hpp"
 
 // For tag cells
 #include "PhiAndKTaggingCriterion.hpp"
@@ -26,7 +23,7 @@
 // Problem specific includes
 #include "ComputePack.hpp"
 #include "Potential.hpp"
-#include "RelaxationChi.hpp"
+#include "ChiRelaxation.hpp"
 #include "ScalarBubble.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
@@ -35,7 +32,7 @@
 void ScalarFieldLevel::specificAdvance()
 {
     // Enforce trace free A_ij and positive chi and alpha
-    BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+    BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
                    m_state_new, m_state_new, FILL_GHOST_CELLS);
 
     // Check for nan's
@@ -64,7 +61,7 @@ void ScalarFieldLevel::preCheckpointLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential);
-    BoxLoops::loop(ConstraintsMatter<ScalarFieldWithPotential>(
+    BoxLoops::loop(MatterConstraints<ScalarFieldWithPotential>(
                        scalar_field, m_dx, m_p.G_Newton),
                    m_state_new, m_state_new, SKIP_GHOST_CELLS);
 }
@@ -84,7 +81,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
         // satisfy constraints per initial conditions
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        RelaxationChi<ScalarFieldWithPotential> relaxation(
+        ChiRelaxation<ScalarFieldWithPotential> relaxation(
             scalar_field, m_dx, m_p.relaxspeed, m_p.G_Newton);
         SetValue set_other_values_zero(0.0, Interval(c_h11, c_Mom3));
         auto compute_pack1 =
@@ -95,15 +92,15 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     {
 
         // Enforce trace free A_ij and positive chi and alpha
-        BoxLoops::loop(make_compute_pack(EnforceTfA(), PositiveChiAndAlpha()),
+        BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
                        a_soln, a_soln, FILL_GHOST_CELLS);
 
-        // Calculate CCZ4Matter right hand side with matter_t = ScalarField
+        // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
         // We don't want undefined values floating around in the constraints so
         // zero these
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential);
-        CCZ4Matter<ScalarFieldWithPotential> my_ccz4_matter(
+        MatterCCZ4<ScalarFieldWithPotential> my_ccz4_matter(
             scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
             m_p.G_Newton);
         SetValue set_constraints_zero(0.0, Interval(c_Ham, c_Mom3));
@@ -118,14 +115,14 @@ void ScalarFieldLevel::specificUpdateODE(GRLevelData &a_soln,
                                          const GRLevelData &a_rhs, Real a_dt)
 {
     // Enforce trace free A_ij
-    BoxLoops::loop(EnforceTfA(), a_soln, a_soln, FILL_GHOST_CELLS);
+    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, FILL_GHOST_CELLS);
 }
 
 // Specify if you want any plot files to be written, with which vars
 void ScalarFieldLevel::specificWritePlotHeader(
     std::vector<int> &plot_states) const
 {
-    plot_states = {c_chi, c_K};
+    plot_states = {c_phi, c_K};
 }
 
 void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,

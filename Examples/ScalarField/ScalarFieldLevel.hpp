@@ -14,7 +14,7 @@
      and evolves it using the CCZ4 equations. It is possible to specify an
    initial period of relaxation for the conformal factor chi, for non analytic
    initial conditions (for example, a general field configuration at a moment of
-   time symmetry assuming conformal flatness). \sa CCZ4Matter(),
+   time symmetry assuming conformal flatness). \sa MatterCCZ4(),
    ConstraintsMatter(), ScalarField(), RelaxationChi()
 */
 class ScalarFieldLevel : public GRAMRLevel

@@ -1,9 +1,9 @@
-# Last edited K Clough 16.10.16
+#Params for runtime inputs
 
 verbosity = 0
-chk_prefix = outMatterSF_
-plot_prefix = outMatterSFp_
-#restart_file = outMatterSF_000060.3d.hdf5
+chk_prefix = ScalarField_
+plot_prefix = ScalarFieldp_
+#restart_file = ScalarField_000060.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -18,8 +18,8 @@ L =  64
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
 regrid_threshold = 0.5
-regrid_threshold_K = 0.1
-regrid_threshold_phi = 1.0
+regrid_threshold_K = 0.2
+regrid_threshold_phi = 0.1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
@@ -27,16 +27,16 @@ max_level = 6 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 50 50 5 5 5 50 50
+regrid_interval = 50 50 5 5 5 5 5
 # Ratio of dx_coarse/dx_fine at each level, usually best to stick to 2
 # Need one for each level, ie max_level+1 items
 ref_ratio = 2 2 2 2 2 2 2
-# Max box sizes
+# Max box size
 max_grid_size = 16
-# Min grid size
+# Min box size
 block_factor = 16
 # Determines how exactly regridding tries to fit the tagging
-fill_ratio = 0.75
+fill_ratio = 0.7
 #Periodicity and ghost cells
 isPeriodic = 1 1 1
 num_ghosts = 3
@@ -44,10 +44,10 @@ num_ghosts = 3
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
-checkpoint_interval = 10
-plot_interval = 1
+checkpoint_interval = 20
+plot_interval = 5
 dt_multiplier = 0.25
-stop_time = 5.0
+stop_time = 50.0
 max_steps = 10000000
 
 #Lapse evolution
@@ -78,7 +78,7 @@ sigma = 0.3
 # G_Newton = 1.0
 
 # SF Initial data
-amplitudeSF = 0.0025
+amplitudeSF = 0.01
 widthSF = 1.0
 r_zero = 5.0
 scalar_mass = 0.001
@@ -88,5 +88,5 @@ scalar_mass = 0.001
 
 # Relaxation paramters
 # how long and how fast to relax
-relaxtime = 2.0
+relaxtime = 20.0
 relaxspeed = 0.01
