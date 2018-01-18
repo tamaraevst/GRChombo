@@ -215,13 +215,9 @@ ALWAYS_INLINE tensor<2, data_t> lower_all(const tensor<2, data_t> &tensor_UU,
 constexpr int delta(int i, int j) { return (i == j); }
 
 /// Computes the levi-civita symbol (3D, NB, symbol, not the tensor)
-tensor<3,double> epsilon() 
+inline tensor<3,double> epsilon()
 {
-    tensor<3, double> epsilon;
-    FOR3(i,j,k)
-    {
-       epsilon[i][j][k] = 0.0;
-    } 
+    tensor<3, double> epsilon = {0.};
     epsilon[0][1][2] = 1.0;
     epsilon[1][2][0] = 1.0;
     epsilon[2][0][1] = 1.0;
