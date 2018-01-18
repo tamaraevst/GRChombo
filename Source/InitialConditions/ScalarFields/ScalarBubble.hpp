@@ -3,13 +3,12 @@
 
 #include "Cell.hpp"
 #include "Coordinates.hpp"
+#include "CCZ4Matter.hpp"
 #include "ScalarField.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
-#include <array>
-#include <vector>
 
 //! Class which creates a bubble of a scalar field given params for initial
 //! matter config
