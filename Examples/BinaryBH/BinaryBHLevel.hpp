@@ -10,21 +10,21 @@ class BinaryBHLevel : public GRAMRLevel
     // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
-    virtual void specificAdvance();
+    virtual void specificAdvance() override;
 
     // initialize data
-    virtual void initialData();
+    virtual void initialData() override;
 
-    virtual void preCheckpointLevel();
+    virtual void preCheckpointLevel() override;
 
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
-                                 const double a_time);
+                                 const double a_time) override;
 
     virtual void specificUpdateODE(GRLevelData &a_soln,
-                                   const GRLevelData &a_rhs, Real a_dt);
+                                   const GRLevelData &a_rhs, Real a_dt) override;
 
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
-                                         const FArrayBox &current_state);
+                                         const FArrayBox &current_state) override;
 };
 
 #endif /* BINARYBHLEVEL_HPP_ */
