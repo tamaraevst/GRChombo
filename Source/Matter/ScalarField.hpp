@@ -8,7 +8,6 @@
 #include "CCZ4Matter.hpp"
 #include "DefaultPotential.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"

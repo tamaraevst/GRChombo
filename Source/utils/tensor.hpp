@@ -2,13 +2,10 @@
 #define TENSOR_HPP_
 
 #include "AlwaysInline.hpp"
-#include "GRUtils.hpp"
-//#include <initializer_list>
+#include "DimensionDefinitions.hpp"
 
-// C++ standard, 12.8 Copying class objects:
-// Each subobject is assigned in the manner appropriate to its type:
-// - if the subobject is an array, EACH ELEMENT IS ASSIGNED, in the manner
-// appropriate to the element type;
+///This class implements a tensor with given rank, element data type, and dimension.
+///By default the dimension is equal to DEFAULT_TENSOR_DIM.
 template <int rank, class data_t, int size = DEFAULT_TENSOR_DIM> class tensor
 {
     template <int, class, int> friend class tensor;

@@ -4,6 +4,7 @@
 #include "Cell.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
+#include "MiscUtils.hpp"
 #include <array>
 
 class FourthOrderDerivatives

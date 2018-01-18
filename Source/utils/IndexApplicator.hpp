@@ -40,7 +40,6 @@ template <typename t, typename... Ts> class IndexApplicator<t, Ts...>
   public:
     template <typename data_t>
     static ALWAYS_INLINE
-
         typename GetIndexTraits<data_t &, t, Ts...>::type
         apply(data_t &obj, t dir0, Ts... dirs)
     {

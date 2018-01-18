@@ -6,6 +6,7 @@
 
 #ifndef SCALARFIELD_IMPL_HPP_
 #define SCALARFIELD_IMPL_HPP_
+#include "MiscUtils.hpp"
 
 // Calculate the stress energy tensor elements
 template <class potential_t>

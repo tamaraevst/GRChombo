@@ -4,7 +4,6 @@
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "TensorAlgebra.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"

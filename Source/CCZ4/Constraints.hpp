@@ -6,7 +6,6 @@
 #include "Cell.hpp"
 #include "FArrayBox.H"
 #include "FourthOrderDerivatives.hpp"
-#include "GRUtils.hpp"
 #include "simd.hpp"
 #include "tensor.hpp"
 
