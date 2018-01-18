@@ -2,7 +2,6 @@
 #define COORDINATES_HPP_
 
 #include "DimensionDefinitions.hpp"
-#include "MiscUtils.hpp"
 #include "simd.hpp"
 
 template <class data_t> class Coordinates
@@ -58,10 +57,9 @@ template <class data_t> class Coordinates
     {
         // Note that this is not currently dimension independent
         data_t r = sqrt(pow(x, 2) + pow(y, 2) + pow(z, 2));
-        double minimum_r = 1e-6;
-        MIN_CUT_OFF(r, minimum_r);
 
-        return r;
+        const double minimum_r = 1e-6;
+        return simd_max(r, minimum_r);
     }
 
     /// This static function returns the radius subject to a floor
@@ -80,10 +78,8 @@ template <class data_t> class Coordinates
 
         data_t r = sqrt(pow(xx, 2) + pow(yy, 2) + pow(zz, 2));
 
-        double minimum_r = 1e-6;
-        MIN_CUT_OFF(r, minimum_r);
-
-        return r;
+        const double minimum_r = 1e-6;
+        return simd_max(r, minimum_r);
     }
 };
 

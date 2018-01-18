@@ -57,8 +57,7 @@ data_t BoostedBH::center_dist(Coordinates<data_t> coords) const
                     pow(coords.z - m_params.center[2], 2));
 
     double minimum_r = 1e-6;
-    MIN_CUT_OFF(r, minimum_r);
-    return r;
+    return simd_max(r, minimum_r);
 }
 
 template <class data_t> data_t BoostedBH::psi0(data_t r) const

@@ -89,8 +89,7 @@ void KerrBH::compute_kerr(tensor<2, data_t> &spherical_g,
     data_t r2 = r * r;
 
     // the radius in xy plane, subject to a floor
-    data_t rho2 = x * x + y * y;
-    MIN_CUT_OFF(rho2, 1e-12);
+    data_t rho2 = simd_max(x * x + y * y, 1e-12);
     data_t rho = sqrt(rho2);
 
     // calculate useful position quantities
