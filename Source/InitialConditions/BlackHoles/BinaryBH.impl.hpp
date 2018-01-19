@@ -51,13 +51,13 @@ data_t BinaryBH::compute_chi(Coordinates<data_t> coords) const
 }
 
 template <class data_t>
-tensor<2, data_t> BinaryBH::compute_A(data_t chi,
+Tensor<2, data_t> BinaryBH::compute_A(data_t chi,
                                       Coordinates<data_t> coords) const
 {
 
-    tensor<2, data_t> Aij1 = bh1.Aij(coords);
-    tensor<2, data_t> Aij2 = bh2.Aij(coords);
-    tensor<2, data_t> out;
+    Tensor<2, data_t> Aij1 = bh1.Aij(coords);
+    Tensor<2, data_t> Aij2 = bh2.Aij(coords);
+    Tensor<2, data_t> out;
 
     // Aij(CCZ4) = psi^(-6) * Aij(Baumgarte&Shapiro book)
     FOR2(i, j) out[i][j] = pow(chi, 3 / 2.) * (Aij1[i][j] + Aij2[i][j]);

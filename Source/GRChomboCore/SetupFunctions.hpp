@@ -24,10 +24,6 @@ void mainFinalize();
 // Sets up the grid parameters, problem domain and AMR object
 void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory);
 
-// TODO (MK): There is a lot of clutter still in this file ... get rid of
-// everything that's not necessary  and comment on the rest (so that we don't
-// carry around useless code forever
-
 void mainSetup(int argc, char *argv[])
 {
 #ifdef CH_MPI
@@ -89,10 +85,6 @@ void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
     const int additional_grid_buffer = 3;
 
     ParmParse pp;
-
-    // TODO: All the parameter loading code in this function is really verbose
-    // and ugly.  Could consider moving it to some base form of
-    // SimulationParameters.
 
     IntVect ivN = IntVect::Unit;
     // Setup the grid size

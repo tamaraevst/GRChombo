@@ -24,7 +24,7 @@ data_t BoostedBH::psi_minus_one(Coordinates<data_t> coords) const
 }
 
 template <class data_t>
-tensor<2, data_t> BoostedBH::Aij(Coordinates<data_t> coords) const
+Tensor<2, data_t> BoostedBH::Aij(Coordinates<data_t> coords) const
 {
     const data_t r = center_dist(coords);
     const data_t l[3] = {(coords.x - m_params.center[0]) / r,
@@ -34,7 +34,7 @@ tensor<2, data_t> BoostedBH::Aij(Coordinates<data_t> coords) const
                            l[1] * m_params.momentum[1] +
                            l[2] * m_params.momentum[2];
 
-    tensor<2, data_t> out;
+    Tensor<2, data_t> out;
 
     FOR2(i, j)
     {

@@ -5,10 +5,8 @@
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
-
+#include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
-
 #include <array>
 
 enum Lapse
@@ -41,7 +39,7 @@ class BinaryBH
     data_t compute_chi(Coordinates<data_t> coords) const;
 
     template <class data_t>
-    tensor<2, data_t> compute_A(data_t chi, Coordinates<data_t> coords) const;
+    Tensor<2, data_t> compute_A(data_t chi, Coordinates<data_t> coords) const;
 };
 
 #include "BinaryBH.impl.hpp"

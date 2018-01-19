@@ -1,7 +1,7 @@
 #include "FArrayBox.H"
 #include "SetValue.hpp"
 #include "UserVariables.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <iostream>
 
 #include "BoxLoops.hpp"

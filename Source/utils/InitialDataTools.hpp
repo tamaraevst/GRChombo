@@ -3,18 +3,18 @@
 
 #include "AlwaysInline.hpp"
 #include "DimensionDefinitions.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 namespace InitialDataTools
 {
-// Convert a tensor (with two lower indices) in spherical coords to cartesian
+// Convert a Tensor (with two lower indices) in spherical coords to cartesian
 // coords
 template <class data_t>
-static tensor<2, data_t>
-    spherical_to_cartesian_LL(tensor<2, data_t> spherical_g, data_t x, double y,
+static Tensor<2, data_t>
+    spherical_to_cartesian_LL(Tensor<2, data_t> spherical_g, data_t x, double y,
                               double z)
 {
-    tensor<2, data_t> cartesian_g;
+    Tensor<2, data_t> cartesian_g;
 
     // calculate useful position quantities
     data_t rho2 = simd_max(x * x + y * y, 1e-12);
@@ -27,7 +27,7 @@ static tensor<2, data_t>
     data_t sin_phi = y / rho;
 
     // derivatives for jacobian matrix - drdx etc
-    tensor<2, data_t> jac;
+    Tensor<2, data_t> jac;
     jac[0][0] = x / r;
     jac[1][0] = cos_phi * z / r2;
     jac[2][0] = -y / rho2;
@@ -38,7 +38,7 @@ static tensor<2, data_t>
     jac[1][2] = -rho / r2;
     jac[2][2] = 0.0;
 
-    // Convert the tensor to cartesian coords
+    // Convert the Tensor to cartesian coords
     FOR2(i, j)
     {
         cartesian_g[i][j] = 0;
@@ -53,10 +53,10 @@ static tensor<2, data_t>
 // Convert a vector (with one upper index) in spherical coords to cartesian
 // coords
 template <class data_t>
-tensor<1, data_t> spherical_to_cartesian_U(tensor<1, data_t> spherical_v,
+Tensor<1, data_t> spherical_to_cartesian_U(Tensor<1, data_t> spherical_v,
                                            data_t x, double y, double z)
 {
-    tensor<1, data_t> cartesian_v;
+    Tensor<1, data_t> cartesian_v;
 
     // calculate useful position quantities
     data_t rho2 = simd_max(x * x + y * y, 1e-12);
@@ -70,7 +70,7 @@ tensor<1, data_t> spherical_to_cartesian_U(tensor<1, data_t> spherical_v,
     data_t sin_phi = y / rho;
 
     // calculate the inverse jacobian, dxdr etc
-    tensor<2, data_t> inv_jac;
+    Tensor<2, data_t> inv_jac;
     inv_jac[0][0] = x / r;
     inv_jac[1][0] = y / r;
     inv_jac[2][0] = z / r;

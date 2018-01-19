@@ -3,20 +3,20 @@
 
 #include "AlwaysInline.hpp"
 #include "DimensionDefinitions.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 template <class data_t> struct chris_t
 {
-    tensor<3, data_t> ULL;        //!<standard christoffel symbols
-    tensor<3, data_t> LLL;        //!<3 lower indices
-    tensor<1, data_t> contracted; //!<contracted christoffel
+    Tensor<3, data_t> ULL;        //!<standard christoffel symbols
+    Tensor<3, data_t> LLL;        //!<3 lower indices
+    Tensor<1, data_t> contracted; //!<contracted christoffel
 };
 
 namespace TensorAlgebra
 {
 /// Computes determinant of a symmetric 3x3 matrix
 template <class data_t>
-ALWAYS_INLINE data_t compute_determinant_sym(const tensor<2, data_t, 3> &matrix)
+ALWAYS_INLINE data_t compute_determinant_sym(const Tensor<2, data_t, 3> &matrix)
 {
     data_t det = matrix[0][0] * matrix[1][1] * matrix[2][2] +
                  2 * matrix[0][1] * matrix[0][2] * matrix[1][2] -
@@ -30,7 +30,7 @@ ALWAYS_INLINE data_t compute_determinant_sym(const tensor<2, data_t, 3> &matrix)
 /// Computes the determinant of a general 3x3 matrix.
 /// Note: for a symmetric matrix use the simplified function
 template <class data_t>
-ALWAYS_INLINE data_t compute_determinant(const tensor<2, data_t, 3> &matrix)
+ALWAYS_INLINE data_t compute_determinant(const Tensor<2, data_t, 3> &matrix)
 {
     data_t det =
         matrix[0][0] *
@@ -44,11 +44,11 @@ ALWAYS_INLINE data_t compute_determinant(const tensor<2, data_t, 3> &matrix)
 
 /// Computes the inverse of a symmetric 3x3 matrix directly.
 template <class data_t>
-tensor<2, data_t> compute_inverse_sym(const tensor<2, data_t, 3> &matrix)
+Tensor<2, data_t> compute_inverse_sym(const Tensor<2, data_t, 3> &matrix)
 {
     data_t deth = compute_determinant_sym(matrix);
     data_t deth_inverse = 1. / deth;
-    tensor<2, data_t> h_UU;
+    Tensor<2, data_t> h_UU;
     h_UU[0][0] = (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[1][2]) *
                  deth_inverse;
     h_UU[0][1] = (matrix[0][2] * matrix[1][2] - matrix[0][1] * matrix[2][2]) *
@@ -71,11 +71,11 @@ tensor<2, data_t> compute_inverse_sym(const tensor<2, data_t, 3> &matrix)
 /// Computes the inverse of a general 3x3 matrix.
 /// Note: for a symmetric matrix use the simplified function
 template <class data_t>
-tensor<2, data_t> compute_inverse(const tensor<2, data_t, 3> &matrix)
+Tensor<2, data_t> compute_inverse(const Tensor<2, data_t, 3> &matrix)
 {
     data_t deth = compute_determinant(matrix);
     data_t deth_inverse = 1. / deth;
-    tensor<2, data_t> h_UU;
+    Tensor<2, data_t> h_UU;
     h_UU[0][0] = (matrix[1][1] * matrix[2][2] - matrix[1][2] * matrix[2][1]) *
                  deth_inverse;
     h_UU[1][1] = (matrix[0][0] * matrix[2][2] - matrix[0][2] * matrix[2][0]) *
@@ -98,19 +98,19 @@ tensor<2, data_t> compute_inverse(const tensor<2, data_t, 3> &matrix)
     return h_UU;
 }
 
-/// Computes the trace of a 2-tensor with lower indices given an inverse metric.
+/// Computes the trace of a 2-Tensor with lower indices given an inverse metric.
 template <class data_t>
-ALWAYS_INLINE data_t compute_trace(const tensor<2, data_t> &tensor_LL,
-                                   const tensor<2, data_t> &inverse_metric)
+ALWAYS_INLINE data_t compute_trace(const Tensor<2, data_t> &tensor_LL,
+                                   const Tensor<2, data_t> &inverse_metric)
 {
     data_t trace = 0.;
     FOR2(i, j) { trace += inverse_metric[i][j] * tensor_LL[i][j]; }
     return trace;
 }
 
-/// Computes the trace of a 1,1 tensor (a matrix) - no metric required.
+/// Computes the trace of a 1,1 Tensor (a matrix) - no metric required.
 template <class data_t>
-ALWAYS_INLINE data_t compute_trace(const tensor<2, data_t> &tensor_UL)
+ALWAYS_INLINE data_t compute_trace(const Tensor<2, data_t> &tensor_UL)
 {
     data_t trace = 0.;
     FOR1(i) trace += tensor_UL[i][i];
@@ -119,7 +119,7 @@ ALWAYS_INLINE data_t compute_trace(const tensor<2, data_t> &tensor_UL)
 
 template <class data_t>
 ALWAYS_INLINE data_t
-compute_trace(const tensor<1, tensor<1, data_t>> &tensor_UL)
+compute_trace(const Tensor<1, Tensor<1, data_t>> &tensor_UL)
 {
     data_t trace = 0.;
     FOR1(i) trace += tensor_UL[i][i];
@@ -128,8 +128,8 @@ compute_trace(const tensor<1, tensor<1, data_t>> &tensor_UL)
 
 /// Computes dot product of a vector and a covector (no metric required)
 template <class data_t>
-ALWAYS_INLINE data_t compute_dot_product(const tensor<1, data_t> &vector_U,
-                                         const tensor<1, data_t> &covector_L)
+ALWAYS_INLINE data_t compute_dot_product(const Tensor<1, data_t> &vector_U,
+                                         const Tensor<1, data_t> &covector_L)
 {
     data_t dot_product = 0.;
     FOR1(i) dot_product += vector_U[i] * covector_L[i];
@@ -140,8 +140,8 @@ ALWAYS_INLINE data_t compute_dot_product(const tensor<1, data_t> &vector_U,
 /// the dot product of two vectors given a metric.
 template <class data_t>
 ALWAYS_INLINE data_t compute_dot_product(
-    const tensor<1, data_t> &covector1_L, const tensor<1, data_t> &covector2_L,
-    const tensor<2, data_t> &inverse_metric)
+    const Tensor<1, data_t> &covector1_L, const Tensor<1, data_t> &covector2_L,
+    const Tensor<2, data_t> &inverse_metric)
 {
     data_t dot_product = 0.;
     FOR2(m, n)
@@ -151,13 +151,13 @@ ALWAYS_INLINE data_t compute_dot_product(
     return dot_product;
 }
 
-/// Removes the trace of a 2-tensor with lower indices given a metric and an
-/// inverse metric.  Or a tensor with upper indices given an inverse metric and
+/// Removes the trace of a 2-Tensor with lower indices given a metric and an
+/// inverse metric.  Or a Tensor with upper indices given an inverse metric and
 /// a metric.
 template <class data_t>
-ALWAYS_INLINE void make_trace_free(tensor<2, data_t> &tensor_LL,
-                                   const tensor<2, data_t> &metric,
-                                   const tensor<2, data_t> &inverse_metric)
+ALWAYS_INLINE void make_trace_free(Tensor<2, data_t> &tensor_LL,
+                                   const Tensor<2, data_t> &metric,
+                                   const Tensor<2, data_t> &inverse_metric)
 {
     auto trace = compute_trace(tensor_LL, inverse_metric);
     double one_over_gr_spacedim = 1. / ((double)GR_SPACEDIM);
@@ -169,22 +169,22 @@ ALWAYS_INLINE void make_trace_free(tensor<2, data_t> &tensor_LL,
 
 /// Raises the index of a covector
 template <class data_t>
-ALWAYS_INLINE tensor<1, data_t>
-raise_all(const tensor<1, data_t> &tensor_L,
-          const tensor<2, data_t> &inverse_metric)
+ALWAYS_INLINE Tensor<1, data_t>
+raise_all(const Tensor<1, data_t> &tensor_L,
+          const Tensor<2, data_t> &inverse_metric)
 {
-    tensor<1, data_t> tensor_U = 0.;
+    Tensor<1, data_t> tensor_U = 0.;
     FOR2(i, j) { tensor_U[i] += inverse_metric[i][j] * tensor_L[j]; }
     return tensor_U;
 }
 
-/// Raises the indices of a 2-tensor
+/// Raises the indices of a 2-Tensor
 template <class data_t>
-ALWAYS_INLINE tensor<2, data_t>
-raise_all(const tensor<2, data_t> &tensor_LL,
-          const tensor<2, data_t> &inverse_metric)
+ALWAYS_INLINE Tensor<2, data_t>
+raise_all(const Tensor<2, data_t> &tensor_LL,
+          const Tensor<2, data_t> &inverse_metric)
 {
-    tensor<2, data_t> tensor_UU = 0.;
+    Tensor<2, data_t> tensor_UU = 0.;
     FOR4(i, j, k, l)
     {
         tensor_UU[i][j] +=
@@ -196,17 +196,17 @@ raise_all(const tensor<2, data_t> &tensor_LL,
 /// Lowers the indices of a vector
 /// Note: same functionality as raise; included to improve readibility
 template <class data_t>
-ALWAYS_INLINE tensor<1, data_t> lower_all(const tensor<1, data_t> &tensor_U,
-                                          const tensor<2, data_t> &metric)
+ALWAYS_INLINE Tensor<1, data_t> lower_all(const Tensor<1, data_t> &tensor_U,
+                                          const Tensor<2, data_t> &metric)
 { // The code for lowering is exactly the same as for raising
     return raise_all(tensor_U, metric);
 }
 
-/// Lowers the indices of a 2-tensor
+/// Lowers the indices of a 2-Tensor
 /// Note: same functionality as raise; included to improve readibility
 template <class data_t>
-ALWAYS_INLINE tensor<2, data_t> lower_all(const tensor<2, data_t> &tensor_UU,
-                                          const tensor<2, data_t> &metric)
+ALWAYS_INLINE Tensor<2, data_t> lower_all(const Tensor<2, data_t> &tensor_UU,
+                                          const Tensor<2, data_t> &metric)
 { // The code for lowering is exactly the same as for raising
     return raise_all(tensor_UU, metric);
 }
@@ -214,10 +214,11 @@ ALWAYS_INLINE tensor<2, data_t> lower_all(const tensor<2, data_t> &tensor_UU,
 /// Computes the (i,j) component of the Kronecker delta
 constexpr int delta(int i, int j) { return (i == j); }
 
-/// Computes the levi-civita symbol (3D, NB, symbol, not the tensor)
-inline tensor<3,double> epsilon()
+
+/// Computes the levi-civita symbol (3D, NB, symbol, not the Tensor)
+inline Tensor<3,double> epsilon() 
 {
-    tensor<3, double> epsilon = {0.};
+    Tensor<3, double> epsilon = {0.};
     epsilon[0][1][2] = 1.0;
     epsilon[1][2][0] = 1.0;
     epsilon[2][0][1] = 1.0;
@@ -231,8 +232,8 @@ inline tensor<3,double> epsilon()
 /// Computes the conformal christoffel symbol
 template <class data_t>
 chris_t<data_t>
-compute_christoffel(const tensor<2, tensor<1, data_t>> &d1_metric,
-                    const tensor<2, data_t> &h_UU)
+compute_christoffel(const Tensor<2, Tensor<1, data_t>> &d1_metric,
+                    const Tensor<2, data_t> &h_UU)
 {
     chris_t<data_t> out;
 

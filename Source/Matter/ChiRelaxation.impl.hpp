@@ -40,7 +40,7 @@ template <class matter_t>
 template <class data_t>
 void ChiRelaxation<matter_t>::rhs_equation(
     Vars<data_t> &rhs, const Vars<data_t> &vars,
-    const Vars<tensor<1, data_t>> &d1, const Diff2Vars<tensor<2, data_t>> &d2,
+    const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2,
     const Vars<data_t> &advec) const
 {
 

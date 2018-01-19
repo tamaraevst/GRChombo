@@ -1,6 +1,6 @@
 #include "FArrayBox.H"
 #include "PositiveChiAndAlpha.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <iostream>
 
 #include "BoxLoops.hpp"

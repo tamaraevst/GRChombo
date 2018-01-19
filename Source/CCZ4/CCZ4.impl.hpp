@@ -48,8 +48,8 @@ template <class data_t> void CCZ4::compute(Cell<data_t> current_cell) const
 template <class data_t, template <typename> class vars_t,
           template <typename> class diff2_vars_t>
 void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
-                        const vars_t<tensor<1, data_t>> &d1,
-                        const diff2_vars_t<tensor<2, data_t>> &d2,
+                        const vars_t<Tensor<1, data_t>> &d1,
+                        const diff2_vars_t<Tensor<2, data_t>> &d2,
                         const vars_t<data_t> &advec) const
 {
     using namespace TensorAlgebra;
@@ -57,8 +57,8 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
     auto h_UU = compute_inverse_sym(vars.h);
     auto chris = compute_christoffel(d1.h, h_UU);
 
-    tensor<1, data_t> Z_over_chi;
-    tensor<1, data_t> Z;
+    Tensor<1, data_t> Z_over_chi;
+    Tensor<1, data_t> Z;
 
     if (m_formulation == USE_BSSN)
     {
@@ -77,8 +77,8 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
     data_t Z_dot_d1lapse = compute_dot_product(Z, d1.lapse);
     data_t dlapse_dot_dchi = compute_dot_product(d1.lapse, d1.chi, h_UU);
 
-    tensor<2, data_t> covdtilde2lapse;
-    tensor<2, data_t> covd2lapse;
+    Tensor<2, data_t> covdtilde2lapse;
+    Tensor<2, data_t> covd2lapse;
     FOR2(k, l)
     {
         covdtilde2lapse[k][l] = d2.lapse[k][l];
@@ -100,7 +100,7 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
         }
     }
 
-    tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
+    Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
 
     // A^{ij} A_{ij}. - Note the abuse of the compute trace function.
     data_t tr_A2 = compute_trace(vars.A, A_UU);
@@ -117,7 +117,7 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
         }
     }
 
-    tensor<2, data_t> Adot_TF;
+    Tensor<2, data_t> Adot_TF;
     FOR2(i, j)
     {
         Adot_TF[i][j] =
@@ -178,7 +178,7 @@ void CCZ4::rhs_equation(vars_t<data_t> &rhs, const vars_t<data_t> &vars,
                  m_cosmological_constant;
     }
 
-    tensor<1, data_t> Gammadot;
+    Tensor<1, data_t> Gammadot;
     FOR1(i)
     {
         Gammadot[i] = (2.0 / GR_SPACEDIM) *

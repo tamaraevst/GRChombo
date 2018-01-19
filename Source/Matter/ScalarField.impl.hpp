@@ -10,8 +10,8 @@
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
 emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
-    const vars_t<data_t> &vars, const vars_t<tensor<1, data_t>> &d1,
-    const tensor<2, data_t> &h_UU, const tensor<3, data_t> &chris_ULL) const
+    const vars_t<data_t> &vars, const vars_t<Tensor<1, data_t>> &d1,
+    const Tensor<2, data_t> &h_UU, const Tensor<3, data_t> &chris_ULL) const
 {
     emtensor_t<data_t> out;
 
@@ -27,7 +27,7 @@ emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
     data_t V_of_phi = 0.0;
     data_t dVdphi = 0.0;
 
-    // compute potential and add constributions to EM tensor
+    // compute potential and add constributions to EM Tensor
     my_potential.compute_potential(V_of_phi, dVdphi, vars);
 
     out.rho += V_of_phi;
@@ -42,8 +42,8 @@ template <class potential_t>
 template <class data_t, template <typename> class vars_t>
 void ScalarField<potential_t>::emtensor_excl_potential(
     emtensor_t<data_t> &out, const vars_t<data_t> &vars,
-    const SFObject<data_t> &vars_sf, const tensor<1, data_t> &d1_phi,
-    const tensor<2, data_t> &h_UU, const tensor<3, data_t> &chris_ULL)
+    const SFObject<data_t> &vars_sf, const Tensor<1, data_t> &d1_phi,
+    const Tensor<2, data_t> &h_UU, const Tensor<3, data_t> &chris_ULL)
 {
     // Useful quantity Vt
     data_t Vt = -vars_sf.Pi * vars_sf.Pi;
@@ -74,8 +74,8 @@ template <class data_t, template <typename> class vars_t,
           template <typename> class rhs_vars_t>
 void ScalarField<potential_t>::add_matter_rhs(
     rhs_vars_t<data_t> &total_rhs, const vars_t<data_t> &vars,
-    const vars_t<tensor<1, data_t>> &d1,
-    const diff2_vars_t<tensor<2, data_t>> &d2,
+    const vars_t<Tensor<1, data_t>> &d1,
+    const diff2_vars_t<Tensor<2, data_t>> &d2,
     const vars_t<data_t> &advec) const
 {
     // first get the non potential part of the rhs
@@ -113,8 +113,8 @@ template <class potential_t>
 template <class data_t, template <typename> class vars_t>
 void ScalarField<potential_t>::matter_rhs_excl_potential(
     SFObject<data_t> &rhs_sf, const vars_t<data_t> &vars,
-    const SFObject<data_t> &vars_sf, const vars_t<tensor<1, data_t>> &d1,
-    const tensor<1, data_t> &d1_phi, const tensor<2, data_t> &d2_phi,
+    const SFObject<data_t> &vars_sf, const vars_t<Tensor<1, data_t>> &d1,
+    const Tensor<1, data_t> &d1_phi, const Tensor<2, data_t> &d2_phi,
     const SFObject<data_t> &advec_sf)
 {
     using namespace TensorAlgebra;

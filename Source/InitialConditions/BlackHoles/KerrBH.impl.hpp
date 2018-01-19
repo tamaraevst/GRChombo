@@ -15,9 +15,9 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
 {
     // set up vars for the metric and extrinsic curvature, shift and lapse in
     // spherical coords
-    tensor<2, data_t> spherical_g;
-    tensor<2, data_t> spherical_K;
-    tensor<1, data_t> spherical_shift;
+    Tensor<2, data_t> spherical_g;
+    Tensor<2, data_t> spherical_K;
+    Tensor<1, data_t> spherical_shift;
     data_t kerr_lapse;
 
     // The cartesian variables and coords
@@ -69,9 +69,9 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
 }
 
 template <class data_t>
-void KerrBH::compute_kerr(tensor<2, data_t> &spherical_g,
-                          tensor<2, data_t> &spherical_K,
-                          tensor<1, data_t> &spherical_shift,
+void KerrBH::compute_kerr(Tensor<2, data_t> &spherical_g,
+                          Tensor<2, data_t> &spherical_K,
+                          Tensor<1, data_t> &spherical_shift,
                           data_t &kerr_lapse,
                           const Coordinates<data_t> coords) const
 {

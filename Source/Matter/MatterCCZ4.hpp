@@ -9,7 +9,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 //!  Calculates RHS using CCZ4 including matter terms, and matter variable
 //!  evolution
@@ -79,11 +79,11 @@ template <class matter_t> class MatterCCZ4 : public CCZ4
     //! The function which adds in the EM Tensor terms to the CCZ4 rhs \sa
     //! compute()
     template <class data_t>
-    void add_EMTensor_rhs(
+    void add_emtensor_rhs(
         Vars<data_t>
             &matter_rhs, //!<the RHS data for each variable at that point.
         const Vars<data_t> &vars, //!<the value of the variables at the point.
-        const Vars<tensor<1, data_t>>
+        const Vars<Tensor<1, data_t>>
             &d1 //!<the value of the first derivatives of the variables.
         ) const;
 

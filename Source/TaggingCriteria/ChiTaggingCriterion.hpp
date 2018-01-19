@@ -4,6 +4,7 @@
 #include "Cell.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "Tensor.hpp"
 
 class ChiTaggingCriterion
 {
@@ -17,7 +18,7 @@ class ChiTaggingCriterion
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
         auto chi = current_cell.load_vars(c_chi);
-        tensor<1, data_t> d1_chi;
+        Tensor<1, data_t> d1_chi;
         FOR1(idir) m_deriv.diff1(d1_chi, current_cell, idir, c_chi);
 
         data_t mod_d1_chi = 0;

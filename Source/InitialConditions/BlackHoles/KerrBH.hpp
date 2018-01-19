@@ -11,8 +11,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
-#include <array>
+#include "Tensor.hpp"
 
 //! Class which computes the Kerr initial conditions per arXiv 1401.1548
 class KerrBH
@@ -51,11 +50,11 @@ class KerrBH
     //! Function which computes the components of the metric in spherical coords
     template <class data_t>
     void compute_kerr(
-        tensor<2, data_t>
+        Tensor<2, data_t>
             &spherical_g, //!<< The spatial metric in spherical coords
-        tensor<2, data_t>
+        Tensor<2, data_t>
             &spherical_K, //!<< The extrinsic curvature in spherical coords
-        tensor<1, data_t>
+        Tensor<1, data_t>
             &spherical_shift, //!<< The spherical components of the shift
         data_t &kerr_lapse,   //!<< The lapse for the kerr solution
         const Coordinates<data_t> coords //!<< Coords of current cell

@@ -8,15 +8,15 @@
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp"
 #include "VarsTools.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 class TraceARemoval
 {
   public:
     template <class data_t> struct Vars
     {
-        tensor<2, data_t> h;
-        tensor<2, data_t> A;
+        Tensor<2, data_t> h;
+        Tensor<2, data_t> A;
 
         template <typename mapping_function_t>
         void enum_mapping(mapping_function_t mapping_function);

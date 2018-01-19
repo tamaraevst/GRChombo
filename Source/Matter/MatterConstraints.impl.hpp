@@ -30,7 +30,7 @@ void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
     const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
     const auto chris = TensorAlgebra::compute_christoffel(d1.h, h_UU);
 
-    // Energy Momentum tensor
+    // Energy Momentum Tensor
     const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
     // Hamiltonain constraint

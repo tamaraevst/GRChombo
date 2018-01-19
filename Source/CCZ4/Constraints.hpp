@@ -7,7 +7,7 @@
 #include "FArrayBox.H"
 #include "FourthOrderDerivatives.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 #include "CCZ4Geometry.hpp"
 
@@ -19,10 +19,10 @@ class Constraints
     template <class data_t> struct Vars
     {
         data_t chi;
-        tensor<2, data_t> h;
+        Tensor<2, data_t> h;
         data_t K;
-        tensor<2, data_t> A;
-        tensor<1, data_t> Gamma;
+        Tensor<2, data_t> A;
+        Tensor<1, data_t> Gamma;
 
         /// Defines the mapping between members of Vars and Chombo grid
         /// variables (enum in User_Variables)
@@ -33,7 +33,7 @@ class Constraints
     template <class data_t> struct constraints_t
     {
         data_t Ham;
-        tensor<1, data_t> Mom;
+        Tensor<1, data_t> Mom;
     };
 
     Constraints(double dx, double cosmological_constant = 0);
@@ -48,8 +48,8 @@ class Constraints
               template <typename> class diff2_vars_t>
     constraints_t<data_t>
     constraint_equations(const vars_t<data_t> &vars,
-                         const vars_t<tensor<1, data_t>> &d1,
-                         const diff2_vars_t<tensor<2, data_t>> &d2) const;
+                         const vars_t<Tensor<1, data_t>> &d1,
+                         const diff2_vars_t<Tensor<2, data_t>> &d2) const;
 };
 
 #include "Constraints.impl.hpp"

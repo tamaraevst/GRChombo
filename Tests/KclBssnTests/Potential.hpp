@@ -2,7 +2,7 @@
 #define POTENTIAL_HPP_
 
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 class Potential
 {

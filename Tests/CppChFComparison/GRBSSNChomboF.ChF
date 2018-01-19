@@ -1060,7 +1060,7 @@ c     set to zero to use 4th order advection, 1 for 2nd order
       enddo
 
       ! rhs_aa
-      ! TODO: This is a different dbeta from above. Use separate variable names!
+      ! NB: This is a different dbeta from above. Use separate variable names!
       dbeta = 0
       do d0 = 0, 2
         do d1 = 0, 2

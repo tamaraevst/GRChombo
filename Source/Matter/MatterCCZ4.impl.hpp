@@ -29,8 +29,8 @@ void MatterCCZ4<matter_t>::compute(Cell<data_t> current_cell) const
     Vars<data_t> matter_rhs;
     rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
-    // add RHS matter terms from EM tensor
-    add_EMTensor_rhs(matter_rhs, matter_vars, d1);
+    // add RHS matter terms from EM Tensor
+    add_emtensor_rhs(matter_rhs, matter_vars, d1);
 
     // add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
@@ -45,9 +45,9 @@ void MatterCCZ4<matter_t>::compute(Cell<data_t> current_cell) const
 // Function to add in EM Tensor matter terms to CCZ4 rhs
 template <class matter_t>
 template <class data_t>
-void MatterCCZ4<matter_t>::add_EMTensor_rhs(
+void MatterCCZ4<matter_t>::add_emtensor_rhs(
     Vars<data_t> &matter_rhs, const Vars<data_t> &matter_vars,
-    const Vars<tensor<1, data_t>> &d1) const
+    const Vars<Tensor<1, data_t>> &d1) const
 {
     using namespace TensorAlgebra;
 
@@ -74,7 +74,7 @@ void MatterCCZ4<matter_t>::add_EMTensor_rhs(
     }
 
     // Update RHS for other variables
-    tensor<2, data_t> Sij_TF = emtensor.Sij;
+    Tensor<2, data_t> Sij_TF = emtensor.Sij;
     make_trace_free(Sij_TF, matter_vars.h, h_UU);
 
     FOR2(i, j)

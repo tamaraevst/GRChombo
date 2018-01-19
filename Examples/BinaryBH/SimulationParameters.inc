@@ -1,7 +1,6 @@
 #ifndef SIMULATIONPARAMETERS_HPP_
 #error  "This file must only be included through SimulationParameters.hpp"
 #endif
-//TODO: this annoying piece of code will be auto-generated from a list of values, names and default-values. This way we also get proper handling of missing parameters
 
 void auto_read_params(GRParmParse& pp)
 {

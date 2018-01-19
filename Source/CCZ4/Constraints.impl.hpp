@@ -32,8 +32,8 @@ void Constraints::compute(Cell<data_t> current_cell) const
 template <class data_t, template <typename> class vars_t,
           template <typename> class diff2_vars_t>
 Constraints::constraints_t<data_t> Constraints::constraint_equations(
-    const vars_t<data_t> &vars, const vars_t<tensor<1, data_t>> &d1,
-    const diff2_vars_t<tensor<2, data_t>> &d2) const
+    const vars_t<data_t> &vars, const vars_t<Tensor<1, data_t>> &d1,
+    const diff2_vars_t<Tensor<2, data_t>> &d2) const
 {
     constraints_t<data_t> out;
 
@@ -51,7 +51,7 @@ Constraints::constraints_t<data_t> Constraints::constraint_equations(
               (GR_SPACEDIM - 1.) * vars.K * vars.K / GR_SPACEDIM - tr_A2;
     out.Ham -= 2 * m_cosmological_constant;
 
-    tensor<2, data_t> covd_A[CH_SPACEDIM];
+    Tensor<2, data_t> covd_A[CH_SPACEDIM];
     FOR3(i, j, k)
     {
         covd_A[i][j][k] = d1.A[j][k][i];

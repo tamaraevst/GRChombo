@@ -4,6 +4,8 @@
 #include "AMRLevel.H"
 #include "CoarseAverage.H"
 #include "FourthOrderFillPatch.H"
+#include "LevelRK4.H"
+#include "UserVariables.hpp" // need NUM_VARS
 #include "GRLevelData.hpp"
 #include "InterpSource.hpp"
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do

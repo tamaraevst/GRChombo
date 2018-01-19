@@ -9,7 +9,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 
 //!  Calculates RHS for relaxation of the conformal factor, for initial
 //!  conditions
@@ -64,9 +64,9 @@ template <class matter_t> class ChiRelaxation
     void rhs_equation(
         Vars<data_t> &rhs, //!<the RHS data for each variable at that point.
         const Vars<data_t> &vars, //!< the value of the variables at the point.
-        const Vars<tensor<1, data_t>>
+        const Vars<Tensor<1, data_t>>
             &d1, //!< the value of the first derivatives of the variables.
-        const Diff2Vars<tensor<2, data_t>>
+        const Diff2Vars<Tensor<2, data_t>>
             &d2, //!< the value of the second derivatives of the variables.
         const Vars<data_t>
             &advec //!< advec the value of the advection terms beta^i d_i(var)

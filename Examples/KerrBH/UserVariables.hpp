@@ -1,12 +1,12 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
+// Assign an enum to each variable
 enum
 {
     c_chi,
 
-    c_h11, // Symmetric tensor must be declared in this order TODO: make this
-           // error proof by autogeneration or a macro.
+    c_h11, // Symmetric tensor must be declared in this order 
     c_h12,
     c_h13,
     c_h22,

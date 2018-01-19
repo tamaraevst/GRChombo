@@ -7,7 +7,7 @@
  */
 
 #include "Coordinates.hpp"
-#include "tensor.hpp"
+#include "Tensor.hpp"
 #include <array>
 
 class BoostedBH
@@ -31,7 +31,7 @@ class BoostedBH
 
     // extrinsic curvature
     template <class data_t>
-    tensor<2, data_t> Aij(Coordinates<data_t> coords) const;
+    Tensor<2, data_t> Aij(Coordinates<data_t> coords) const;
 
   private:
     template <class data_t>
