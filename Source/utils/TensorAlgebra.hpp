@@ -216,7 +216,7 @@ constexpr int delta(int i, int j) { return (i == j); }
 
 
 /// Computes the levi-civita symbol (3D, NB, symbol, not the Tensor)
-Tensor<3,double> epsilon() 
+inline Tensor<3,double> epsilon() 
 {
     Tensor<3, double> epsilon = {0.};
     epsilon[0][1][2] = 1.0;

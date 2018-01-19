@@ -1,5 +1,4 @@
 #include "GRAMRLevel.hpp"
-#include "LevelRK4.H"
 
 GRAMRLevel::GRAMRLevel(const SimulationParameters &a_p, int a_verbosity)
     : m_num_ghosts(a_p.num_ghosts), m_p(a_p), m_verbosity(a_verbosity)
