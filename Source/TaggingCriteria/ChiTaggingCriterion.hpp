@@ -2,8 +2,8 @@
 #define CHITAGGINGCRITERION_HPP_
 
 #include "Cell.hpp"
+#include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "MiscUtils.hpp"
 
 class ChiTaggingCriterion
 {

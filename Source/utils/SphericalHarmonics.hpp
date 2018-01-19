@@ -3,7 +3,6 @@
 
 #include "Combinatorics.hpp"
 #include "Coordinates.hpp"
-#include "MiscUtils.hpp"
 #include "tensor.hpp"
 
 // Functions for the spin weighted spherical harmonics
@@ -28,8 +27,7 @@ Y_lm_t<data_t> spin_Y_lm(const data_t x, const double y, const double z,
     Y_lm_t<data_t> Y_lm;
 
     // calculate useful position quantities
-    data_t r = sqrt(x * x + y * y + z * z);
-    MIN_CUT_OFF(r, 1e-6);
+    data_t r = simd_max(sqrt(x * x + y * y + z * z), 1e-6);
     data_t theta = acos(z / r);
     data_t phi = atan2(y, x);
 

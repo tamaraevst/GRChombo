@@ -2,7 +2,7 @@
 #define INITIALDATATOOLS_HPP_
 
 #include "AlwaysInline.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "tensor.hpp"
 
 namespace InitialDataTools
@@ -17,11 +17,9 @@ static tensor<2, data_t>
     tensor<2, data_t> cartesian_g;
 
     // calculate useful position quantities
-    data_t rho2 = x * x + y * y;
-    MIN_CUT_OFF(rho2, 1e-12);
+    data_t rho2 = simd_max(x * x + y * y, 1e-12);
     data_t rho = sqrt(rho2);
-    data_t r2 = x * x + y * y + z * z;
-    MIN_CUT_OFF(r2, 1e-12);
+    data_t r2 = simd_max(x * x + y * y + z * z, 1e-12);
     data_t r = sqrt(r2);
 
     // And the sines and cosines of phi and theta
@@ -61,11 +59,9 @@ tensor<1, data_t> spherical_to_cartesian_U(tensor<1, data_t> spherical_v,
     tensor<1, data_t> cartesian_v;
 
     // calculate useful position quantities
-    data_t rho2 = x * x + y * y;
-    MIN_CUT_OFF(rho2, 1e-12);
+    data_t rho2 = simd_max(x * x + y * y, 1e-12);
     data_t rho = sqrt(rho2);
-    data_t r2 = x * x + y * y + z * z;
-    MIN_CUT_OFF(r2, 1e-12);
+    data_t r2 = simd_max(x * x + y * y + z * z, 1e-12);
     data_t r = sqrt(r2);
 
     // And the sines and cosines of phi and theta

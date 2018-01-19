@@ -1,11 +1,5 @@
-#if !defined(SCALARFIELDLEVEL_HPP_)
-#error "This file should only be included through ScalarFieldLevel.hpp"
-#endif
-
-#ifndef SCALARFIELDLEVEL_IMPL_HPP_
-#define SCALARFIELDLEVEL_IMPL_HPP_
-
 // General includes common to most GR problems
+#include "ScalarFieldLevel.hpp"
 #include "BoxLoops.hpp"
 #include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
@@ -133,5 +127,3 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                            m_p.regrid_threshold_K),
                    current_state, tagging_criterion);
 }
-
-#endif

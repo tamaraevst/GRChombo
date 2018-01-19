@@ -2,7 +2,7 @@
 #define TENSORALGEBRA_HPP_
 
 #include "AlwaysInline.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "tensor.hpp"
 
 template <class data_t> struct chris_t

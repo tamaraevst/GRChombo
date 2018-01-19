@@ -1,10 +1,4 @@
-#if !defined(KERRBHLEVEL_HPP_)
-#error "This file should only be included through KerrBHLevel.hpp"
-#endif
-
-#ifndef KERRBHLEVEL_IMPL_HPP_
-#define KERRBHLEVEL_IMPL_HPP_
-
+#include "KerrBHLevel.hpp"
 #include "BoxLoops.hpp"
 #include "CCZ4.hpp"
 #include "ChiTaggingCriterion.hpp"
@@ -91,5 +85,3 @@ void KerrBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 {
     BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
-
-#endif

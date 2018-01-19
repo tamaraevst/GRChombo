@@ -3,6 +3,7 @@
 #ifndef SCALARFIELDLEVEL_HPP_
 #define SCALARFIELDLEVEL_HPP_
 
+#include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 // Problem specific includes
 #include "Potential.hpp"
@@ -50,7 +51,5 @@ class ScalarFieldLevel : public GRAMRLevel
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
 };
-
-#include "ScalarFieldLevel.impl.hpp"
 
 #endif /* SCALARFIELDLEVEL_HPP_ */

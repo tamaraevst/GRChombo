@@ -2,7 +2,7 @@
 #define FOURTHORDERDERIVATIVES_HPP_
 
 #include "Cell.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "UserVariables.hpp"
 #include "tensor.hpp"
 #include <array>

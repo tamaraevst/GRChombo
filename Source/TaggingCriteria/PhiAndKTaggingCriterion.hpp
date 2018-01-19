@@ -1,7 +1,7 @@
 #ifndef PHIANDKTAGGINGCRITERION_HPP_
 #define PHIANDKTAGGINGCRITERION_HPP_
 
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 
 class PhiAndKTaggingCriterion
 {
