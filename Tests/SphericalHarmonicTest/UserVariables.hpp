@@ -1,11 +1,7 @@
-// Last edited K Clough 16.10.16
-
 #ifndef USERVARIABLES_HPP_
 #define USERVARIABLES_HPP_
 
-// TODO: This file can be auto-generated from a list of variable names
-// Also, we should probably scope this enum too...
-//
+// assigns number to each variable
 enum
 {
     c_chi,

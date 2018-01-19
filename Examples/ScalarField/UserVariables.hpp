@@ -3,9 +3,7 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
-// TODO: This file can be auto-generated from a list of variable names
-// Also, we should probably scope this enum too...
-//
+// assign an enum to each variable
 enum
 {
     c_chi,
