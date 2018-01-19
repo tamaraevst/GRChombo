@@ -4,7 +4,7 @@
 
 #ifndef MATTERCCZ4_IMPL_HPP_
 #define MATTERCCZ4_IMPL_HPP_
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 
 template <class matter_t>
 MatterCCZ4<matter_t>::MatterCCZ4(matter_t a_matter, params_t params, double dx,

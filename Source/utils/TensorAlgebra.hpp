@@ -2,7 +2,7 @@
 #define TENSORALGEBRA_HPP_
 
 #include "AlwaysInline.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
 
 template <class data_t> struct chris_t
@@ -214,14 +214,11 @@ ALWAYS_INLINE Tensor<2, data_t> lower_all(const Tensor<2, data_t> &tensor_UU,
 /// Computes the (i,j) component of the Kronecker delta
 constexpr int delta(int i, int j) { return (i == j); }
 
+
 /// Computes the levi-civita symbol (3D, NB, symbol, not the Tensor)
 Tensor<3,double> epsilon() 
 {
-    Tensor<3, double> epsilon;
-    FOR3(i,j,k)
-    {
-       epsilon[i][j][k] = 0.0;
-    } 
+    Tensor<3, double> epsilon = {0.};
     epsilon[0][1][2] = 1.0;
     epsilon[1][2][0] = 1.0;
     epsilon[2][0][1] = 1.0;

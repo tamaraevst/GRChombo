@@ -1,7 +1,7 @@
 #ifndef SCALARBUBBLE_HPP_
 #define SCALARBUBBLE_HPP_
 
-#include "CCZ4Matter.hpp"
+#include "MatterCCZ4.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "ScalarField.hpp"

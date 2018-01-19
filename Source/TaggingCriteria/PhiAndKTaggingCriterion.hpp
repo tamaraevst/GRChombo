@@ -1,10 +1,10 @@
 #ifndef PHIANDKTAGGINGCRITERION_HPP_
 #define PHIANDKTAGGINGCRITERION_HPP_
 
-#include "MiscUtils.hpp"
 #include "Tensor.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "DimensionDefinitions.hpp"
 
 class PhiAndKTaggingCriterion
 {
@@ -21,12 +21,19 @@ class PhiAndKTaggingCriterion
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
+<<<<<<< HEAD
         auto phi = current_cell.load_vars(c_phi);
         Tensor<1, data_t> d1_phi;
         FOR1(idir) m_deriv.diff1(d1_phi, current_cell, idir, c_phi);
 
         auto K = current_cell.load_vars(c_K);
         Tensor<1, data_t> d1_K;
+=======
+        tensor<1, data_t> d1_phi;
+        FOR1(idir) m_deriv.diff1(d1_phi, current_cell, idir, c_phi);
+
+        tensor<1, data_t> d1_K;
+>>>>>>> feature/clean_up
         FOR1(idir) m_deriv.diff1(d1_K, current_cell, idir, c_K);
 
         data_t mod_d1_phi = 0;

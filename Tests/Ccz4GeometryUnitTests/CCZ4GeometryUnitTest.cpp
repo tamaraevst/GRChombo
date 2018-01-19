@@ -1,5 +1,5 @@
 #include "CCZ4Geometry.hpp"
-#include "MiscUtils.hpp"
+#include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
 #include <iostream>
 

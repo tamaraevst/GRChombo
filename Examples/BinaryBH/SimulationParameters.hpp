@@ -13,6 +13,7 @@ class SimulationParameters
   public:
     SimulationParameters(GRParmParse &pp) { readParams(pp); }
 
+    /// Read parameters from the parameter file
     void readParams(GRParmParse &pp)
     {
         // The automatically generated read parameters code defined in

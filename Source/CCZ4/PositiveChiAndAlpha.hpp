@@ -3,7 +3,6 @@
 #define POSITIVECHIANDALPHA_HPP_
 
 #include "Cell.hpp"
-#include "MiscUtils.hpp"
 #include "UserVariables.hpp"
 #include "simd.hpp"
 
@@ -15,8 +14,8 @@ class PositiveChiAndAlpha
         auto chi = current_cell.load_vars(c_chi);
         auto lapse = current_cell.load_vars(c_lapse);
 
-        MIN_CUT_OFF(chi, 1e-4);
-        MIN_CUT_OFF(lapse, 1e-4);
+        chi = simd_max(chi, 1e-4);
+        lapse = simd_max(lapse, 1e-4);
 
         current_cell.store_vars(chi, c_chi);
         current_cell.store_vars(lapse, c_lapse);

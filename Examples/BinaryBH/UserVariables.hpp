@@ -1,9 +1,7 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
-// TODO: This file can be auto-generated from a list of variable names
-// Also, we should probably scope this enum too...
-//
+/// This enum gives the index of every variable stored in the grid
 enum
 {
     c_chi,
