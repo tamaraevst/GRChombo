@@ -17,7 +17,7 @@
 
 #include "parstream.H" //Gives us pout()
 using std::endl;
-#include "AMR.H"
+#include "GRAMR.hpp"
 
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
@@ -46,8 +46,8 @@ int runInterpolatorTest(int argc, char *argv[])
 
     DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(
         sim_params);
-    AMR amr;
-    setupAMRObject(amr, interpolator_test_level_fact);
+    GRAMR gr_amr;
+    setupAMRObject(gr_amr, interpolator_test_level_fact);
 
     // Setup the AMRInterpolator
     int num_points = 2;
@@ -81,14 +81,14 @@ int runInterpolatorTest(int argc, char *argv[])
         .addComp(c_chi, chi_ptr.get())
         .addComp(c_phi, phi_ptr.get());
 
-    auto dx_scalar = GRAMRLevel::gr_cast(amr.getAMRLevels()[0])
+    auto dx_scalar = GRAMRLevel::gr_cast(gr_amr.getAMRLevels()[0])
                          ->get_dx(); // coarsest grid spacing
     std::array<double, 3> dx;
     dx.fill(dx_scalar);
     std::array<double, CH_SPACEDIM> origin;
     origin.fill(dx_scalar / 2);
 
-    AMRInterpolator<Lagrange<4>> interpolator(amr, origin, dx, 2);
+    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, origin, dx, 2);
     interpolator.interp(query);
 
     int status = 0;

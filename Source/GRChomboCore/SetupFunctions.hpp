@@ -7,7 +7,7 @@
 #include <iostream>
 using std::endl;
 using std::cerr;
-#include "AMR.H"
+#include "GRAMR.hpp"
 #include "AMRLevelFactory.H"
 #include "ParmParse.H"
 
@@ -22,7 +22,7 @@ void mainSetup(int argc, char *argv[]);
 void mainFinalize();
 
 // Sets up the grid parameters, problem domain and AMR object
-void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory);
+void setupAMRObject(AMR &gr_amr, AMRLevelFactory &a_factory);
 
 void mainSetup(int argc, char *argv[])
 {
@@ -76,7 +76,7 @@ void mainFinalize()
 #endif
 }
 
-void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
+void setupAMRObject(GRAMR &gr_amr, AMRLevelFactory &a_factory)
 {
     // Some hard-coded parameters:
     // The buffer is width of ghost cells + additional_grid_buffer
@@ -115,7 +115,7 @@ void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
     pp.getarr("ref_ratio", ref_ratios, 0, max_level + 1);
 
     // Define the AMR object
-    amr.define(max_level, ref_ratios, physdomain, &a_factory);
+    gr_amr.define(max_level, ref_ratios, physdomain, &a_factory);
 
     // To preserve proper nesting we need to know the maximum ref_ratio.
     int max_ref_ratio = ref_ratios[0];
@@ -129,81 +129,81 @@ void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
     int grid_buffer_size =
         std::ceil(((double)num_ghosts) / (double)max_ref_ratio) +
         additional_grid_buffer;
-    amr.gridBufferSize(grid_buffer_size);
+    gr_amr.gridBufferSize(grid_buffer_size);
 
     int checkpoint_interval;
     pp.get("checkpoint_interval", checkpoint_interval);
-    amr.checkpointInterval(checkpoint_interval);
+    gr_amr.checkpointInterval(checkpoint_interval);
 
     // Number of coarse time steps from one regridding to the next
     Vector<int> regrid_intervals;
     pp.getarr("regrid_interval", regrid_intervals, 0, max_level + 1);
-    amr.regridIntervals(regrid_intervals);
+    gr_amr.regridIntervals(regrid_intervals);
 
     if (pp.contains("max_grid_size"))
     {
         int max_grid_size;
         pp.query("max_grid_size", max_grid_size);
-        amr.maxGridSize(max_grid_size);
+        gr_amr.maxGridSize(max_grid_size);
     }
 
     if (pp.contains("block_factor"))
     {
         int block_factor;
         pp.query("block_factor", block_factor);
-        amr.blockFactor(block_factor);
+        gr_amr.blockFactor(block_factor);
     }
 
     if (pp.contains("fill_ratio"))
     {
         Real fill_ratio;
         pp.query("fill_ratio", fill_ratio);
-        amr.fillRatio(fill_ratio);
+        gr_amr.fillRatio(fill_ratio);
     }
 
     if (pp.contains("max_dt_grow"))
     {
         Real max_dt_grow;
         pp.query("max_dt_grow", max_dt_grow);
-        amr.maxDtGrow(max_dt_grow);
+        gr_amr.maxDtGrow(max_dt_grow);
     }
 
     if (pp.contains("dt_tolerance_factor"))
     {
         Real dt_tolerance_factor;
         pp.query("dt_tolerance_factor", dt_tolerance_factor);
-        amr.dtToleranceFactor(dt_tolerance_factor);
+        gr_amr.dtToleranceFactor(dt_tolerance_factor);
     }
 
     if (pp.contains("chk_prefix"))
     {
         std::string prefix;
         pp.query("chk_prefix", prefix);
-        amr.checkpointPrefix(prefix);
+        gr_amr.checkpointPrefix(prefix);
     }
 
     if (pp.contains("plot_interval"))
     {
         int plot_interval;
         pp.get("plot_interval", plot_interval);
-        amr.plotInterval(plot_interval);
+        gr_amr.plotInterval(plot_interval);
     }
 
     if (pp.contains("plot_prefix"))
     {
         std::string prefix;
         pp.query("plot_prefix", prefix);
-        amr.plotPrefix(prefix);
+        gr_amr.plotPrefix(prefix);
     }
 
     int verbosity;
     pp.get("verbosity", verbosity);
-    amr.verbosity(verbosity);
+    gr_amr.verbosity(verbosity);
 
     // Set up input files
     if (!pp.contains("restart_file"))
     {
-        amr.setupForNewAMRRun();
+        gr_amr.setupForNewAMRRun();
     }
     else
     {
@@ -213,7 +213,7 @@ void setupAMRObject(AMR &amr, AMRLevelFactory &a_factory)
 #ifdef CH_USE_HDF5
         HDF5Handle handle(restart_file, HDF5Handle::OPEN_RDONLY);
         // read from checkpoint file
-        amr.setupForRestart(handle);
+        gr_amr.setupForRestart(handle);
         handle.close();
 #else
         MayDay::Error("GRChombo restart only defined with hdf5");

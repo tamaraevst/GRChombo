@@ -17,7 +17,7 @@
 
 #include "parstream.H" //Gives us pout()
 using std::endl;
-#include "AMR.H"
+#include "GRAMR.hpp"
 
 #include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
@@ -48,17 +48,17 @@ int runGRChombo(int argc, char *argv[])
     //(To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
     DefaultLevelFactory<KerrBHLevel> kerr_bh_level_fact(sim_params);
-    AMR amr;
-    setupAMRObject(amr, kerr_bh_level_fact);
+    GRAMR gr_amr;
+    setupAMRObject(gr_amr, kerr_bh_level_fact);
 
     Real stop_time;
     pp.get("stop_time", stop_time);
     int max_steps;
     pp.get("max_steps", max_steps);
 
-    amr.run(stop_time, max_steps);
+    gr_amr.run(stop_time, max_steps);
 
-    amr.conclude();
+    gr_amr.conclude();
 
     return 0;
 }
