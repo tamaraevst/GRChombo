@@ -27,7 +27,7 @@ bool sv_test(const char *name, sop_t sop, vop_t vop)
 
 #pragma novector
     for (int i = 0; i < simd_length; i++)
-        vals[i] = sop(i + 1);
+        vals[i] = sop(static_cast<t>(i + 1));
 
     for (int i = 0; i < simd_length; i++)
     {
@@ -128,6 +128,11 @@ int main()
     SV_TEST(sinh(x));
     SV_TEST(cosh(x));
     SV_TEST(tanh(x));
+
+   SV_TEST_T(double, simd_min(x,0.5));
+   SV_TEST_T(float, simd_min(x,0.5f));
+   SV_TEST_T(double, simd_max(x,0.5));
+   SV_TEST_T(float, simd_max(x,0.5f));
 
     RV_TEST(exp(x), log(x));
     // RV_TEST(pow(x,(decltype(x))2),sqrt(x));
