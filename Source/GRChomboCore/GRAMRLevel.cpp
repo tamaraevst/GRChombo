@@ -1,10 +1,10 @@
 #include "GRAMRLevel.hpp"
 
-GRAMRLevel::GRAMRLevel(const SimulationParameters &a_p, int a_verbosity)
-    : m_num_ghosts(a_p.num_ghosts), m_p(a_p), m_verbosity(a_verbosity)
+GRAMRLevel::GRAMRLevel(GRAMR& gr_amr, const SimulationParameters &a_p, int a_verbosity)
+    : m_gr_amr (gr_amr), m_p(a_p), m_verbosity(a_verbosity), m_num_ghosts(a_p.num_ghosts)
 {
     if (m_verbosity)
-        pout() << "GRAMRLevel default constructor" << endl;
+        pout() << "GRAMRLevel constructor" << endl;
 }
 
 GRAMRLevel::~GRAMRLevel() {}

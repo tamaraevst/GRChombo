@@ -47,8 +47,8 @@ int runGRChombo(int argc, char *argv[])
     // The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
-    DefaultLevelFactory<KerrBHLevel> kerr_bh_level_fact(sim_params);
     GRAMR gr_amr;
+    DefaultLevelFactory<KerrBHLevel> kerr_bh_level_fact(gr_amr, sim_params);
     setupAMRObject(gr_amr, kerr_bh_level_fact);
 
     Real stop_time;

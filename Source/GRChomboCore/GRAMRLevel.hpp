@@ -10,11 +10,12 @@
 #include "InterpSource.hpp"
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
 #include "SimulationParameters.hpp"
+#include "GRAMR.hpp"
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {
   public:
-    GRAMRLevel(const SimulationParameters &a_p, int a_verbosity);
+    GRAMRLevel(GRAMR& gr_amr, const SimulationParameters &a_p, int a_verbosity);
 
     virtual ~GRAMRLevel();
 
@@ -150,18 +151,14 @@ class GRAMRLevel : public AMRLevel, public InterpSource
   protected:
     virtual void fillIntralevelGhosts();
 
-  public:
-    const int m_num_ghosts;
-    // periodicity information
-    //  static const int s_periodicity[SpaceDim];
-
-  protected:
     // state vector at old time
     GRLevelData m_state_old;
     // state vector at new time
     GRLevelData m_state_new;
     // grid spacing
     Real m_dx;
+
+    GRAMR& m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
 
     // params
     SimulationParameters m_p;
@@ -176,6 +173,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     CoarseAverage m_coarse_average;
     FourthOrderFineInterp m_fine_interp;
     DisjointBoxLayout m_grids;
+
+  public:
+    const int m_num_ghosts;
 };
 
 #endif /* GRAMRLEVEL_HPP_ */

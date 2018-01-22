@@ -44,9 +44,9 @@ int runInterpolatorTest(int argc, char *argv[])
     ParmParse pp(0, argv + argc, NULL, in_file);
     SimulationParameters sim_params(pp);
 
-    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(
-        sim_params);
     GRAMR gr_amr;
+    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(gr_amr,
+        sim_params);
     setupAMRObject(gr_amr, interpolator_test_level_fact);
 
     // Setup the AMRInterpolator
