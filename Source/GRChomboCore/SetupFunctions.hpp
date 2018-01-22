@@ -15,6 +15,10 @@ using std::cerr;
 #include "DebuggingTools.hpp"
 #endif
 
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 // This function calls MPI_Init, makes sure a parameter file is supplied etc...
 void mainSetup(int argc, char *argv[]);
 

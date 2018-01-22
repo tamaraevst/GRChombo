@@ -8,34 +8,17 @@
  */
 #endif
 
-// General includes:
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
 #include <iostream>
-#include <sys/time.h>
-
 #include "parstream.H" //Gives us pout()
-using std::endl;
+
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
-
 #include "SetupFunctions.hpp"
-
 #include "DefaultLevelFactory.hpp"
 #include "SimulationParameters.hpp"
 
 // Problem specific includes:
 #include "BinaryBHLevel.hpp"
-
-// TODO: Remove the below three lines if they aren't necessary
-#if defined(__i386__) && defined(__SSE__)
-#include <xmmintrin.h>
-#endif
-
-#ifdef _OPENMP
-#include <omp.h>
-#endif
 
 int runGRChombo(int argc, char *argv[])
 {
@@ -52,7 +35,7 @@ int runGRChombo(int argc, char *argv[])
     DefaultLevelFactory<BinaryBHLevel> binary_bh_level_fact(gr_amr, sim_params);
     setupAMRObject(gr_amr, binary_bh_level_fact);
 
-    Real stop_time;
+    double stop_time;
     pp.get("stop_time", stop_time);
     int max_steps;
     pp.get("max_steps", max_steps);
@@ -71,9 +54,9 @@ int main(int argc, char *argv[])
     int status = runGRChombo(argc, argv);
 
     if (status == 0)
-        pout() << "GRChombo finished." << endl;
+        pout() << "GRChombo finished." << std::endl;
     else
-        pout() << "GRChombo failed with return code " << status << endl;
+        pout() << "GRChombo failed with return code " << status << std::endl;
 
     mainFinalize();
     return status;
