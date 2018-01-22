@@ -353,10 +353,8 @@ Lagrange<Order>::generateStencil(
         }
     }
 
-    // TODO: Now we are at the mercy of NRVO gods. Use move semantics when we do
-    // C++11.
-    return pair<std::vector<IntVect>, std::vector<double>>(out_points,
-                                                           out_weights);
+    return pair<std::vector<IntVect>, std::vector<double>>(std::move(out_points),
+                                                           std::move(out_weights));
 }
 
 #endif /* LAGRANGE_IMPL_HPP_ */
