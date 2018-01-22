@@ -17,7 +17,7 @@ template <class t> bool similar(t a, t b, t *error, t *tolerance)
 template <class t, class sop_t, class vop_t>
 bool sv_test(const char *name, sop_t sop, vop_t vop)
 {
-    int simd_length = simd_traits<t>::simd_len;
+    constexpr int simd_length = simd_traits<t>::simd_len;
     t vals[simd_length];
 
     for (int i = 0; i < simd_length; i++)
@@ -50,7 +50,7 @@ bool sv_test(const char *name, sop_t sop, vop_t vop)
 template <class t, class op_t, class rev_op_t>
 bool rv_test(const char *name, op_t op, rev_op_t rev_op)
 {
-    int simd_length = simd_traits<t>::simd_len;
+    constexpr int simd_length = simd_traits<t>::simd_len;
     t vals[simd_length];
 
 #pragma novector
