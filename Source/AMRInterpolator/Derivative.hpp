@@ -1,10 +1,9 @@
-#ifndef _DERIVATIVE_HPP_
-#define _DERIVATIVE_HPP_
+#ifndef DERIVATIVE_HPP_
+#define DERIVATIVE_HPP_
 
 class Derivative : public std::array<int, CH_SPACEDIM>
 {
-private:
-
+  private:
     Derivative(int d)
     {
         for (int i = 0; i < CH_SPACEDIM; ++i)
@@ -26,8 +25,7 @@ private:
         (*this)[d2] += 1;
     }
 
-public:
-
+  public:
     Derivative()
     {
         for (int i = 0; i < CH_SPACEDIM; ++i)
@@ -38,7 +36,7 @@ public:
 
     // Ordering for std::map
 
-    bool operator==(const Derivative& rhs) const
+    bool operator==(const Derivative &rhs) const
     {
         for (int i = 0; i < CH_SPACEDIM; ++i)
         {
@@ -51,7 +49,7 @@ public:
         return true;
     }
 
-    bool operator<(const Derivative& rhs) const
+    bool operator<(const Derivative &rhs) const
     {
         int derivs = 0;
         int rhs_derivs = 0;
@@ -74,7 +72,8 @@ public:
         {
             for (int i = 0; i < CH_SPACEDIM; ++i)
             {
-                // This is counterintuitive but is actually the ordering the we want in order to generalise to arbitrary #dims
+                // This is counterintuitive but is actually the ordering the we
+                // want in order to generalise to arbitrary #dims
                 if ((*this)[i] > rhs[i])
                 {
                     return true;
@@ -87,7 +86,6 @@ public:
 
             return false;
         }
-
     }
 
     static const Derivative LOCAL;
@@ -103,7 +101,6 @@ public:
     static const Derivative dxdy;
     static const Derivative dxdz;
     static const Derivative dydz;
-
 };
 
 const Derivative Derivative::LOCAL;
@@ -120,4 +117,4 @@ const Derivative Derivative::dxdy(0, 1);
 const Derivative Derivative::dxdz(0, 2);
 const Derivative Derivative::dydz(1, 2);
 
-#endif /* _DERIVATIVE_HPP_ */
+#endif /* DERIVATIVE_HPP_ */

@@ -1,5 +1,3 @@
-// Last edited K Clough 1.1.18
-
 #ifndef SIMULATIONPARAMETERS_HPP_
 #error  "This file must only be included through SimulationParameters.hpp"
 #endif
@@ -57,7 +55,7 @@ bool ignore_checkpoint_name_mismatch; //ignore mismatch of variable names betwee
 Real dt_multiplier;
 
 // Problem specific parameters
-Real regrid_threshold_K, regrid_threshold_phi, regrid_threshold;
+Real regrid_threshold;
 //Lapse evolution
 Real lapse_power, lapse_coeff, lapse_advec_coeff;
 //ShiftEvolution

@@ -53,7 +53,7 @@ c     Calculate the Hamiltonian and momentum constraints
       ! Constraints
       REAL_T              hamC, momC(0:2)
 
-      ! Ricci tensor
+      ! Ricci Tensor
       REAL_T              cf1(0:2,0:2,0:2), cf2(0:2,0:2,0:2), c_ri(0:2,0:2)
       REAL_T              c_ri_ph(0:2,0:2), c_ri_hh(0:2,0:2), ri_1(0:2,0:2), ri_2(0:2,0:2),
      &                    ri_3(0:2,0:2), sq_aa, a2(0:2,0:2), trr, gamcon(0:2)
@@ -394,7 +394,7 @@ c     note that this has not been extended to work for DIM > 3
       ! The first version of trr assumes validity of the vacuum
       ! Hamiltonian constraint which we cannot assume in D >= 5.
       ! Instead, we can calculate the Ricci scalar directly from
-      ! the Ricci tensor which is defined unambiguously in terms
+      ! the Ricci Tensor which is defined unambiguously in terms
       ! of the metric, vacuum or not.
       trr = 0
       do d0 = 0, 2
