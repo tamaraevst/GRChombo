@@ -8,11 +8,11 @@
  */
 #endif
 
-//General includes:
-#include <cmath>
+// General includes:
 #include <algorithm>
-#include <iostream>
+#include <cmath>
 #include <cstdlib>
+#include <iostream>
 #include <sys/time.h>
 
 #include "parstream.H" //Gives us pout()
@@ -23,11 +23,11 @@ using std::endl;
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
 
-//Problem specific includes:
+// Problem specific includes:
 #include "DefaultLevelFactory.hpp"
 #include "ScalarFieldLevel.hpp"
 
-//TODO: Remove the below three lines if they aren't necessary
+// TODO: Remove the below three lines if they aren't necessary
 #if defined(__i386__) && defined(__SSE__)
 #include <xmmintrin.h>
 #endif
@@ -36,21 +36,20 @@ using std::endl;
 #include <omp.h>
 #endif
 
-int
-runGRChombo (int argc, char* argv[])
+int runGRChombo(int argc, char *argv[])
 {
-    //Load the parameter file and construct the SimulationParameter class
-    //To add more parameters edit the SimulationParameters file.
-    char* in_file = argv[1];
-    GRParmParse  pp(argc-2,argv+2,NULL,in_file);
+    // Load the parameter file and construct the SimulationParameter class
+    // To add more parameters edit the SimulationParameters file.
+    char *in_file = argv[1];
+    GRParmParse pp(argc - 2, argv + 2, NULL, in_file);
     SimulationParameters sim_params(pp);
 
-    //The line below selects the problem that is simulated
+    // The line below selects the problem that is simulated
     //(To simulate a different problem, define a new child of AMRLevel
-    //and an associated LevelFactory)
-    DefaultLevelFactory<ScalarFieldLevel> matter_sf_level_fact(sim_params);
+    // and an associated LevelFactory)
+    DefaultLevelFactory<ScalarFieldLevel> scalar_field_level_fact(sim_params);
     AMR amr;
-    setupAMRObject(amr, matter_sf_level_fact);
+    setupAMRObject(amr, scalar_field_level_fact);
 
     Real stop_time;
     pp.get("stop_time", stop_time);
@@ -61,19 +60,20 @@ runGRChombo (int argc, char* argv[])
 
     amr.conclude();
 
-    return 0 ;
+    return 0;
 }
 
-int
-main(int argc ,char* argv[])
+int main(int argc, char *argv[])
 {
     mainSetup(argc, argv);
 
     int status = runGRChombo(argc, argv);
 
-    if ( status == 0 ) pout() << "GRChombo finished." << endl ;
-    else pout() << "GRChombo failed with return code " << status << endl ;
+    if (status == 0)
+        pout() << "GRChombo finished." << endl;
+    else
+        pout() << "GRChombo failed with return code " << status << endl;
 
     mainFinalize();
-    return status ;
+    return status;
 }

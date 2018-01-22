@@ -1,79 +1,48 @@
-#ifndef _MPICONTEXT_IMPL_HPP_
-#define _MPICONTEXT_IMPL_HPP_
+#ifndef MPICONTEXT_IMPL_HPP_
+#define MPICONTEXT_IMPL_HPP_
 
-MPIContext::MPIContext() :
-    m_num_process (comm_size()),
-    m_rank (comm_rank()),
-    m_query (m_num_process),
-    m_answer (m_num_process),
-    m_async_active (false)
+MPIContext::MPIContext()
+    : m_num_process(comm_size()), m_rank(comm_rank()), m_query(m_num_process),
+      m_answer(m_num_process), m_async_active(false)
 {
-
 }
 
-inline int
-MPIContext::queryCount(int rank)
-{
-    return m_query.count(rank);
-}
+inline int MPIContext::queryCount(int rank) { return m_query.count(rank); }
 
-inline int
-MPIContext::totalQueryCount()
-{
-    return m_query.totalCount();
-}
+inline int MPIContext::totalQueryCount() { return m_query.totalCount(); }
 
-inline int
-MPIContext::answerCount(int rank)
-{
-    return m_answer.count(rank);
-}
+inline int MPIContext::answerCount(int rank) { return m_answer.count(rank); }
 
-inline int
-MPIContext::totalAnswerCount()
-{
-    return m_answer.totalCount();
-}
+inline int MPIContext::totalAnswerCount() { return m_answer.totalCount(); }
 
-inline int
-MPIContext::queryDispl(int rank)
-{
-    return m_query.displ(rank);
-}
+inline int MPIContext::queryDispl(int rank) { return m_query.displ(rank); }
 
-inline int
-MPIContext::answerDispl(int rank)
-{
-    return m_answer.displ(rank);
-}
+inline int MPIContext::answerDispl(int rank) { return m_answer.displ(rank); }
 
-inline void
-MPIContext::setQueryCount(int rank, int count)
+inline void MPIContext::setQueryCount(int rank, int count)
 {
     CH_assert(!m_async_active);
     m_query.setCount(rank, count);
 }
 
-inline void
-MPIContext::incrementQueryCount(int rank)
+inline void MPIContext::incrementQueryCount(int rank)
 {
     CH_assert(!m_async_active);
     m_query.incrementCount(rank);
 }
 
-inline void
-MPIContext::clearQueryCounts()
+inline void MPIContext::clearQueryCounts()
 {
     CH_assert(!m_async_active);
     m_query.clearCounts();
 }
 
-void
-MPIContext::exchangeLayout()
+void MPIContext::exchangeLayout()
 {
     CH_assert(!m_async_active);
 #ifdef CH_MPI
-    MPI_Alltoall(m_query.countsPtr(), 1, MPI_INT, m_answer.countsPtr(), 1, MPI_INT, Chombo_MPI::comm);
+    MPI_Alltoall(m_query.countsPtr(), 1, MPI_INT, m_answer.countsPtr(), 1,
+                 MPI_INT, Chombo_MPI::comm);
 #else
     *m_answer.countsPtr() = *m_query.countsPtr();
 #endif
@@ -81,55 +50,49 @@ MPIContext::exchangeLayout()
 }
 
 #ifdef CH_MPI
-void
-MPIContext::asyncBegin()
+void MPIContext::asyncBegin()
 {
     CH_assert(!m_async_active);
     m_async_active = true;
 }
 
-void
-MPIContext::asyncExchangeQuery(void* sendbuf, void* recvbuf, MPI_Datatype type)
+void MPIContext::asyncExchangeQuery(void *sendbuf, void *recvbuf,
+                                    MPI_Datatype type)
 {
     CH_assert(m_async_active);
     MPI_Request req;
     m_mpi_requests.push_back(req);
 
 #if MPI_VERSION >= 3
-    MPI_Ialltoallv(
-        sendbuf, m_query.countsPtr(), m_query.displsPtr(), type,
-        recvbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
-        Chombo_MPI::comm, &m_mpi_requests.back());
+    MPI_Ialltoallv(sendbuf, m_query.countsPtr(), m_query.displsPtr(), type,
+                   recvbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
+                   Chombo_MPI::comm, &m_mpi_requests.back());
 #else
-    MPI_Alltoallv(
-        sendbuf, m_query.countsPtr(), m_query.displsPtr(), type,
-        recvbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
-        Chombo_MPI::comm);
+    MPI_Alltoallv(sendbuf, m_query.countsPtr(), m_query.displsPtr(), type,
+                  recvbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
+                  Chombo_MPI::comm);
 #endif
 }
 
-void
-MPIContext::asyncExchangeAnswer(void* sendbuf, void* recvbuf, MPI_Datatype type)
+void MPIContext::asyncExchangeAnswer(void *sendbuf, void *recvbuf,
+                                     MPI_Datatype type)
 {
     CH_assert(m_async_active);
     MPI_Request req;
     m_mpi_requests.push_back(req);
 
 #if MPI_VERSION >= 3
-    MPI_Ialltoallv(
-        sendbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
-        recvbuf, m_query.countsPtr(), m_query.displsPtr(), type,
-        Chombo_MPI::comm, &m_mpi_requests.back());
+    MPI_Ialltoallv(sendbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
+                   recvbuf, m_query.countsPtr(), m_query.displsPtr(), type,
+                   Chombo_MPI::comm, &m_mpi_requests.back());
 #else
-    MPI_Alltoallv(
-        sendbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
-        recvbuf, m_query.countsPtr(), m_query.displsPtr(), type,
-        Chombo_MPI::comm);
+    MPI_Alltoallv(sendbuf, m_answer.countsPtr(), m_answer.displsPtr(), type,
+                  recvbuf, m_query.countsPtr(), m_query.displsPtr(), type,
+                  Chombo_MPI::comm);
 #endif
 }
 
-void
-MPIContext::asyncEnd()
+void MPIContext::asyncEnd()
 {
     CH_assert(m_async_active);
     m_async_active = false;
@@ -142,4 +105,4 @@ MPIContext::asyncEnd()
 }
 #endif /* ifdef CH_MPI */
 
-#endif /* _MPICONTEXT_IMPL_HPP_ */
+#endif /* MPICONTEXT_IMPL_HPP_ */

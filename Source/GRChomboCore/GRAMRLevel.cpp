@@ -1,42 +1,31 @@
 #include "GRAMRLevel.hpp"
-#include "LevelRK4.H"
 
-//TODO: Remove this once tagCells is sorted out!
-#include "GRAMRLevel.hpp"
-#include "BoxLoops.hpp"
-
-GRAMRLevel::GRAMRLevel (const SimulationParameters &a_p, int a_verbosity, ProfilingInfo * a_profilingInfo)
-: m_num_ghosts (a_p.num_ghosts), m_p(a_p), m_verbosity (a_verbosity), m_profilingInfo(a_profilingInfo)
+GRAMRLevel::GRAMRLevel(const SimulationParameters &a_p, int a_verbosity)
+    : m_num_ghosts(a_p.num_ghosts), m_p(a_p), m_verbosity(a_verbosity)
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel default constructor" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel default constructor" << endl;
 }
 
-GRAMRLevel::~GRAMRLevel ()
-{
-}
+GRAMRLevel::~GRAMRLevel() {}
 
-void
-GRAMRLevel::define (AMRLevel* a_coarser_level_ptr,
-                  const Box& a_problem_domain,
-                  int a_level,
-                  int a_ref_ratio)
+void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
+                        const Box &a_problem_domain, int a_level,
+                        int a_ref_ratio)
 {
     ProblemDomain physdomain(a_problem_domain);
     define(a_coarser_level_ptr, physdomain, a_level, a_ref_ratio);
 }
 
-void
-GRAMRLevel::define (AMRLevel* a_coarser_level_ptr,
-                  const ProblemDomain& a_problem_domain,
-                  int a_level,
-                  int a_ref_ratio)
+void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
+                        const ProblemDomain &a_problem_domain, int a_level,
+                        int a_ref_ratio)
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel::define " << a_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::define " << a_level << endl;
 
-    AMRLevel::define (a_coarser_level_ptr,
-                      a_problem_domain,
-                      a_level,
-                      a_ref_ratio);
+    AMRLevel::define(a_coarser_level_ptr, a_problem_domain, a_level,
+                     a_ref_ratio);
 
     if (a_coarser_level_ptr)
     {
@@ -45,40 +34,39 @@ GRAMRLevel::define (AMRLevel* a_coarser_level_ptr,
     }
     else
     {
-        m_dx = m_p.L / (a_problem_domain.domainBox().longside ());
+        m_dx = m_p.L / (a_problem_domain.domainBox().longside());
     }
 }
 
 /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
-const GRAMRLevel* GRAMRLevel::gr_cast(const AMRLevel* const amr_level_ptr)
+const GRAMRLevel *GRAMRLevel::gr_cast(const AMRLevel *const amr_level_ptr)
 {
-    const GRAMRLevel* gr_amr_level_ptr = dynamic_cast<const GRAMRLevel*> (amr_level_ptr);
+    const GRAMRLevel *gr_amr_level_ptr =
+        dynamic_cast<const GRAMRLevel *>(amr_level_ptr);
     if (gr_amr_level_ptr == nullptr)
     {
-        MayDay::Error ("in GRAMRLevel::gr_cast: amr_level_ptr is not castable to GRAMRLevel*");
+        MayDay::Error("in GRAMRLevel::gr_cast: amr_level_ptr is not castable "
+                      "to GRAMRLevel*");
     }
     return gr_amr_level_ptr;
 }
 
 /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
-GRAMRLevel* GRAMRLevel::gr_cast(AMRLevel* const amr_level_ptr)
+GRAMRLevel *GRAMRLevel::gr_cast(AMRLevel *const amr_level_ptr)
 {
-    return const_cast<GRAMRLevel*>(gr_cast(static_cast<const AMRLevel* const>(amr_level_ptr)));
+    return const_cast<GRAMRLevel *>(
+        gr_cast(static_cast<const AMRLevel *const>(amr_level_ptr)));
 }
 
-const GRLevelData&
-GRAMRLevel::getLevelData() const
-{
-    return m_state_new;
-}
+const GRLevelData &GRAMRLevel::getLevelData() const { return m_state_new; }
 
-bool
-GRAMRLevel::contains(const std::array<double, CH_SPACEDIM>& point) const
+bool GRAMRLevel::contains(const std::array<double, CH_SPACEDIM> &point) const
 {
-    const Box& domainBox = problemDomain().domainBox();
+    const Box &domainBox = problemDomain().domainBox();
     for (int i = 0; i < CH_SPACEDIM; ++i)
     {
-        if (point[i] < domainBox.smallEnd(i) - m_num_ghosts || point[i] > domainBox.bigEnd(i) + m_num_ghosts)
+        if (point[i] < domainBox.smallEnd(i) - m_num_ghosts ||
+            point[i] > domainBox.bigEnd(i) + m_num_ghosts)
         {
             return false;
         }
@@ -87,29 +75,29 @@ GRAMRLevel::contains(const std::array<double, CH_SPACEDIM>& point) const
 }
 
 // advance by one timestep
-Real
-GRAMRLevel::advance ()
+Real GRAMRLevel::advance()
 {
     CH_TIME("GRAMRLevel::advance");
 
-    //Get information on number of boxes on this level (helps with better load balancing)
-    const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
+    // Get information on number of boxes on this level (helps with better load
+    // balancing)
+    const DisjointBoxLayout &level_domain = m_state_new.disjointBoxLayout();
     int nbox = level_domain.dataIterator().size();
-    pout () << "GRAMRLevel::advance " << m_level << " at " << m_time <<
-        ". Boxes on this rank: " << nbox << "." << endl;
+    pout() << "GRAMRLevel::advance " << m_level << " at " << m_time
+           << ". Boxes on this rank: " << nbox << "." << endl;
 
-    m_state_new.copyTo ( m_state_new.interval (),
-                         m_state_old,
-                         m_state_old.interval () );
+    m_state_new.copyTo(m_state_new.interval(), m_state_old,
+                       m_state_old.interval());
 
     // The level classes take flux-register parameters, use dummy ones here
-    LevelFluxRegister* coarser_fr = nullptr;
-    LevelFluxRegister* finer_fr   = nullptr;
+    LevelFluxRegister *coarser_fr = nullptr;
+    LevelFluxRegister *finer_fr = nullptr;
     // Default coarser level pointers to an empty LevelData
-    // (Chombo usually checks isDefined() rather than != nullptr so we shouldn't use the nullptr)
+    // (Chombo usually checks isDefined() rather than != nullptr so we shouldn't
+    // use the nullptr)
     const GRLevelData null_gr_level_data;
-    const GRLevelData* coarser_data_old = &null_gr_level_data;
-    const GRLevelData* coarser_data_new = &null_gr_level_data;
+    const GRLevelData *coarser_data_old = &null_gr_level_data;
+    const GRLevelData *coarser_data_new = &null_gr_level_data;
 
     Real t_coarser_old = 0.0;
     Real t_coarser_new = 0.0;
@@ -117,7 +105,7 @@ GRAMRLevel::advance ()
     // A coarser level exists
     if (m_coarser_level_ptr != nullptr)
     {
-        GRAMRLevel* coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
+        GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
         coarser_data_old = &coarser_gr_amr_level_ptr->m_state_old;
         coarser_data_new = &coarser_gr_amr_level_ptr->m_state_new;
 
@@ -127,16 +115,18 @@ GRAMRLevel::advance ()
 
     if (m_finer_level_ptr != nullptr)
     {
-        GRAMRLevel* fine_gr_amr_level_ptr = gr_cast(m_finer_level_ptr);
+        GRAMRLevel *fine_gr_amr_level_ptr = gr_cast(m_finer_level_ptr);
         RK4LevelAdvance(m_state_new, m_state_old,
                         fine_gr_amr_level_ptr->m_patcher.getTimeInterpolator(),
-                        *coarser_data_old, t_coarser_old, *coarser_data_new, t_coarser_new,
-                        *coarser_fr, *finer_fr, m_time, m_dt, *this);
+                        *coarser_data_old, t_coarser_old, *coarser_data_new,
+                        t_coarser_new, *coarser_fr, *finer_fr, m_time, m_dt,
+                        *this);
     }
     else
     {
-        RK4LevelAdvance(m_state_new, m_state_old, *coarser_data_old, t_coarser_old,
-                        *coarser_data_new, t_coarser_new, *coarser_fr, *finer_fr, m_time, m_dt, *this);
+        RK4LevelAdvance(m_state_new, m_state_old, *coarser_data_old,
+                        t_coarser_old, *coarser_data_new, t_coarser_new,
+                        *coarser_fr, *finer_fr, m_time, m_dt, *this);
     }
 
     specificAdvance();
@@ -146,56 +136,51 @@ GRAMRLevel::advance ()
 }
 
 // things to do after a timestep
-void
-GRAMRLevel::postTimeStep ()
+void GRAMRLevel::postTimeStep()
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel::postTimeStep " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::postTimeStep " << m_level << endl;
 
     if (m_finer_level_ptr != nullptr)
     {
-        GRAMRLevel* finer_gr_amr_level_ptr = gr_cast(m_finer_level_ptr);
-        finer_gr_amr_level_ptr->m_coarse_average.averageToCoarse (m_state_new, finer_gr_amr_level_ptr->m_state_new);
+        GRAMRLevel *finer_gr_amr_level_ptr = gr_cast(m_finer_level_ptr);
+        finer_gr_amr_level_ptr->m_coarse_average.averageToCoarse(
+            m_state_new, finer_gr_amr_level_ptr->m_state_new);
     }
 
     specificPostTimeStep();
 
-    if ( m_verbosity ) pout () << "GRAMRLevel::postTimeStep " << m_level << " finished" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::postTimeStep " << m_level << " finished" << endl;
 }
 
-
 // create tags
-void
-GRAMRLevel::tagCells (IntVectSet& a_tags)
+void GRAMRLevel::tagCells(IntVectSet &a_tags)
 {
     CH_TIME("GRAMRLevel::tagCells");
-    if ( m_verbosity ) pout () << "GRAMRLevel::tagCells " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::tagCells " << m_level << endl;
 
-    //TODO: Need to think about how to do the tagging nicely.
-    //One possibility would be to pass a BaseFAB<bool> to the specific implementation
-    //but for local tagging criteria this wastes memory as we save a whole BaseFAB.
-    //In the meantime the user must override tagCells (it's virtual) with code similar
-    //to the one below.
-
-    fillAllGhosts(); //We need filled ghost cells to calculate gradients etc
+    fillAllGhosts(); // We need filled ghost cells to calculate gradients etc
 
     // Create tags based on undivided gradient of phi
     IntVectSet local_tags;
 
-    const DisjointBoxLayout& level_domain = m_state_new.disjointBoxLayout();
+    const DisjointBoxLayout &level_domain = m_state_new.disjointBoxLayout();
     DataIterator dit0 = level_domain.dataIterator();
     int nbox = dit0.size();
-    for(int ibox = 0; ibox < nbox; ++ibox)
+    for (int ibox = 0; ibox < nbox; ++ibox)
     {
         DataIndex di = dit0[ibox];
-        const Box& b = level_domain[di];
-        const FArrayBox& state_fab = m_state_new[di];
+        const Box &b = level_domain[di];
+        const FArrayBox &state_fab = m_state_new[di];
 
-        //mod gradient
-        FArrayBox tagging_criterion(b,1);
+        // mod gradient
+        FArrayBox tagging_criterion(b, 1);
         computeTaggingCriterion(tagging_criterion, state_fab);
 
-        const IntVect& smallEnd = b.smallEnd();
-        const IntVect& bigEnd = b.bigEnd();
+        const IntVect &smallEnd = b.smallEnd();
+        const IntVect &bigEnd = b.bigEnd();
 
         const int xmin = smallEnd[0];
         const int ymin = smallEnd[1];
@@ -207,20 +192,20 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
 
 #pragma omp parallel for collapse(3) schedule(static) default(shared)
         for (int iz = zmin; iz <= zmax; ++iz)
-        for (int iy = ymin; iy <= ymax; ++iy)
-        for (int ix = xmin; ix <= xmax; ++ix)
-        {
-            IntVect iv(ix,iy,iz);
-            //At the moment only base on gradient chi/chi^2
-            if (tagging_criterion(iv,0) >= m_p.regrid_threshold)
-            {
-                // local_tags |= is not thread safe.
-#pragma omp critical
+            for (int iy = ymin; iy <= ymax; ++iy)
+                for (int ix = xmin; ix <= xmax; ++ix)
                 {
-                    local_tags |= iv;
+                    IntVect iv(ix, iy, iz);
+                    // At the moment only base on gradient chi/chi^2
+                    if (tagging_criterion(iv, 0) >= m_p.regrid_threshold)
+                    {
+// local_tags |= is not thread safe.
+#pragma omp critical
+                        {
+                            local_tags |= iv;
+                        }
+                    }
                 }
-            }
-        }
     }
 
     local_tags.grow(m_p.tag_buffer_size);
@@ -235,108 +220,106 @@ GRAMRLevel::tagCells (IntVectSet& a_tags)
 }
 
 // create tags at initialization
-void
-GRAMRLevel::tagCellsInit (IntVectSet& a_tags)
+void GRAMRLevel::tagCellsInit(IntVectSet &a_tags)
 {
-    //the default is to use the standard tagging function
+    // the default is to use the standard tagging function
     tagCells(a_tags);
 }
 
 // regrid
-void
-GRAMRLevel::regrid (const Vector<Box>& a_new_grids)
+void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
 {
     CH_TIME("GRAMRLevel::regrid");
 
-    if ( m_verbosity ) pout () << "GRAMRLevel::regrid " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::regrid " << m_level << endl;
 
     m_level_grids = a_new_grids;
 
     mortonOrdering(m_level_grids);
-    const DisjointBoxLayout level_domain = m_grids = loadBalance (a_new_grids);
+    const DisjointBoxLayout level_domain = m_grids = loadBalance(a_new_grids);
 
     // save data for later copy
-    m_state_new.copyTo(m_state_new.interval(), m_state_old, m_state_old.interval());
+    m_state_new.copyTo(m_state_new.interval(), m_state_old,
+                       m_state_old.interval());
 
     // reshape state with new grids
-    IntVect iv_ghosts = m_num_ghosts*IntVect::Unit;
-    m_state_new.define (level_domain, c_NUM, iv_ghosts);
+    IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
 
     // maintain interlevel stuff
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define (level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define (level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
-        GRAMRLevel* coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
+        GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
         m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
-                         c_NUM, coarser_gr_amr_level_ptr->problemDomain(),
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
                          m_ref_ratio, m_num_ghosts);
 
         // interpolate from coarser level
-        m_fine_interp.interpToFine (m_state_new, coarser_gr_amr_level_ptr->m_state_new);
+        m_fine_interp.interpToFine(m_state_new,
+                                   coarser_gr_amr_level_ptr->m_state_new);
     }
     // copy from old state
-    m_state_old.copyTo (m_state_old.interval(), m_state_new, m_state_new.interval() );
-    m_state_old.define (level_domain, c_NUM, iv_ghosts);
+    m_state_old.copyTo(m_state_old.interval(), m_state_new,
+                       m_state_new.interval());
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 }
 
 // initialize grid
-void
-GRAMRLevel::initialGrid (const Vector<Box>& a_new_grids)
+void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
 {
     CH_TIME("GRAMRLevel::initialGrid");
 
-    if (m_verbosity) pout () << "GRAMRLevel::initialGrid " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::initialGrid " << m_level << endl;
 
     m_level_grids = a_new_grids;
 
-    const DisjointBoxLayout level_domain = m_grids = loadBalance (a_new_grids);
+    const DisjointBoxLayout level_domain = m_grids = loadBalance(a_new_grids);
 
-    IntVect iv_ghosts = m_num_ghosts*IntVect::Unit;
-    m_state_new.define (level_domain, c_NUM, iv_ghosts);
-    m_state_old.define (level_domain, c_NUM, iv_ghosts);
+    IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define (level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define (level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
-        GRAMRLevel* coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids, c_NUM,
-                         coarser_gr_amr_level_ptr->problemDomain(), m_ref_ratio, m_num_ghosts);
+        GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
+        m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
+                         m_ref_ratio, m_num_ghosts);
     }
 }
 
 // things to do after initialization
-void
-GRAMRLevel::postInitialize ()
-{
-}
+void GRAMRLevel::postInitialize() {}
 
 // compute dt
-Real
-GRAMRLevel::computeDt ()
+Real GRAMRLevel::computeDt()
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel::computeDt " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::computeDt " << m_level << endl;
     return m_dt;
 }
 
-
 // compute dt with initial data
-Real
-GRAMRLevel::computeInitialDt ()
+Real GRAMRLevel::computeInitialDt()
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel::computeInitialDt " << m_level << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::computeInitialDt " << m_level << endl;
 
     m_dt = m_initial_dt_multiplier * m_dx;
     return m_dt;
 }
 
-DisjointBoxLayout
-GRAMRLevel::loadBalance(const Vector<Box>& a_grids)
+DisjointBoxLayout GRAMRLevel::loadBalance(const Vector<Box> &a_grids)
 {
     CH_TIME("GRAMRLevel::loadBalance");
 
@@ -344,7 +327,7 @@ GRAMRLevel::loadBalance(const Vector<Box>& a_grids)
     Vector<int> procMap;
 
     // appears to be faster for all procs to do the loadbalance (ndk)
-    LoadBalance(procMap,a_grids);
+    LoadBalance(procMap, a_grids);
 
     if (m_verbosity)
     {
@@ -356,7 +339,7 @@ GRAMRLevel::loadBalance(const Vector<Box>& a_grids)
         pout() << endl;
     }
 
-    DisjointBoxLayout dbl(a_grids,procMap,m_problem_domain);
+    DisjointBoxLayout dbl(a_grids, procMap, m_problem_domain);
     dbl.close();
 
     return dbl;
@@ -364,172 +347,195 @@ GRAMRLevel::loadBalance(const Vector<Box>& a_grids)
 
 // write checkpoint header
 #ifdef CH_USE_HDF5
-void
-GRAMRLevel::writeCheckpointHeader (HDF5Handle& a_handle) const
+void GRAMRLevel::writeCheckpointHeader(HDF5Handle &a_handle) const
 {
-    if ( m_verbosity ) pout () << "GRAMRLevel::writeCheckpointHeader" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::writeCheckpointHeader" << endl;
 
     HDF5HeaderData header;
-    header.m_int ["num_components"] = c_NUM;
+    header.m_int["num_components"] = NUM_VARS;
     char comp_str[30];
-    for (int comp = 0; comp < c_NUM; ++comp)
+    for (int comp = 0; comp < NUM_VARS; ++comp)
     {
-        sprintf (comp_str, "component_%d", comp);
+        sprintf(comp_str, "component_%d", comp);
         header.m_string[comp_str] = UserVariables::variable_names[comp];
     }
     header.writeToFile(a_handle);
 
-    if ( m_verbosity ) pout () << header << endl;
+    if (m_verbosity)
+        pout() << header << endl;
 }
 
-
-void
-GRAMRLevel::writeCheckpointLevel (HDF5Handle& a_handle) const
+void GRAMRLevel::writeCheckpointLevel(HDF5Handle &a_handle) const
 {
     CH_TIME("GRAMRLevel::writeCheckpointLevel");
 
-    if ( m_verbosity ) pout () << "GRAMRLevel::writeCheckpointLevel" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::writeCheckpointLevel" << endl;
 
     char level_str[20];
-    sprintf (level_str, "%d", m_level);
-    const std::string label = std::string ("level_") + level_str;
+    sprintf(level_str, "%d", m_level);
+    const std::string label = std::string("level_") + level_str;
 
-    a_handle.setGroup (label);
+    a_handle.setGroup(label);
 
     HDF5HeaderData header;
 
-    header.m_int  ["ref_ratio"]   = m_ref_ratio;
-    header.m_int  ["tag_buffer_size"] = m_p.tag_buffer_size;
-    header.m_real ["dx"]          = m_dx;
-    header.m_real ["dt"]          = m_dt;
-    header.m_real ["time"]        = m_time;
-    header.m_box  ["prob_domain"] = m_problem_domain.domainBox();
+    header.m_int["ref_ratio"] = m_ref_ratio;
+    header.m_int["tag_buffer_size"] = m_p.tag_buffer_size;
+    header.m_real["dx"] = m_dx;
+    header.m_real["dt"] = m_dt;
+    header.m_real["time"] = m_time;
+    header.m_box["prob_domain"] = m_problem_domain.domainBox();
 
     // Setup the periodicity info
-    for (int dir=0; dir<SpaceDim; ++dir)
+    for (int dir = 0; dir < SpaceDim; ++dir)
     {
         char dir_str[20];
-        sprintf (dir_str, "%d", dir);
-        const std::string periodic_label = std::string ("is_periodic_") + dir_str;
+        sprintf(dir_str, "%d", dir);
+        const std::string periodic_label =
+            std::string("is_periodic_") + dir_str;
         header.m_int[periodic_label] = m_problem_domain.isPeriodic(dir);
     }
 
     header.writeToFile(a_handle);
 
-    if ( m_verbosity ) pout () << header << endl;
+    if (m_verbosity)
+        pout() << header << endl;
 
-    write (a_handle, m_state_new.boxLayout ());
-    write (a_handle, m_state_new, "data");
+    write(a_handle, m_state_new.boxLayout());
+    write(a_handle, m_state_new, "data");
 }
 
-void
-GRAMRLevel::readCheckpointHeader  (HDF5Handle& a_handle)
+void GRAMRLevel::readCheckpointHeader(HDF5Handle &a_handle)
 {
     CH_TIME("GRAMRLevel::readCheckpointHeader");
 
-    if ( m_verbosity ) pout () << "GRAMRLevel::readCheckpointHeader" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::readCheckpointHeader" << endl;
 
     HDF5HeaderData header;
     header.readFromFile(a_handle);
 
-    if ( m_verbosity ) pout () << "hdf5 header data:" << endl;
-    if ( m_verbosity ) pout () << header << endl;
+    if (m_verbosity)
+        pout() << "hdf5 header data:" << endl;
+    if (m_verbosity)
+        pout() << header << endl;
 
     // read number of components
-    if (header.m_int.find ("num_components") == header.m_int.end())
+    if (header.m_int.find("num_components") == header.m_int.end())
     {
-        MayDay::Error ("GRAMRLevel::readCheckpointHeader: checkpoint file does not have num_components");
+        MayDay::Error("GRAMRLevel::readCheckpointHeader: checkpoint file does "
+                      "not have num_components");
     }
-    int num_comps = header.m_int ["num_components"];
-    if (num_comps != c_NUM)
+    int num_comps = header.m_int["num_components"];
+    if (num_comps != NUM_VARS)
     {
-        MayDay::Error ("GRAMRLevel::readCheckpointHeader: num_components in checkpoint file does not match solver");
+        MayDay::Error("GRAMRLevel::readCheckpointHeader: num_components in "
+                      "checkpoint file does not match solver");
     }
 
     // read component names
     std::string state_name;
     char comp_str[60];
-    for (int comp = 0; comp < c_NUM; ++comp)
+    for (int comp = 0; comp < NUM_VARS; ++comp)
     {
-        sprintf (comp_str, "component_%d", comp);
-        if (header.m_string.find (comp_str) == header.m_string.end())
+        sprintf(comp_str, "component_%d", comp);
+        if (header.m_string.find(comp_str) == header.m_string.end())
         {
-            MayDay::Error ("GRAMRLevel::readCheckpointHeader: checkpoint file does not have enough component names");
+            MayDay::Error("GRAMRLevel::readCheckpointHeader: checkpoint file "
+                          "does not have enough component names");
         }
-        state_name = header.m_string [comp_str];
+        state_name = header.m_string[comp_str];
         if (state_name != UserVariables::variable_names[comp])
         {
             if (m_p.ignore_checkpoint_name_mismatch)
             {
-                MayDay::Warning("GRAMRLevel::readCheckpointHeader: state_name mismatch error silenced by user.");
+                MayDay::Warning("GRAMRLevel::readCheckpointHeader: state_name "
+                                "mismatch error silenced by user.");
             }
-            else MayDay::Error("GRAMRLevel::readCheckpointHeader: state_name in checkpoint does not match solver");
+            else
+                MayDay::Error("GRAMRLevel::readCheckpointHeader: state_name in "
+                              "checkpoint does not match solver");
         }
     }
 }
 
-void
-GRAMRLevel::readCheckpointLevel (HDF5Handle& a_handle)
+void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
 {
     CH_TIME("GRAMRLevel::readCheckpointLevel");
-    if ( m_verbosity ) pout () << "GRAMRLevel::readCheckpointLevel" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::readCheckpointLevel" << endl;
 
     char level_str[20];
-    sprintf (level_str, "%d", m_level);
-    const std::string label = std::string ("level_") + level_str;
+    sprintf(level_str, "%d", m_level);
+    const std::string label = std::string("level_") + level_str;
 
-    a_handle.setGroup (label);
+    a_handle.setGroup(label);
 
     HDF5HeaderData header;
-    header.readFromFile (a_handle);
+    header.readFromFile(a_handle);
 
-    if ( m_verbosity ) pout () << "hdf5 header data:" << endl;
-    if ( m_verbosity ) pout () << header << endl;
+    if (m_verbosity)
+        pout() << "hdf5 header data:" << endl;
+    if (m_verbosity)
+        pout() << header << endl;
 
     // read refinement ratio
     if (header.m_int.find("ref_ratio") == header.m_int.end())
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain ref_ratio");
+        MayDay::Error(
+            "GRAMRLevel::readCheckpointLevel: file does not contain ref_ratio");
     }
-    m_ref_ratio = header.m_int ["ref_ratio"];
+    m_ref_ratio = header.m_int["ref_ratio"];
 
-    if ( m_verbosity ) pout () << "read ref_ratio = " << m_ref_ratio << endl;
+    if (m_verbosity)
+        pout() << "read ref_ratio = " << m_ref_ratio << endl;
 
     // read dx
     if (header.m_real.find("dx") == header.m_real.end())
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain dx");
+        MayDay::Error(
+            "GRAMRLevel::readCheckpointLevel: file does not contain dx");
     }
-    m_dx = header.m_real ["dx"];
+    m_dx = header.m_real["dx"];
 
-    if ( m_verbosity ) pout () << "read dx = " << m_dx << endl;
+    if (m_verbosity)
+        pout() << "read dx = " << m_dx << endl;
 
-    //Since we have fixed time steping it is better to take dt from the parameter file
+    // Since we have fixed time steping it is better to take dt from the
+    // parameter file
     computeInitialDt();
-    if ( m_verbosity ) pout () << "dt = " << m_dt << endl;
+    if (m_verbosity)
+        pout() << "dt = " << m_dt << endl;
 
     // read time
     if (header.m_real.find("time") == header.m_real.end())
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain time");
+        MayDay::Error(
+            "GRAMRLevel::readCheckpointLevel: file does not contain time");
     }
-    m_time = header.m_real ["time"];
-    if ( m_verbosity ) pout () << "read time = " << m_time << endl;
+    m_time = header.m_real["time"];
+    if (m_verbosity)
+        pout() << "read time = " << m_time << endl;
 
     // read problem domain
     if (header.m_box.find("prob_domain") == header.m_box.end())
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain prob_domain");
+        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain "
+                      "prob_domain");
     }
-    Box domainBox = header.m_box ["prob_domain"];
+    Box domainBox = header.m_box["prob_domain"];
 
     // Get the periodicity info
-    bool isPeriodic[SpaceDim] = {false}; //default to false unless other info is available
-    for (int dir=0; dir<SpaceDim; ++dir)
+    bool isPeriodic[SpaceDim] = {
+        false}; //default to false unless other info is available
+    for (int dir = 0; dir < SpaceDim; ++dir)
     {
         char dir_str[20];
-        sprintf (dir_str, "%d", dir);
-        const std::string periodic_label = std::string ("is_periodic_") + dir_str;
+        sprintf(dir_str, "%d", dir);
+        const std::string periodic_label =
+            std::string("is_periodic_") + dir_str;
         if (!(header.m_int.find(periodic_label) == header.m_int.end()))
         {
             isPeriodic[dir] = (header.m_int[periodic_label] == true);
@@ -539,53 +545,59 @@ GRAMRLevel::readCheckpointLevel (HDF5Handle& a_handle)
 
     // read grids
     Vector<Box> grids;
-    const int grid_status = read (a_handle, grids);
+    const int grid_status = read(a_handle, grids);
     if (grid_status != 0)
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain a Vector<Box>");
+        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain "
+                      "a Vector<Box>");
     }
 
     // create level domain
-    const DisjointBoxLayout level_domain = m_grids = loadBalance (grids);
+    const DisjointBoxLayout level_domain = m_grids = loadBalance(grids);
 
-    if ( m_verbosity ) pout () << "read level domain: " << endl;
+    if (m_verbosity)
+        pout() << "read level domain: " << endl;
     LayoutIterator lit = level_domain.layoutIterator();
     for (lit.begin(); lit.ok(); ++lit)
     {
-        const Box& b = level_domain[lit()];
-        if ( m_verbosity ) pout () << lit().intCode() << ": " << b << endl;
+        const Box &b = level_domain[lit()];
+        if (m_verbosity)
+            pout() << lit().intCode() << ": " << b << endl;
         m_level_grids.push_back(b);
     }
-    if ( m_verbosity ) pout () << endl;
+    if (m_verbosity)
+        pout() << endl;
 
     // maintain interlevel stuff
-    IntVect iv_ghosts = m_num_ghosts*IntVect::Unit;
+    IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    m_coarse_average.define (level_domain, c_NUM, m_ref_ratio);
-    m_fine_interp.define (level_domain, c_NUM, m_ref_ratio, m_problem_domain);
+    m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {
-        GRAMRLevel* coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
+        GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
         m_patcher.define(level_domain, coarser_gr_amr_level_ptr->m_grids,
-                         c_NUM, coarser_gr_amr_level_ptr->problemDomain(),
+                         NUM_VARS, coarser_gr_amr_level_ptr->problemDomain(),
                          m_ref_ratio, m_num_ghosts);
     }
 
     // reshape state with new grids
-    m_state_new.define (level_domain, c_NUM, iv_ghosts);
-    const int data_status = read<FArrayBox> (a_handle, m_state_new, "data", level_domain);
+    m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
+    const int data_status =
+        read<FArrayBox>(a_handle, m_state_new, "data", level_domain);
     if (data_status != 0)
     {
-        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain state data");
+        MayDay::Error("GRAMRLevel::readCheckpointLevel: file does not contain "
+                      "state data");
     }
-    m_state_old.define (level_domain, c_NUM, iv_ghosts);
+    m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 }
 
-void
-GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
+void GRAMRLevel::writePlotLevel(HDF5Handle &a_handle) const
 {
-    if (m_verbosity) pout() << "GRAMRLevel::writePlotLevel" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::writePlotLevel" << endl;
 
     // number and index of states to print
     std::vector<int> plot_states;
@@ -593,11 +605,11 @@ GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
     specificWritePlotHeader(plot_states);
     int num_states = plot_states.size();
 
-    if ( num_states > 0 )
+    if (num_states > 0)
     {
         // Setup the level string
         char levelStr[20];
-        sprintf(levelStr,"%d",m_level);
+        sprintf(levelStr, "%d", m_level);
         const std::string label = std::string("level_") + levelStr;
 
         a_handle.setGroup(label);
@@ -605,31 +617,33 @@ GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
         // Setup the level header information
         HDF5HeaderData header;
 
-        header.m_int ["ref_ratio"]   = m_ref_ratio;
-        header.m_int  ["tag_buffer_size"] = m_p.tag_buffer_size;
-        header.m_real["dx"]          = m_dx;
-        header.m_real["dt"]          = m_dt;
-        header.m_real["time"]        = m_time;
-        header.m_box ["prob_domain"] = m_problem_domain.domainBox();
+        header.m_int["ref_ratio"] = m_ref_ratio;
+        header.m_int["tag_buffer_size"] = m_p.tag_buffer_size;
+        header.m_real["dx"] = m_dx;
+        header.m_real["dt"] = m_dt;
+        header.m_real["time"] = m_time;
+        header.m_box["prob_domain"] = m_problem_domain.domainBox();
 
         // Setup the periodicity info
-        for (int dir=0; dir<SpaceDim; ++dir)
+        for (int dir = 0; dir < SpaceDim; ++dir)
         {
             char dir_str[20];
-            sprintf (dir_str, "%d", dir);
-            const std::string periodic_label = std::string ("is_periodic_") + dir_str;
+            sprintf(dir_str, "%d", dir);
+            const std::string periodic_label =
+                std::string("is_periodic_") + dir_str;
             header.m_int[periodic_label] = m_problem_domain.isPeriodic(dir);
         }
 
         // Write the header for this level
         header.writeToFile(a_handle);
 
-        if (m_verbosity) pout() << header << endl;
+        if (m_verbosity)
+            pout() << header << endl;
 
-        const DisjointBoxLayout& levelGrids = m_state_new.getBoxes();
+        const DisjointBoxLayout &levelGrids = m_state_new.getBoxes();
         LevelData<FArrayBox> plot_data(levelGrids, num_states);
 
-        for (int comp=0; comp < num_states; comp++)
+        for (int comp = 0; comp < num_states; comp++)
         {
             Interval currentComp(comp, comp);
             Interval plotComps(plot_states[comp], plot_states[comp]);
@@ -639,15 +653,15 @@ GRAMRLevel::writePlotLevel (HDF5Handle& a_handle) const
         plot_data.exchange(plot_data.interval());
 
         // Write the data for this level
-        write (a_handle, levelGrids);
-        write (a_handle, plot_data, "data");
+        write(a_handle, levelGrids);
+        write(a_handle, plot_data, "data");
     }
 }
 
-void
-GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
+void GRAMRLevel::writePlotHeader(HDF5Handle &a_handle) const
 {
-    if (m_verbosity) pout() << "GRAMRLevel::writePlotHeader" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::writePlotHeader" << endl;
 
     // number and index of states to print
     std::vector<int> plot_states;
@@ -655,7 +669,7 @@ GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
     specificWritePlotHeader(plot_states);
     int num_states = plot_states.size();
 
-    if ( num_states > 0 )
+    if (num_states > 0)
     {
         // Setup the number of components
         HDF5HeaderData header;
@@ -665,36 +679,40 @@ GRAMRLevel::writePlotHeader (HDF5Handle& a_handle) const
         char compStr[30];
         for (int comp = 0; comp < num_states; ++comp)
         {
-            sprintf(compStr,"component_%d", comp);
-            header.m_string[compStr] = UserVariables::variable_names[plot_states[comp]];
+            sprintf(compStr, "component_%d", comp);
+            header.m_string[compStr] =
+                UserVariables::variable_names[plot_states[comp]];
         }
 
         // Write the header
         header.writeToFile(a_handle);
 
-        if (m_verbosity) pout() << header << endl;
+        if (m_verbosity)
+            pout() << header << endl;
     }
     else
     {
-        MayDay::Warning("GRAMRLevel::writePlotLevel: A plot interval is provided but no components are selected for plotting. Plot files will be empty.");
+        MayDay::Warning("GRAMRLevel::writePlotLevel: A plot interval is "
+                        "provided but no components are selected for plotting. "
+                        "Plot files will be empty.");
     }
 }
 #endif /*ifdef CH_USE_HDF5*/
 
 // methods used with LevelRK4
 // evaluate d(soln)/dt at current time based on soln
-void
-GRAMRLevel::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
-                  TSoln& soln, // soln at current time
-                  TFR& fineFR,  // flux register w/ finer level
-                  TFR& crseFR,  // flux register w/ crse level
-                  const TSoln& oldCrseSoln, // old-time crse solution
-                  Real oldCrseTime,    // old crse time
-                  const TSoln& newCrseSoln,  // new-time crse solution
-                  Real newCrseTime,   // new crse time
-                  Real time,   // current time centering of soln
-                  Real fluxWeight // weight to apply to fluxRegister updates
-                 )
+void GRAMRLevel::evalRHS(
+    TSoln &rhs,               // d(soln)/dt based on soln
+    TSoln &soln,              // soln at current time
+    TFR &fineFR,              // flux register w/ finer level
+    TFR &crseFR,              // flux register w/ crse level
+    const TSoln &oldCrseSoln, // old-time crse solution
+    Real oldCrseTime,         // old crse time
+    const TSoln &newCrseSoln, // new-time crse solution
+    Real newCrseTime,         // new crse time
+    Real time,                // current time centering of soln
+    Real fluxWeight           // weight to apply to fluxRegister updates
+    )
 {
     CH_TIME("GRAMRLevel::evalRHS");
 
@@ -708,82 +726,71 @@ GRAMRLevel::evalRHS(TSoln& rhs, // d(soln)/dt based on soln
         // Truncate the fraction to the range [0,1] to remove floating-point
         // subtraction roundoff effects
         Real eps = 0.04 * m_dt / m_ref_ratio;
-        if (Abs(alpha) < eps) alpha = 0.0;
-        else if (Abs(1.0-alpha) < eps) alpha = 1.0;
+        if (Abs(alpha) < eps)
+            alpha = 0.0;
+        else if (Abs(1.0 - alpha) < eps)
+            alpha = 1.0;
 
         // Current time before old coarse time
-        if (alpha < 0.0) MayDay::Error( "GRAMRLevel::evalRHS: alpha < 0.0");
+        if (alpha < 0.0)
+            MayDay::Error("GRAMRLevel::evalRHS: alpha < 0.0");
         // Current time after new coarse time
-        if (alpha > 1.0) MayDay::Error( "GRAMRLevel::evalRHS: alpha > 1.0");
+        if (alpha > 1.0)
+            MayDay::Error("GRAMRLevel::evalRHS: alpha > 1.0");
 
         // Interpolate ghost cells from next coarser level in space and time
-        m_patcher.fillInterp(soln,alpha,0,0,c_NUM);
+        m_patcher.fillInterp(soln, alpha, 0, 0, NUM_VARS);
     }
-    //Time and count the RHS if possible
-    if (m_profilingInfo != nullptr) m_profilingInfo->resetCounters();
 
-    specificEvalRHS(soln, rhs, time); //Call the problem specific rhs
-
-    if (m_profilingInfo != nullptr) m_profilingInfo->readCounters();
+    specificEvalRHS(soln, rhs, time); // Call the problem specific rhs
 }
 
 // implements soln += dt*rhs
-void
-GRAMRLevel::updateODE(TSoln& soln, const TSoln& rhs, Real dt)
+void GRAMRLevel::updateODE(TSoln &soln, const TSoln &rhs, Real dt)
 {
     CH_TIME("GRAMRLevel::updateODE");
-    soln.plus(rhs,dt);
+    soln.plus(rhs, dt);
 
     specificUpdateODE(soln, rhs, dt);
 }
 
 // define data holder newSoln based on existingSoln,
 // including ghost cell specification
-void
-GRAMRLevel::defineSolnData(TSoln& newSoln,
-                         const TSoln& existingSoln)
+void GRAMRLevel::defineSolnData(TSoln &newSoln, const TSoln &existingSoln)
 {
-    newSoln.define(existingSoln.disjointBoxLayout(),existingSoln.nComp(),
-                    existingSoln.ghostVect());
+    newSoln.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
+                   existingSoln.ghostVect());
 }
 
-// define data holder for RHS based on existingSoln including ghost cell specification
-// (which in most cases is no ghost cells)
-void
-GRAMRLevel::defineRHSData(TSoln& newRHS, const TSoln& existingSoln)
+// define data holder for RHS based on existingSoln including ghost cell
+// specification (which in most cases is no ghost cells)
+void GRAMRLevel::defineRHSData(TSoln &newRHS, const TSoln &existingSoln)
 {
-    newRHS.define(existingSoln.disjointBoxLayout(),existingSoln.nComp());
+    newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp());
 }
 
 /// copy data in src into dest
-void
-GRAMRLevel::copySolnData(TSoln& dest, const TSoln& src)
+void GRAMRLevel::copySolnData(TSoln &dest, const TSoln &src)
 {
-    src.copyTo(src.interval(),dest,dest.interval());
+    src.copyTo(src.interval(), dest, dest.interval());
 }
 
-double
-GRAMRLevel::get_dx() const
-{
-    return m_dx;
-}
+double GRAMRLevel::get_dx() const { return m_dx; }
 
-void
-GRAMRLevel::fillAllGhosts()
+void GRAMRLevel::fillAllGhosts()
 {
     // If there is a coarser level then interpolate undefined ghost cells
     if (m_coarser_level_ptr != nullptr)
     {
-        GRAMRLevel* coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
-        m_patcher.fillInterp(m_state_new, coarser_gr_amr_level_ptr->m_state_new, 0, 0, c_NUM);
+        GRAMRLevel *coarser_gr_amr_level_ptr = gr_cast(m_coarser_level_ptr);
+        m_patcher.fillInterp(m_state_new, coarser_gr_amr_level_ptr->m_state_new,
+                             0, 0, NUM_VARS);
     }
     fillIntralevelGhosts();
 }
 
-void
-GRAMRLevel::fillIntralevelGhosts()
+void GRAMRLevel::fillIntralevelGhosts()
 {
     m_state_new.exchange(m_exchange_copier);
     fillBdyGhosts();
 }
-

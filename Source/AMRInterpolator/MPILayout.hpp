@@ -1,10 +1,10 @@
-#ifndef _MPILAYOUT_HPP_
-#define _MPILAYOUT_HPP_
+#ifndef MPILAYOUT_HPP_
+#define MPILAYOUT_HPP_
 
 class MPILayout
 {
 
-public:
+  public:
     // Getters
     inline int count(int rank) const;
     inline int totalCount() const;
@@ -15,25 +15,23 @@ public:
     inline void incrementCount(int rank);
     inline void clearCounts();
 
-private:
+  private:
     friend class MPIContext;
 
     MPILayout(int num_process);
 
     const int m_num_process;
-    vector<int> m_counts;
-    mutable vector<int> m_displs;
+    std::vector<int> m_counts;
+    mutable std::vector<int> m_displs;
 
     mutable int m_total_count;
     mutable bool m_dirty;
 
     inline void updateDirty() const;
-    inline int* countsPtr();
-    inline int* displsPtr();
-
+    inline int *countsPtr();
+    inline int *displsPtr();
 };
-
 
 #include "MPILayout.impl.hpp"
 
-#endif /* _MPILAYOUT_HPP_ */
+#endif /* MPILAYOUT_HPP_ */

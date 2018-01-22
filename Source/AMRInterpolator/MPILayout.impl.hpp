@@ -1,63 +1,49 @@
-#ifndef _MPILAYOUT_IMPL_HPP_
-#define _MPILAYOUT_IMPL_HPP_
+#ifndef MPILAYOUT_IMPL_HPP_
+#define MPILAYOUT_IMPL_HPP_
 
-MPILayout::MPILayout(int num_process) :
-    m_num_process (num_process),
-    m_counts (m_num_process, 0),
-    m_displs (m_num_process, 0),
-    m_dirty (false)
+MPILayout::MPILayout(int num_process)
+    : m_num_process(num_process), m_counts(m_num_process, 0),
+      m_displs(m_num_process, 0), m_dirty(false)
 {
-
 }
 
-inline int
-MPILayout::count(int rank)
-const
-{
-    return m_counts[rank];
-}
+inline int MPILayout::count(int rank) const { return m_counts[rank]; }
 
-inline int
-MPILayout::totalCount()
-const
+inline int MPILayout::totalCount() const
 {
-    if (m_dirty) updateDirty();
+    if (m_dirty)
+        updateDirty();
     return m_total_count;
 }
 
-inline int
-MPILayout::displ(int rank)
-const
+inline int MPILayout::displ(int rank) const
 {
-    if (m_dirty) updateDirty();
+    if (m_dirty)
+        updateDirty();
     return m_displs[rank];
 }
 
-inline void
-MPILayout::setCount(int rank, int count)
+inline void MPILayout::setCount(int rank, int count)
 {
     CH_assert(rank < m_num_process && count >= 0);
     m_counts[rank] = count;
     m_dirty = true;
 }
 
-inline void
-MPILayout::incrementCount(int rank)
+inline void MPILayout::incrementCount(int rank)
 {
     CH_assert(rank < m_num_process);
     ++m_counts[rank];
     m_dirty = true;
 }
 
-inline void
-MPILayout::clearCounts()
+inline void MPILayout::clearCounts()
 {
     m_counts.assign(m_num_process, 0);
     m_dirty = true;
 }
 
-inline void
-MPILayout::updateDirty() const
+inline void MPILayout::updateDirty() const
 {
     m_total_count = m_counts[0];
     for (int i = 1; i < m_num_process; ++i)
@@ -68,17 +54,13 @@ MPILayout::updateDirty() const
     m_dirty = false;
 }
 
-inline int*
-MPILayout::countsPtr()
-{
-    return &m_counts[0];
-}
+inline int *MPILayout::countsPtr() { return &m_counts[0]; }
 
-inline int*
-MPILayout::displsPtr()
+inline int *MPILayout::displsPtr()
 {
-    if (m_dirty) updateDirty();
+    if (m_dirty)
+        updateDirty();
     return &m_displs[0];
 }
 
-#endif /* _MPILAYOUT_IMPL_HPP_ */
+#endif /* MPILAYOUT_IMPL_HPP_ */

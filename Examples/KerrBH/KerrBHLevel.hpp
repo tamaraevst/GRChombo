@@ -1,38 +1,41 @@
 #ifndef KERRBHLEVEL_HPP_
 #define KERRBHLEVEL_HPP_
 
+#include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 
 class KerrBHLevel : public GRAMRLevel
 {
     friend class DefaultLevelFactory<KerrBHLevel>;
-    //Inherit the contructors from GRAMRLevel
+    // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
-    virtual
-    void specificAdvance();
+    /// Things to do at every full timestep
+    ///(might include several substeps, e.g. in RK4)
+    virtual void specificAdvance() override;
 
-    // initialize data
-    virtual
-    void initialData();
+    /// Initial data calculation
+    virtual void initialData() override;
 
-    virtual
-    void preCheckpointLevel();
+    /// Any actions that should happen just before checkpointing
+    virtual void preCheckpointLevel() override;
 
-    virtual
-    void specificEvalRHS(GRLevelData& a_soln, GRLevelData& a_rhs, const double a_time);
+    /// Calculation of the right hand side for the time stepping
+    virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                 const double a_time) override;
 
-    virtual
-    void specificUpdateODE(GRLevelData& a_soln, const GRLevelData& a_rhs, Real a_dt);
+    /// Things to do after dt*rhs has been added to the solution
+    virtual void specificUpdateODE(GRLevelData &a_soln,
+                                   const GRLevelData &a_rhs,
+                                   Real a_dt) override;
 
-    // Specify which variables to write at plot intervals
-    virtual
-    void specificWritePlotHeader(std::vector<int> &plot_states) const;
+    /// Specify which variables to write at plot intervals
+    virtual void
+    specificWritePlotHeader(std::vector<int> &plot_states) const override;
 
-    virtual
-    void computeTaggingCriterion(FArrayBox& tagging_criterion, const FArrayBox& current_state);
+    virtual void
+    computeTaggingCriterion(FArrayBox &tagging_criterion,
+                            const FArrayBox &current_state) override;
 };
-
-#include "KerrBHLevel.impl.hpp"
 
 #endif /* KERRBHLEVEL_HPP_ */
