@@ -17,11 +17,11 @@
 
 // This file provides functionalities for simd<t> whose implementation is
 // architecture independent.  Most importantly, all simd functions which have no
-// associated vector intrinsics, e.g. calls like ostream operator <<,  are defined
-// in the same way for all architectures and are, therefore, in this file.  A more
-// subtle example:
+// associated vector intrinsics, e.g. calls like ostream operator <<,  are
+// defined in the same way for all architectures and are, therefore, in this
+// file.  A more subtle example:
 //*= is an operator which has an architecture dependent vector intrinsic
-//associated to it  and is, therefore, not defined in this file. However, the
+// associated to it  and is, therefore, not defined in this file. However, the
 // binary operation a*b can be rewritten  as { a *= b; return a; } for all
 // architectures and, therefore, is defined in this file.
 template <typename t> struct simd_base

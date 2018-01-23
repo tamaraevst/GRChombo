@@ -89,15 +89,15 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
   public:
     /// evaluate d(soln)/dt at current time based on soln
-    void evalRHS(GRLevelData &rhs,               //!< d(soln)/dt based on soln
-                 GRLevelData &soln,              //!< soln at current time
-                 LevelFluxRegister &fineFR,              //!< flux register w/ finer level
-                 LevelFluxRegister &crseFR,              //!< flux register w/ crse level
+    void evalRHS(GRLevelData &rhs,          //!< d(soln)/dt based on soln
+                 GRLevelData &soln,         //!< soln at current time
+                 LevelFluxRegister &fineFR, //!< flux register w/ finer level
+                 LevelFluxRegister &crseFR, //!< flux register w/ crse level
                  const GRLevelData &oldCrseSoln, //!< old-time crse solution
-                 Real oldCrseTime,         //!< old crse time
+                 Real oldCrseTime,               //!< old crse time
                  const GRLevelData &newCrseSoln, //!< new-time crse solution
-                 Real newCrseTime,         //!< new crse time
-                 Real time,                //!< current time centering of soln
+                 Real newCrseTime,               //!< new crse time
+                 Real time,      //!< current time centering of soln
                  Real fluxWeight //!< weight to apply to fluxRegister updates
                  );
 
@@ -128,7 +128,8 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state) = 0;
 
-    /// This function shouldbe overriden to fill ghost cells outside the domain (for non-periodic boundary conditions)
+    /// This function shouldbe overriden to fill ghost cells outside the domain
+    /// (for non-periodic boundary conditions)
     virtual void fillBdyGhosts() {}
 
 #ifdef CH_USE_HDF5
@@ -154,25 +155,28 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     virtual void fillAllGhosts();
 
   protected:
-    /// Fill ghosts cells from boxes on this level only. Do not interpolate between levels.
+    /// Fill ghosts cells from boxes on this level only. Do not interpolate
+    /// between levels.
     virtual void fillIntralevelGhosts();
 
     GRLevelData m_state_old; //!< the solution at the old time
     GRLevelData m_state_new; //!< the solution at the new time
-    Real m_dx; //!< grid spacing
+    Real m_dx;               //!< grid spacing
 
     GRAMR &m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
 
     // params
     SimulationParameters m_p; //!< Holds parameters necessary for the simulation
-    int m_verbosity; //!< Level of verbosity of the output
+    int m_verbosity;          //!< Level of verbosity of the output
 
     Copier m_exchange_copier; //!< copier (for ghost cells on same level)
 
     CoarseAverage m_coarse_average; //!< Averages from fine to coarse level
 
-    FourthOrderFillPatch m_patcher; //!< Organises interpolation from coarse to fine levels
-    FourthOrderFineInterp m_fine_interp; //!< executes the interpolation from coarse to fine
+    FourthOrderFillPatch
+        m_patcher; //!< Organises interpolation from coarse to fine levels
+    FourthOrderFineInterp
+        m_fine_interp; //!< executes the interpolation from coarse to fine
 
     DisjointBoxLayout m_grids; //!< Holds grid setup (the layout of boxes)
 

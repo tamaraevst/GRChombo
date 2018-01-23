@@ -105,7 +105,7 @@ template <typename t> struct simd
 // simd_compare_gt, min, max etc.)  For simd<t> these are defined in the various
 // architecture-specific implementations.  Here, we make sure that the same
 // function calls also work when simd is switched off. (e.g.
-//simd_compare_lt(double, double) must work but needs to be implemented
+// simd_compare_lt(double, double) must work but needs to be implemented
 template <typename t>
 t simd_conditional(const bool cond, const t &true_value, const t &false_value)
 {

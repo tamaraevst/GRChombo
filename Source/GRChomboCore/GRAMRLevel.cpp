@@ -706,18 +706,11 @@ void GRAMRLevel::writePlotHeader(HDF5Handle &a_handle) const
 }
 #endif /*ifdef CH_USE_HDF5*/
 
-void GRAMRLevel::evalRHS(
-    GRLevelData &rhs,
-    GRLevelData &soln,
-    LevelFluxRegister &fineFR,
-    LevelFluxRegister &crseFR,
-    const GRLevelData &oldCrseSoln,
-    Real oldCrseTime,
-    const GRLevelData &newCrseSoln,
-    Real newCrseTime,
-    Real time,
-    Real fluxWeight
-    )
+void GRAMRLevel::evalRHS(GRLevelData &rhs, GRLevelData &soln,
+                         LevelFluxRegister &fineFR, LevelFluxRegister &crseFR,
+                         const GRLevelData &oldCrseSoln, Real oldCrseTime,
+                         const GRLevelData &newCrseSoln, Real newCrseTime,
+                         Real time, Real fluxWeight)
 {
     CH_TIME("GRAMRLevel::evalRHS");
 
@@ -761,7 +754,8 @@ void GRAMRLevel::updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt)
 
 // define data holder newSoln based on existingSoln,
 // including ghost cell specification
-void GRAMRLevel::defineSolnData(GRLevelData &newSoln, const GRLevelData &existingSoln)
+void GRAMRLevel::defineSolnData(GRLevelData &newSoln,
+                                const GRLevelData &existingSoln)
 {
     newSoln.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
                    existingSoln.ghostVect());
@@ -769,7 +763,8 @@ void GRAMRLevel::defineSolnData(GRLevelData &newSoln, const GRLevelData &existin
 
 // define data holder for RHS based on existingSoln including ghost cell
 // specification (which in most cases is no ghost cells)
-void GRAMRLevel::defineRHSData(GRLevelData &newRHS, const GRLevelData &existingSoln)
+void GRAMRLevel::defineRHSData(GRLevelData &newRHS,
+                               const GRLevelData &existingSoln)
 {
     newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp());
 }

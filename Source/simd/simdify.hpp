@@ -51,8 +51,8 @@ template <typename data_t> struct simd_proxy
     // The operator definitions below are there just in case we want to do
     // arithmetic directly  with a simd_proxy object. e.g. if we write
     // 3*SIMDIFY<simd<t>>(ptr_t). The behaviour mimics what we  would get if we
-    // loaded a simd<t> object, did the operation, and then stored it back to the
-    // location that the  simd_proxy points to.
+    // loaded a simd<t> object, did the operation, and then stored it back to
+    // the location that the  simd_proxy points to.
     ALWAYS_INLINE
     simd_t operator+(const simd_t &other)
     {
@@ -149,7 +149,8 @@ template <typename data_t> struct simd_array_wrapper
 // is only called on valid input types. -->
 
 // If the first and second template parameter are the same then this struct will
-// have a member of type  given by the third template parameter and called "type"
+// have a member of type  given by the third template parameter and called
+// "type"
 template <typename q1, typename q2, typename t> struct _simd_enable_if_same
 {
 };
@@ -172,7 +173,7 @@ template <typename t, typename ptr_t> struct _simdify<simd<t>, ptr_t>
                                           simd_array_wrapper<ptr_t>>::type type;
 };
 //<--End: structs that help create the return type of SIMDIFY and make sure it
-//is only called on valid input types.
+// is only called on valid input types.
 
 /// SIMDIFY<simd<base_t>>(ptr) is used to load simd data from an array of
 /// base_t's pointed to by ptr.  SIMDIFY<t>(ptr) for t not a simd object just
@@ -185,12 +186,12 @@ template <typename t, typename ptr_t> struct _simdify<simd<t>, ptr_t>
  */
 // Given SIMDIFY<t>(ptr_t) the return types are:
 //- If t=ptr_t (up to const and volatile) and t not simd<base_t>: return type
-//just ptr_t* - If t=simd<base_t> (up to const and volatile) where base_t =
-//ptr_t: return type simd_array_wrapper<ptr_t> - Else: substitution failure
+// just ptr_t* - If t=simd<base_t> (up to const and volatile) where base_t =
+// ptr_t: return type simd_array_wrapper<ptr_t> - Else: substitution failure
 template <typename t, typename ptr_t>
 ALWAYS_INLINE typename _simdify<t, ptr_t>::type // See comments at _simdify for
                                                 // explanation of return types
-                                                SIMDIFY(ptr_t *ptr)
+SIMDIFY(ptr_t *ptr)
 {
     return ptr;
 }
