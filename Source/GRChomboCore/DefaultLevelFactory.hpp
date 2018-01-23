@@ -1,16 +1,21 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef DEFAULTLEVELFACTORY_HPP_
 #define DEFAULTLEVELFACTORY_HPP_
 
 // General includes:
 #include "AMRLevelFactory.H"
-#include "SimulationParameters.hpp"
 #include "GRAMR.hpp"
+#include "SimulationParameters.hpp"
 
 template <class level_t> class DefaultLevelFactory : public AMRLevelFactory
 {
   public:
-    DefaultLevelFactory(GRAMR& gr_amr, SimulationParameters &a_sim_params) :
-        m_gr_amr (gr_amr), m_p(a_sim_params)
+    DefaultLevelFactory(GRAMR &gr_amr, SimulationParameters &a_sim_params)
+        : m_gr_amr(gr_amr), m_p(a_sim_params)
     {
     }
 
@@ -24,7 +29,7 @@ template <class level_t> class DefaultLevelFactory : public AMRLevelFactory
     virtual ~DefaultLevelFactory() {}
 
   protected:
-    GRAMR& m_gr_amr;
+    GRAMR &m_gr_amr;
     SimulationParameters m_p;
 };
 #endif /* DEFAULTLEVELFACTORY_HPP_ */

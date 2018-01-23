@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef AMRINTERPOLATOR_HPP_
 #define AMRINTERPOLATOR_HPP_
 

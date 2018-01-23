@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // This file calculates CCZ4 geometric quantities (or a similar 3+1 split).
 #ifndef CCZ4GEOMETRY_HPP_
 #define CCZ4GEOMETRY_HPP_

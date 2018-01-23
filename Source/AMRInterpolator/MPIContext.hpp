@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef MPICONTEXT_HPP_
 #define MPICONTEXT_HPP_
 

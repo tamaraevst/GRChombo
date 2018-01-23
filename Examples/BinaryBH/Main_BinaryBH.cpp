@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifdef CH_LANG_CC
 /*
  *      _______              __
@@ -8,13 +13,13 @@
  */
 #endif
 
-#include <iostream>
 #include "parstream.H" //Gives us pout()
+#include <iostream>
 
+#include "DefaultLevelFactory.hpp"
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
-#include "DefaultLevelFactory.hpp"
 #include "SimulationParameters.hpp"
 
 // Problem specific includes:

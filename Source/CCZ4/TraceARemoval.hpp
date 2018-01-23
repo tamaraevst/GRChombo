@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // This class enforces A to be trace-free
 #ifndef TRACEAREMOVAL_HPP_
 #define TRACEAREMOVAL_HPP_
@@ -5,10 +10,10 @@
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "Interval.H"
+#include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp"
 #include "VarsTools.hpp"
-#include "Tensor.hpp"
 
 class TraceARemoval
 {
@@ -35,7 +40,8 @@ class TraceARemoval
 
 template <class data_t>
 template <typename mapping_function_t>
-void TraceARemoval::Vars<data_t>::enum_mapping(mapping_function_t mapping_function)
+void TraceARemoval::Vars<data_t>::enum_mapping(
+    mapping_function_t mapping_function)
 {
     VarsTools::define_symmetric_enum_mapping(mapping_function,
                                              GRInterval<c_h11, c_h33>(), h);

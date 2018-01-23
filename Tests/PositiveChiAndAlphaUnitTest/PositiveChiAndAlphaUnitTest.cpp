@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "FArrayBox.H"
 #include "PositiveChiAndAlpha.hpp"
 #include "Tensor.hpp"

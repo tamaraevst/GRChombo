@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #if !defined(CHIRELAXATION_HPP_)
 #error "This file should only be included through ChiRelaxation.hpp"
 #endif
@@ -62,7 +67,8 @@ void ChiRelaxation<matter_t>::rhs_equation(
     rhs.chi =
         m_relax_speed *
         (ricci.scalar + (GR_SPACEDIM - 1.) * vars.K * vars.K / GR_SPACEDIM -
-         tr_AA - 16.0 * M_PI * m_G_Newton * emtensor.rho) / vars.chi;
+         tr_AA - 16.0 * M_PI * m_G_Newton * emtensor.rho) /
+        vars.chi;
 }
 
 #endif /* CHIRELAXATION_IMPL_HPP_ */

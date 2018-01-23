@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // This class computes the modulus of the magnitude of chi
 #ifndef COMPUTEMODGRAD_HPP_
 #define COMPUTEMODGRAD_HPP_
@@ -5,8 +10,8 @@
 #include "Cell.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "UserVariables.hpp"
 #include "Tensor.hpp"
+#include "UserVariables.hpp"
 
 #include <array>
 

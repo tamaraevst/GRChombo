@@ -1,12 +1,17 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef CCZ4_HPP_
 #define CCZ4_HPP_
 
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 

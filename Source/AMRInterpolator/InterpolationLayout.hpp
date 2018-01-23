@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef INTERPOLATIONLAYOUT_HPP_
 #define INTERPOLATIONLAYOUT_HPP_
 

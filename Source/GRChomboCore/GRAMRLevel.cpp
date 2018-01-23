@@ -1,7 +1,14 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "GRAMRLevel.hpp"
 
-GRAMRLevel::GRAMRLevel(GRAMR& gr_amr, const SimulationParameters &a_p, int a_verbosity)
-    : m_gr_amr (gr_amr), m_p(a_p), m_verbosity(a_verbosity), m_num_ghosts(a_p.num_ghosts)
+GRAMRLevel::GRAMRLevel(GRAMR &gr_amr, const SimulationParameters &a_p,
+                       int a_verbosity)
+    : m_gr_amr(gr_amr), m_p(a_p), m_verbosity(a_verbosity),
+      m_num_ghosts(a_p.num_ghosts)
 {
     if (m_verbosity)
         pout() << "GRAMRLevel constructor" << endl;
@@ -699,18 +706,11 @@ void GRAMRLevel::writePlotHeader(HDF5Handle &a_handle) const
 }
 #endif /*ifdef CH_USE_HDF5*/
 
-void GRAMRLevel::evalRHS(
-    GRLevelData &rhs,
-    GRLevelData &soln,
-    LevelFluxRegister &fineFR,
-    LevelFluxRegister &crseFR,
-    const GRLevelData &oldCrseSoln,
-    Real oldCrseTime,
-    const GRLevelData &newCrseSoln,
-    Real newCrseTime,
-    Real time,
-    Real fluxWeight
-    )
+void GRAMRLevel::evalRHS(GRLevelData &rhs, GRLevelData &soln,
+                         LevelFluxRegister &fineFR, LevelFluxRegister &crseFR,
+                         const GRLevelData &oldCrseSoln, Real oldCrseTime,
+                         const GRLevelData &newCrseSoln, Real newCrseTime,
+                         Real time, Real fluxWeight)
 {
     CH_TIME("GRAMRLevel::evalRHS");
 
@@ -754,7 +754,8 @@ void GRAMRLevel::updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt)
 
 // define data holder newSoln based on existingSoln,
 // including ghost cell specification
-void GRAMRLevel::defineSolnData(GRLevelData &newSoln, const GRLevelData &existingSoln)
+void GRAMRLevel::defineSolnData(GRLevelData &newSoln,
+                                const GRLevelData &existingSoln)
 {
     newSoln.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
                    existingSoln.ghostVect());
@@ -762,7 +763,8 @@ void GRAMRLevel::defineSolnData(GRLevelData &newSoln, const GRLevelData &existin
 
 // define data holder for RHS based on existingSoln including ghost cell
 // specification (which in most cases is no ghost cells)
-void GRAMRLevel::defineRHSData(GRLevelData &newRHS, const GRLevelData &existingSoln)
+void GRAMRLevel::defineRHSData(GRLevelData &newRHS,
+                               const GRLevelData &existingSoln)
 {
     newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp());
 }

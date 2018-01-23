@@ -1,14 +1,19 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef SCALARBUBBLE_HPP_
 #define SCALARBUBBLE_HPP_
 
-#include "MatterCCZ4.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
+#include "MatterCCZ4.hpp"
 #include "ScalarField.hpp"
+#include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total no. components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 //! Class which creates a bubble of a scalar field given params for initial
 //! matter config

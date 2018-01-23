@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
@@ -6,7 +11,7 @@ enum
 {
     c_chi,
 
-    c_h11, // Symmetric tensor must be declared in this order 
+    c_h11, // Symmetric tensor must be declared in this order
     c_h12,
     c_h13,
     c_h22,

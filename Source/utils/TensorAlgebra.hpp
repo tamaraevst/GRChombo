@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef TENSORALGEBRA_HPP_
 #define TENSORALGEBRA_HPP_
 
@@ -214,9 +219,8 @@ ALWAYS_INLINE Tensor<2, data_t> lower_all(const Tensor<2, data_t> &tensor_UU,
 /// Computes the (i,j) component of the Kronecker delta
 constexpr int delta(int i, int j) { return (i == j); }
 
-
 /// Computes the levi-civita symbol (3D, NB, symbol, not the Tensor)
-inline Tensor<3,double> epsilon() 
+inline Tensor<3, double> epsilon()
 {
     Tensor<3, double> epsilon = {0.};
     epsilon[0][1][2] = 1.0;

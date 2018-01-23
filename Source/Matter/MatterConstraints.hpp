@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef MATTERCONSTRAINTS_HPP_
 #define MATTERCONSTRAINTS_HPP_
 
@@ -6,8 +11,8 @@
 #include "Constraints.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "GRInterval.hpp"
-#include "simd.hpp"
 #include "Tensor.hpp"
+#include "simd.hpp"
 #include <array>
 
 //!  Calculates the Hamiltonain and Momentum constraints with matter fields

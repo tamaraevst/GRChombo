@@ -1,12 +1,17 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef BINARYBH_HPP_
 #define BINARYBH_HPP_
 
 #include "BoostedBH.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
-#include "simd.hpp"
 #include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
+#include "simd.hpp"
 #include <array>
 
 enum Lapse

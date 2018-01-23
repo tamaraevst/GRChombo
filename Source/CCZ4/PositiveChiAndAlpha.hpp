@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // This compute class enforces the positive chi and alpha condition
 #ifndef POSITIVECHIANDALPHA_HPP_
 #define POSITIVECHIANDALPHA_HPP_

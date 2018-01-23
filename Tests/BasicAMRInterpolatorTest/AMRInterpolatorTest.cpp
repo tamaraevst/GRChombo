@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifdef CH_LANG_CC
 /*
  *      _______              __
@@ -45,8 +50,8 @@ int runInterpolatorTest(int argc, char *argv[])
     SimulationParameters sim_params(pp);
 
     GRAMR gr_amr;
-    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(gr_amr,
-        sim_params);
+    DefaultLevelFactory<InterpolatorTestLevel> interpolator_test_level_fact(
+        gr_amr, sim_params);
     setupAMRObject(gr_amr, interpolator_test_level_fact);
 
     // Setup the AMRInterpolator
@@ -102,7 +107,7 @@ int runInterpolatorTest(int argc, char *argv[])
     return status;
 }
 
-int main(int argc ,char* argv[])
+int main(int argc, char *argv[])
 {
     mainSetup(argc, argv);
 
@@ -115,5 +120,5 @@ int main(int argc ,char* argv[])
                << endl;
 
     mainFinalize();
-    return status ;
+    return status;
 }

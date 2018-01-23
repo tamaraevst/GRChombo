@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #define COVARIANTZ4
 
 #ifdef _OPENMP
@@ -5,9 +10,9 @@
 #endif
 
 #include "BoxLoops.hpp"
+#include "FArrayBox.H"
 #include "MatterCCZ4.hpp"
 #include "MatterConstraints.hpp"
-#include "FArrayBox.H"
 #include "Potential.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"

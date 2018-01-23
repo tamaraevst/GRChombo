@@ -1,8 +1,13 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef POTENTIAL_HPP_
 #define POTENTIAL_HPP_
 
-#include "simd.hpp"
 #include "Tensor.hpp"
+#include "simd.hpp"
 
 class Potential
 {

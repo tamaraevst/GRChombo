@@ -1,10 +1,15 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef PHIANDKTAGGINGCRITERION_HPP_
 #define PHIANDKTAGGINGCRITERION_HPP_
 
-#include "Tensor.hpp"
 #include "Cell.hpp"
-#include "FourthOrderDerivatives.hpp"
 #include "DimensionDefinitions.hpp"
+#include "FourthOrderDerivatives.hpp"
+#include "Tensor.hpp"
 
 class PhiAndKTaggingCriterion
 {
@@ -35,9 +40,8 @@ class PhiAndKTaggingCriterion
             mod_d1_K += d1_K[idir] * d1_K[idir];
         }
 
-        data_t criterion =
-            m_dx * (sqrt(mod_d1_phi) / m_threshold_phi
-                        + sqrt(mod_d1_K) / m_threshold_K);
+        data_t criterion = m_dx * (sqrt(mod_d1_phi) / m_threshold_phi +
+                                   sqrt(mod_d1_K) / m_threshold_K);
 
         // Write back into the flattened Chombo box
         current_cell.store_vars(criterion, 0);
