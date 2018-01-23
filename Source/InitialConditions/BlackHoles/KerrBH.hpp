@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Last update K Clough 21.05.2017
 
 #ifndef KERRBH_HPP_
@@ -7,11 +12,11 @@
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "InitialDataTools.hpp"
+#include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 //! Class which computes the Kerr initial conditions per arXiv 1401.1548
 class KerrBH

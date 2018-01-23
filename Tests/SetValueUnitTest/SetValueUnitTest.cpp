@@ -1,7 +1,12 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "FArrayBox.H"
 #include "SetValue.hpp"
-#include "UserVariables.hpp"
 #include "Tensor.hpp"
+#include "UserVariables.hpp"
 #include <iostream>
 
 #include "BoxLoops.hpp"

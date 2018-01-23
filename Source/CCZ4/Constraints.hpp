@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // This compute class calculates Hamiltonian and Momentum constraints
 
 #ifndef CONSTRAINTS_HPP_
@@ -6,8 +11,8 @@
 #include "Cell.hpp"
 #include "FArrayBox.H"
 #include "FourthOrderDerivatives.hpp"
-#include "simd.hpp"
 #include "Tensor.hpp"
+#include "simd.hpp"
 
 #include "CCZ4Geometry.hpp"
 

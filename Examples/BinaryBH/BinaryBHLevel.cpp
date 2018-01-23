@@ -1,13 +1,18 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "BinaryBHLevel.hpp"
 #include "BoxLoops.hpp"
 #include "CCZ4.hpp"
 #include "ChiTaggingCriterion.hpp"
 #include "ComputePack.hpp"
 #include "Constraints.hpp"
-#include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "SetValue.hpp"
+#include "TraceARemoval.hpp"
 
 // Initial data
 #include "BinaryBH.hpp"

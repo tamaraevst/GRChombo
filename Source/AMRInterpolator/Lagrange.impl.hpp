@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef LAGRANGE_IMPL_HPP_
 #define LAGRANGE_IMPL_HPP_
 
@@ -353,8 +358,8 @@ Lagrange<Order>::generateStencil(
         }
     }
 
-    return pair<std::vector<IntVect>, std::vector<double>>(std::move(out_points),
-                                                           std::move(out_weights));
+    return pair<std::vector<IntVect>, std::vector<double>>(
+        std::move(out_points), std::move(out_weights));
 }
 
 #endif /* LAGRANGE_IMPL_HPP_ */

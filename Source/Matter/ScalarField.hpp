@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Developed by K Clough 2017
 
 #ifndef SCALARFIELD_HPP_
@@ -6,10 +11,10 @@
 #include "CCZ4Geometry.hpp"
 #include "DefaultPotential.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS, total num of components
 #include "VarsTools.hpp"
-#include "Tensor.hpp"
 
 //!  Calculates the matter type specific elements such as the EMTensor and
 //   matter evolution

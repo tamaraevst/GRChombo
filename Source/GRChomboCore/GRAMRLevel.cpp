@@ -1,7 +1,14 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "GRAMRLevel.hpp"
 
-GRAMRLevel::GRAMRLevel(GRAMR& gr_amr, const SimulationParameters &a_p, int a_verbosity)
-    : m_gr_amr (gr_amr), m_p(a_p), m_verbosity(a_verbosity), m_num_ghosts(a_p.num_ghosts)
+GRAMRLevel::GRAMRLevel(GRAMR &gr_amr, const SimulationParameters &a_p,
+                       int a_verbosity)
+    : m_gr_amr(gr_amr), m_p(a_p), m_verbosity(a_verbosity),
+      m_num_ghosts(a_p.num_ghosts)
 {
     if (m_verbosity)
         pout() << "GRAMRLevel constructor" << endl;

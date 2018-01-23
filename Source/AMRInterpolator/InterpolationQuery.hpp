@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef INTERPOLATIONQUERY_HPP_
 #define INTERPOLATIONQUERY_HPP_
 

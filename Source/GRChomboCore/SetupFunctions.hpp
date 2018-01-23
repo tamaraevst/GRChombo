@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef SETUP_FUNCTIONS_HPP_
 #define SETUP_FUNCTIONS_HPP_
 // This file incldues several functions that need to be called to
@@ -7,8 +12,8 @@
 #include <iostream>
 using std::endl;
 using std::cerr;
-#include "GRAMR.hpp"
 #include "AMRLevelFactory.H"
+#include "GRAMR.hpp"
 #include "ParmParse.H"
 
 #ifdef EQUATION_DEBUG_MODE

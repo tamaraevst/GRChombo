@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Last edited K Clough 16.10.16
 
 #ifndef USERVARIABLES_HPP

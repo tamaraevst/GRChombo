@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Last update K Clough 23.04.2017
 
 #if !defined(KERRBH_HPP_)

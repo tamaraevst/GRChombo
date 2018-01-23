@@ -1,10 +1,15 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Last edited K Clough 13.05.17
 
 #ifndef DEFAULTPOTENTIAL_HPP_
 #define DEFAULTPOTENTIAL_HPP_
 
-#include "simd.hpp"
 #include "Tensor.hpp"
+#include "simd.hpp"
 
 class DefaultPotential
 {

@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifdef CH_LANG_CC
 /*
  *      _______              __
@@ -8,13 +13,13 @@
  */
 #endif
 
-#include <iostream>
 #include "parstream.H" //Gives us pout()
+#include <iostream>
 
+#include "DefaultLevelFactory.hpp"
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
-#include "DefaultLevelFactory.hpp"
 #include "SimulationParameters.hpp"
 
 // Problem specific includes:
@@ -32,7 +37,8 @@ int runGRChombo(int argc, char *argv[])
     // (To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
     GRAMR gr_amr;
-    DefaultLevelFactory<ScalarFieldLevel> scalar_field_level_fact(gr_amr, sim_params);
+    DefaultLevelFactory<ScalarFieldLevel> scalar_field_level_fact(gr_amr,
+                                                                  sim_params);
     setupAMRObject(gr_amr, scalar_field_level_fact);
 
     double stop_time;

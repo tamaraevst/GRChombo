@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // Last update K Clough 23.02.2017
 
 #ifndef GAMMACALCULATOR_HPP_
@@ -7,10 +12,10 @@
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "GRInterval.hpp"
+#include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 class GammaCalculator
 {

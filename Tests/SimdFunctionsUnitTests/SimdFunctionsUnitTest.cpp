@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "simd.hpp"
 #include <cmath>
 #include <iomanip>
@@ -129,10 +134,10 @@ int main()
     SV_TEST(cosh(x));
     SV_TEST(tanh(x));
 
-   SV_TEST_T(double, simd_min(x,0.5));
-   SV_TEST_T(float, simd_min(x,0.5f));
-   SV_TEST_T(double, simd_max(x,0.5));
-   SV_TEST_T(float, simd_max(x,0.5f));
+    SV_TEST_T(double, simd_min(x, 0.5));
+    SV_TEST_T(float, simd_min(x, 0.5f));
+    SV_TEST_T(double, simd_max(x, 0.5));
+    SV_TEST_T(float, simd_max(x, 0.5f));
 
     RV_TEST(exp(x), log(x));
     // RV_TEST(pow(x,(decltype(x))2),sqrt(x));

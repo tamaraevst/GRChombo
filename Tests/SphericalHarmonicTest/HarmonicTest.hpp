@@ -1,12 +1,17 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef HARMONICTEST_HPP_
 #define HARMONICTEST_HPP_
 
 #include "BoxLoops.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
+#include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 class HarmonicTest
 {

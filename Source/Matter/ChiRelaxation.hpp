@@ -1,15 +1,20 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef CHIRELAXATION_HPP_
 #define CHIRELAXATION_HPP_
 
 #include "CCZ4Geometry.hpp"
-#include "MatterCCZ4.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "MatterCCZ4.hpp"
+#include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
-#include "Tensor.hpp"
 
 //!  Calculates RHS for relaxation of the conformal factor, for initial
 //!  conditions

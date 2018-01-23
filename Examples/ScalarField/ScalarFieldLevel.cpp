@@ -1,9 +1,14 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 // General includes common to most GR problems
 #include "ScalarFieldLevel.hpp"
 #include "BoxLoops.hpp"
-#include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
+#include "TraceARemoval.hpp"
 
 // For RHS update
 #include "MatterCCZ4.hpp"
@@ -15,9 +20,9 @@
 #include "PhiAndKTaggingCriterion.hpp"
 
 // Problem specific includes
+#include "ChiRelaxation.hpp"
 #include "ComputePack.hpp"
 #include "Potential.hpp"
-#include "ChiRelaxation.hpp"
 #include "ScalarBubble.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
@@ -87,8 +92,9 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     {
 
         // Enforce trace free A_ij and positive chi and alpha
-        BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
-                       a_soln, a_soln, FILL_GHOST_CELLS);
+        BoxLoops::loop(
+            make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()), a_soln,
+            a_soln, FILL_GHOST_CELLS);
 
         // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
         // We don't want undefined values floating around in the constraints so

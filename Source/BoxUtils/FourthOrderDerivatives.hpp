@@ -1,10 +1,15 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef FOURTHORDERDERIVATIVES_HPP_
 #define FOURTHORDERDERIVATIVES_HPP_
 
 #include "Cell.hpp"
 #include "DimensionDefinitions.hpp"
-#include "UserVariables.hpp"
 #include "Tensor.hpp"
+#include "UserVariables.hpp"
 #include <array>
 
 class FourthOrderDerivatives

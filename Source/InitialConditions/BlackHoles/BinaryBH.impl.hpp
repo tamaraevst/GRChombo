@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #if !defined(BINARYBH_HPP_)
 #error "This file should only be included through BinaryBH.hpp"
 #endif

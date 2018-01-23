@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #include "CCZ4Geometry.hpp"
 #include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"

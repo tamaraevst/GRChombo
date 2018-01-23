@@ -1,3 +1,8 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #if !defined(CELL_HPP_)
 #error "This file should only be included through Cell.hpp"
 #endif
@@ -6,8 +11,8 @@
 #define CELL_IMPL_HPP_
 
 #include "GRInterval.hpp"
-#include "simd.hpp"
 #include "Tensor.hpp"
+#include "simd.hpp"
 
 template <class data_t>
 ALWAYS_INLINE data_t Cell<data_t>::load_vars(const int ivar) const

@@ -1,21 +1,26 @@
+/* GRChombo
+ * Copyright 2012 The GRChombo collaboration.
+ * Please refer to Copyright.txt in GRChombo's root directory.
+ */
+
 #ifndef GRAMRLEVEL_HPP_
 #define GRAMRLEVEL_HPP_
 
 #include "AMRLevel.H"
 #include "CoarseAverage.H"
 #include "FourthOrderFillPatch.H"
-#include "LevelRK4.H"
-#include "UserVariables.hpp" // need NUM_VARS
+#include "GRAMR.hpp"
 #include "GRLevelData.hpp"
 #include "InterpSource.hpp"
 #include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
+#include "LevelRK4.H"
 #include "SimulationParameters.hpp"
-#include "GRAMR.hpp"
+#include "UserVariables.hpp" // need NUM_VARS
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {
   public:
-    GRAMRLevel(GRAMR& gr_amr, const SimulationParameters &a_p, int a_verbosity);
+    GRAMRLevel(GRAMR &gr_amr, const SimulationParameters &a_p, int a_verbosity);
 
     virtual ~GRAMRLevel();
 
@@ -158,7 +163,7 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     // grid spacing
     Real m_dx;
 
-    GRAMR& m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
+    GRAMR &m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
 
     // params
     SimulationParameters m_p;
