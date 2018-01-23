@@ -706,19 +706,17 @@ void GRAMRLevel::writePlotHeader(HDF5Handle &a_handle) const
 }
 #endif /*ifdef CH_USE_HDF5*/
 
-// methods used with LevelRK4
-// evaluate d(soln)/dt at current time based on soln
 void GRAMRLevel::evalRHS(
-    TSoln &rhs,               // d(soln)/dt based on soln
-    TSoln &soln,              // soln at current time
-    TFR &fineFR,              // flux register w/ finer level
-    TFR &crseFR,              // flux register w/ crse level
-    const TSoln &oldCrseSoln, // old-time crse solution
-    Real oldCrseTime,         // old crse time
-    const TSoln &newCrseSoln, // new-time crse solution
-    Real newCrseTime,         // new crse time
-    Real time,                // current time centering of soln
-    Real fluxWeight           // weight to apply to fluxRegister updates
+    GRLevelData &rhs,
+    GRLevelData &soln,
+    LevelFluxRegister &fineFR,
+    LevelFluxRegister &crseFR,
+    const GRLevelData &oldCrseSoln,
+    Real oldCrseTime,
+    const GRLevelData &newCrseSoln,
+    Real newCrseTime,
+    Real time,
+    Real fluxWeight
     )
 {
     CH_TIME("GRAMRLevel::evalRHS");
@@ -753,7 +751,7 @@ void GRAMRLevel::evalRHS(
 }
 
 // implements soln += dt*rhs
-void GRAMRLevel::updateODE(TSoln &soln, const TSoln &rhs, Real dt)
+void GRAMRLevel::updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt)
 {
     CH_TIME("GRAMRLevel::updateODE");
     soln.plus(rhs, dt);
@@ -763,7 +761,7 @@ void GRAMRLevel::updateODE(TSoln &soln, const TSoln &rhs, Real dt)
 
 // define data holder newSoln based on existingSoln,
 // including ghost cell specification
-void GRAMRLevel::defineSolnData(TSoln &newSoln, const TSoln &existingSoln)
+void GRAMRLevel::defineSolnData(GRLevelData &newSoln, const GRLevelData &existingSoln)
 {
     newSoln.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
                    existingSoln.ghostVect());
@@ -771,13 +769,13 @@ void GRAMRLevel::defineSolnData(TSoln &newSoln, const TSoln &existingSoln)
 
 // define data holder for RHS based on existingSoln including ghost cell
 // specification (which in most cases is no ghost cells)
-void GRAMRLevel::defineRHSData(TSoln &newRHS, const TSoln &existingSoln)
+void GRAMRLevel::defineRHSData(GRLevelData &newRHS, const GRLevelData &existingSoln)
 {
     newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp());
 }
 
 /// copy data in src into dest
-void GRAMRLevel::copySolnData(TSoln &dest, const TSoln &src)
+void GRAMRLevel::copySolnData(GRLevelData &dest, const GRLevelData &src)
 {
     src.copyTo(src.interval(), dest, dest.interval());
 }
