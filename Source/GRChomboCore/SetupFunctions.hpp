@@ -19,13 +19,13 @@ using std::cerr;
 #include <omp.h>
 #endif
 
-// This function calls MPI_Init, makes sure a parameter file is supplied etc...
+/// This function calls MPI_Init, makes sure a parameter file is supplied etc...
 void mainSetup(int argc, char *argv[]);
 
-// This function calls all finalisations
+/// This function calls all finalisations
 void mainFinalize();
 
-// Sets up the grid parameters, problem domain and AMR object
+/// Sets up the grid parameters, problem domain and AMR object
 void setupAMRObject(AMR &gr_amr, AMRLevelFactory &a_factory);
 
 void mainSetup(int argc, char *argv[])
@@ -63,7 +63,7 @@ void mainSetup(int argc, char *argv[])
 #endif
     }
 
-    int required_argc = 2;
+    const int required_argc = 2;
     if (argc < required_argc)
     {
         cerr << " usage " << argv[0] << " <input_file_name> " << endl;
