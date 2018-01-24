@@ -14,8 +14,7 @@ void GRLevelData::setVal(const double a_val)
     for (dit.begin(); dit.ok(); ++dit)
     {
         FArrayBox &fab = (*this)[dit];
-        fab.setVal(
-            a_val); // TODO: Make sure these functions are threaded in Chombo!
+        fab.setVal(a_val);
     }
 }
 
