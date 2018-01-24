@@ -69,9 +69,6 @@ void BoxLoops::loop(const ComputePack<compute_ts...> &compute_pack,
     const int *loop_hi = loop_box.hiVect();
 
 #pragma omp parallel for default(shared) collapse(CH_SPACEDIM - 1)
-#if CH_SPACEDIM >= 4
-#error "TODO: Implement CH_SPACEDIM >= 4"
-#endif
 #if CH_SPACEDIM >= 3
     for (int iz = loop_lo[2]; iz <= loop_hi[2]; ++iz)
 #endif

@@ -53,17 +53,11 @@ class BoxPointers
 #if CH_SPACEDIM >= 3
         m_in_stride[2] = (m_in_hi[1] - m_in_lo[1] + 1) * m_in_stride[1];
 #endif
-#if CH_SPACEDIM >= 4
-#error "TODO: Implement CH_SPACEDIM >= 4"
-#endif
 
         m_out_stride[0] = 1;
         m_out_stride[1] = m_out_hi[0] - m_out_lo[0] + 1;
 #if CH_SPACEDIM >= 3
         m_out_stride[2] = (m_out_hi[1] - m_out_lo[1] + 1) * m_out_stride[1];
-#endif
-#if CH_SPACEDIM >= 4
-#error "TODO: Implement CH_SPACEDIM >= 4"
 #endif
     }
 
