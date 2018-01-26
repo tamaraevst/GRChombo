@@ -1,6 +1,6 @@
 /* GRChombo
  * Copyright 2012 The GRChombo collaboration.
- * Please refer to Copyright.txt in GRChombo's root directory.
+ * Please refer to LICENSE in GRChombo's root directory.
  */
 
 // This file calculates CCZ4 geometric quantities (or a similar 3+1 split).

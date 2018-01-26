@@ -1,6 +1,6 @@
 /* GRChombo
  * Copyright 2012 The GRChombo collaboration.
- * Please refer to Copyright.txt in GRChombo's root directory.
+ * Please refer to LICENSE in GRChombo's root directory.
  */
 
 #ifdef CH_LANG_CC
@@ -9,7 +9,7 @@
  *     / ___/ /  ___  __ _  / /  ___
  *    / /__/ _ \/ _ \/  V \/ _ \/ _ \
  *    \___/_//_/\___/_/_/_/_.__/\___/
- *    Please refer to Copyright.txt, in Chombo's root directory.
+ *    Please refer to LICENSE, in Chombo's root directory.
  */
 #endif
 
