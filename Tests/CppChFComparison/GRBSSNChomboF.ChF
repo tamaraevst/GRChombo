@@ -1,3 +1,7 @@
+C GRChombo
+C Copyright 2012 The GRChombo collaboration.
+C Please refer to LICENSE in GRChombo's root directory.
+
 c     Vector indices
 #define _1  0
 #define _2  1
