@@ -7,6 +7,11 @@ RealCleanExampleDirs := $(ExampleDirs:%=realclean-%)
 
 .PHONY: all run $(TestDirs) $(ExampleDirs)
 
+
+ifndef GRCHOMBO_SOURCE
+    $(error Please define GRCHOMBO_SOURCE - see installation instructions.)
+endif
+
 test: $(TestDirs)
 
 examples: $(ExampleDirs)
