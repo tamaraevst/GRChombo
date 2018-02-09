@@ -7,8 +7,6 @@
 #define BSSNVARS_HPP_
 
 #include "ADMVars.hpp"
-#include "AlwaysInline.hpp"
-#include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
 #include "VarsTools.hpp"
 
@@ -76,23 +74,11 @@ template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
 template <class data_t>
 struct Diff2VarsNoGauge : public ADMVars::Diff2VarsNoGauge<data_t>
 {
-    template <typename mapping_function_t>
-    void enum_mapping(mapping_function_t mapping_function)
-    {
-        using namespace VarsTools; // define_enum_mapping is part of VarsTools
-        ADMVars::Diff2VarsNoGauge<data_t>::enum_mapping(mapping_function);
-    }
 };
 
 template <class data_t>
 struct Diff2VarsWithGauge : public ADMVars::Diff2VarsWithGauge<data_t>
 {
-    template <typename mapping_function_t>
-    void enum_mapping(mapping_function_t mapping_function)
-    {
-        using namespace VarsTools; // define_enum_mapping is part of VarsTools
-        ADMVars::Diff2VarsWithGauge<data_t>::enum_mapping(mapping_function);
-    }
 };
 }
 

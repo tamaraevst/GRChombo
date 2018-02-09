@@ -7,9 +7,7 @@
 #define CCZ4VARS_HPP_
 
 #include "ADMVars.hpp"
-#include "AlwaysInline.hpp"
 #include "BSSNVars.hpp"
-#include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
 #include "VarsTools.hpp"
 
@@ -67,27 +65,14 @@ struct VarsWithGauge : public BSSNVars::VarsWithGauge<data_t>
 
 /// 2nd derivatives are only calculated for a small subset defined by
 /// Deriv2Vars
-/** Making this split speeds up the code significantly */
 template <class data_t>
 struct Diff2VarsNoGauge : public ADMVars::Diff2VarsNoGauge<data_t>
 {
-    template <typename mapping_function_t>
-    void enum_mapping(mapping_function_t mapping_function)
-    {
-        using namespace VarsTools; // define_enum_mapping is part of VarsTools
-        ADMVars::Diff2VarsNoGauge<data_t>::enum_mapping(mapping_function);
-    }
 };
 
 template <class data_t>
 struct Diff2VarsWithGauge : public ADMVars::Diff2VarsWithGauge<data_t>
 {
-    template <typename mapping_function_t>
-    void enum_mapping(mapping_function_t mapping_function)
-    {
-        using namespace VarsTools; // define_enum_mapping is part of VarsTools
-        ADMVars::Diff2VarsWithGauge<data_t>::enum_mapping(mapping_function);
-    }
 };
 }
 
