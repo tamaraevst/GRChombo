@@ -3,12 +3,10 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-// Last update K Clough 21.05.2017
-
 #ifndef KERRBH_HPP_
 #define KERRBH_HPP_
 
-#include "CCZ4.hpp"
+#include "ADMVars.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "InitialDataTools.hpp"
@@ -22,7 +20,7 @@
 class KerrBH
 {
     // Use the variable definition in CCZ4
-    template <class data_t> using Vars = CCZ4::Vars<data_t>;
+    template <class data_t> using Vars = ADMVars::VarsWithGauge<data_t>;
 
   public:
     //! Stuct for the params of the Kerr BH
