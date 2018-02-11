@@ -3,23 +3,19 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef ADMVARS_HPP_
-#define ADMVARS_HPP_
+#ifndef ADMCONFORMALVARS_HPP_
+#define ADMCONFORMALVARS_HPP_
 
 #include "Tensor.hpp"
 #include "UserVariables.hpp"
 #include "VarsTools.hpp"
 
-namespace ADMVars
+/// Namespace for ADM vars in conformally decomposed form
+/** The structs in this namespace collect all the ADM variables. It's main use is to make a local, nicely laid-out, copy of the ADM variables for the current grid cell (Otherwise, this data would only exist on the grid in the huge, flattened Chombo array). \sa {CCZ4Vars, BSSNVars} 
+**/
+namespace ADMConformalVars
 {
-/// ADM variables
-/** This struct collects all the ADM variables. It's main use is to make a
- *local, nicely laid-out, copy of the ADM variables for the current grid
- *cell (Otherwise, this data would only exist on the grid in the huge,
- *flattened Chombo array). To this end, ADM::Vars inherits from VarsBase
- *which contains functionality to connect the local copy of the variables
- *with values in the Chombo grid.
- **/
+/// Vars object for ADM vars, including gauge vars
 template <class data_t> struct VarsNoGauge
 {
     data_t chi;          //!< Conformal factor
@@ -34,10 +30,6 @@ template <class data_t> struct VarsNoGauge
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         // Scalars
         define_enum_mapping(mapping_function, c_chi, chi);
@@ -51,6 +43,7 @@ template <class data_t> struct VarsNoGauge
     }
 };
 
+/// Vars object for ADM vars, including gauge vars
 template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
 {
     data_t lapse;
@@ -61,24 +54,15 @@ template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         VarsNoGauge<data_t>::enum_mapping(mapping_function);
-        // Scalars
         define_enum_mapping(mapping_function, c_lapse, lapse);
-
-        // Vectors
         define_enum_mapping(mapping_function, GRInterval<c_shift1, c_shift3>(),
                             shift);
     }
 };
 
-/// 2nd derivatives are only calculated for a small subset defined by
-/// Deriv2Vars
-/** Making this split speeds up the code significantly */
+/// Vars object for ADM vars requiring second derivs, excluding gauge vars
 template <class data_t> struct Diff2VarsNoGauge
 {
     data_t chi;          //!< Conformal factor
@@ -94,6 +78,7 @@ template <class data_t> struct Diff2VarsNoGauge
     }
 };
 
+/// Vars object for ADM vars requiring second derivs, with gauge vars
 template <class data_t>
 struct Diff2VarsWithGauge : public Diff2VarsNoGauge<data_t>
 {
@@ -105,20 +90,13 @@ struct Diff2VarsWithGauge : public Diff2VarsNoGauge<data_t>
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         Diff2VarsNoGauge<data_t>::enum_mapping(mapping_function);
-        // Scalars
         define_enum_mapping(mapping_function, c_lapse, lapse);
-
-        // Vectors
         define_enum_mapping(mapping_function, GRInterval<c_shift1, c_shift3>(),
                             shift);
     }
 };
 }
 
-#endif /* ADMVARS_HPP_ */
+#endif /* ADMCONFORMALVARS_HPP_ */

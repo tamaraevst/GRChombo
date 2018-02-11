@@ -6,7 +6,7 @@
 #ifndef KERRBH_HPP_
 #define KERRBH_HPP_
 
-#include "ADMVars.hpp"
+#include "ADMConformalVars.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "InitialDataTools.hpp"
@@ -20,7 +20,7 @@
 class KerrBH
 {
     // Use the variable definition in CCZ4
-    template <class data_t> using Vars = ADMVars::VarsWithGauge<data_t>;
+    template <class data_t> using Vars = ADMConformalVars::VarsWithGauge<data_t>;
 
   public:
     //! Stuct for the params of the Kerr BH

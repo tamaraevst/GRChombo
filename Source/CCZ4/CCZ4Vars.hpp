@@ -6,46 +6,40 @@
 #ifndef CCZ4VARS_HPP_
 #define CCZ4VARS_HPP_
 
-#include "ADMVars.hpp"
+#include "ADMConformalVars.hpp"
 #include "BSSNVars.hpp"
 #include "Tensor.hpp"
 #include "VarsTools.hpp"
 
+/// Namespace for CCZ4 vars
+/** The structs in this namespace collect all the CCZ4 variables. It's main use
+ *  is to make a local, nicely laid-out, copy of the CCZ4 variables for the
+ *  current grid cell (Otherwise, this data would only exist on the grid in
+ *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars} 
+**/
 namespace CCZ4Vars
 {
-/// CCZ4 variables
-/** This struct collects all the CCZ4 variables. It's main use is to make a
- *local, nicely laid-out, copy of the CCZ4 variables for the current grid
- *cell (Otherwise, this data would only exist on the grid in the huge,
- *flattened Chombo array). To this end, CCZ4::Vars inherits from VarsBase
- *which contains functionality to connect the local copy of the variables
- *with values in the Chombo grid.
- **/
+/// Vars object for CCZ4 vars, including gauge vars
 template <class data_t>
 struct VarsNoGauge : public BSSNVars::VarsNoGauge<data_t>
 {
-    // Additional variable is Theta
-    data_t Theta; //!< CCZ4 quantity associated to hamiltonian constraint
+    data_t Theta; //!< CCZ4 quantity associated to Hamiltonian constraint
 
     /// Defines the mapping between members of Vars and Chombo grid
     /// variables (enum in User_Variables)
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         BSSNVars::VarsNoGauge<data_t>::enum_mapping(mapping_function);
         define_enum_mapping(mapping_function, c_Theta, Theta);
     }
 };
 
+/// Vars object for CCZ4 vars, including gauge vars
 template <class data_t>
 struct VarsWithGauge : public BSSNVars::VarsWithGauge<data_t>
 {
-    // Additional variable is Theta
     data_t Theta; //!< CCZ4 quantity associated to hamiltonian constraint
 
     /// Defines the mapping between members of Vars and Chombo grid
@@ -53,25 +47,21 @@ struct VarsWithGauge : public BSSNVars::VarsWithGauge<data_t>
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         BSSNVars::VarsWithGauge<data_t>::enum_mapping(mapping_function);
         define_enum_mapping(mapping_function, c_Theta, Theta);
     }
 };
 
-/// 2nd derivatives are only calculated for a small subset defined by
-/// Deriv2Vars
+/// Vars object for CCZ4 vars needing second derivs, excluding gauge vars
 template <class data_t>
-struct Diff2VarsNoGauge : public ADMVars::Diff2VarsNoGauge<data_t>
+struct Diff2VarsNoGauge : public ADMConformalVars::Diff2VarsNoGauge<data_t>
 {
 };
 
+/// Vars object for CCZ4 vars needing second derivs, including gauge vars
 template <class data_t>
-struct Diff2VarsWithGauge : public ADMVars::Diff2VarsWithGauge<data_t>
+struct Diff2VarsWithGauge : public ADMConformalVars::Diff2VarsWithGauge<data_t>
 {
 };
 }

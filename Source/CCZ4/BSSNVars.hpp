@@ -6,21 +6,20 @@
 #ifndef BSSNVARS_HPP_
 #define BSSNVARS_HPP_
 
-#include "ADMVars.hpp"
+#include "ADMConformalVars.hpp"
 #include "Tensor.hpp"
 #include "VarsTools.hpp"
 
+/// Namespace for BSSN vars
+/** The structs in this namespace collect all the BSSN variables. It's main use
+ *  is to make a local, nicely laid-out, copy of the BSSN variables for the
+ *  current grid cell (Otherwise, this data would only exist on the grid in
+ *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars} 
+**/
 namespace BSSNVars
 {
-/// BSSN variables
-/** This struct collects all the BSSN variables. It's main use is to make a
- *local, nicely laid-out, copy of the BSSN variables for the current grid
- *cell (Otherwise, this data would only exist on the grid in the huge,
- *flattened Chombo array). To this end, BSSN::Vars inherits from VarsBase
- *which contains functionality to connect the local copy of the variables
- *with values in the Chombo grid.
- **/
-template <class data_t> struct VarsNoGauge : public ADMVars::VarsNoGauge<data_t>
+/// Vars object for BSSN vars excluding gauge vars
+template <class data_t> struct VarsNoGauge : public ADMConformalVars::VarsNoGauge<data_t>
 {
     Tensor<1, data_t> Gamma; //!< Conformal connection functions
 
@@ -29,17 +28,14 @@ template <class data_t> struct VarsNoGauge : public ADMVars::VarsNoGauge<data_t>
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
-        ADMVars::VarsNoGauge<data_t>::enum_mapping(mapping_function);
+        ADMConformalVars::VarsNoGauge<data_t>::enum_mapping(mapping_function);
         define_enum_mapping(mapping_function, GRInterval<c_Gamma1, c_Gamma3>(),
-                            Gamma);
+                            Gamma); //!< The auxilliary variable Gamma^i
     }
 };
 
+/// Vars object for BSSN vars, including gauge vars
 template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
 {
     data_t lapse;
@@ -52,32 +48,24 @@ template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
     template <typename mapping_function_t>
     void enum_mapping(mapping_function_t mapping_function)
     {
-        // Define the mapping from components of chombo grid to elements in
-        // Vars. This allows to read/write data from the chombo grid into local
-        // variables in Vars (which only exist for the current cell).
-
         using namespace VarsTools; // define_enum_mapping is part of VarsTools
         VarsNoGauge<data_t>::enum_mapping(mapping_function);
-        // Scalars
         define_enum_mapping(mapping_function, c_lapse, lapse);
-
-        // Vectors
         define_enum_mapping(mapping_function, GRInterval<c_shift1, c_shift3>(),
                             shift);
         define_enum_mapping(mapping_function, GRInterval<c_B1, c_B3>(), B);
     }
 };
 
-/// 2nd derivatives are only calculated for a small subset defined by
-/// Deriv2Vars
-/** Making this split speeds up the code significantly */
+/// Vars object for BSSN vars needing second derivs, excluding gauge vars
 template <class data_t>
-struct Diff2VarsNoGauge : public ADMVars::Diff2VarsNoGauge<data_t>
+struct Diff2VarsNoGauge : public ADMConformalVars::Diff2VarsNoGauge<data_t>
 {
 };
 
+/// Vars object for BSSN vars needing second derivs, including gauge vars
 template <class data_t>
-struct Diff2VarsWithGauge : public ADMVars::Diff2VarsWithGauge<data_t>
+struct Diff2VarsWithGauge : public ADMConformalVars::Diff2VarsWithGauge<data_t>
 {
 };
 }
