@@ -15,8 +15,8 @@
 /** The structs in this namespace collect all the CCZ4 variables. It's main use
  *  is to make a local, nicely laid-out, copy of the CCZ4 variables for the
  *  current grid cell (Otherwise, this data would only exist on the grid in
- *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars} 
-**/
+ *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars}
+ **/
 namespace CCZ4Vars
 {
 /// Vars object for CCZ4 vars, including gauge vars

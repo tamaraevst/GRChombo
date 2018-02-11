@@ -14,12 +14,13 @@
 /** The structs in this namespace collect all the BSSN variables. It's main use
  *  is to make a local, nicely laid-out, copy of the BSSN variables for the
  *  current grid cell (Otherwise, this data would only exist on the grid in
- *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars} 
-**/
+ *  the huge, flattened Chombo array). \sa {CCZ4Vars, ADMConformalVars}
+ **/
 namespace BSSNVars
 {
 /// Vars object for BSSN vars excluding gauge vars
-template <class data_t> struct VarsNoGauge : public ADMConformalVars::VarsNoGauge<data_t>
+template <class data_t>
+struct VarsNoGauge : public ADMConformalVars::VarsNoGauge<data_t>
 {
     Tensor<1, data_t> Gamma; //!< Conformal connection functions
 
