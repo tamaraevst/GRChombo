@@ -16,6 +16,7 @@
 #include "LevelRK4.H"
 #include "SimulationParameters.hpp"
 #include "UserVariables.hpp" // need NUM_VARS
+#include <sys/time.h>
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {

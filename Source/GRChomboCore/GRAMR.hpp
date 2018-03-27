@@ -7,6 +7,7 @@
 #define GRAMR_HPP_
 
 #include "AMR.H"
+#include <sys/time.h>
 
 /// A child of Chombo's AMR class to interface with tools which require
 /// access to the whole AMR hierarchy (such as the AMRInterpolator)
@@ -16,6 +17,26 @@
  */
 class GRAMR : public AMR
 {
+  public:
+    struct timeval start_clock;
+    double restart_time;
+
+    GRAMR()
+    {
+        restart_time = 0.0;
+        gettimeofday(&start_clock, NULL);
+    }
+
+//    ~GRAMR()
+//    {
+        //pout() << "GRAMR deleted" << endl;
+//    }
+
+    void set_restart_time(double a_time)
+    {
+        restart_time = a_time;
+        gettimeofday(&start_clock, NULL);
+    }
 };
 
 #endif /* GRAMR_HPP_ */

@@ -86,11 +86,18 @@ Real GRAMRLevel::advance()
 {
     CH_TIME("GRAMRLevel::advance");
 
+    // Work out roughly how fast the evolution is going since restart
+    struct timeval current_clock;
+    gettimeofday(&current_clock, NULL);
+    double clock_difference = (current_clock.tv_sec - m_gr_amr.start_clock.tv_sec) / 3600.0;
+    double speed = (m_time - m_gr_amr.restart_time) / clock_difference;
+
     // Get information on number of boxes on this level (helps with better load
     // balancing)
     const DisjointBoxLayout &level_domain = m_state_new.disjointBoxLayout();
     int nbox = level_domain.dataIterator().size();
-    pout() << "GRAMRLevel::advance " << m_level << " at " << m_time
+    pout() << "GRAMRLevel::advance level " << m_level << " at time " << m_time
+           << " (" << speed << " M/hr" << ")"
            << ". Boxes on this rank: " << nbox << "." << endl;
 
     m_state_new.copyTo(m_state_new.interval(), m_state_old,
@@ -306,7 +313,10 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
 }
 
 // things to do after initialization
-void GRAMRLevel::postInitialize() {}
+void GRAMRLevel::postInitialize()
+{
+    m_gr_amr.set_restart_time(0.0);
+}
 
 // compute dt
 Real GRAMRLevel::computeDt()
@@ -336,7 +346,11 @@ DisjointBoxLayout GRAMRLevel::loadBalance(const Vector<Box> &a_grids)
     // appears to be faster for all procs to do the loadbalance (ndk)
     LoadBalance(procMap, a_grids);
 
-    if (m_verbosity)
+    if (m_verbosity == 1)
+    {
+        pout() << "GRAMRLevel::::loadBalance" << endl; 
+    }
+    else if (m_verbosity > 1)
     {
         pout() << "GRAMRLevel::::loadBalance: procesor map: " << endl;
         for (int igrid = 0; igrid < a_grids.size(); ++igrid)
@@ -525,6 +539,7 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
     m_time = header.m_real["time"];
     if (m_verbosity)
         pout() << "read time = " << m_time << endl;
+    m_gr_amr.set_restart_time(m_time);
 
     // read problem domain
     if (header.m_box.find("prob_domain") == header.m_box.end())
