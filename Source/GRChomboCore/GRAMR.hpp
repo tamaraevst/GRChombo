@@ -27,11 +27,6 @@ class GRAMR : public AMR
         gettimeofday(&start_clock, NULL);
     }
 
-//    ~GRAMR()
-//    {
-        //pout() << "GRAMR deleted" << endl;
-//    }
-
     void set_restart_time(double a_time)
     {
         restart_time = a_time;
