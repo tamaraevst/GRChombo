@@ -7,7 +7,8 @@
 #define GRAMR_HPP_
 
 #include "AMR.H"
-#include <sys/time.h>
+#include <chrono>
+#include <ratio>
 
 /// A child of Chombo's AMR class to interface with tools which require
 /// access to the whole AMR hierarchy (such as the AMRInterpolator)
@@ -17,20 +18,18 @@
  */
 class GRAMR : public AMR
 {
+    using Clock = std::chrono::steady_clock;
+    using Hours = std::chrono::duration<double, std::ratio<3600, 1>>;
+
+    std::chrono::time_point<Clock> start_time = Clock::now();
+
   public:
-    struct timeval start_clock;
-    double restart_time;
-
-    GRAMR()
+    auto get_walltime()
     {
-        restart_time = 0.0;
-        gettimeofday(&start_clock, NULL);
-    }
+        auto now = Clock::now();
+        auto duration = std::chrono::duration_cast<Hours>(now - start_time);
 
-    void set_restart_time(double a_time)
-    {
-        restart_time = a_time;
-        gettimeofday(&start_clock, NULL);
+        return duration.count();
     }
 };
 
