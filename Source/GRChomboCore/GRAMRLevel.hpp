@@ -100,7 +100,7 @@ class GRAMRLevel : public AMRLevel, public InterpSource
                  Real newCrseTime,               //!< new crse time
                  Real time,      //!< current time centering of soln
                  Real fluxWeight //!< weight to apply to fluxRegister updates
-    );
+                 );
 
     /// implements soln += dt*rhs
     void updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt);
@@ -163,6 +163,7 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     GRLevelData m_state_old; //!< the solution at the old time
     GRLevelData m_state_new; //!< the solution at the new time
     Real m_dx;               //!< grid spacing
+    double m_restart_time;
 
     GRAMR &m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
 
