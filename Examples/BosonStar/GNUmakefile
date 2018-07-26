@@ -7,11 +7,8 @@
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
 ifndef BOOST_ROOT
-		$(error The BosonStar example requires BOOST_ROOT to be set to the root of
-		the boost library directory.)
+		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
 endif
-
-#BOOST_VERSION=$(cat $(BOOST_ROOT)/boost/version.hpp | grep BOOST_VERSION\ [0-9] | cut -d ' ' -f 3)
 
 ebase := Main_ScalarField
 
