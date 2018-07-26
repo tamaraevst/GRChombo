@@ -13,7 +13,7 @@
 #include "SimulationParameters.hpp"
 
 // Problem specific includes:
-#include "ScalarFieldLevel.hpp"
+#include "BosonStarLevel.hpp"
 
 int runGRChombo(int argc, char *argv[])
 {
@@ -27,9 +27,9 @@ int runGRChombo(int argc, char *argv[])
     // (To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
     GRAMR gr_amr;
-    DefaultLevelFactory<ScalarFieldLevel> scalar_field_level_fact(gr_amr,
+    DefaultLevelFactory<BosonStarLevel> boson_star_level_fact(gr_amr,
                                                                   sim_params);
-    setupAMRObject(gr_amr, scalar_field_level_fact);
+    setupAMRObject(gr_amr, boson_star_level_fact);
 
     double stop_time;
     pp.get("stop_time", stop_time);

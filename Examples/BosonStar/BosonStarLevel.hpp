@@ -3,32 +3,28 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef SCALARFIELDLEVEL_HPP_
-#define SCALARFIELDLEVEL_HPP_
+#ifndef BOSONSTARLEVEL_HPP_
+#define BOSONSTARLEVEL_HPP_
 
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 // Problem specific includes
 #include "Potential.hpp"
-#include "ScalarField.hpp"
+#include "ComplexScalarField.hpp"
 
-//!  A class for the evolution of a scalar field, minimally coupled to gravity
+//!  A class for the evolution of a single boson star.
 /*!
-     The class takes some initial data for a scalar field (variables phi and Pi)
-     and evolves it using the CCZ4 equations. It is possible to specify an
-   initial period of relaxation for the conformal factor chi, for non analytic
-   initial conditions (for example, a general field configuration at a moment of
-   time symmetry assuming conformal flatness). \sa MatterCCZ4(),
-   ConstraintsMatter(), ScalarField(), RelaxationChi()
+     The class takes some initial data for a boson star (i.e. a compact complex
+     scalar field configuration) and evolves it using the CCZ4 equations.
 */
-class ScalarFieldLevel : public GRAMRLevel
+class BosonStarLevel : public GRAMRLevel
 {
-    friend class DefaultLevelFactory<ScalarFieldLevel>;
+    friend class DefaultLevelFactory<BosonStarLevel>;
     // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
     // Typedef for scalar field
-    typedef ScalarField<Potential> ScalarFieldWithPotential;
+    typedef ComplexScalarField<Potential> ComplexScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
     virtual void specificAdvance();
@@ -55,4 +51,4 @@ class ScalarFieldLevel : public GRAMRLevel
                                          const FArrayBox &current_state);
 };
 
-#endif /* SCALARFIELDLEVEL_HPP_ */
+#endif /* BOSONSTARLEVEL_HPP_ */

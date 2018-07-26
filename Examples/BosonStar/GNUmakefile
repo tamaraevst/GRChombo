@@ -10,7 +10,7 @@ ifndef BOOST_ROOT
 		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
 endif
 
-ebase := Main_ScalarField
+ebase := Main_BosonStar
 
 LibNames := AMRTimeDependent AMRTools BoxTools
 
@@ -22,6 +22,7 @@ src_dirs := $(GRCHOMBO_SOURCE)/utils \
             $(GRCHOMBO_SOURCE)/GRChomboCore  \
             $(GRCHOMBO_SOURCE)/TaggingCriteria  \
             $(GRCHOMBO_SOURCE)/AMRInterpolator  \
-            $(GRCHOMBO_SOURCE)/InitialConditions/ScalarFields
+            $(GRCHOMBO_SOURCE)/InitialConditions/BosonStars  \
+						$(BOOST_ROOT)
 
 include $(CHOMBO_HOME)/mk/Make.test
