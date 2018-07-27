@@ -3,8 +3,8 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef SCALARFIELD_HPP_
-#define SCALARFIELD_HPP_
+#ifndef COMPLEXSCALARFIELD_HPP_
+#define COMPLEXSCALARFIELD_HPP_
 
 #include "CCZ4Geometry.hpp"
 #include "DefaultPotential.hpp"
@@ -28,7 +28,7 @@
      It assumes minimal coupling of the field to gravity.
      \sa MatterCCZ4(), ConstraintsMatter()
 */
-template <class potential_t = DefaultPotential> class ScalarField
+template <class potential_t = DefaultPotential> class ComplexScalarField
 {
   protected:
     //! The local copy of the potential
@@ -36,10 +36,10 @@ template <class potential_t = DefaultPotential> class ScalarField
 
   public:
     //!  Constructor of class ScalarField, inputs are the matter parameters.
-    ScalarField(const potential_t a_potential) : my_potential(a_potential) {}
+    ComplexScalarField(const potential_t a_potential) : my_potential(a_potential) {}
 
     //! Structure containing the variables for the matter fields
-    template <class data_t> struct SFObject
+    template <class data_t> struct CSFObject
     {
         data_t phi;
         data_t Pi;
@@ -128,4 +128,4 @@ template <class potential_t = DefaultPotential> class ScalarField
 
 #include "ScalarField.impl.hpp"
 
-#endif /* SCALARFIELD_HPP_ */
+#endif /* COMPLEXSCALARFIELD_HPP_ */
