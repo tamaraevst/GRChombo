@@ -11,7 +11,6 @@
 #include "Lagrange.hpp"
 #include <chrono>
 #include <ratio>
-#include <sys/time.h>
 
 /// A child of Chombo's AMR class to interface with tools which require
 /// access to the whole AMR hierarchy (such as the AMRInterpolator)
@@ -35,15 +34,10 @@ class GRAMR : public AMR
         return duration.count();
     }
 
-    void set_interpolator(const int dx_scalar, const int &a_verbosity = 0)
+    // Called after AMR object set up
+    void set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {
-        // Setup the AMRInterpolator
-        std::array<double, CH_SPACEDIM> origin, dx;
-        dx.fill(dx_scalar);
-        origin.fill(dx_scalar / 2);
-        AMRInterpolator<Lagrange<4>> interpolator(*this, origin, dx,
-                                                  a_verbosity);
-        m_interpolator = &interpolator;
+        m_interpolator = a_interpolator;
     }
 
   private:

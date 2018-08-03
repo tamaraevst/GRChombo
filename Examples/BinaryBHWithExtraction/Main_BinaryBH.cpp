@@ -30,10 +30,15 @@ int runGRChombo(int argc, char *argv[])
     DefaultLevelFactory<BinaryBHLevel> binary_bh_level_fact(gr_amr, sim_params);
     setupAMRObject(gr_amr, binary_bh_level_fact);
 
-    // call this after amr object setup
+    // call this after amr object setup so grids known
+    // and need it to stay in scope throughout run
     auto dx_scalar = GRAMRLevel::gr_cast(gr_amr.getAMRLevels()[0])
                          ->get_dx(); // coarsest grid spacing
-    gr_amr.set_interpolator(dx_scalar, sim_params.verbosity);
+    std::array<double, CH_SPACEDIM> origin, dx;
+    dx.fill(dx_scalar);
+    origin.fill(dx_scalar / 2);
+    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, origin, dx, sim_params.verbosity);
+    gr_amr.set_interpolator(&interpolator);
 
     double stop_time;
     pp.get("stop_time", stop_time);

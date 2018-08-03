@@ -1,7 +1,7 @@
-verbosity = 1
-chk_prefix = /scratch2/kclough/Binarychk
-plot_prefix = /scratch2/kclough/Binaryplt
-#restart_file = /gss/scratch/pr48pu/di36hup2/BinaryBHChk_000500.3d.hdf5
+verbosity = 0
+chk_prefix = BinaryBHchk
+plot_prefix = BinaryBHplt
+#restart_file = BinaryBHchk_000500.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
