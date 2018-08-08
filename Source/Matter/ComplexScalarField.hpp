@@ -120,9 +120,11 @@ template <class potential_t = DefaultComplexPotential> class ComplexScalarField
         const vars_t<data_t> &vars,      //!< the values of all the variables
         const CSFObject<data_t> &vars_csf, //!< the value of the sf variables
         const vars_t<Tensor<1, data_t>> &d1, //!< the value of the 1st derivs
-        const Tensor<1, data_t> &d1_phi, //!< the value of the 1st derivs of phi
-        const Tensor<2, data_t> &d2_phi, //!< the value of the 2nd derivs of phi
-        const CFObject<data_t> &advec_csf); //!< advection terms for the sf vars
+        const Tensor<1, data_t> &d1_phi_Re, //!< the value of the 1st derivs of phi_Re
+        const Tensor<1, data_t> &d1_phi_Im, //!< the value of the 1st derivs of phi_Im
+        const Tensor<2, data_t> &d2_phi_Re, //!< the value of the 2nd derivs of phi_Re
+        const Tensor<2, data_t> &d2_phi_Im, //!< the value of the 2nd derivs of phi_Im
+        const CSFObject<data_t> &advec_csf); //!< advection terms for the csf vars
 };
 
 #include "ComplexScalarField.impl.hpp"
