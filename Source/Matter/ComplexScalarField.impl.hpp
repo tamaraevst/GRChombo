@@ -3,41 +3,46 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#if !defined(SCALARFIELD_HPP_)
-#error "This file should only be included through ScalarField.hpp"
+#if !defined(COMPLEXSCALARFIELD_HPP_)
+#error "This file should only be included through ComplexScalarField.hpp"
 #endif
 
-#ifndef SCALARFIELD_IMPL_HPP_
-#define SCALARFIELD_IMPL_HPP_
+#ifndef COMPLEXSCALARFIELD_IMPL_HPP_
+#define COMPLEXSCALARFIELD_IMPL_HPP_
 #include "DimensionDefinitions.hpp"
 
 // Calculate the stress energy tensor elements
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
-emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
+emtensor_t<data_t> ComplexScalarField<potential_t>::compute_emtensor(
     const vars_t<data_t> &vars, const vars_t<Tensor<1, data_t>> &d1,
     const Tensor<2, data_t> &h_UU, const Tensor<3, data_t> &chris_ULL) const
 {
     emtensor_t<data_t> out;
 
     // Copy the field vars into SFObject
-    SFObject<data_t> vars_sf;
-    vars_sf.phi = vars.phi;
-    vars_sf.Pi = vars.Pi;
+    CSFObject<data_t> vars_csf;
+    vars_csf.phi_Re = vars.phi_Re;
+    vars_csf.phi_Im = vars.phi_Im;
+    vars_csf.Pi_Re = vars.Pi_Re;
+    vars_csf.Pi_Im = vars.Pi_Im;
 
     // call the function which computes the em tensor excluding the potential
-    emtensor_excl_potential(out, vars, vars_sf, d1.phi, h_UU, chris_ULL);
+    emtensor_excl_potential(out, vars, vars_csf, d1.phi_Re, d1.phi_Im, h_UU,
+        chris_ULL);
 
-    // set the potential values
-    data_t V_of_phi = 0.0;
-    data_t dVdphi = 0.0;
+    // set the default potential values
+    data_t V_of_modulus_phi_squared = 0.0;
+    data_t dVdmodulus_phi_squared = 0.0;
 
     // compute potential and add constributions to EM Tensor
-    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+    my_potential.compute_potential(V_of_modulus_phi_squared,
+        dVdmodulus_phi_squared, vars);
 
-    out.rho += V_of_phi;
-    out.S += -3.0 * V_of_phi;
-    FOR2(i, j) { out.Sij[i][j] += -vars.h[i][j] * V_of_phi / vars.chi; }
+    out.rho += 0.5 * V_of_modulus_phi_squared;
+    out.S += -1.5 * V_of_modulus_phi_squared;
+    FOR2(i, j) { out.Sij[i][j] +=
+        -0.5 * vars.h[i][j] * V_of_modulus_phi_squared / vars.chi; }
 
     return out;
 }
@@ -45,31 +50,44 @@ emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
 // Calculate the stress energy tensor elements
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
-void ScalarField<potential_t>::emtensor_excl_potential(
+void ComplexScalarField<potential_t>::emtensor_excl_potential(
     emtensor_t<data_t> &out, const vars_t<data_t> &vars,
-    const SFObject<data_t> &vars_sf, const Tensor<1, data_t> &d1_phi,
-    const Tensor<2, data_t> &h_UU, const Tensor<3, data_t> &chris_ULL)
+    const CSFObject<data_t> &vars_csf, const Tensor<1, data_t> &d1_phi_Re,
+    const Tensor<1, data_t> &d1_phi_Im, const Tensor<2, data_t> &h_UU,
+    const Tensor<3, data_t> &chris_ULL)
 {
-    // Useful quantity Vt
-    data_t Vt = -vars_sf.Pi * vars_sf.Pi;
-    FOR2(i, j) { Vt += vars.chi * h_UU[i][j] * d1_phi[i] * d1_phi[j]; }
+    //initialise some useful quantities
+    data_t modulus_d1_phi_squared = 0;
+    data_t modulus_Pi_squared =
+        vars_csf.Pi_Re * vars_csf.Pi_Re + vars_csf.Pi_Im * vars_csf.Pi_Im;
+    FOR2(i, j)
+    {
+        modulus_d1_phi_squared +=
+            vars.chi * h_UU[i][j] * (d1_phi_Re[i] * d1_phi_Re[j]
+            + d1_phi_Im[i] * d1_phi_Im[j]);
+    }
 
     // Calculate components of EM Tensor
     // S_ij = T_ij
     FOR2(i, j)
     {
         out.Sij[i][j] =
-            -0.5 * vars.h[i][j] * Vt / vars.chi + d1_phi[i] * d1_phi[j];
+            0.5 * (d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j]
+            - (modulus_d1_phi_squared - modulus_Pi_squared) / vars.chi);
     }
 
     // S = Tr_S_ij
     out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij, h_UU);
 
     // S_i (note lower index) = n^a T_a0
-    FOR1(i) { out.Si[i] = -d1_phi[i] * vars_sf.Pi; }
+    FOR1(i)
+    {
+        out.Si[i] =
+            vars_csf.Pi_Re * d1_phi_Re[i] + vars_csf.Pi_Im * d1_phi_Im[i];
+    }
 
     // rho = n^a n^b T_ab
-    out.rho = vars_sf.Pi * vars_sf.Pi + 0.5 * Vt;
+    out.rho = 0.5 * (modulus_Pi_squared + modulus_d1_phi_squared);
 }
 
 // Adds in the RHS for the matter vars
@@ -77,50 +95,57 @@ template <class potential_t>
 template <class data_t, template <typename> class vars_t,
           template <typename> class diff2_vars_t,
           template <typename> class rhs_vars_t>
-void ScalarField<potential_t>::add_matter_rhs(
+void ComplexScalarField<potential_t>::add_matter_rhs(
     rhs_vars_t<data_t> &total_rhs, const vars_t<data_t> &vars,
     const vars_t<Tensor<1, data_t>> &d1,
     const diff2_vars_t<Tensor<2, data_t>> &d2,
     const vars_t<data_t> &advec) const
 {
-    // first get the non potential part of the rhs
-    // this may seem a bit long winded, but it makes the function
-    // work for more multiple fields
-
-    SFObject<data_t> rhs_sf;
+    CSFObject<data_t> rhs_csf;
     // advection terms
-    SFObject<data_t> advec_sf;
-    advec_sf.phi = advec.phi;
-    advec_sf.Pi = advec.Pi;
+    CSFObject<data_t> advec_csf;
+    advec_csf.phi_Re = advec.phi_Re;
+    advec_csf.phi_Im = advec.phi_Im;
+    advec_csf.Pi_Re = advec.Pi_Re;
+    advec_csf.Pi_Im = advec.Pi_Im;
+
     // the vars
-    SFObject<data_t> vars_sf;
-    vars_sf.phi = vars.phi;
-    vars_sf.Pi = vars.Pi;
+    CSFObject<data_t> vars_csf;
+    vars_csf.phi_Re = vars.phi_Re;
+    vars_csf.phi_Im = vars.phi_Im;
+    vars_csf.Pi_Re = vars_csf.Pi_Re;
+    vars_csf.Pi_Im = vars.Pi_Im;
 
     // call the function for the rhs excluding the potential
-    matter_rhs_excl_potential(rhs_sf, vars, vars_sf, d1, d1.phi, d2.phi,
-                              advec_sf);
+    matter_rhs_excl_potential(rhs_csf, vars, vars_csf, d1, d1.phi_Re, d1.phi_Im,
+         d2.phi_Re, d2.phi_Im, advec_csf);
 
-    // set the potential values
-    data_t V_of_phi = 0.0;
-    data_t dVdphi = 0.0;
+     // set the default potential values
+     data_t V_of_modulus_phi_squared = 0.0;
+     data_t dVdmodulus_phi_squared = 0.0;
 
-    // compute potential
-    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+     // compute potential and add constributions to EM Tensor
+     my_potential.compute_potential(V_of_modulus_phi_squared,
+         dVdmodulus_phi_squared, vars);
 
     // adjust RHS for the potential term
-    total_rhs.phi = rhs_sf.phi;
-    total_rhs.Pi = rhs_sf.Pi - vars.lapse * dVdphi;
+    total_rhs.phi_Re = rhs_csf.phi_Re;
+    total_rhs.phi_Im = rhs_csf.phi_Im;
+    total_rhs.Pi_Re =
+        rhs_csf.Pi_Re - vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Re;
+    total_rhs.Pi_Im =
+        rhs_csf.Pi_Im - vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Im;
 }
 
 // the RHS excluding the potential terms
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
-void ScalarField<potential_t>::matter_rhs_excl_potential(
-    SFObject<data_t> &rhs_sf, const vars_t<data_t> &vars,
-    const SFObject<data_t> &vars_sf, const vars_t<Tensor<1, data_t>> &d1,
-    const Tensor<1, data_t> &d1_phi, const Tensor<2, data_t> &d2_phi,
-    const SFObject<data_t> &advec_sf)
+void ComplexScalarField<potential_t>::matter_rhs_excl_potential(
+    CSFObject<data_t> &rhs_csf, const vars_t<data_t> &vars,
+    const CSFObject<data_t> &vars_csf, const vars_t<Tensor<1, data_t>> &d1,
+    const Tensor<1, data_t> &d1_phi_Re, const Tensor<1, data_t> &d1_phi_Im,
+    const Tensor<2, data_t> &d2_phi_Re, const Tensor<2, data_t> &d2_phi_Im,
+    const CSFObject<data_t> &advec_csf)
 {
     using namespace TensorAlgebra;
 
@@ -128,21 +153,28 @@ void ScalarField<potential_t>::matter_rhs_excl_potential(
     const auto chris = compute_christoffel(d1.h, h_UU);
 
     // evolution equations for scalar field and (minus) its conjugate momentum
-    rhs_sf.phi = vars.lapse * vars_sf.Pi + advec_sf.phi;
-    rhs_sf.Pi = vars.lapse * vars.K * vars_sf.Pi + advec_sf.Pi;
+    rhs_csf.phi_Re = advec_csf.phi_Re - vars.lapse * vars_csf.Pi_Re;
+    rhs_csf.phi_Im = advec_csf.phi_Im - vars.lapse * vars_csf.Pi_Im;
+    rhs_csf.Pi_Re = advec_csf.Pi_Re + vars.lapse * vars_csf.Pi_Re * vars.K;
+    rhs_csf.Pi_Im = advec_csf.Pi_Im + vars.lapse * vars_csf.Pi_Im * vars.K;
 
-    FOR2(i, j)
+    FOR1(k)
     {
-        // includes non conformal parts of chris not included in chris_ULL
-        rhs_sf.Pi += h_UU[i][j] * (-0.5 * d1.chi[j] * vars.lapse * d1_phi[i] +
-                                   vars.chi * vars.lapse * d2_phi[i][j] +
-                                   vars.chi * d1.lapse[i] * d1_phi[j]);
-        FOR1(k)
-        {
-            rhs_sf.Pi += -vars.chi * vars.lapse * h_UU[i][j] *
-                         chris.ULL[k][i][j] * d1_phi[k];
-        }
+        rhs_csf.Pi_Re +=
+            vars.lapse * vars.chi * chris.contracted[k] * d1_phi_Re[k];
+        rhs_csf.Pi_Im +=
+            vars.lapse * vars.chi * chris.contracted[k] * d1_phi_Im[k];
+    }
+
+    FOR2(k, l)
+    {
+        rhs_csf.Pi_Re += h_UU[k][l] * (-vars.chi * d1.lapse[k] * d1_phi_Re[l]
+                                + vars.lapse * (0.5 * d1.chi[k] * d1_phi_Re[l]
+                                - vars.chi * d2_phi_Re[k][l]))
+        rhs_csf.Pi_Im += h_UU[k][l] * (-vars.chi * d1.lapse[k] * d1_phi_Im[l]
+                                + vars.lapse * (0.5 * d1.chi[k] * d1_phi_Im[l]
+                                - vars.chi * d2_phi_Im[k][l]))
     }
 }
 
-#endif /* SCALARFIELD_IMPL_HPP_ */
+#endif /* COMPLEXSCALARFIELD_IMPL_HPP_ */
