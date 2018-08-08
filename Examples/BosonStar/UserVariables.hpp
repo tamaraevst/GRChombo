@@ -43,8 +43,10 @@ enum
     c_B2,
     c_B3,
 
-    c_phi, // matter field added
-    c_Pi,  //(minus) conjugate momentum
+    c_phi_Re, // real part of scalar field
+    c_phi_Im, // imaginary part of scalar field
+    c_Pi_Re, // real part of auxiliary variable Pi = -L_n phi
+    c_Pi_Im, // imaginary part of auxiliary variable Pi = -L_n phi
 
     c_Ham,
 
@@ -76,7 +78,7 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "B1",     "B2",     "B3",
 
-    "phi",    "Pi",
+    "phi_Re",   "phi_Im",   "Pi_Re",    "Pi_Im",
 
     "Ham",    "Mom1",   "Mom2",   "Mom3"};
 }
