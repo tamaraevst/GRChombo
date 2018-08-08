@@ -36,17 +36,10 @@ void auto_read_params(GRParmParse& pp)
     //Dissipation
     pp.load("sigma",sigma);
 
-    //Initial and SF data
-    pp.load("G_Newton", G_Newton, 1.0);
-    pp.load("amplitudeSF", amplitudeSF);
-    pp.load("centerSF", centerSF, {0.5*L, 0.5*L, 0.5*L}); // default to grid center
-    pp.load("widthSF", widthSF);
-    pp.load("r_zero", r_zero);
+    //Boson Star initial data and CSF Potential
+    pp.load("central_amplitude_CSF",central_amplitude_CSF)
     pp.load("scalar_mass", scalar_mass);
-
-    //Relaxation params
-    pp.load("relaxtime", relaxtime);
-    pp.load("relaxspeed", relaxspeed);
+    pp.load("phi4_coeff", phi4_coeff, 0)
 
     //Misc
     pp.load("nan_check", nan_check, 1);
@@ -76,7 +69,7 @@ int covariantZ4;
 Real sigma; //Dissipation
 //Initial data for matter and potential
 double G_Newton;
-Real amplitudeSF, widthSF, r_zero, scalar_mass;
-std::array<double, CH_SPACEDIM> centerSF;
+Real central_amplitude_CSF, scalar_mass, phi4_coeff;
+
 //Relaxation params
 Real relaxtime, relaxspeed;

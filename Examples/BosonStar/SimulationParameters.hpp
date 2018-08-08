@@ -12,7 +12,7 @@
 // Problem specific includes:
 #include "CCZ4.hpp"
 #include "Potential.hpp"
-#include "ScalarBubble.hpp"
+#include "BosonStar.hpp"
 
 class SimulationParameters
 {
@@ -26,13 +26,11 @@ class SimulationParameters
         auto_read_params(pp);
 
         // Fill in the Matter Parameters
-        initial_params.amplitudeSF = amplitudeSF;
-        initial_params.centerSF = centerSF;
-        initial_params.widthSF = widthSF;
-        initial_params.r_zero = r_zero;
+        initial_params.central_amplitude_CSF = central_amplitude_CSF;
 
         // Fill in the potential parameters
         potential_params.scalar_mass = scalar_mass;
+        potential_params.phi4_coeff = phi4_coeff;
 
         // Fill in the ccz4Parameters
         ccz4_params.kappa1 = kappa1;
@@ -52,7 +50,7 @@ class SimulationParameters
 
     // Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4_params;
-    ScalarBubble::params_t initial_params;
+    BosonStar::params_t initial_params;
     Potential::params_t potential_params;
 };
 

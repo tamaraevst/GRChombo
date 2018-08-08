@@ -57,7 +57,7 @@ lapse_advec_coeff = 1 # 1 makes the lapse gauge 1+log slicing
 
 # Shift evolution coefficients
 shift_advec_coeff = 0 # Usually no advection for beta
-shift_Gamma_coeff = 0.75 # 
+shift_Gamma_coeff = 0.75 #
 eta = 1.0 # This is beta_driver, usually of order 1/M_ADM of spacetime
 SpatialBetaDriverRadius = 1e12
 
@@ -77,16 +77,9 @@ sigma = 0.3
 # Default is 1.0, for standard geometric units
 # G_Newton = 1.0
 
-# SF Initial data
-amplitudeSF = 0.01
-widthSF = 1.0
-r_zero = 5.0
-scalar_mass = 0.001
-# SF parameter for bubble centre - defaulted to center of grid
-# so only uncomment if you want to place it off center
-#centerSF = 32 32 32
+# BosonStar Initial data
+central_amplitude_CSF = 0.1
 
-# Relaxation paramters
-# how long and how fast to relax
-relaxtime = 20.0
-relaxspeed = 0.01
+# Potential params
+scalar_mass = 1.0
+phi4_coeff = 1.0
