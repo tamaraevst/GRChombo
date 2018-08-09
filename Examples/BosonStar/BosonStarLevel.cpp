@@ -47,10 +47,12 @@ void BosonStarLevel::initialData()
     if (m_verbosity)
         pout() << "BosonStarLevel::initialData " << m_level << endl;
 
+    //First initalise a BosonStar object
+    BosonStar boson_star(m_p.initial_params, m_p.potential_params, m_dx);
+
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
-    BoxLoops::loop(make_compute_pack(SetValue(0.0),
-                    BosonStar(m_p.initial_params, m_p.potential_params, m_dx)),
+    BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),
                    m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 }
 

@@ -27,6 +27,7 @@ class SimulationParameters
 
         // Fill in the Matter Parameters
         initial_params.central_amplitude_CSF = central_amplitude_CSF;
+        initial_params.star_centre = star_centre;
 
         // Fill in the potential parameters
         potential_params.scalar_mass = scalar_mass;

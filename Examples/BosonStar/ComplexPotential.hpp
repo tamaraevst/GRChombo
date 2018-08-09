@@ -6,7 +6,7 @@
 #ifndef COMPLEXPOTENTIAL_HPP_
 #define COMPLEXPOTENTIAL_HPP_
 
-#include "simd.hpp"
+//#include "simd.hpp"
 
 class Potential
 {
@@ -14,7 +14,7 @@ class Potential
     struct params_t
     {
         double scalar_mass;
-        double phi4_coeff
+        double phi4_coeff;
     };
 
   private:
@@ -36,13 +36,14 @@ class Potential
         // The potential value at phi (note the convention with factors of 1/2)
         // m^2 |phi|^2 + lambda/2 |phi|^4
         V_of_modulus_phi_squared =
-            scalar_mass * scalar_mass * modulus_phi_squared +
-            0.5 * phi4_coeff * modulus_phi_squared * modulus_phi_squared;
+            m_params.scalar_mass * m_params.scalar_mass * modulus_phi_squared +
+            0.5 * m_params.phi4_coeff * modulus_phi_squared * modulus_phi_squared;
 
         // The potential gradient at phi
         // m^2 + lambda |phi|^2
         dVdmodulus_phi_squared =
-            scalar_mass * scalar_mass + phi4_coeff * modulus_phi_squared;
+            m_params.scalar_mass * m_params.scalar_mass +
+            m_params.phi4_coeff * modulus_phi_squared;
     }
 };
 

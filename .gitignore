@@ -13,6 +13,6 @@ log*
 *.out
 *.hdf5
 *.dSYM
-*.gch
+.gcc-flags.json
 
 Doxygen/html

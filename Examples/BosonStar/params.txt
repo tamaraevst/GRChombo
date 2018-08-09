@@ -79,6 +79,8 @@ sigma = 0.3
 
 # BosonStar Initial data
 central_amplitude_CSF = 0.1
+# centre of the star - only uncomment if you want star off centre
+#star_centre = 32 32 32
 
 # Potential params
 scalar_mass = 1.0
