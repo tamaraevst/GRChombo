@@ -11,7 +11,7 @@
 
 // Problem specific includes:
 #include "CCZ4.hpp"
-#include "Potential.hpp"
+#include "ComplexPotential.hpp"
 #include "BosonStar.hpp"
 
 class SimulationParameters

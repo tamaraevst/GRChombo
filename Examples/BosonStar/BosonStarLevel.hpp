@@ -9,7 +9,7 @@
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 // Problem specific includes
-#include "Potential.hpp"
+#include "ComplexPotential.hpp"
 #include "ComplexScalarField.hpp"
 
 //!  A class for the evolution of a single boson star.
