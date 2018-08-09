@@ -113,7 +113,7 @@ void ComplexScalarField<potential_t>::add_matter_rhs(
     CSFObject<data_t> vars_csf;
     vars_csf.phi_Re = vars.phi_Re;
     vars_csf.phi_Im = vars.phi_Im;
-    vars_csf.Pi_Re = vars_csf.Pi_Re;
+    vars_csf.Pi_Re = vars.Pi_Re;
     vars_csf.Pi_Im = vars.Pi_Im;
 
     // call the function for the rhs excluding the potential
@@ -170,10 +170,10 @@ void ComplexScalarField<potential_t>::matter_rhs_excl_potential(
     {
         rhs_csf.Pi_Re += h_UU[k][l] * (-vars.chi * d1.lapse[k] * d1_phi_Re[l]
                                 + vars.lapse * (0.5 * d1.chi[k] * d1_phi_Re[l]
-                                - vars.chi * d2_phi_Re[k][l]))
+                                - vars.chi * d2_phi_Re[k][l]));
         rhs_csf.Pi_Im += h_UU[k][l] * (-vars.chi * d1.lapse[k] * d1_phi_Im[l]
                                 + vars.lapse * (0.5 * d1.chi[k] * d1_phi_Im[l]
-                                - vars.chi * d2_phi_Im[k][l]))
+                                - vars.chi * d2_phi_Im[k][l]));
     }
 }
 

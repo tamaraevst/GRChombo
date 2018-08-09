@@ -15,8 +15,8 @@
 #include "VarsTools.hpp"
 #include "simd.hpp"
 #include "ComplexPotential.hpp"
-#include <boost/numerics/odeint.hpp>
-#include <boost/math/interpolators/barycentric_rational.hpp>
+#include "boost/numeric/odeint.hpp"
+#include "boost/math/interpolators/barycentric_rational.hpp"
 
 //! Class which solves for the initial data for a spherically symmetric boson
 //! star with phi^4 coupling
@@ -32,7 +32,7 @@ class BosonStar
 
     //! The constructor
     BosonStar(params_t a_params_CSF,
-        ComplexPotential::params_t a_params_potential, double a_dx);
+        Potential::params_t a_params_potential, double a_dx);
 
     //! Function to compute the value of all the initial vars on the grid
     template <class data_t> void compute(Cell<data_t> current_cell) const;
@@ -40,7 +40,7 @@ class BosonStar
   protected:
     double m_dx;
     const params_t m_params_CSF; //!< The complex scalar field params
-    const ComplexPotential::params_t m_params_potential; //!< The potential params
+    const Potential::params_t m_params_potential; //!< The potential params
 
 };
 

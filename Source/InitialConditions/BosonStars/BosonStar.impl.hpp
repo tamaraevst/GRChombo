@@ -10,8 +10,10 @@
 #ifndef BOSONSTAR_IMPL_HPP_
 #define BOSONSTAR_IMPL_HPP_
 
-inline BosonStar::BosonStar(params_t a_params, double a_dx)
-    : m_dx(a_dx), m_params(a_params)
+inline BosonStar::BosonStar(params_t a_params_CSF,
+                    Potential::params_t a_params_potential, double a_dx)
+    : m_dx(a_dx), m_params_CSF(a_params_CSF),
+        m_params_potential(a_params_potential)
 {
 }
 

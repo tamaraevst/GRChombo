@@ -17,7 +17,7 @@
 #include "MatterConstraints.hpp"
 
 // For tag cells
-#include "PhiAndKTaggingCriterion.hpp"
+#include "ComplexPhiAndKTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ChiRelaxation.hpp"
