@@ -57,8 +57,8 @@ initial_state_t &rhs_out, const double &a_rho)
             - rho_inv * (exp_plus2beta -1.0));
         psi_rhs = Psi;
         Psi_rhs = (exp_plus2beta * a_rho * psi2 * (1.0
-            + 0.5 * m_rescaled_phi4_coeff * psi2) - 0.5 * (exp_plus2beta + 1.0))
-            * Psi + exp_plus2beta * (1.0 + m_rescaled_phi4_coeff * psi2 -
+            + 0.5 * m_rescaled_phi4_coeff * psi2) - rho_inv * (exp_plus2beta +
+            1.0)) * Psi + exp_plus2beta * (1.0 + m_rescaled_phi4_coeff * psi2 -
             exp_minus2alpha) * psi;
     }
 }

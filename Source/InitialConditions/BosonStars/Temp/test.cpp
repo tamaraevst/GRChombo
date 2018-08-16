@@ -8,7 +8,7 @@
 int main()
 {
     //initial vars (i.e. the ones at the centre)
-    std::vector<double> central_vars{-0.071, 0.0, 0.1, 0.0};
+    std::vector<double> central_vars{-0.070176, 0.0, 0.1, 0.0};
 
     //initialise storage arrays
     std::vector<std::vector<double>> initial_var_arrays{};
@@ -22,11 +22,14 @@ int main()
     BosonStarSolutionObserver<std::vector, std::vector<double>>
         sol_observer(initial_var_arrays, rhos);
 
+    using namespace boost::numeric::odeint;
+    typedef std::vector<double> state_type;
+    typedef runge_kutta_cash_karp54<state_type> error_stepper_type;
     //do integration
     try
     {
-        boost::numeric::odeint::integrate(boson_star_rhs, central_vars, 0.0,
-        20.0, 0.01, sol_observer);
+        integrate_adaptive(make_controlled<error_stepper_type>(1.0e-14, 1.0e-12),
+            boson_star_rhs, central_vars, 0.0, 150.0, 0.01, sol_observer);
     }
     catch (const char* exception)
     {
@@ -36,11 +39,12 @@ int main()
 
     std::cout.precision(10);
     std::cout << std::fixed;
-    std::cout << "rho\t\t\tpsi\t\t\talpha\n";
+    std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
     for(int i=0; i<rhos.size(); ++i)
     {
         std::cout << rhos[i] << "\t\t" << initial_var_arrays[i][2] << "\t\t" <<
-        initial_var_arrays[i][0] << "\n";
+        initial_var_arrays[i][3] << "\t\t" << initial_var_arrays[i][0] << "\t\t"
+        << initial_var_arrays[i][1] <<"\n";
     }
     return 0;
 }

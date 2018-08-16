@@ -32,14 +32,20 @@ public:
         if (m_initial_var_arrays.size() > 0)
         {
             //first remind us which variable we're referring to
+            auto alpha_new = a_vars[0];
+            auto beta_new = a_vars[1];
             auto psi_new = a_vars[2];
+            auto Psi_new = a_vars[3];
             auto psi_old = m_initial_var_arrays.back()[2];
             auto psi_central = m_initial_var_arrays[0][2];
 
             //if our solution has grown too large throw an exception
-            if (std::abs(psi_new) > 2.0 * psi_central )
+            if (std::abs(psi_new) > 2.0 * psi_central
+            || std::abs(alpha_new) > 1e4 || std::abs(beta_new) > 1e4 ||
+            std::abs(Psi_new) > 1e4)
             {
-                throw "psi has grown too large.";
+                throw "Solution blow up. \
+                This is not the solution you're looking for.";
             }
 
             //if psi has changed sign, increase our count of the number of roots
