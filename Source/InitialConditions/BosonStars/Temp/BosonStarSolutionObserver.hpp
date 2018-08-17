@@ -7,6 +7,8 @@
 #define BOSONSTARSOLUTIONOBSERVER_HPP_
 
 #include <cmath>
+#include <iostream>
+#include <stdexcept>
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarSolutionObserver
@@ -16,14 +18,30 @@ public:
         hold the grid values for all rescaled initial quantities */
     initial_data_t<double> &m_rhos; /*!< array that stores the rescaled radial
         coordinate corresponding to the grid values */
-    int m_num_psi_roots; //!< this counts the number of roots in psi
+    int &m_num_psi_roots; //!< this counts the number of roots in psi
 
     //! Constructor
     BosonStarSolutionObserver(
         initial_data_t<initial_state_t> &a_initial_var_arrays,
-        initial_data_t<double> &a_rhos)
-         : m_initial_var_arrays(a_initial_var_arrays), m_rhos(a_rhos),
-         m_num_psi_roots(0) {}
+        initial_data_t<double> &a_rhos, int &a_num_psi_roots)
+         : m_initial_var_arrays(a_initial_var_arrays), m_rhos(a_rhos)
+         , m_num_psi_roots(a_num_psi_roots) {}
+
+    /*
+    //! Copy Constructor
+    BosonStarSolutionObserver(const BosonStarSolutionObserver &observer)
+    : m_initial_var_arrays(observer.m_initial_var_arrays),
+    m_rhos(observer.m_rhos), m_num_psi_roots(observer.m_num_psi_roots)
+    {
+        std::cout << "Copy constructor called when there have been\n";
+    }
+
+    //! Destructor
+    ~BosonStarSolutionObserver()
+    {
+        std::cout << "Destructor called.\n";
+    }
+    */
 
 
     void operator() (const initial_state_t &a_vars, double a_rho)
@@ -41,17 +59,20 @@ public:
 
             //if our solution has grown too large throw an exception
             if (std::abs(psi_new) > 2.0 * psi_central
-            || std::abs(alpha_new) > 1e4 || std::abs(beta_new) > 1e4 ||
-            std::abs(Psi_new) > 1e4)
+            || std::abs(alpha_new) > 1.0e4 || std::abs(beta_new) > 1.0e4 ||
+            std::abs(Psi_new) > 1.0e4)
             {
-                throw "Solution blow up. \
-                This is not the solution you're looking for.";
+                throw std::runtime_error("Solution blow up. "\
+                "Integration stopped.");
             }
 
             //if psi has changed sign, increase our count of the number of roots
             if (psi_new * psi_old < 0.0)
             {
                 ++m_num_psi_roots;
+                std::cout << "The number of roots in psi is now "
+                << m_num_psi_roots << "\n";
+                //throw "I have found a root.\n";
             }
         }
         //finally store the result of this step and carry on
