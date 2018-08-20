@@ -6,14 +6,20 @@
 #include <iostream>
 #include <stdexcept>
 
+//some typedefs to make it easier to understand what we're using each type for
+typedef std::vector<double> initial_state_t;
+template<class T>
+using initial_data_t = std::vector<T>;
+typedef initial_data_t<double> initial_grid_t;
+
 int main()
 {
     //initial vars (i.e. the ones at the centre)
-    std::vector<double> central_vars{-0.159, 0.0, 0.1, 0.0};
+    initial_state_t central_vars{-0.159, 0.0, 0.1, 0.0};
 
     //initialise storage arrays
-    std::vector<std::vector<double>> initial_var_arrays{};
-    std::vector<double> rhos{};
+    initial_data_t<initial_state_t> initial_var_arrays{};
+    initial_grid_t rhos{};
 
     //initialise parameter struct
     Potential::params_t potential_params{1.0, 0.0};
@@ -21,16 +27,15 @@ int main()
     //initialise RHS Class and solution observer
     BosonStarRHS boson_star_rhs(potential_params);
     int num_psi_roots{0};
-    BosonStarSolutionObserver<std::vector, std::vector<double>>
+    BosonStarSolutionObserver<initial_data_t, initial_state_t>
         sol_observer(initial_var_arrays, rhos, num_psi_roots);
 
     using namespace boost::numeric::odeint;
-    typedef std::vector<double> state_type;
-    typedef runge_kutta_cash_karp54<state_type> error_stepper_type;
+    typedef runge_kutta_cash_karp54<initial_state_t> error_stepper_t;
     //do integration
     try
     {
-        integrate_adaptive(make_controlled<error_stepper_type>(1.0e-14, 1.0e-12),
+        integrate_adaptive(make_controlled<error_stepper_t>(1.0e-14, 1.0e-12),
             boson_star_rhs, central_vars, 0.0, 100.0, 0.01, sol_observer);
     }
     catch (std::exception &exception)

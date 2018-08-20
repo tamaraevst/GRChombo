@@ -70,9 +70,6 @@ public:
             if (psi_new * psi_old < 0.0)
             {
                 ++m_num_psi_roots;
-                std::cout << "The number of roots in psi is now "
-                << m_num_psi_roots << "\n";
-                //throw "I have found a root.\n";
             }
         }
         //finally store the result of this step and carry on
