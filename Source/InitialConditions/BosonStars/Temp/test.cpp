@@ -1,5 +1,6 @@
 #include "BosonStarRHS.hpp"
 #include "BosonStarSolutionObserver.hpp"
+#include "BosonStarSolution.hpp"
 #include "ComplexPotential.hpp"
 #include <boost/numeric/odeint.hpp>
 #include <vector>
@@ -43,15 +44,19 @@ int main()
         std::cout << exception.what() << " rho_max = " <<
             rhos.back() << "\n";
     }
-    std::cout << "The number of roots in psi is " << num_psi_roots << "\n";
-    /*std::cout.precision(10);
+
+    BosonStarSolution<initial_data_t, initial_state_t>
+        sol(initial_var_arrays, rhos, num_psi_roots);
+    std::cout << "The number of roots in psi is " << sol.get_num_psi_roots()
+        << ".\n";
+    std::cout.precision(10);
     std::cout << std::fixed;
     std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
-    for(int i=0; i<rhos.size(); ++i)
+    for(int i = 0; i < sol.get_grid().size(); ++i)
     {
-        std::cout << rhos[i] << "\t\t" << initial_var_arrays[i][2] << "\t\t" <<
-        initial_var_arrays[i][3] << "\t\t" << initial_var_arrays[i][0] << "\t\t"
-        << initial_var_arrays[i][1] <<"\n";
-    }*/
+        std::cout << sol.get_grid()[i] << "\t\t" << sol.get_psi()[i] << "\t\t"
+        << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
+        << sol.get_beta()[i] <<"\n";
+    }
     return 0;
 }

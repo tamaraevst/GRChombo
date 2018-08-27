@@ -65,7 +65,7 @@ private:
     initial_data_t<initial_state_t> m_sol_min;
     initial_data_t<initial_state_t> m_sol_max;
     initial_data_t<initial_state_t> m_sol_mid;
-}
+};
 
 #include "BosonStarBinarySearch.impl.hpp"
 
