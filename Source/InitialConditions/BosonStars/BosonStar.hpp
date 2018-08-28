@@ -6,17 +6,17 @@
 #ifndef BOSONSTAR_HPP_
 #define BOSONSTAR_HPP_
 
-#include "Cell.hpp"
-#include "Coordinates.hpp"
-#include "MatterCCZ4.hpp"
-#include "ComplexScalarField.hpp"
-#include "Tensor.hpp"
-#include "UserVariables.hpp" //This files needs NUM_VARS - total no. components
-#include "VarsTools.hpp"
-#include "simd.hpp"
+//#include "Cell.hpp"
+//#include "Coordinates.hpp"
+//#include "MatterCCZ4.hpp"
+//#include "ComplexScalarField.hpp"
+//#include "Tensor.hpp"
+//#include "UserVariables.hpp" //This files needs NUM_VARS - total no. components
+//#include "VarsTools.hpp"
+//#include "simd.hpp"
 #include "ComplexPotential.hpp"
-#include "boost/numeric/odeint.hpp"
-#include "boost/math/interpolators/barycentric_rational.hpp"
+//#include "boost/numeric/odeint.hpp"
+//#include "boost/math/interpolators/barycentric_rational.hpp"
 
 //! Class which solves for the initial data for a spherically symmetric boson
 //! star with phi^4 coupling
@@ -27,7 +27,7 @@ class BosonStar
     struct params_t
     {
         double central_amplitude_CSF; //!< Central amplitude of the star
-        std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
+        //<-(remove)std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
     };
 
     //! The constructor
@@ -35,7 +35,7 @@ class BosonStar
         Potential::params_t a_params_potential, double a_dx);
 
     //! Function to compute the value of all the initial vars on the grid
-    template <class data_t> void compute(Cell<data_t> current_cell) const;
+    //<-(remove)template <class data_t> void compute(Cell<data_t> current_cell) const;
 
   protected:
     double m_dx;

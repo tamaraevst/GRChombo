@@ -55,8 +55,7 @@ public:
     initial_data_t<double>& get_Psi();
 
 protected:
-    initial_data_t<double> &m_radii; //!< reference to array holding the grid
-                                    //! radial coordinates
+    initial_data_t<double> m_radii; //!< array holding the grid radial coordinates
     initial_data_t<double> m_alpha_array = {}; //!< array to hold alpha grid values
     initial_data_t<double> m_beta_array = {}; //!< array to hold beta grid values
     initial_data_t<double> m_psi_array = {}; //!< array to hold psi grid values

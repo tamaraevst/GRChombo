@@ -6,9 +6,9 @@
 #ifndef BOSONSTARSOLUTIONOBSERVER_HPP_
 #define BOSONSTARSOLUTIONOBSERVER_HPP_
 
-#include <cmath>
-#include <iostream>
-#include <stdexcept>
+#include <cmath> //for std::abs
+//#include <iostream>
+#include <stdexcept> //for std::exception
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarSolutionObserver
@@ -18,32 +18,16 @@ public:
         hold the grid values for all rescaled initial quantities */
     initial_data_t<double> &m_rhos; /*!< array that stores the rescaled radial
         coordinate corresponding to the grid values */
-    int &m_num_psi_roots; //!< this counts the number of roots in psi
+    int m_num_psi_roots; //!< this counts the number of roots in psi
 
     //! Constructor
     BosonStarSolutionObserver(
         initial_data_t<initial_state_t> &a_initial_var_arrays,
-        initial_data_t<double> &a_rhos, int &a_num_psi_roots)
+        initial_data_t<double> &a_rhos, int a_num_psi_roots = 0)
          : m_initial_var_arrays(a_initial_var_arrays), m_rhos(a_rhos)
          , m_num_psi_roots(a_num_psi_roots) {}
 
-    /*
-    //! Copy Constructor
-    BosonStarSolutionObserver(const BosonStarSolutionObserver &observer)
-    : m_initial_var_arrays(observer.m_initial_var_arrays),
-    m_rhos(observer.m_rhos), m_num_psi_roots(observer.m_num_psi_roots)
-    {
-        std::cout << "Copy constructor called when there have been\n";
-    }
-
-    //! Destructor
-    ~BosonStarSolutionObserver()
-    {
-        std::cout << "Destructor called.\n";
-    }
-    */
-
-
+    //! Overloaded () operator required for interface with boost odeint library
     void operator() (const initial_state_t &a_vars, double a_rho)
     {
         //don't do checks if this is the first step
@@ -70,6 +54,14 @@ public:
             if (psi_new * psi_old < 0.0)
             {
                 ++m_num_psi_roots;
+            }
+
+            //We only care about the ground state so stop integrating if the
+            //number of roots exceeds 1
+            if (m_num_psi_roots > 1)
+            {
+                throw std::runtime_error("This solution has more than 1 root"\
+                " and is therefore not the ground state.");
             }
         }
         //finally store the result of this step and carry on

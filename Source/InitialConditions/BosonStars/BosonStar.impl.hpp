@@ -18,7 +18,7 @@ inline BosonStar::BosonStar(params_t a_params_CSF,
 }
 
 // Compute the value of the initial vars on the grid
-template <class data_t>
+/*template <class data_t>
 void BosonStar::compute(Cell<data_t> current_cell) const
 {
     MatterCCZ4<ComplexScalarField<>>::Vars<data_t> vars;
@@ -30,6 +30,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);
-}
+}*/
 
 #endif /* BOSONSTAR_IMPL_HPP_ */

@@ -1,6 +1,8 @@
+#include "BosonStar.hpp"
 #include "BosonStarRHS.hpp"
 #include "BosonStarSolutionObserver.hpp"
 #include "BosonStarSolution.hpp"
+#include "BosonStarBinarySearch.hpp"
 #include "ComplexPotential.hpp"
 #include <boost/numeric/odeint.hpp>
 #include <vector>
@@ -15,40 +17,89 @@ typedef initial_data_t<double> initial_grid_t;
 
 int main()
 {
-    //initial vars (i.e. the ones at the centre)
-    initial_state_t central_vars{-0.159, 0.0, 0.1, 0.0};
+    //Set parameters
+    const BosonStar::params_t params_CSF{0.1};
+    const Potential::params_t params_potential{1.0, 0.0};
+
+    //identify all the BCs
+    double alpha_central_min{-0.071};
+    double alpha_central_max{-0.07};
+    const double beta_central{0.0};
+    const double Psi_central{0.0};
+
+    //Set central BCs
+    initial_state_t central_vars_min{alpha_central_min, beta_central,
+        params_CSF.central_amplitude_CSF, Psi_central};
+    initial_state_t central_vars_max{alpha_central_max, beta_central,
+        params_CSF.central_amplitude_CSF, Psi_central};
+
+    //Set integration error tolerances
+    const double abs_error{1.0e-14};
+    const double rel_error{1.0e-14};
+
+    //Set initial step size and max radius
+    const double drho{2.0e-7};
+    const double max_radius{200.0};
 
     //initialise storage arrays
-    initial_data_t<initial_state_t> initial_var_arrays{};
-    initial_grid_t rhos{};
+    initial_data_t<initial_state_t> initial_var_arrays_min{};
+    initial_data_t<initial_state_t> initial_var_arrays_max{};
+    initial_grid_t initial_grid_min{};
+    initial_grid_t initial_grid_max{};
 
-    //initialise parameter struct
-    Potential::params_t potential_params{1.0, 0.0};
-
-    //initialise RHS Class and solution observer
-    BosonStarRHS boson_star_rhs(potential_params);
-    int num_psi_roots{0};
+    //initialise RHS Class and solution observer. Since odeint makes a copy of
+    //sol_observer, it should be safe to just instantiate it once here for all
+    //the iterations in the while loop.
+    BosonStarRHS boson_star_rhs(params_potential);
     BosonStarSolutionObserver<initial_data_t, initial_state_t>
-        sol_observer(initial_var_arrays, rhos, num_psi_roots);
+        sol_observer_min(initial_var_arrays_min, initial_grid_min);
+    BosonStarSolutionObserver<initial_data_t, initial_state_t>
+        sol_observer_max(initial_var_arrays_max, initial_grid_max);
 
     using namespace boost::numeric::odeint;
     typedef runge_kutta_cash_karp54<initial_state_t> error_stepper_t;
-    //do integration
+    //do integration for min case
     try
     {
-        integrate_adaptive(make_controlled<error_stepper_t>(1.0e-14, 1.0e-12),
-            boson_star_rhs, central_vars, 0.0, 100.0, 0.01, sol_observer);
+        integrate_adaptive(make_controlled<error_stepper_t>
+            (abs_error, rel_error), boson_star_rhs, central_vars_min, 0.0,
+            max_radius, drho, sol_observer_min);
     }
     catch (std::exception &exception)
     {
-        std::cout << exception.what() << " rho_max = " <<
-            rhos.back() << "\n";
+        std::cout << exception.what() << " max radius = " <<
+            initial_grid_min.back() << "\n";
     }
 
+    //do integration for max case
+    try
+    {
+        integrate_adaptive(make_controlled<error_stepper_t>
+            (abs_error, rel_error), boson_star_rhs, central_vars_max, 0.0,
+            max_radius, drho, sol_observer_max);
+    }
+    catch (std::exception &exception)
+    {
+        std::cout << exception.what() << " max radius = " <<
+            initial_grid_max.back() << "\n";
+    }
+
+    //Put arrays into solution objects
     BosonStarSolution<initial_data_t, initial_state_t>
-        sol(initial_var_arrays, rhos, num_psi_roots);
-    std::cout << "The number of roots in psi is " << sol.get_num_psi_roots()
-        << ".\n";
+        sol_min(initial_var_arrays_min, initial_grid_min);
+    BosonStarSolution<initial_data_t, initial_state_t>
+        sol_max(initial_var_arrays_max, initial_grid_max);
+
+    //Construct BinarySearch object for shooting
+    BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
+        params_CSF, params_potential, sol_min, sol_max);
+
+    //do shooting
+    binary_search.shoot(1e-15, max_radius);
+
+    //get the solution out
+    auto sol = binary_search.getSolution();
+
     std::cout.precision(10);
     std::cout << std::fixed;
     std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
