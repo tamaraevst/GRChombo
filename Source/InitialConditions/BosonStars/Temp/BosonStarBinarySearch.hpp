@@ -18,6 +18,15 @@
 #include <cmath>
 #include <limits>
 
+/*! Class that implements the binary search shooting algorithm to find the
+static, spherically-symmetric, ground state boson star solutions. It uses a
+standard interval bisection method to find the central value of
+alpha = (1/2)log(g_tt) - frequency/m for a given central scalar field amplitude.
+It requires two (almost-)solutions sol_min and sol_max with values of alpha that
+bound the true value. The scalar field in sol_min (sol_max) will blow up
+to -infinity (+infinity).
+*/
+
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarBinarySearch
 {

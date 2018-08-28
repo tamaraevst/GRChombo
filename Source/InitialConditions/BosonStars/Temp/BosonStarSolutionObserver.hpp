@@ -7,8 +7,10 @@
 #define BOSONSTARSOLUTIONOBSERVER_HPP_
 
 #include <cmath> //for std::abs
-//#include <iostream>
 #include <stdexcept> //for std::exception
+
+//! This is a class to store the solution found by odeint in storage arrays as
+//! it is calculated.
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarSolutionObserver

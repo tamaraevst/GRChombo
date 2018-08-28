@@ -13,8 +13,9 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
     initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_radii) : m_radii(a_radii), m_alpha_array {},
-    m_beta_array {}, m_psi_array {}, m_Psi_array {}, m_num_psi_roots(0)
+    initial_data_t<double> &a_initial_grid) : m_initial_grid(a_initial_grid),
+    m_alpha_array {}, m_beta_array {}, m_psi_array {}, m_Psi_array {},
+    m_num_psi_roots(0)
     {
         separateArrays(a_initial_var_arrays);
         count_num_psi_roots();
@@ -22,9 +23,9 @@ BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
     initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_radii, int a_num_psi_roots) : m_radii(a_radii),
-    m_alpha_array {}, m_beta_array {}, m_psi_array {}, m_Psi_array {},
-    m_num_psi_roots(a_num_psi_roots)
+    initial_data_t<double> &a_initial_grid, int a_num_psi_roots)
+    : m_initial_grid(a_initial_grid), m_alpha_array {}, m_beta_array {},
+    m_psi_array {}, m_Psi_array {},m_num_psi_roots(a_num_psi_roots)
     {
         separateArrays(a_initial_var_arrays);
     }
@@ -34,7 +35,7 @@ void BosonStarSolution<initial_data_t, initial_state_t>::separateArrays(
     initial_data_t<initial_state_t> &a_initial_var_arrays)
 {
     //first get the number of grid values
-     m_num_grid_values = m_radii.size();
+     m_num_grid_values = m_initial_grid.size();
 
     //allocate enough memory for the variable arrays
     m_alpha_array.reserve(m_num_grid_values);
@@ -57,7 +58,7 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 double BosonStarSolution<initial_data_t, initial_state_t>::
     get_max_radius() const
 {
-    return m_radii.back();
+    return m_initial_grid.back();
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -80,7 +81,8 @@ void BosonStarSolution<initial_data_t, initial_state_t>::count_num_psi_roots()
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots() const
+int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots()
+const
 {
     return m_num_psi_roots;
 }
@@ -89,7 +91,7 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 initial_data_t<double>& BosonStarSolution<initial_data_t, initial_state_t>::
     get_grid()
 {
-    return m_radii;
+    return m_initial_grid;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>

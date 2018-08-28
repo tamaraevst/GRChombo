@@ -16,11 +16,11 @@ class BosonStarSolution
 public:
     //! Constructor 1 that counts the number of roots in psi
     BosonStarSolution(initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_radii);
+    initial_data_t<double> &a_initial_grid);
 
     //! Constructor 2 that needs to be passed the number of roots in psi
     BosonStarSolution(initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_radii, int a_num_psi_roots);
+    initial_data_t<double> &a_initial_grid, int a_num_psi_roots);
 
     //! Function called by constructor to separate the arrays for each of the
     //! initial variables
@@ -39,7 +39,7 @@ public:
     //! Returns the number of roots in Psi
     int get_num_psi_roots() const;
 
-    //! Returns m_radii
+    //! Returns m_initial_grid
     initial_data_t<double>& get_grid();
 
     //! Returns the m_alpha_array
@@ -55,7 +55,7 @@ public:
     initial_data_t<double>& get_Psi();
 
 protected:
-    initial_data_t<double> m_radii; //!< array holding the grid radial coordinates
+    initial_data_t<double> m_initial_grid; //!< array holding the grid radial coordinates
     initial_data_t<double> m_alpha_array = {}; //!< array to hold alpha grid values
     initial_data_t<double> m_beta_array = {}; //!< array to hold beta grid values
     initial_data_t<double> m_psi_array = {}; //!< array to hold psi grid values

@@ -24,7 +24,7 @@ public:
     void operator() (
         const initial_state_t &a_vars,  //!< the values of the initial variables
         initial_state_t &rhs_out,       //!< where the RHS is stored
-        const double &a_rho);     //!< rescaled radial coordinate rho = mr
+        const double &a_radius);     //!< rescaled radial coordinate = mr
 
 private:
     const double m_rescaled_phi4_coeff = 0.0;

@@ -18,13 +18,13 @@ BosonStarRHS::BosonStarRHS(Potential::params_t a_params_potential,
 
 template <typename initial_state_t>
 void BosonStarRHS::operator() (const initial_state_t &a_vars,
-initial_state_t &rhs_out, const double &a_rho)
+initial_state_t &rhs_out, const double &a_radius)
 {
     //introduce references to make equations easier to read
     auto &alpha = a_vars[0]; //alpha = (1/2)*log(g_tt) - frequency/m
     auto &beta = a_vars[1]; //beta = (1/2)*log(g_rr)
     auto &psi = a_vars[2]; //psi = sqrt(4*pi*G)*|phi|
-    auto &Psi = a_vars[3]; //Psi = d(psi)/d(rho)
+    auto &Psi = a_vars[3]; //Psi = d(psi)/d(radius)
 
     auto &alpha_rhs = rhs_out[0];
     auto &beta_rhs = rhs_out[1];
@@ -32,8 +32,8 @@ initial_state_t &rhs_out, const double &a_rho)
     auto &Psi_rhs = rhs_out[3];
 
     //the RHS contains removable singularities so need to handle the case
-    //rho = 0 separately
-    if( a_rho < std::numeric_limits<double>::epsilon() )
+    //radius = 0 separately
+    if( a_radius < std::numeric_limits<double>::epsilon() )
     {
         alpha_rhs = 0.0;
         beta_rhs = 0.0;
@@ -47,17 +47,17 @@ initial_state_t &rhs_out, const double &a_rho)
         auto exp_plus2beta = std::exp(2.0 * beta);
         auto psi2 = psi * psi;
         auto Psi2 = Psi * Psi;
-        auto rho_inv = 1.0 / a_rho;
+        auto radius_inv = 1.0 / a_radius;
 
-        alpha_rhs = 0.5 * (a_rho * (exp_plus2beta * psi2 * (exp_minus2alpha - 1.0
+        alpha_rhs = 0.5 * (a_radius * (exp_plus2beta * psi2 * (exp_minus2alpha - 1.0
             - 0.5 * m_rescaled_phi4_coeff * psi2) + Psi2)
-            + rho_inv * (exp_plus2beta - 1.0));
-        beta_rhs = 0.5 * (a_rho * (exp_plus2beta * psi2 * (exp_minus2alpha + 1.0
+            + radius_inv * (exp_plus2beta - 1.0));
+        beta_rhs = 0.5 * (a_radius * (exp_plus2beta * psi2 * (exp_minus2alpha + 1.0
             + 0.5 * m_rescaled_phi4_coeff * psi2) + Psi2)
-            - rho_inv * (exp_plus2beta -1.0));
+            - radius_inv * (exp_plus2beta -1.0));
         psi_rhs = Psi;
-        Psi_rhs = (exp_plus2beta * a_rho * psi2 * (1.0
-            + 0.5 * m_rescaled_phi4_coeff * psi2) - rho_inv * (exp_plus2beta +
+        Psi_rhs = (exp_plus2beta * a_radius * psi2 * (1.0
+            + 0.5 * m_rescaled_phi4_coeff * psi2) - radius_inv * (exp_plus2beta +
             1.0)) * Psi + exp_plus2beta * (1.0 + m_rescaled_phi4_coeff * psi2 -
             exp_minus2alpha) * psi;
     }
