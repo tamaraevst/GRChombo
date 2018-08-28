@@ -16,19 +16,19 @@ class BosonStarSolutionObserver
 public:
     initial_data_t<initial_state_t> &m_initial_var_arrays; /*!< arrays that
         hold the grid values for all rescaled initial quantities */
-    initial_data_t<double> &m_rhos; /*!< array that stores the rescaled radial
+    initial_data_t<double> &m_initial_grid; /*!< array that stores the rescaled radial
         coordinate corresponding to the grid values */
     int m_num_psi_roots; //!< this counts the number of roots in psi
 
     //! Constructor
     BosonStarSolutionObserver(
         initial_data_t<initial_state_t> &a_initial_var_arrays,
-        initial_data_t<double> &a_rhos, int a_num_psi_roots = 0)
-         : m_initial_var_arrays(a_initial_var_arrays), m_rhos(a_rhos)
-         , m_num_psi_roots(a_num_psi_roots) {}
+        initial_data_t<double> &a_initial_grid, int a_num_psi_roots = 0)
+         : m_initial_var_arrays(a_initial_var_arrays),
+         m_initial_grid(a_initial_grid), m_num_psi_roots(a_num_psi_roots) {}
 
     //! Overloaded () operator required for interface with boost odeint library
-    void operator() (const initial_state_t &a_vars, double a_rho)
+    void operator() (const initial_state_t &a_vars, double a_radius)
     {
         //don't do checks if this is the first step
         if (m_initial_var_arrays.size() > 0)
@@ -66,7 +66,7 @@ public:
         }
         //finally store the result of this step and carry on
         m_initial_var_arrays.push_back(a_vars);
-        m_rhos.push_back(a_rho);
+        m_initial_grid.push_back(a_radius);
     }
 };
 

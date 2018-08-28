@@ -8,6 +8,7 @@
 #include <vector>
 #include <iostream>
 #include <stdexcept>
+#include <cmath>
 
 //some typedefs to make it easier to understand what we're using each type for
 typedef std::vector<double> initial_state_t;
@@ -18,28 +19,21 @@ typedef initial_data_t<double> initial_grid_t;
 int main()
 {
     //Set parameters
-    const BosonStar::params_t params_CSF{0.1};
-    const Potential::params_t params_potential{1.0, 0.0};
+    const BosonStar::params_t params_BosonStar{0.1, 1.0e-14, 1.0e-14,
+        std::pow(2.0,-7), 200.0,std::pow(2.0,-51)};
+    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 10.0};
 
     //identify all the BCs
-    double alpha_central_min{-0.071};
-    double alpha_central_max{-0.07};
+    double alpha_central_min{-0.095};
+    double alpha_central_max{-0.094};
     const double beta_central{0.0};
     const double Psi_central{0.0};
 
     //Set central BCs
     initial_state_t central_vars_min{alpha_central_min, beta_central,
-        params_CSF.central_amplitude_CSF, Psi_central};
+        params_BosonStar.central_amplitude_CSF, Psi_central};
     initial_state_t central_vars_max{alpha_central_max, beta_central,
-        params_CSF.central_amplitude_CSF, Psi_central};
-
-    //Set integration error tolerances
-    const double abs_error{1.0e-14};
-    const double rel_error{1.0e-14};
-
-    //Set initial step size and max radius
-    const double drho{2.0e-7};
-    const double max_radius{200.0};
+        params_BosonStar.central_amplitude_CSF, Psi_central};
 
     //initialise storage arrays
     initial_data_t<initial_state_t> initial_var_arrays_min{};
@@ -57,13 +51,14 @@ int main()
         sol_observer_max(initial_var_arrays_max, initial_grid_max);
 
     using namespace boost::numeric::odeint;
-    typedef runge_kutta_cash_karp54<initial_state_t> error_stepper_t;
+    typedef runge_kutta_dopri5<initial_state_t> error_stepper_t;
     //do integration for min case
     try
     {
         integrate_adaptive(make_controlled<error_stepper_t>
-            (abs_error, rel_error), boson_star_rhs, central_vars_min, 0.0,
-            max_radius, drho, sol_observer_min);
+            (params_BosonStar.abs_error, params_BosonStar.rel_error),
+            boson_star_rhs, central_vars_min, 0.0, params_BosonStar.max_radius,
+            params_BosonStar.initial_step_size, sol_observer_min);
     }
     catch (std::exception &exception)
     {
@@ -75,8 +70,9 @@ int main()
     try
     {
         integrate_adaptive(make_controlled<error_stepper_t>
-            (abs_error, rel_error), boson_star_rhs, central_vars_max, 0.0,
-            max_radius, drho, sol_observer_max);
+            (params_BosonStar.abs_error, params_BosonStar.rel_error),
+            boson_star_rhs, central_vars_max, 0.0, params_BosonStar.max_radius,
+            params_BosonStar.initial_step_size, sol_observer_max);
     }
     catch (std::exception &exception)
     {
@@ -92,22 +88,22 @@ int main()
 
     //Construct BinarySearch object for shooting
     BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
-        params_CSF, params_potential, sol_min, sol_max);
+        params_BosonStar, params_potential, sol_min, sol_max);
 
     //do shooting
-    binary_search.shoot(1e-15, max_radius);
+    binary_search.shoot();
 
-    //get the solution out
+    //get the solution out for printing
     auto sol = binary_search.getSolution();
 
-    std::cout.precision(10);
+    /*std::cout.precision(10);
     std::cout << std::fixed;
     std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
-    for(int i = 0; i < sol.get_grid().size(); ++i)
+    for(int i = 0; i < static_cast<int>(sol.get_grid().size()); ++i)
     {
         std::cout << sol.get_grid()[i] << "\t\t" << sol.get_psi()[i] << "\t\t"
         << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
         << sol.get_beta()[i] <<"\n";
-    }
+    }*/
     return 0;
 }

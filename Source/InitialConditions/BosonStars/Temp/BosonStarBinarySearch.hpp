@@ -25,7 +25,7 @@ class BosonStarBinarySearch
 
 public:
     //! Constructor
-    BosonStarBinarySearch(BosonStar::params_t a_params_CSF,
+    BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
         Potential::params_t a_params_potential,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max);
@@ -43,7 +43,7 @@ public:
     /*! This function performs the binary search shooting algorithm to find a
     value of alpha that is within a_tol of the true value
     */
-    void shoot(const double a_tol, const double a_max_radius = 100.0);
+    void shoot();
 
     /*! This function gets the solution and returns it to the caller in the
     variable out.
@@ -51,7 +51,7 @@ public:
     BosonStarSolution<initial_data_t, initial_state_t>& getSolution();
 
 private:
-    BosonStar::params_t m_params_CSF;
+    BosonStar::params_t m_params_BosonStar;
     Potential::params_t m_params_potential;
     double m_alpha_central_min;
     double m_alpha_central_max;

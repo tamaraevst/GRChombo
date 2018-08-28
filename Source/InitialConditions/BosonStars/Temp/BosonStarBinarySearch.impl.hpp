@@ -12,10 +12,12 @@
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
-    BosonStar::params_t a_params_CSF, Potential::params_t a_params_potential,
+    BosonStar::params_t a_params_BosonStar,
+    Potential::params_t a_params_potential,
     BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
     BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max)
-    : m_params_CSF(a_params_CSF), m_params_potential(a_params_potential),
+    : m_params_BosonStar(a_params_BosonStar),
+    m_params_potential(a_params_potential),
     m_alpha_central_min(a_sol_min.get_alpha()[0]),
     m_alpha_central_max(a_sol_max.get_alpha()[0]),
     m_sol_min(a_sol_min), m_sol_max(a_sol_max), m_sol_mid(a_sol_min)
@@ -37,19 +39,11 @@ bool BosonStarBinarySearch<initial_data_t, initial_state_t>
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-void BosonStarBinarySearch<initial_data_t, initial_state_t>
-    ::shoot(const double a_tol, const double a_max_radius)
+void BosonStarBinarySearch<initial_data_t, initial_state_t>::shoot()
 {
     //identify the two BCs that are fixed
     double beta_central{0.0};
     double Psi_central{0.0};
-
-    //Set integration error tolerances
-    double abs_error{1.0e-14};
-    double rel_error{1.0e-14};
-
-    //Set initial step size
-    double drho{2.0e-7};
 
     //initialise storage arrays
     initial_data_t<initial_state_t> initial_var_arrays_mid{};
@@ -63,10 +57,15 @@ void BosonStarBinarySearch<initial_data_t, initial_state_t>
         sol_observer(initial_var_arrays_mid, initial_grid_mid);
 
     using namespace boost::numeric::odeint;
-    typedef runge_kutta_cash_karp54<initial_state_t> error_stepper_t;
+    typedef runge_kutta_dopri5<initial_state_t> error_stepper_t;
+
+    //count the number of iterations so the loop doesn't run away
+    int n_binary_search_iter{0};
 
     //keep bisecting until we are within the desired tolerance
-    while(m_alpha_central_max - m_alpha_central_min > a_tol)
+    while(m_alpha_central_max - m_alpha_central_min
+        > m_params_BosonStar.binary_search_tol &&
+        n_binary_search_iter <= m_params_BosonStar.max_binary_search_iter)
     {
         //Clear the storage arrays from the last iteration
         initial_var_arrays_mid.clear();
@@ -76,19 +75,21 @@ void BosonStarBinarySearch<initial_data_t, initial_state_t>
         m_alpha_central_mid =
             0.5 * ( m_alpha_central_min + m_alpha_central_max );
         initial_state_t central_vars_mid{m_alpha_central_mid, beta_central,
-            m_params_CSF.central_amplitude_CSF, Psi_central};
+            m_params_BosonStar.central_amplitude_CSF, Psi_central};
 
         //do integration
         try
         {
-            integrate_adaptive(make_controlled<error_stepper_t>(
-                abs_error, rel_error), boson_star_rhs, central_vars_mid, 0.0,
-                a_max_radius, drho, sol_observer);
+            integrate_adaptive(make_controlled<error_stepper_t>
+                (m_params_BosonStar.abs_error, m_params_BosonStar.rel_error),
+                boson_star_rhs, central_vars_mid, 0.0,
+                m_params_BosonStar.max_radius,
+                m_params_BosonStar.initial_step_size, sol_observer);
         }
         catch (std::exception &exception)
         {
-            //std::cout << exception.what() << " max radius = " <<
-            //    initial_grid_mid.back() << "\n";
+            std::cout << exception.what() << " max radius = " <<
+                initial_grid_mid.back() << "\n";
         }
 
         //Copy the storage arrays into a solution object
@@ -115,19 +116,21 @@ void BosonStarBinarySearch<initial_data_t, initial_state_t>
     //Calculate final mid solution.
     m_alpha_central_mid = 0.5 * ( m_alpha_central_min + m_alpha_central_max );
     initial_state_t central_vars_mid{m_alpha_central_mid, beta_central,
-        m_params_CSF.central_amplitude_CSF, Psi_central};
+        m_params_BosonStar.central_amplitude_CSF, Psi_central};
 
     //do integration for final mid solution
     try
     {
-        integrate_adaptive(make_controlled<error_stepper_t>(
-            abs_error, rel_error), boson_star_rhs, central_vars_mid, 0.0,
-            a_max_radius, drho, sol_observer);
+        integrate_adaptive(make_controlled<error_stepper_t>
+            (m_params_BosonStar.abs_error, m_params_BosonStar.rel_error),
+            boson_star_rhs, central_vars_mid, 0.0,
+            m_params_BosonStar.max_radius,
+            m_params_BosonStar.initial_step_size, sol_observer);
     }
     catch (std::exception &exception)
     {
-        //std::cout << exception.what() << " max radius = " <<
-        //    initial_grid_mid.back() << "\n";
+        std::cout << exception.what() << " max radius = " <<
+            initial_grid_mid.back() << "\n";
     }
     //Copy the storage arrays into a solution object
     m_sol_mid = BosonStarSolution<initial_data_t, initial_state_t>
