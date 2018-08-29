@@ -50,7 +50,7 @@ public:
     bool checkValidInterval();
 
     /*! This function performs the binary search shooting algorithm to find a
-    value of alpha that is within a_tol of the true value
+    value of alpha that is within binary_search_tol of the true value
     */
     void shoot();
 
@@ -62,13 +62,13 @@ public:
 private:
     BosonStar::params_t m_params_BosonStar;
     Potential::params_t m_params_potential;
-    double m_alpha_central_min;
-    double m_alpha_central_max;
-    double m_alpha_central_mid;
+    double m_alpha_central_min; //!< Central value of alpha for the "min" solution
+    double m_alpha_central_max; //!< Central value of alpha for the "max" solution
+    double m_alpha_central_mid; //!< Central value of alpha for the "mid" solution
 
-    BosonStarSolution<initial_data_t, initial_state_t> m_sol_min;
-    BosonStarSolution<initial_data_t, initial_state_t> m_sol_max;
-    BosonStarSolution<initial_data_t, initial_state_t> m_sol_mid;
+    BosonStarSolution<initial_data_t, initial_state_t> m_sol_min; //!< Stores the "min" solution.
+    BosonStarSolution<initial_data_t, initial_state_t> m_sol_max; //!< Stores the "max" solution.
+    BosonStarSolution<initial_data_t, initial_state_t> m_sol_mid; //!< Stores the "mid" solution.
 };
 
 #include "BosonStarBinarySearch.impl.hpp"
