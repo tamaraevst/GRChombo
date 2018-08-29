@@ -6,15 +6,16 @@
 #ifndef BOSONSTARBINARYSEARCH_HPP_
 #define BOSONSTARBINARYSEARCH_HPP_
 
-#include "BosonStar.hpp"
-#include "BosonStarRHS.hpp"
-#include "BosonStarSolutionObserver.hpp"
+//#include "BosonStar.hpp"
+//#include "BosonStarRHS.hpp"
+//#include "BosonStarSolutionObserver.hpp"
 #include "BosonStarSolution.hpp"
+#include "BosonStarIntegrator.hpp"
 #include "ComplexPotential.hpp"
-#include <boost/numeric/odeint.hpp>
-#include <vector>
-#include <iostream>
-#include <stdexcept>
+//#include <boost/numeric/odeint.hpp>
+//#include <vector>
+//#include <iostream>
+//#include <stdexcept>
 #include <cmath>
 #include <limits>
 
@@ -28,10 +29,9 @@ to -infinity (+infinity).
 */
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-class BosonStarBinarySearch
+class BosonStarBinarySearch : \
+    public BosonStarIntegrator<initial_data_t, initial_state_t>
 {
-    typedef initial_data_t<double> initial_grid_t;
-
 public:
     //! Constructor
     BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
@@ -50,18 +50,16 @@ public:
     bool checkValidInterval();
 
     /*! This function performs the binary search shooting algorithm to find a
-    value of alpha that is within binary_search_tol of the true value
+    value of alpha that is within binary_search_tol of the true value. It
+    stores the final computed solution in m_sol_mid.
     */
     void shoot();
 
-    /*! This function gets the solution and returns it to the caller in the
-    variable out.
+    /*! This function returns the final "mid" solution to the caller
     */
-    BosonStarSolution<initial_data_t, initial_state_t>& getSolution();
+    BosonStarSolution<initial_data_t, initial_state_t>& getShootedSolution();
 
 private:
-    BosonStar::params_t m_params_BosonStar;
-    Potential::params_t m_params_potential;
     double m_alpha_central_min; //!< Central value of alpha for the "min" solution
     double m_alpha_central_max; //!< Central value of alpha for the "max" solution
     double m_alpha_central_mid; //!< Central value of alpha for the "mid" solution

@@ -6,6 +6,7 @@
 #ifndef BOSONSTAR_HPP_
 #define BOSONSTAR_HPP_
 
+// TODO: uncomment these includes when incorporating into GRChombo.
 //#include "Cell.hpp"
 //#include "Coordinates.hpp"
 //#include "MatterCCZ4.hpp"
@@ -27,7 +28,8 @@ class BosonStar
     struct params_t
     {
         double central_amplitude_CSF; //!< Central amplitude of the star
-        //<-(remove)std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
+        // TODO: uncomment when incorporating into GRCHombo
+        //std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
         double abs_error; //!< absolute error tolerance for the 1D ODE integrator
         double rel_error; //!< relative error tolerance for the 1D ODE integrator
         double initial_step_size; //!< initial step size for the 1D ODE integrator

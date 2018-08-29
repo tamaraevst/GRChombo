@@ -58,6 +58,7 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
     }
     catch (std::exception &exception)
     {
+        // TODO: change to pout when integrating into GRChombo
         std::cout << exception.what() << " max radius = " <<
             m_initial_grid.back() << "\n";
     }
