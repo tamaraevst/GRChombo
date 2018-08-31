@@ -24,7 +24,6 @@ class GRAMR : public AMR
     AMRInterpolator<Lagrange<4>> *m_interpolator; //!< The interpolator pointer
 
     GRAMR() { m_interpolator = nullptr; } // constructor
-    ~GRAMR() { delete m_interpolator; }   // destructor
 
     auto get_walltime()
     {
