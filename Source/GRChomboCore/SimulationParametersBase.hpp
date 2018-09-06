@@ -44,6 +44,7 @@ class SimulationParametersBase
         pp.load("num_ghosts", num_ghosts, 3);
         pp.load("tag_buffer_size", tag_buffer_size, 3);
         pp.load("dt_multiplier", dt_multiplier, 0.25);
+        pp.load("fill_ratio", fill_ratio, 0.7);
 
         // Lapse evolution
         pp.load("lapse_advec_coeff", lapse_advec_coeff);
@@ -95,16 +96,26 @@ class SimulationParametersBase
         pp.load("plot_interval", plot_interval, 0);
         pp.load("plot_prefix", plot_prefix);
         pp.load("stop_time", stop_time, 1.0);
+        pp.load("max_steps", max_steps, 1000000);
 
         // alias the weird chombo names to something more descriptive
         // for these box params, and default to some reasonable values
-        pp.load("max_grid_size", max_grid_size, 32);
-        pp.load("max_box_size", max_grid_size, max_grid_size);
-        pp.load("block_factor", block_factor, 8);
-        pp.load("min_box_size", block_factor, block_factor);
-        pp.load("fill_ratio", fill_ratio, 0.7);
-        // default max steps to something high
-        pp.load("max_steps", max_steps, 1000000);
+        if (pp.contains("max_grid_size"))
+        {
+            pp.load("max_grid_size", max_grid_size);
+        }
+        else
+        {
+            pp.load("max_box_size", max_grid_size, 64);
+        }
+        if (pp.contains("block_factor"))
+        {
+            pp.load("block_factor", block_factor);
+        }
+        else
+        {
+            pp.load("min_box_size", block_factor, 8);
+        }
     }
 
     // General parameters
