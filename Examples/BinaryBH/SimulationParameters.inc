@@ -9,7 +9,7 @@ void auto_read_params(GRParmParse& pp)
     pp.load("L", L);
     pp.load("regrid_threshold", regrid_threshold);
     pp.load("isPeriodic", isPeriodic);
-    pp.load("num_ghosts", num_ghosts);
+    pp.load("num_ghosts", num_ghosts, 3);
     pp.load("tag_buffer_size", tag_buffer_size);
     pp.load("dt_multiplier", dt_multiplier);
 
