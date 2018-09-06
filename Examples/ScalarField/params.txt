@@ -22,9 +22,9 @@ regrid_threshold_phi = 0.1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 1 # There are (max_level+1) grids, so min is zero
+max_level = 6 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
-# Need one for each level, ie max_level+1 items, or default to 1
+# Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
 regrid_interval = 50 50 5 5 5 5 5
 # Max and min box size - for load balancing

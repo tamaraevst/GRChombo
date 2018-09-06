@@ -87,7 +87,7 @@ class SimulationParametersBase
         pp.load("max_level", max_level, 0);
         ref_ratios.resize(max_level + 1);
         ref_ratios.assign(2);
-        pp.getarr("regrid_interval", regrid_interval, 0, max_level+1);
+        pp.getarr("regrid_interval", regrid_interval, 0, max_level + 1);
 
         // time stepping outputs and regrid data
         pp.load("checkpoint_interval", checkpoint_interval, 1);
@@ -116,11 +116,11 @@ class SimulationParametersBase
     int num_ghosts;      // must be at least 3 for KO dissipation
     int tag_buffer_size; // Amount the tagged region is grown by
     std::array<bool, CH_SPACEDIM> isPeriodic; // periodicity
-    Vector<int> ref_ratios;              // ref ratios between levels
+    Vector<int> ref_ratios;                   // ref ratios between levels
     Vector<int> regrid_interval; // steps between regrid at each level
     int nan_check, max_steps;
-    bool ignore_checkpoint_name_mismatch; // ignore mismatch of variable names
-                                          // between restart file and program
+    bool ignore_checkpoint_name_mismatch;   // ignore mismatch of variable names
+                                            // between restart file and program
     double dt_multiplier, stop_time;        // The Courant factor and stop time
     int checkpoint_interval, plot_interval; // Steps between outputs
     int max_grid_size, block_factor;        // max and min box sizes
