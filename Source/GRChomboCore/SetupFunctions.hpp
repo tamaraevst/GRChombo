@@ -17,6 +17,8 @@ using std::endl;
 #include "GRParmParse.hpp"
 #include "SimulationParametersBase.hpp"
 
+#include "simd.hpp"
+
 #ifdef EQUATION_DEBUG_MODE
 #include "DebuggingTools.hpp"
 #endif
@@ -67,6 +69,7 @@ void mainSetup(int argc, char *argv[])
 #ifdef _OPENMP
         pout() << " threads = " << omp_get_max_threads() << endl;
 #endif
+        pout() << " simd width (doubles) = " << simd_traits<double>::simd_len << endl;
     }
 
     const int required_argc = 2;
