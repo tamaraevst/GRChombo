@@ -22,7 +22,6 @@ void auto_read_params(GRParmParse& pp)
     pp.load("shift_advec_coeff",shift_advec_coeff);
     pp.load("shift_Gamma_coeff",shift_Gamma_coeff);
     pp.load("eta",eta);
-    pp.load("SpatialBetaDriverRadius",SpatialBetaDriverRadius);
 
     //CCZ4 parameters
     pp.load("kappa1",kappa1);
@@ -69,7 +68,7 @@ Real regrid_threshold;
 //Lapse evolution
 Real lapse_advec_coeff, lapse_power, lapse_coeff;
 //ShiftEvolution
-Real shift_advec_coeff, shift_Gamma_coeff, eta, SpatialBetaDriverRadius;
+Real shift_advec_coeff, shift_Gamma_coeff, eta;
 //CCZ4 parameters
 Real kappa1, kappa2, kappa3;
 int covariantZ4;
