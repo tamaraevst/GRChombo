@@ -32,20 +32,10 @@ int runGRChombo(int argc, char *argv[])
 
     // call this after amr object setup so grids known
     // and need it to stay in scope throughout run
-    auto dx_scalar = GRAMRLevel::gr_cast(gr_amr.getAMRLevels()[0])
-                         ->get_dx(); // coarsest grid spacing
-    std::array<double, CH_SPACEDIM> origin, dx;
-    dx.fill(dx_scalar);
-    origin.fill(dx_scalar / 2);
-    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, origin, dx, sim_params.verbosity);
+    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, sim_params.origin, sim_params.dx, sim_params.verbosity);
     gr_amr.set_interpolator(&interpolator);
 
-    double stop_time;
-    pp.get("stop_time", stop_time);
-    int max_steps;
-    pp.get("max_steps", max_steps);
-
-    gr_amr.run(stop_time, max_steps);
+    gr_amr.run(sim_params.stop_time, sim_params.max_steps);
 
     gr_amr.conclude();
 

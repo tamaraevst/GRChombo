@@ -10,7 +10,7 @@
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Tensor.hpp"
-#include "WeylExtraction.hpp"
+#include "SimulationParametersBase.hpp"
 
 class ChiExtractionTaggingCriterion
 {
@@ -18,7 +18,7 @@ class ChiExtractionTaggingCriterion
     const double m_dx;
     const FourthOrderDerivatives m_deriv;
     const int m_level;
-    const WeylExtraction::params_t m_params;
+    const extraction_params_t m_params;
 
     template <class data_t> struct Vars
     {
@@ -35,7 +35,7 @@ class ChiExtractionTaggingCriterion
 
   public:
     ChiExtractionTaggingCriterion(const double dx, const int a_level,
-                                  const WeylExtraction::params_t a_params)
+                                  const extraction_params_t a_params)
         : m_dx(dx), m_deriv(dx), m_params(a_params), m_level(a_level){};
 
     template <class data_t> void compute(Cell<data_t> current_cell) const

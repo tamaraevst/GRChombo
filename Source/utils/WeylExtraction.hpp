@@ -9,6 +9,7 @@
 #include "AMRInterpolator.hpp"
 #include "InterpolationQuery.hpp"
 #include "Lagrange.hpp"
+#include "SimulationParametersBase.hpp"
 #include "SphericalHarmonics.hpp"
 #include "UserVariables.hpp" // Needs c_Weyl_Re etc
 #include <fstream>
@@ -23,19 +24,9 @@
 */
 class WeylExtraction
 {
-  public:
-    struct params_t
-    {
-        double extraction_radius = 0;
-        std::array<double, CH_SPACEDIM> extraction_center;
-        int num_points_phi = 2;
-        int num_points_theta = 4;
-        int extraction_level = 0;
-    };
-
   private:
     //! Params for extraction
-    const params_t m_params;
+    const extraction_params_t m_params;
     const int m_re_comp = c_Weyl4_Re;
     const int m_im_comp = c_Weyl4_Im;
     const double m_dt;
@@ -46,7 +37,7 @@ class WeylExtraction
 
   public:
     //! The constructor
-    WeylExtraction(params_t a_params, double a_dt, double a_time)
+    WeylExtraction(extraction_params_t a_params, double a_dt, double a_time)
         : m_params(a_params), m_dt(a_dt), m_time(a_time),
         m_num_points(m_params.num_points_phi * m_params.num_points_theta),
         m_dphi (2.0 * M_PI / m_params.num_points_phi),
