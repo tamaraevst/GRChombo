@@ -25,7 +25,7 @@ public:
     BosonStarIntegrator(BosonStar::params_t a_params_BosonStar,
         Potential::params_t a_params_potential);
 
-    //! Clear internally arrays. Called by doIntegration()
+    //! Clear internal arrays. Called by doIntegration()
     void clearArrays();
 
     //! Do integration

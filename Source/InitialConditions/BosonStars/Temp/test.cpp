@@ -16,11 +16,11 @@ typedef initial_data_t<double> initial_grid_t;
 int main()
 {
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.1, 1.0e-14, 1.0e-14,
-        std::pow(2.0,-7), 200.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 10.0};
-    const double alpha_central_min{-0.095};
-    const double alpha_central_max{-0.094};
+    const BosonStar::params_t params_BosonStar{0.6, 1.0e-14, 1.0e-14,
+        0.125, 200.0, std::pow(2.0,-51)};
+    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 100.0};
+    const double alpha_central_min{-2.06043};
+    const double alpha_central_max{-2.06042};
 
     //Construct integrator object
     BosonStarIntegrator<initial_data_t, initial_state_t> integrator(
@@ -41,10 +41,13 @@ int main()
     //do shooting
     binary_search.shoot();
 
-    //get solution out
+    //get solution out and print frequency
     auto sol = binary_search.getShootedSolution();
+    double frequency = sol.get_frequency();
+    std::cout << "Star Frequency = " << frequency << "\n";
 
     //print solution
+    /*
     std::cout.precision(10);
     std::cout << std::fixed;
     std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
@@ -54,6 +57,7 @@ int main()
         << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
         << sol.get_beta()[i] <<"\n";
     }
+    */
     return 0;
 
 }

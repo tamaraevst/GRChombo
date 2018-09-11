@@ -6,6 +6,10 @@
 #ifndef BOSONSTARSOLUTION_HPP_
 #define BOSONSTARSOLUTION_HPP_
 
+#include <cmath> //for std::exp and std::abs
+#include <iostream> //TODO: remove after debugging
+#include <boost/math/interpolators/barycentric_rational.hpp>
+
 //! Class which stores the grid values of the initial vars in separate arrays.
 //! This does not interface with boost and should only be constructed once the
 //! integration has finished.
@@ -14,30 +18,26 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarSolution
 {
 public:
-    //! Constructor 1 that counts the number of roots in psi
+    //! Constructor which accepts the arrays outputted by the solution observer
+    //! as inputs and puts the data into its own internal arrays.
     BosonStarSolution(initial_data_t<initial_state_t> &a_initial_var_arrays,
     initial_data_t<double> &a_initial_grid);
 
-    //! Constructor 2 that needs to be passed the number of roots in psi
-    BosonStarSolution(initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_initial_grid, int a_num_psi_roots);
-
-    //! Function called by constructor to separate the arrays for each of the
-    //! initial variables
-    void separateArrays(initial_data_t<initial_state_t> &a_initial_var_arrays);
-
-    //! Function to return the maximum radius of the solution
+    //! Returns the maximum radius of the solution
     double get_max_radius() const;
 
-    //! Function to retun the value of psi at the maximum get_max_radius
+    //! Returns the value of psi at the maximum radius
     double get_psi_at_max_radius() const;
-
-    //! Function to count the number of roots in psi if this is not passed to
-    //! to the constructor
-    void count_num_psi_roots();
 
     //! Returns the number of roots in Psi
     int get_num_psi_roots() const;
+
+    //! Calculates the complex oscillation frequency (divided by the scalar
+    //! mass) of the solution and stores it in m_frequency
+    void calculate_frequency();
+
+    //! Returns the frequency (divided by the scalar mass)
+    double get_frequency();
 
     //! Returns m_initial_grid
     initial_data_t<double>& get_grid();
@@ -54,7 +54,7 @@ public:
     //! Returns the m_Psi_array
     initial_data_t<double>& get_Psi();
 
-protected:
+private:
     initial_data_t<double> m_initial_grid; //!< array holding the grid radial coordinates
     initial_data_t<double> m_alpha_array = {}; //!< array to hold alpha grid values
     initial_data_t<double> m_beta_array = {}; //!< array to hold beta grid values
@@ -62,6 +62,14 @@ protected:
     initial_data_t<double> m_Psi_array = {}; //!< array to hold Psi grid values
     int m_num_grid_values; //!< this stores the number of grid values per variable
     int m_num_psi_roots; //!< this stores the number of roots in psi
+    double m_frequency; //!< this stores the complex oscillation frequency/m
+
+    //! Function called by constructor to separate the arrays for each of the
+    //! initial variables
+    void separateArrays(initial_data_t<initial_state_t> &a_initial_var_arrays);
+
+    //! Function to count the number of roots in psi and store in m_num_psi_roots
+    void count_num_psi_roots();
 };
 
 #include "BosonStarSolution.impl.hpp"

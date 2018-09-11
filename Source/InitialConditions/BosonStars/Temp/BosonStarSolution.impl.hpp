@@ -15,19 +15,10 @@ BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
     initial_data_t<initial_state_t> &a_initial_var_arrays,
     initial_data_t<double> &a_initial_grid) : m_initial_grid(a_initial_grid),
     m_alpha_array {}, m_beta_array {}, m_psi_array {}, m_Psi_array {},
-    m_num_psi_roots(0)
+    m_num_psi_roots(0), m_frequency{NAN}
     {
         separateArrays(a_initial_var_arrays);
         count_num_psi_roots();
-    }
-template <template<typename...> class initial_data_t, typename initial_state_t>
-BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
-    initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_initial_grid, int a_num_psi_roots)
-    : m_initial_grid(a_initial_grid), m_alpha_array {}, m_beta_array {},
-    m_psi_array {}, m_Psi_array {},m_num_psi_roots(a_num_psi_roots)
-    {
-        separateArrays(a_initial_var_arrays);
     }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -85,6 +76,55 @@ int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots()
 const
 {
     return m_num_psi_roots;
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
+{
+    //first calculate the grid values of the function for which the limit in the
+    //far field is the frequency/m
+    initial_data_t<double> frequency_limit_function;
+    frequency_limit_function.reserve(m_num_grid_values);
+    for(int i = 0; i < m_num_grid_values; ++i)
+    {
+        frequency_limit_function.push_back( std::exp( - m_alpha_array[i]
+            - m_beta_array[i] ) );
+    }
+
+
+    //Now work out where the absolute value of the derivative of psi
+    //is smallest. Note this uses a very crude first order approximation.
+    double temp_abs_derivative, min_abs_derivative{1.0};
+    int min_abs_derivative_index{0};
+    for(int i = 0; i < m_num_grid_values - 1; ++i)
+    {
+        temp_abs_derivative = std::abs(
+            ( frequency_limit_function[i+1] - frequency_limit_function[i] )
+            / ( m_initial_grid[i+1] - m_initial_grid[i] ) );
+
+        if( temp_abs_derivative < min_abs_derivative
+            && temp_abs_derivative > 0.0 )
+        {
+            min_abs_derivative = temp_abs_derivative;
+            min_abs_derivative_index = i;
+        }
+    }
+
+    //Use linear interpolation to evaluate the frequency limit function midway
+    //between grid points at the point the derivative is smallest.
+    std::cout << "Frequency evaluation radius = " <<
+    m_initial_grid[min_abs_derivative_index] << ", Derivative = "
+    << min_abs_derivative << "\n";
+    m_frequency = 0.5 * (frequency_limit_function[min_abs_derivative_index]
+        + frequency_limit_function[min_abs_derivative_index + 1] );
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+double BosonStarSolution<initial_data_t, initial_state_t>::get_frequency()
+{
+    if(std::isnan(m_frequency))
+        calculate_frequency();
+    return m_frequency;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>

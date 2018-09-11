@@ -32,7 +32,8 @@ public:
     //! Overloaded () operator required for interface with boost odeint library
     void operator() (const initial_state_t &a_vars, double a_radius)
     {
-        //don't do checks if this is the first step
+        //don't do checks if this is the first step as the arrays will have
+        //zero length.
         if (m_initial_var_arrays.size() > 0)
         {
             //first remind us which variable we're referring to
@@ -48,7 +49,7 @@ public:
             || std::abs(alpha_new) > 1.0e4 || std::abs(beta_new) > 1.0e4 ||
             std::abs(Psi_new) > 1.0e4)
             {
-                throw std::runtime_error("Solution blow up. "\
+                throw std::runtime_error("Solution blow up; "\
                 "Integration stopped.");
             }
 

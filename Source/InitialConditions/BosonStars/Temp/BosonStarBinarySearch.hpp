@@ -6,18 +6,11 @@
 #ifndef BOSONSTARBINARYSEARCH_HPP_
 #define BOSONSTARBINARYSEARCH_HPP_
 
-//#include "BosonStar.hpp"
-//#include "BosonStarRHS.hpp"
-//#include "BosonStarSolutionObserver.hpp"
-#include "BosonStarSolution.hpp"
-#include "BosonStarIntegrator.hpp"
-#include "ComplexPotential.hpp"
-//#include <boost/numeric/odeint.hpp>
-//#include <vector>
-//#include <iostream>
-//#include <stdexcept>
-#include <cmath>
-#include <limits>
+#include "BosonStarSolution.hpp" //for BosonStarSolution class
+#include "BosonStarIntegrator.hpp" //for inheritance from BosonStarIntegrator class
+#include "ComplexPotential.hpp" //for Potential::params_t struct
+//#include <cmath>
+//#include <limits>
 
 /*! Class that implements the binary search shooting algorithm to find the
 static, spherically-symmetric, ground state boson star solutions. It uses a
@@ -55,7 +48,7 @@ public:
     */
     void shoot();
 
-    /*! This function returns the final "mid" solution to the caller
+    /*! This function returns the final "mid" solution to the caller.
     */
     BosonStarSolution<initial_data_t, initial_state_t>& getShootedSolution();
 
