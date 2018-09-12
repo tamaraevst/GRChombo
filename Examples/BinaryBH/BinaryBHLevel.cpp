@@ -14,7 +14,7 @@
 #include "PositiveChiAndAlpha.hpp"
 #include "SetValue.hpp"
 #include "TraceARemoval.hpp"
-#include "Weyl4Scalar.hpp"
+#include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
 
 void BinaryBHLevel::specificAdvance()
@@ -88,7 +88,7 @@ void BinaryBHLevel::specificPostTimeStep()
         // Populate the Weyl Scalar values on the grid
         fillAllGhosts();
         BoxLoops::loop(
-            Weyl4Scalar(m_p.extraction_params.extraction_center, m_dx),
+            Weyl4(m_p.extraction_params.extraction_center, m_dx),
             m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
         // Now refresh the interpolator and do the interpolation
@@ -102,7 +102,7 @@ void BinaryBHLevel::specificPostTimeStep()
 void BinaryBHLevel::prePlotLevel()
 {
     fillAllGhosts();
-    BoxLoops::loop(Weyl4Scalar(m_p.extraction_params.extraction_center, m_dx),
+    BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 }
 

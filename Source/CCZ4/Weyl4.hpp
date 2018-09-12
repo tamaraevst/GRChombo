@@ -3,8 +3,8 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef WEYL4SCALAR_HPP_
-#define WEYL4SCALAR_HPP_
+#ifndef WEYL4_HPP_
+#define WEYL4_HPP_
 
 #include "BSSNVars.hpp"
 #include "CCZ4Geometry.hpp"
@@ -47,7 +47,7 @@ template <class data_t> struct NPScalar_t
    is used together with the tetrads defined in "gr-qc/0104063" to calculate the
    Weyl4 scalar.
 */
-class Weyl4Scalar
+class Weyl4
 {
   public:
     // Use the variable definitions containing the needed quantities
@@ -55,11 +55,11 @@ class Weyl4Scalar
     template <class data_t>
     using Diff2Vars = ADMConformalVars::Diff2VarsNoGauge<data_t>;
 
-    //! Constructor of class Weyl4Scalar
+    //! Constructor of class Weyl4
     /*!
         Takes in the centre for the calculation of the tetrads, and grid spacing
     */
-    Weyl4Scalar(const std::array<double, CH_SPACEDIM> a_center,
+    Weyl4(const std::array<double, CH_SPACEDIM> a_center,
                 const double a_dx)
         : m_center(a_center), m_dx(a_dx), m_deriv(a_dx)
     {
@@ -98,6 +98,6 @@ class Weyl4Scalar
                       const Coordinates<data_t> &coords) const;
 };
 
-#include "Weyl4Scalar.impl.hpp"
+#include "Weyl4.impl.hpp"
 
-#endif /* WEYL4SCALAR_HPP_ */
+#endif /* WEYL4_HPP_ */

@@ -3,15 +3,15 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#if !defined(WEYL4SCALAR_HPP_)
-#error "This file should only be included through Weyl4Scalar.hpp"
+#if !defined(WEYL4_HPP_)
+#error "This file should only be included through Weyl4.hpp"
 #endif
 
-#ifndef WEYL4SCALAR_IMPL_HPP_
-#define WEYL4SCALAR_IMPL_HPP_
+#ifndef WEYL4_IMPL_HPP_
+#define WEYL4_IMPL_HPP_
 
 template <class data_t>
-void Weyl4Scalar::compute(Cell<data_t> current_cell) const
+void Weyl4::compute(Cell<data_t> current_cell) const
 {
 
     // copy data from chombo gridpoint into local variables
@@ -37,7 +37,7 @@ void Weyl4Scalar::compute(Cell<data_t> current_cell) const
 // Formalism from Alcubierre book
 template <class data_t>
 EBFields_t<data_t>
-Weyl4Scalar::compute_EB_fields(const Vars<data_t> &vars,
+Weyl4::compute_EB_fields(const Vars<data_t> &vars,
                                const Vars<Tensor<1, data_t>> &d1,
                                const Diff2Vars<Tensor<2, data_t>> &d2,
                                const Coordinates<data_t> &coords) const
@@ -152,7 +152,7 @@ Weyl4Scalar::compute_EB_fields(const Vars<data_t> &vars,
 
 // Calculation of the Weyl4 scalar
 template <class data_t>
-NPScalar_t<data_t> Weyl4Scalar::compute_Weyl4(
+NPScalar_t<data_t> Weyl4::compute_Weyl4(
     const EBFields_t<data_t> &ebfields, const Vars<data_t> &vars,
     const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2,
     const Coordinates<data_t> &coords) const
@@ -184,7 +184,7 @@ NPScalar_t<data_t> Weyl4Scalar::compute_Weyl4(
 // Baker et al.
 template <class data_t>
 Tetrad_t<data_t>
-Weyl4Scalar::compute_null_tetrad(const Vars<data_t> &vars,
+Weyl4::compute_null_tetrad(const Vars<data_t> &vars,
                                  const Coordinates<data_t> &coords) const
 {
     Tetrad_t<data_t> out;
@@ -251,4 +251,4 @@ Weyl4Scalar::compute_null_tetrad(const Vars<data_t> &vars,
     return out;
 }
 
-#endif /* WEYL4SCALAR_HPP_ */
+#endif /* WEYL4_HPP_ */
