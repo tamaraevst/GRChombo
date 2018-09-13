@@ -25,20 +25,16 @@ public:
     BosonStarIntegrator(BosonStar::params_t a_params_BosonStar,
         Potential::params_t a_params_potential);
 
-    //! Clear internal arrays. Called by doIntegration()
-    void clearArrays();
-
     //! Do integration
     void doIntegration(const double a_alpha_central);
 
     //! Returns the solution in a BosonStarSolution object.
-    BosonStarSolution<initial_data_t, initial_state_t> getSolution();
+    BosonStarSolution<initial_data_t, initial_state_t>& getSolution();
 
 protected:
     BosonStar::params_t m_params_BosonStar;
     BosonStarRHS m_boson_star_rhs;
-    initial_data_t<initial_state_t> m_initial_var_arrays;
-    initial_grid_t m_initial_grid;
+    BosonStarSolution<initial_data_t, initial_state_t> m_boson_star_solution;
     BosonStarSolutionObserver<initial_data_t, initial_state_t> m_sol_observer;
 };
 

@@ -11,38 +11,41 @@
 #define BOSONSTARSOLUTION_IMPL_HPP_
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution(
-    initial_data_t<initial_state_t> &a_initial_var_arrays,
-    initial_data_t<double> &a_initial_grid) : m_initial_grid(a_initial_grid),
-    m_alpha_array {}, m_beta_array {}, m_psi_array {}, m_Psi_array {},
-    m_num_psi_roots(0), m_frequency{NAN}
-    {
-        separateArrays(a_initial_var_arrays);
-        count_num_psi_roots();
-    }
+BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution()
+    : m_initial_grid {}, m_alpha_array {}, m_beta_array {}, m_psi_array {},
+    m_Psi_array {}, m_num_grid_points{0}, m_num_psi_roots {0},
+    m_frequency {NAN} {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-void BosonStarSolution<initial_data_t, initial_state_t>::separateArrays(
-    initial_data_t<initial_state_t> &a_initial_var_arrays)
+void BosonStarSolution<initial_data_t, initial_state_t>::push_back(
+    const initial_state_t a_vars, const double a_radius)
 {
-    //first get the number of grid values
-     m_num_grid_values = m_initial_grid.size();
+    m_initial_grid.push_back(a_radius);
+    m_alpha_array.push_back(a_vars[0]);
+    m_beta_array.push_back(a_vars[1]);
+    m_psi_array.push_back(a_vars[2]);
+    m_Psi_array.push_back(a_vars[3]);
+    ++m_num_grid_points;
+}
 
-    //allocate enough memory for the variable arrays
-    m_alpha_array.reserve(m_num_grid_values);
-    m_beta_array.reserve(m_num_grid_values);
-    m_psi_array.reserve(m_num_grid_values);
-    m_Psi_array.reserve(m_num_grid_values);
+template <template<typename...> class initial_data_t, typename initial_state_t>
+void BosonStarSolution<initial_data_t, initial_state_t>::clear()
+{
+    m_initial_grid.clear();
+    m_alpha_array.clear();
+    m_beta_array.clear();
+    m_psi_array.clear();
+    m_Psi_array.clear();
+    m_num_grid_points = 0;
+    m_num_psi_roots = 0;
+    m_frequency = NAN;
+}
 
-    //now put the values of m_initial_var_arrays into the separate variable
-    //arrays
-    for(int i = 0; i < m_num_grid_values; ++i)
-    {
-        m_alpha_array.push_back(a_initial_var_arrays[i][0]);
-        m_beta_array.push_back(a_initial_var_arrays[i][1]);
-        m_psi_array.push_back(a_initial_var_arrays[i][2]);
-        m_Psi_array.push_back(a_initial_var_arrays[i][3]);
-    }
+template <template<typename...> class initial_data_t, typename initial_state_t>
+int BosonStarSolution<initial_data_t, initial_state_t>::get_num_grid_points()
+const
+{
+    return m_num_grid_points;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -62,7 +65,7 @@ double BosonStarSolution<initial_data_t, initial_state_t>::
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::count_num_psi_roots()
 {
-    for (int i = 1; i < m_num_grid_values; ++i)
+    for (int i = 1; i < m_num_grid_points; ++i)
     {
         if(m_psi_array[i - 1] * m_psi_array[i] < 0)
         {
@@ -73,8 +76,9 @@ void BosonStarSolution<initial_data_t, initial_state_t>::count_num_psi_roots()
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots()
-const
 {
+    if(m_num_psi_roots == 0)
+        count_num_psi_roots();
     return m_num_psi_roots;
 }
 
@@ -84,8 +88,8 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
     //first calculate the grid values of the function for which the limit in the
     //far field is the frequency/m
     initial_data_t<double> frequency_limit_function;
-    frequency_limit_function.reserve(m_num_grid_values);
-    for(int i = 0; i < m_num_grid_values; ++i)
+    frequency_limit_function.reserve(m_num_grid_points);
+    for(int i = 0; i < m_num_grid_points; ++i)
     {
         frequency_limit_function.push_back( std::exp( - m_alpha_array[i]
             - m_beta_array[i] ) );
@@ -96,7 +100,7 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
     //is smallest. Note this uses a very crude first order approximation.
     double temp_abs_derivative, min_abs_derivative{1.0};
     int min_abs_derivative_index{0};
-    for(int i = 0; i < m_num_grid_values - 1; ++i)
+    for(int i = 0; i < m_num_grid_points - 1; ++i)
     {
         temp_abs_derivative = std::abs(
             ( frequency_limit_function[i+1] - frequency_limit_function[i] )

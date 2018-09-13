@@ -16,16 +16,7 @@ BosonStarIntegrator<initial_data_t, initial_state_t>::BosonStarIntegrator(
     Potential::params_t a_params_potential)
     : m_params_BosonStar(a_params_BosonStar),
     m_boson_star_rhs(a_params_potential),
-    m_initial_var_arrays{},
-    m_initial_grid{},
-    m_sol_observer(m_initial_var_arrays, m_initial_grid) {}
-
-template <template<typename...> class initial_data_t, typename initial_state_t>
-void BosonStarIntegrator<initial_data_t, initial_state_t>::clearArrays()
-{
-    m_initial_var_arrays.clear();
-    m_initial_grid.clear();
-}
+    m_sol_observer(m_boson_star_solution) {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIntegrator<initial_data_t, initial_state_t>
@@ -33,7 +24,7 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
 {
     //First clear arrays to make sure nothing has been left from the last
     //integration.
-    clearArrays();
+    m_boson_star_solution.clear();
 
     //identify fixed BCs
     const double beta_central{0.0};
@@ -60,17 +51,16 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
     {
         // TODO: change to pout when integrating into GRChombo
         std::cout << exception.what() << " max radius = " <<
-            m_initial_grid.back() << "\n";
+            m_boson_star_solution.get_grid().back() << "\n";
     }
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-BosonStarSolution<initial_data_t, initial_state_t>
+BosonStarSolution<initial_data_t, initial_state_t>&
     BosonStarIntegrator<initial_data_t, initial_state_t>
     ::getSolution()
 {
-    return BosonStarSolution<initial_data_t, initial_state_t>
-        (m_initial_var_arrays, m_initial_grid);
+    return m_boson_star_solution;
 }
 
 
