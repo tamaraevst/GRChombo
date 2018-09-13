@@ -8,7 +8,7 @@
 
 #include <cmath> //for std::abs
 #include <stdexcept> //for std::exception
-#include "BosonStarSolution.hpp"
+#include "BosonStarSolution.hpp" //BosonStarSolution Class
 
 //! This is a class to store the solution found by odeint in storage arrays as
 //! it is calculated.
@@ -22,7 +22,7 @@ public:
 
     //! Constructor
     BosonStarSolutionObserver(
-        BosonStarSolution<initial_data_t, initial_state_t> 
+        BosonStarSolution<initial_data_t, initial_state_t>
         &a_boson_star_solution, int a_num_psi_roots = 0)
          : m_boson_star_solution(a_boson_star_solution),
          m_num_psi_roots(a_num_psi_roots) {}
@@ -55,14 +55,6 @@ public:
             if (psi_new * psi_old < 0.0)
             {
                 ++m_num_psi_roots;
-            }
-
-            //We only care about the ground state so stop integrating if the
-            //number of roots exceeds 1
-            if (m_num_psi_roots > 1)
-            {
-                throw std::runtime_error("This solution has more than 1 root"\
-                " and is therefore not the ground state.");
             }
         }
         //finally store the result of this step and carry on

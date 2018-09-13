@@ -15,10 +15,12 @@ typedef initial_data_t<double> initial_grid_t;
 
 int main()
 {
+
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.6, 1.0e-14, 1.0e-14,
+    const BosonStar::params_t params_BosonStar{0.5, 1.0e-14, 1.0e-14,
         0.125, 200.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 100.0};
+    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 300.0};
+    /*
     const double alpha_central_min{-2.06043};
     const double alpha_central_max{-2.06042};
 
@@ -45,19 +47,33 @@ int main()
     auto sol = binary_search.getShootedSolution();
     double frequency = sol.get_frequency();
     std::cout << "Star Frequency = " << frequency << "\n";
-
-    //print solution
-    /*
-    std::cout.precision(10);
-    std::cout << std::fixed;
-    std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
-    for(int i = 0; i < static_cast<int>(sol.get_grid().size()); ++i)
-    {
-        std::cout << sol.get_grid()[i] << "\t\t" << sol.get_psi()[i] << "\t\t"
-        << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
-        << sol.get_beta()[i] <<"\n";
-    }
     */
+    try
+    {
+        BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
+        params_BosonStar, params_potential);
+
+        binary_search.shoot();
+        auto sol = binary_search.getShootedSolution();
+
+        /*
+        //print solution
+        std::cout.precision(10);
+        std::cout << std::fixed;
+        std::cout << "rho\t\t\tpsi\t\t\tPsi\t\t\talpha\t\t\tbeta\n";
+        for(int i = 0; i < static_cast<int>(sol.get_grid().size()); ++i)
+        {
+            std::cout << sol.get_grid()[i] << "\t\t" << sol.get_psi()[i] << "\t\t"
+            << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
+            << sol.get_beta()[i] <<"\n";
+        }
+        */
+    }
+    catch (std::exception &exception)
+    {
+        std::cout << exception.what() << "\n";
+    }
+
     return 0;
 
 }

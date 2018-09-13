@@ -18,7 +18,8 @@ standard interval bisection method to find the central value of
 alpha = (1/2)log(g_tt) - frequency/m for a given central scalar field amplitude.
 It requires two (almost-)solutions sol_min and sol_max with values of alpha that
 bound the true value. The scalar field in sol_min (sol_max) will blow up
-to -infinity (+infinity).
+to -infinity (+infinity). However these solutions can be found with the
+findInterval function.
 */
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -26,11 +27,17 @@ class BosonStarBinarySearch : \
     public BosonStarIntegrator<initial_data_t, initial_state_t>
 {
 public:
-    //! Constructor
+    //! Constructor which requires pre-computed bounding solutions sol_min and
+    //! sol_max
     BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
         Potential::params_t a_params_potential,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max);
+
+    //! Constructor which calls findInterval to find sol_min and sol_max
+    BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
+        Potential::params_t a_params_potential,
+        const double a_alpha_central_guess = -0.5);
 
     /*! Function called by the constructor to check the inputted values of
     alpha_central_min and alpha_central_max bound the desired value of
@@ -41,6 +48,9 @@ public:
     that we are getting the ground state
     */
     bool checkValidInterval();
+
+    //! Function to find bounding solutions sol_min and sol_max
+    void findInterval();
 
     /*! This function performs the binary search shooting algorithm to find a
     value of alpha that is within binary_search_tol of the true value. It

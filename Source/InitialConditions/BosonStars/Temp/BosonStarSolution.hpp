@@ -20,7 +20,7 @@ public:
     //! Constructor which just initialises the member arrays to be empty
     BosonStarSolution();
 
-    //! Push back function is called by BosonStarSolutionObserver to push push
+    //! Push back function is called by BosonStarSolutionObserver to push
     //! back the variables at every integration step
     void push_back(const initial_state_t a_vars, const double a_radius);
 
