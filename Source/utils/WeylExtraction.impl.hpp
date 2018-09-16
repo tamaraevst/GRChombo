@@ -80,9 +80,10 @@ inline void WeylExtraction::execute_query(
 }
 
 //! integrate over a spherical shell with given harmonics
-inline std::array<double, 2> WeylExtraction::integrate_surface(
-    int es, int el, int em, const double * m_state_ptr_re,
-    const double * m_state_ptr_im) const
+inline std::array<double, 2>
+WeylExtraction::integrate_surface(int es, int el, int em,
+                                  const double *m_state_ptr_re,
+                                  const double *m_state_ptr_im) const
 {
     int rank;
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
@@ -165,9 +166,9 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
 }
 
 //! Write out the result of the extraction in phi and theta at each timestep
-inline void WeylExtraction::write_extraction(
-    char *file_prefix, const double * m_state_ptr_re,
-    const double * m_state_ptr_im) const
+inline void WeylExtraction::write_extraction(char *file_prefix,
+                                             const double *m_state_ptr_re,
+                                             const double *m_state_ptr_im) const
 {
     int rank;
     MPI_Comm_rank(Chombo_MPI::comm, &rank);

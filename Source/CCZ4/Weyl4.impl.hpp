@@ -10,8 +10,7 @@
 #ifndef WEYL4_IMPL_HPP_
 #define WEYL4_IMPL_HPP_
 
-template <class data_t>
-void Weyl4::compute(Cell<data_t> current_cell) const
+template <class data_t> void Weyl4::compute(Cell<data_t> current_cell) const
 {
 
     // copy data from chombo gridpoint into local variables
@@ -38,9 +37,9 @@ void Weyl4::compute(Cell<data_t> current_cell) const
 template <class data_t>
 EBFields_t<data_t>
 Weyl4::compute_EB_fields(const Vars<data_t> &vars,
-                               const Vars<Tensor<1, data_t>> &d1,
-                               const Diff2Vars<Tensor<2, data_t>> &d2,
-                               const Coordinates<data_t> &coords) const
+                         const Vars<Tensor<1, data_t>> &d1,
+                         const Diff2Vars<Tensor<2, data_t>> &d2,
+                         const Coordinates<data_t> &coords) const
 {
     EBFields_t<data_t> out;
 
@@ -152,10 +151,11 @@ Weyl4::compute_EB_fields(const Vars<data_t> &vars,
 
 // Calculation of the Weyl4 scalar
 template <class data_t>
-NPScalar_t<data_t> Weyl4::compute_Weyl4(
-    const EBFields_t<data_t> &ebfields, const Vars<data_t> &vars,
-    const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2,
-    const Coordinates<data_t> &coords) const
+NPScalar_t<data_t> Weyl4::compute_Weyl4(const EBFields_t<data_t> &ebfields,
+                                        const Vars<data_t> &vars,
+                                        const Vars<Tensor<1, data_t>> &d1,
+                                        const Diff2Vars<Tensor<2, data_t>> &d2,
+                                        const Coordinates<data_t> &coords) const
 {
     NPScalar_t<data_t> out;
 
@@ -185,7 +185,7 @@ NPScalar_t<data_t> Weyl4::compute_Weyl4(
 template <class data_t>
 Tetrad_t<data_t>
 Weyl4::compute_null_tetrad(const Vars<data_t> &vars,
-                                 const Coordinates<data_t> &coords) const
+                           const Coordinates<data_t> &coords) const
 {
     Tetrad_t<data_t> out;
 

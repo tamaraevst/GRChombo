@@ -59,8 +59,7 @@ class Weyl4
     /*!
         Takes in the centre for the calculation of the tetrads, and grid spacing
     */
-    Weyl4(const std::array<double, CH_SPACEDIM> a_center,
-                const double a_dx)
+    Weyl4(const std::array<double, CH_SPACEDIM> a_center, const double a_dx)
         : m_center(a_center), m_dx(a_dx), m_deriv(a_dx)
     {
     }

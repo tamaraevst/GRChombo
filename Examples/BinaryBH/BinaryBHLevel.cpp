@@ -83,13 +83,12 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 
 void BinaryBHLevel::specificPostTimeStep()
 {
-    if ((m_level == m_p.extraction_level)&&(m_p.activate_extraction==1))
+    if ((m_level == m_p.extraction_level) && (m_p.activate_extraction == 1))
     {
         // Populate the Weyl Scalar values on the grid
         fillAllGhosts();
-        BoxLoops::loop(
-            Weyl4(m_p.extraction_params.extraction_center, m_dx),
-            m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
+                       m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
         // Now refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
@@ -102,10 +101,10 @@ void BinaryBHLevel::specificPostTimeStep()
 void BinaryBHLevel::prePlotLevel()
 {
     fillAllGhosts();
-    if(m_p.activate_extraction == 1)
+    if (m_p.activate_extraction == 1)
     {
-    BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
+                       m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
     }
 }
 

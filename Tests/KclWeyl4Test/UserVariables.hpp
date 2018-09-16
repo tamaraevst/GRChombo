@@ -1,8 +1,8 @@
 #ifndef USERVARIABLES_HPP
 #define USERVARIABLES_HPP
 
-//TODO: This file can be auto-generated from a list of variable names
-//Also, we should probably scope this enum too...
+// TODO: This file can be auto-generated from a list of variable names
+// Also, we should probably scope this enum too...
 //
 enum
 {
@@ -52,67 +52,47 @@ enum
     c_phi,
     c_Pi,
 
-    c_Rho, 
+    c_Rho,
 
     c_chi2,
-
 
     NUM_VARS
 };
 
 namespace UserVariables
 {
-    static constexpr char const * variable_names[NUM_VARS] =
-    {
-   	"ReWeyl4",
-    	"ImWeyl4",
+static constexpr char const *variable_names[NUM_VARS] = {
+    "ReWeyl4", "ImWeyl4",
 
-        "chi",
+    "chi",
 
-        "h11",
-        "h12",
-        "h13",
-        "h22",
-        "h23",
-        "h33",
+    "h11",     "h12",     "h13",    "h22", "h23", "h33",
 
-        "K",
+    "K",
 
-        "A11",
-        "A12",
-        "A13",
-        "A22",
-        "A23",
-        "A33",
+    "A11",     "A12",     "A13",    "A22", "A23", "A33",
 
-        "Theta",
+    "Theta",
 
-        "Gamma1",
-        "Gamma2",
-        "Gamma3",
+    "Gamma1",  "Gamma2",  "Gamma3",
 
-        "lapse",
+    "lapse",
 
-        "shift1",
-        "shift2",
-        "shift3",
+    "shift1",  "shift2",  "shift3",
 
-        "B1",
-        "B2",
-        "B3",
+    "B1",      "B2",      "B3",
 
-        "phi",
-        "Pi",
+    "phi",     "Pi",
 
-	"rho",
+    "rho",
 
-        "chi2"
+    "chi2"
 
-//        "Ham",
-//        "Mom1",
-//        "Mom2",
-//        "Mom3"
-    };
+    //        "Ham",
+    //        "Mom1",
+    //        "Mom2",
+    //        "Mom3"
+};
 }
 
 #endif /* USERVARIABLES_HPP */

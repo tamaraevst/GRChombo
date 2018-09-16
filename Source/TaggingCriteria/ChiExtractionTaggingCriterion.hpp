@@ -9,8 +9,8 @@
 #include "Cell.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "Tensor.hpp"
 #include "SimulationParametersBase.hpp"
+#include "Tensor.hpp"
 
 class ChiExtractionTaggingCriterion
 {
@@ -60,8 +60,7 @@ class ChiExtractionTaggingCriterion
                                              m_params.extraction_center);
             const data_t r = coords.get_radius();
             // add a 20% buffer to extraction zone so not too near to boundary
-            auto regrid =
-                simd_compare_lt(r, 1.2 * m_params.extraction_radius);
+            auto regrid = simd_compare_lt(r, 1.2 * m_params.extraction_radius);
             criterion = simd_conditional(regrid, 100.0, criterion);
         }
 

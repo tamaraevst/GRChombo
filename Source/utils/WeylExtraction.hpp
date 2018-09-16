@@ -39,10 +39,11 @@ class WeylExtraction
     //! The constructor
     WeylExtraction(extraction_params_t a_params, double a_dt, double a_time)
         : m_params(a_params), m_dt(a_dt), m_time(a_time),
-        m_num_points(m_params.num_points_phi * m_params.num_points_theta),
-        m_dphi (2.0 * M_PI / m_params.num_points_phi),
-        m_dtheta (M_PI / m_params.num_points_theta)
-    {}
+          m_num_points(m_params.num_points_phi * m_params.num_points_theta),
+          m_dphi(2.0 * M_PI / m_params.num_points_phi),
+          m_dtheta(M_PI / m_params.num_points_theta)
+    {
+    }
 
     //! Destructor
     ~WeylExtraction() {}
@@ -52,19 +53,17 @@ class WeylExtraction
 
   private:
     //! integrate over a spherical shell with given harmonics
-    std::array<double, 2>
-    integrate_surface(int es, int el, int em,
-                      const double * m_state_ptr_re,
-                      const double * m_state_ptr_im) const;
+    std::array<double, 2> integrate_surface(int es, int el, int em,
+                                            const double *m_state_ptr_re,
+                                            const double *m_state_ptr_im) const;
 
     //! Write out calculated value of integral
     void write_integral(std::array<double, 2> integral,
                         const char *filename) const;
 
     //! Write out the result of the extraction in phi and theta at each timestep
-    void write_extraction(char *file_prefix,
-                          const double * m_state_ptr_re,
-                          const double * m_state_ptr_im) const;
+    void write_extraction(char *file_prefix, const double *m_state_ptr_re,
+                          const double *m_state_ptr_im) const;
 };
 
 #include "WeylExtraction.impl.hpp"
