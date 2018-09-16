@@ -1,6 +1,6 @@
 verbosity = 0
-chk_prefix = /scratch2/kclough/BinaryBH_
-plot_prefix = /scratch2/kclough/BinaryBHPlot_
+chk_prefix = BinaryBH_
+plot_prefix = BinaryBHPlot_
 #restart_file = BinaryBH_000360.3d.hdf5
 
 # Set up grid spacings and regrid params
