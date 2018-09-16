@@ -44,6 +44,7 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("massB", massB);
         pp.load("centerB", centerB);
         pp.load("momentumB", momentumB);
+        pp.load("activate_extraction", activate_extraction,0);
     
         //Fill in BinaryBHParameters
         bh1_params.mass = massA;
@@ -56,6 +57,7 @@ class SimulationParameters : public SimulationParametersBase
     }
     
     //Initial data
+    int activate_extraction; 
     Real massA, massB;
     std::array<double, CH_SPACEDIM> centerA, centerB;
     std::array<double, CH_SPACEDIM> momentumA, momentumB;

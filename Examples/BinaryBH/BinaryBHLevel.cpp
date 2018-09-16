@@ -83,7 +83,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 
 void BinaryBHLevel::specificPostTimeStep()
 {
-    if (m_level == m_p.extraction_level)
+    if ((m_level == m_p.extraction_level)&&(m_p.activate_extraction==1))
     {
         // Populate the Weyl Scalar values on the grid
         fillAllGhosts();
@@ -102,8 +102,11 @@ void BinaryBHLevel::specificPostTimeStep()
 void BinaryBHLevel::prePlotLevel()
 {
     fillAllGhosts();
+    if(m_p.activate_extraction == 1)
+    {
     BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+    }
 }
 
 // Specify if you want any plot files to be written, with which vars
