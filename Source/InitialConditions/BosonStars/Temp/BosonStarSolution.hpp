@@ -9,9 +9,8 @@
 #include <cmath> //for std::exp and std::abs
 #include <iostream> //TODO: remove after debugging
 
-//! Class which stores the grid values of the initial vars in separate arrays.
-//! This does not interface with boost and should only be constructed once the
-//! integration has finished.
+//! Container class which stores the grid values of the rescaled Boson Star
+//! solutions in polar areal coordinates.
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarSolution

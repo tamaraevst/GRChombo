@@ -3,6 +3,7 @@
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "BosonStarIntegrator.hpp" //for BosonStarIntegrator class
 #include "BosonStarBinarySearch.hpp" //for BosonStarBinarySearch class
+#include "BosonStarIsotropicSolution.hpp" //for BosonStarIsotropicSolution class
 #include <vector> //for initial_data_t and initial_state_t
 #include <iostream> //for writing to cout
 #include <cmath> //for std::pow and M_PI
@@ -17,9 +18,9 @@ int main()
 {
 
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.5, 1.0e-14, 1.0e-14,
-        0.125, 200.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 300.0};
+    const BosonStar::params_t params_BosonStar{0.1, 1.0e-14, 1.0e-14,
+        0.125, 120.0, std::pow(2.0,-51)};
+    const Potential::params_t params_potential{1.0, 0.0};
     /*
     const double alpha_central_min{-2.06043};
     const double alpha_central_max{-2.06042};
@@ -55,6 +56,9 @@ int main()
 
         binary_search.shoot();
         auto sol = binary_search.getShootedSolution();
+
+        BosonStarIsotropicSolution<initial_data_t, initial_state_t>
+            isotropic_sol(sol, params_BosonStar, params_potential, 70.0);
 
         /*
         //print solution
