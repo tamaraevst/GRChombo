@@ -16,8 +16,6 @@
 //#include "VarsTools.hpp"
 //#include "simd.hpp"
 #include "ComplexPotential.hpp"
-//#include "boost/numeric/odeint.hpp"
-//#include "boost/math/interpolators/barycentric_rational.hpp"
 
 //! Class which solves for the initial data for a spherically symmetric boson
 //! star with phi^4 coupling

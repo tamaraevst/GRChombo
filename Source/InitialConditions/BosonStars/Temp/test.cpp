@@ -18,37 +18,10 @@ int main()
 {
 
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.1, 1.0e-14, 1.0e-14,
-        0.125, 120.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{1.0, 0.0};
-    /*
-    const double alpha_central_min{-2.06043};
-    const double alpha_central_max{-2.06042};
+    const BosonStar::params_t params_BosonStar{0.5, 1.0e-14, 1.0e-14,
+        std::pow(2.0,-6), 120.0, std::pow(2.0,-51)};
+    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 100.0};
 
-    //Construct integrator object
-    BosonStarIntegrator<initial_data_t, initial_state_t> integrator(
-        params_BosonStar, params_potential);
-
-    //first calculate the "min" solution
-    integrator.doIntegration(alpha_central_min);
-    auto sol_min = integrator.getSolution();
-
-    //now calculate the "max" solution
-    integrator.doIntegration(alpha_central_max);
-    auto sol_max = integrator.getSolution();
-
-    //Construct binary search object
-    BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
-        params_BosonStar, params_potential, sol_min, sol_max);
-
-    //do shooting
-    binary_search.shoot();
-
-    //get solution out and print frequency
-    auto sol = binary_search.getShootedSolution();
-    double frequency = sol.get_frequency();
-    std::cout << "Star Frequency = " << frequency << "\n";
-    */
     try
     {
         BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
@@ -57,10 +30,16 @@ int main()
         binary_search.shoot();
         auto sol = binary_search.getShootedSolution();
 
+        double omega = sol.get_frequency();
+        double ADM_mass = sol.get_ADM_mass();
+
+        std::cout << "Frequency = " << omega << ", ADM mass = " << ADM_mass
+            << ".\n";
+        /*
         BosonStarIsotropicSolution<initial_data_t, initial_state_t>
             isotropic_sol(sol, params_BosonStar, params_potential, 70.0);
 
-        /*
+
         //print solution
         std::cout.precision(10);
         std::cout << std::fixed;

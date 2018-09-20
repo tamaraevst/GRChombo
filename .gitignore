@@ -15,6 +15,7 @@ log*
 *.dSYM
 .gcc-flags.json
 *.o
+test
 *.dat
 
 Doxygen/html

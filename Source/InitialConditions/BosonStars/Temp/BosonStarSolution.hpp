@@ -7,6 +7,9 @@
 #define BOSONSTARSOLUTION_HPP_
 
 #include <cmath> //for std::exp and std::abs
+#include <limits> //for double epsilon
+#include <algorithm> //for std::min_element and std::upper_bound
+#include <iterator> //for std::iterator
 #include <iostream> //TODO: remove after debugging
 
 //! Container class which stores the grid values of the rescaled Boson Star
@@ -32,6 +35,10 @@ public:
     //! Returns the maximum radius of the solution
     double get_max_radius() const;
 
+    //! Approximately calculates the index of an array at which there is an
+    //! inflection point. Uses a crude first order approximation.
+    int find_inflection_index(const initial_data_t<double> &a_array) const;
+
     //! Returns the value of psi at the maximum radius
     double get_psi_at_max_radius() const;
 
@@ -42,8 +49,14 @@ public:
     //! mass) of the solution and stores it in m_frequency
     void calculate_frequency();
 
+    //! Calculates the ADM mass of the solution
+    void calculate_ADM_mass();
+
     //! Returns the frequency (divided by the scalar mass)
     double get_frequency();
+
+    //! Returns the ADM mass in rescaled units (M_pl^2/m)
+    double get_ADM_mass();
 
     //! Returns m_initial_grid
     initial_data_t<double>& get_grid();
@@ -69,6 +82,7 @@ private:
     int m_num_grid_points; //!< this stores the number of grid values per variable
     int m_num_psi_roots; //!< this stores the number of roots in psi
     double m_frequency; //!< this stores the complex oscillation frequency/m
+    double m_ADM_mass; //!< this stores the ADM mass in units of M_pl^2/m
 
     //! Function to count the number of roots in psi and store in m_num_psi_roots
     void count_num_psi_roots();

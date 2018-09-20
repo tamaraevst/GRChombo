@@ -9,8 +9,6 @@
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "BosonStarIntegrator.hpp" //for inheritance from BosonStarIntegrator class
 #include "ComplexPotential.hpp" //for Potential::params_t struct
-//#include <cmath>
-//#include <limits>
 
 /*! Class that implements the binary search shooting algorithm to find the
 static, spherically-symmetric, ground state boson star solutions. It uses a

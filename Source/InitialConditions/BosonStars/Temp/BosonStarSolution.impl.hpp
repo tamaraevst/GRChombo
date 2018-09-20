@@ -14,7 +14,7 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution()
     : m_initial_grid {}, m_alpha_array {}, m_beta_array {}, m_psi_array {},
     m_Psi_array {}, m_num_grid_points{0}, m_num_psi_roots {0},
-    m_frequency {NAN} {}
+    m_frequency {NAN}, m_ADM_mass {NAN} {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::push_back(
@@ -53,6 +53,42 @@ double BosonStarSolution<initial_data_t, initial_state_t>::
     get_max_radius() const
 {
     return m_initial_grid.back();
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+int BosonStarSolution<initial_data_t, initial_state_t>::
+    find_inflection_index(const initial_data_t<double> &a_array) const
+{
+    //Start looking only in the outer 75% radius
+    auto start_iterator = std::upper_bound(std::begin(m_initial_grid),
+        std::end(m_initial_grid), 0.25 * m_initial_grid.back());
+    const int start_index{static_cast<int>(std::distance(std::begin(
+        m_initial_grid),start_iterator))};
+
+    //first calculate the absolute approximate first order derivative
+    initial_data_t<double> array_abs_diff(m_num_grid_points - start_index - 1);
+    double temp_abs_diff;
+
+    for(int i = start_index; i < m_num_grid_points - 1; ++i)
+    {
+        temp_abs_diff = std::abs((a_array[i+1] - a_array[i]) /
+            ( m_initial_grid[i+1] - m_initial_grid[i] ) );
+        array_abs_diff[i - start_index] =
+            temp_abs_diff > std::numeric_limits<double>::epsilon() ?
+            temp_abs_diff : HUGE_VAL;
+    }
+
+    //now get an iterator to the minimum element of this abs diff array
+    auto iterator = std::min_element(std::begin(array_abs_diff),
+        std::end(array_abs_diff));
+
+    auto inflection_index =
+        start_index + std::distance(std::begin(array_abs_diff), iterator);
+
+    std::cout << "min derivative = " << *(iterator) << " at rho = "
+        << m_initial_grid[inflection_index] << "\n";
+
+    return inflection_index;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -95,32 +131,37 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
             - m_beta_array[i] ) );
     }
 
-
-    //Now work out where the absolute value of the derivative of psi
-    //is smallest. Note this uses a very crude first order approximation.
-    double temp_abs_derivative, min_abs_derivative{1.0};
-    int min_abs_derivative_index{0};
-    for(int i = 0; i < m_num_grid_points - 1; ++i)
-    {
-        temp_abs_derivative = std::abs(
-            ( frequency_limit_function[i+1] - frequency_limit_function[i] )
-            / ( m_initial_grid[i+1] - m_initial_grid[i] ) );
-
-        if( temp_abs_derivative < min_abs_derivative
-            && temp_abs_derivative > 0.0 )
-        {
-            min_abs_derivative = temp_abs_derivative;
-            min_abs_derivative_index = i;
-        }
-    }
+    //Get the lower index between which the frequency should be evaluated
+    int eval_index_lower
+        = find_inflection_index(frequency_limit_function);
 
     //Use linear interpolation to evaluate the frequency limit function midway
     //between grid points at the point the derivative is smallest.
-    std::cout << "Frequency evaluation radius = " <<
-    m_initial_grid[min_abs_derivative_index] << ", Derivative = "
-    << min_abs_derivative << "\n";
-    m_frequency = 0.5 * (frequency_limit_function[min_abs_derivative_index]
-        + frequency_limit_function[min_abs_derivative_index + 1] );
+    m_frequency = 0.5 * (frequency_limit_function[eval_index_lower]
+        + frequency_limit_function[eval_index_lower + 1] );
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
+{
+    //first calculate the grid values of the mass aspect function
+    initial_data_t<double> mass_aspect_function;
+    mass_aspect_function.reserve(m_num_grid_points);
+    for(int i = 0; i < m_num_grid_points; ++i)
+    {
+        mass_aspect_function.push_back( 0.5 * m_initial_grid[i] *
+            (1.0 - std::exp(-2.0 * m_beta_array[i])) );
+        //std::cout << "rho = " << m_initial_grid[i] << "\tM(rho) = "
+        //    << mass_aspect_function[i] << "\n";
+    }
+
+    //Get the lower index between which the frequency should be evaluated
+    int eval_index_lower
+        = find_inflection_index(mass_aspect_function);
+
+    //Use linear interpolation to get the ADM mass
+    m_ADM_mass = 0.5 * (mass_aspect_function[eval_index_lower]
+        + mass_aspect_function[eval_index_lower + 1] );
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -129,6 +170,14 @@ double BosonStarSolution<initial_data_t, initial_state_t>::get_frequency()
     if(std::isnan(m_frequency))
         calculate_frequency();
     return m_frequency;
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+double BosonStarSolution<initial_data_t, initial_state_t>::get_ADM_mass()
+{
+    if(std::isnan(m_ADM_mass))
+        calculate_ADM_mass();
+    return m_ADM_mass;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
