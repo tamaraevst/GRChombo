@@ -10,6 +10,15 @@
 #include "CCZ4.hpp"
 #include "GRParmParse.hpp"
 
+struct extraction_params_t
+{
+    double extraction_radius;
+    std::array<double, CH_SPACEDIM> extraction_center;
+    int num_points_phi;
+    int num_points_theta;
+    int extraction_level;
+};
+
 class SimulationParametersBase
 {
   public:
@@ -30,6 +39,13 @@ class SimulationParametersBase
         ccz4_params.lapse_power = lapse_power;
         ccz4_params.lapse_coeff = lapse_coeff;
         ccz4_params.lapse_advec_coeff = lapse_advec_coeff;
+
+        // Fill in the params
+        extraction_params.extraction_radius = extraction_radius;
+        extraction_params.extraction_center = extraction_center;
+        extraction_params.num_points_phi = num_points_phi;
+        extraction_params.num_points_theta = num_points_theta;
+        extraction_params.extraction_level = extraction_level;
     }
 
     void auto_read_base_params(GRParmParse &pp)
@@ -73,6 +89,7 @@ class SimulationParametersBase
 
         // Setup the grid size
         ivN = IntVect::Unit;
+        int max_N = 0;
         for (int dir = 0; dir < CH_SPACEDIM; ++dir)
         {
             char dir_str[20];
@@ -80,6 +97,7 @@ class SimulationParametersBase
             int N;
             pp.load(dir_str, N);
             ivN[dir] = N - 1;
+            max_N = max(ivN[dir], max_N);
         }
 
         // the reference ratio is hard coded to 2
@@ -116,6 +134,19 @@ class SimulationParametersBase
         {
             pp.load("min_box_size", block_factor, 8);
         }
+
+        // extraction params
+        double dx_scalar = L / max_N;
+        dx.fill(dx_scalar);
+        origin.fill(dx_scalar / 2.0);
+
+        // Extraction params
+        pp.load("extraction_level", extraction_level, 3);
+        pp.load("extraction_radius", extraction_radius, 120.0);
+        pp.load("num_points_phi", num_points_phi, 8);
+        pp.load("num_points_theta", num_points_theta, 16);
+        pp.load("extraction_center", extraction_center,
+                {0.5 * L, 0.5 * L, 0.5 * L});
     }
 
     // General parameters
@@ -138,6 +169,13 @@ class SimulationParametersBase
     double fill_ratio; // determines how fussy the regridding is about tags
     std::string checkpoint_prefix, plot_prefix; // naming of files
 
+    // Extraction parameters
+    std::array<double, CH_SPACEDIM> origin,
+        dx; // location of coarsest origin and dx
+    double extraction_radius;
+    std::array<double, CH_SPACEDIM> extraction_center;
+    int num_points_phi, num_points_theta, extraction_level;
+
     // For tagging
     double regrid_threshold;
     // Lapse evolution
@@ -150,8 +188,9 @@ class SimulationParametersBase
     int covariantZ4;
     // Kreiss Oliger dissipation
     double sigma;
-    // Collection of parameters necessary for the CCZ4 RHS
+    // Collection of parameters necessary for the CCZ4 RHS and extraction
     CCZ4::params_t ccz4_params;
+    extraction_params_t extraction_params;
 };
 
 #endif /* SIMULATIONPARAMETERSBASE_HPP_ */
