@@ -9,6 +9,7 @@
 #include "AlwaysInline.hpp"
 #include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
+#include <array>
 
 template <class data_t> struct chris_t
 {
@@ -235,7 +236,7 @@ inline Tensor<3, double> epsilon()
 
 /// Computes the levi-civita symbol (4D, NB, symbol, not the Tensor)
 
-inline std::array<std::array<std::array<std::array<int, 4>, 4>, 4>, 4>
+std::array<std::array<std::array<std::array<int, 4>, 4>, 4>, 4>
 epsilon4D()
 {
     std::array<std::array<std::array<std::array<int, 4>, 4>, 4>, 4> epsilon4D;
