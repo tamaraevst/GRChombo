@@ -15,12 +15,17 @@ BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     ::BosonStarIsotropicSolution(
     BosonStarSolution<initial_data_t, initial_state_t>
     &a_polar_areal_solution, BosonStar::params_t a_params_BosonStar,
-    Potential::params_t a_params_potential,const double a_max_radius)
+    Potential::params_t a_params_potential, const double a_max_radius,
+    const double a_G_Newton)
     : m_params_BosonStar(a_params_BosonStar),
     m_params_potential(a_params_potential),
-    m_polar_areal_solution(a_polar_areal_solution)
+    m_polar_areal_solution(a_polar_areal_solution),
+    m_G_Newton(a_G_Newton)
 {
     calculateIsotropicGrid(a_max_radius);
+    construct_chi();
+    construct_phi_and_lapse();
+    /*
     std::cout.precision(16);
     std::cout << std::fixed;
     std::cout << "rho\t\t\tR\n";
@@ -29,30 +34,77 @@ BosonStarIsotropicSolution<initial_data_t, initial_state_t>
         std::cout << m_polar_areal_grid[i] << "\t" << m_isotropic_grid[i]
         << "\n";
     }
+    */
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     ::calculateIsotropicGrid(const double a_max_radius)
 {
-    //First interpolate beta
-    tools::spline<initial_data_t> beta_interpolated;
-    beta_interpolated.set_points(m_polar_areal_solution.get_grid(),
-        m_polar_areal_solution.get_beta());
+    //Copy grid and calculate exp(beta)
+    initial_data_t<double> exp_beta_array(
+        m_polar_areal_solution.get_num_grid_points());
+    initial_data_t<double> extended_grid = m_polar_areal_solution.get_grid();
+
+    for(int i = 0; i < m_polar_areal_solution.get_num_grid_points(); ++i)
+    {
+        exp_beta_array[i] = std::exp(m_polar_areal_solution.get_beta()[i]);
+    }
+
+    const double rho_match{m_polar_areal_solution.get_grid()[
+        m_polar_areal_solution.get_last_good_beta_index()]};
+    std::cout << "match radius = " << rho_match << "\n";
+    //if we want a solution up to a larger radius than is possible from the
+    //polar areal solution, we can use asymptotics.
+    if(rho_match < m_params_potential.scalar_mass * a_max_radius)
+    {
+        //Remove elements where the solution is no longer valid
+        exp_beta_array.resize(
+            m_polar_areal_solution.get_last_good_beta_index());
+        extended_grid.resize(m_polar_areal_solution.get_last_good_beta_index());
+
+        //Now add in extra grid-points using the asymptotic solution
+        const double max_computed_radius{extended_grid.back()};
+
+        //Note the division by scalar_mass as a_max_radius is not rescaled
+        //but max_computed_radius is rescaled
+        int num_extra_points = std::ceil((a_max_radius
+             - max_computed_radius / m_params_potential.scalar_mass)
+             / m_params_BosonStar.initial_step_size);
+        extended_grid.reserve(static_cast<int>(extended_grid.size())
+            + num_extra_points);
+        exp_beta_array.reserve(extended_grid.size());
+
+        double radius, exp_beta_value;
+        for(int i = 1; i <= num_extra_points; ++i)
+        {
+            radius = max_computed_radius
+                + m_params_BosonStar.initial_step_size * i;
+            //asymptotics = e^(-2beta) ~ 1 - 2M/rho
+            exp_beta_value = std::pow(1.0 -
+                2.0 * m_polar_areal_solution.get_ADM_mass() / radius, -0.5);
+            extended_grid.push_back(radius);
+            exp_beta_array.push_back(exp_beta_value);
+        }
+    }
+
+    //Now construct interpolation function
+    tools::spline<initial_data_t> exp_beta_interpolated;
+    exp_beta_interpolated.set_points(extended_grid, exp_beta_array);
 
     //RHS for converting to isotropic coordinates
     auto rhs_lambda = [&](const initial_state_t &R , initial_state_t &dRdr ,
         double r )
     {
-        dRdr[0] = std::exp(beta_interpolated(m_params_potential.scalar_mass \
-            * r)) * R[0]/r;
+        dRdr[0] = exp_beta_interpolated(m_params_potential.scalar_mass * r)
+            * R[0]/r;
     };
 
     //outer boundary condition
-    initial_state_t R_max {0.25 * a_max_radius *
-    (std::exp(-beta_interpolated(m_params_potential.scalar_mass * \
-        a_max_radius)) + 1.0) * (std::exp(-beta_interpolated(\
-            m_params_potential.scalar_mass * a_max_radius)) + 1.0)};
+    initial_state_t R_max {0.25 * a_max_radius * (1.0 /
+        exp_beta_interpolated(m_params_potential.scalar_mass * a_max_radius)
+        + 1.0) * (1.0 / exp_beta_interpolated(m_params_potential.scalar_mass
+        * a_max_radius) + 1.0)};
 
     //Since the ODE involves division by r, we can only integrate up to some
     //r > 0
@@ -70,13 +122,79 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
             m_polar_areal_grid.push_back(a_r);
         });
 
-    //since we can't integrate to the origin, add it in manually
-    m_isotropic_grid.push_back(0.0);
-    m_polar_areal_grid.push_back(0.0);
-
     //reverse both arrays as they currently start from the outer limit
     std::reverse(m_isotropic_grid.begin(), m_isotropic_grid.end());
     std::reverse(m_polar_areal_grid.begin(), m_polar_areal_grid.end());
+
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
+    ::construct_chi()
+{
+    //first make an array to hold the isotropic grid values of chi.
+    initial_data_t<double> chi_array(m_polar_areal_grid.size());
+
+    for(int i = 0; i < static_cast<int>(m_polar_areal_grid.size()); i++)
+    {
+        chi_array[i] = m_isotropic_grid[i] * m_isotropic_grid[i] /
+            ( m_polar_areal_grid[i] * m_polar_areal_grid[i] );
+    }
+
+    //construct interpolation function
+    m_chi.set_points(m_isotropic_grid, chi_array);
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
+void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
+    ::construct_phi_and_lapse()
+{
+    //first construct interpolation function of alpha and psi = sqrt(4 pi G) * phi
+    tools::spline<initial_data_t> alpha_interp;
+    alpha_interp.set_points(m_polar_areal_solution.get_grid(),
+        m_polar_areal_solution.get_alpha());
+    tools::spline<initial_data_t> psi_interp;
+    psi_interp.set_points(m_polar_areal_solution.get_grid(),
+        m_polar_areal_solution.get_psi());
+
+    //as for the isotropic grid, we'll want to switch to asymptotics for large radii
+    const double rho_match{m_polar_areal_solution.get_grid()[
+        m_polar_areal_solution.get_last_good_beta_index()]};
+    const double r_match{rho_match / m_params_potential.scalar_mass};
+
+
+    //make arrays to hold the isotropic grid values of the
+    //lapse = (omega/m) * e^(alpha) and phi
+    initial_data_t<double> lapse_array(m_polar_areal_grid.size());
+    initial_data_t<double> phi_array(m_polar_areal_grid.size());
+
+    double r, rho;
+    double psi_factor = 1.0 / std::sqrt(4.0 * M_PI * m_G_Newton);
+    double omega_over_m = m_polar_areal_solution.get_frequency();
+    double phi_decay_rate = std::sqrt(1.0 - omega_over_m * omega_over_m);
+    for(int i = 0; i < static_cast<int>(m_polar_areal_grid.size()); i++)
+    {
+        r = m_polar_areal_grid[i];
+        rho = m_params_potential.scalar_mass * r;
+        if(m_polar_areal_grid[i] <= r_match)
+        {
+            lapse_array[i] = omega_over_m * std::exp(alpha_interp(rho));
+            phi_array[i] = psi_factor * psi_interp(rho);
+        }
+        else
+        {
+            //for large radii, lapse ~ sqrt(1 - 2M/rho)
+            lapse_array[i] = std::sqrt(1.0 -
+                2.0 * m_polar_areal_solution.get_ADM_mass() / rho);
+            //for large radii, psi ~ K/rho * exp( -rho * sqrt(1 - omega^2/m^2))
+            phi_array[i] = psi_factor * psi_interp(rho_match) * std::exp(
+                - (rho - rho_match) * phi_decay_rate) * rho_match / rho;
+        }
+    }
+
+    //construct interpolation functions
+    m_lapse.set_points(m_isotropic_grid, lapse_array);
+    m_phi.set_points(m_isotropic_grid, phi_array);
 }
 
 #endif /* BOSONSTARISOTROPICSOLUTION_IMPL_HPP_ */

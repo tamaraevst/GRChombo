@@ -10,7 +10,7 @@
 #include <limits> //for double epsilon
 #include <algorithm> //for std::min_element and std::upper_bound
 #include <iterator> //for std::iterator
-#include <iostream> //TODO: remove after debugging
+#include <iostream> //TODO: remove after debuggingd
 
 //! Container class which stores the grid values of the rescaled Boson Star
 //! solutions in polar areal coordinates.
@@ -44,6 +44,9 @@ public:
 
     //! Returns the number of roots in Psi
     int get_num_psi_roots();
+
+    //! Returns the last valid index for beta
+    int get_last_good_beta_index();
 
     //! Calculates the complex oscillation frequency (divided by the scalar
     //! mass) of the solution and stores it in m_frequency
@@ -81,6 +84,9 @@ private:
     initial_data_t<double> m_Psi_array = {}; //!< array to hold Psi grid values
     int m_num_grid_points; //!< this stores the number of grid values per variable
     int m_num_psi_roots; //!< this stores the number of roots in psi
+    int m_last_good_beta_index; /*!< this stores the largest grid index for which
+                                beta is still valid (before growing modes take
+                                over) */
     double m_frequency; //!< this stores the complex oscillation frequency/m
     double m_ADM_mass; //!< this stores the ADM mass in units of M_pl^2/m
 

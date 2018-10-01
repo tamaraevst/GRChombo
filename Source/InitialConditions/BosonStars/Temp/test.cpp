@@ -18,9 +18,9 @@ int main()
 {
 
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.5, 1.0e-14, 1.0e-14,
-        std::pow(2.0,-6), 120.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 100.0};
+    const BosonStar::params_t params_BosonStar{0.3, 1.0e-14, 1.0e-14,
+        std::pow(2.0,-6), 200.0, std::pow(2.0,-51)};
+    const Potential::params_t params_potential{2.0, 4.0 * M_PI * 50.0};
 
     try
     {
@@ -30,16 +30,22 @@ int main()
         binary_search.shoot();
         auto sol = binary_search.getShootedSolution();
 
-        double omega = sol.get_frequency();
-        double ADM_mass = sol.get_ADM_mass();
-
-        std::cout << "Frequency = " << omega << ", ADM mass = " << ADM_mass
-            << ".\n";
-        /*
         BosonStarIsotropicSolution<initial_data_t, initial_state_t>
-            isotropic_sol(sol, params_BosonStar, params_potential, 70.0);
+            isotropic_sol(sol, params_BosonStar, params_potential, 200.0);
 
 
+        std::cout.precision(16);
+        std::cout << std::fixed;
+        std::cout << "R\t\t\tphi\t\t\tchi\t\t\tlapse" << "\n";
+        double R;
+        for(int i = 0; i < 400; ++i)
+        {
+            R = i/2.0;
+            std::cout << R << "\t" << isotropic_sol.m_phi(R) << "\t" <<
+            isotropic_sol.m_chi(R) << "\t" << isotropic_sol.m_lapse(R) << "\n";
+        }
+
+        /*
         //print solution
         std::cout.precision(10);
         std::cout << std::fixed;
@@ -48,7 +54,7 @@ int main()
         {
             std::cout << sol.get_grid()[i] << "\t\t" << sol.get_psi()[i] << "\t\t"
             << sol.get_Psi()[i] << "\t\t" << sol.get_alpha()[i] << "\t\t"
-            << sol.get_beta()[i] <<"\n";
+            << sol.get_beta()[i] << "\n";
         }
         */
     }

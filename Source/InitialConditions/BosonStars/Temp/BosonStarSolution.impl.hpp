@@ -13,8 +13,8 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution()
     : m_initial_grid {}, m_alpha_array {}, m_beta_array {}, m_psi_array {},
-    m_Psi_array {}, m_num_grid_points{0}, m_num_psi_roots {0},
-    m_frequency {NAN}, m_ADM_mass {NAN} {}
+    m_Psi_array {}, m_num_grid_points {0}, m_num_psi_roots {0},
+    m_last_good_beta_index {0}, m_frequency {NAN}, m_ADM_mass {NAN} {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::push_back(
@@ -85,8 +85,8 @@ int BosonStarSolution<initial_data_t, initial_state_t>::
     auto inflection_index =
         start_index + std::distance(std::begin(array_abs_diff), iterator);
 
-    std::cout << "min derivative = " << *(iterator) << " at rho = "
-        << m_initial_grid[inflection_index] << "\n";
+    //std::cout << "min derivative = " << *(iterator) << " at rho = "
+    //    << m_initial_grid[inflection_index] << "\n";
 
     return inflection_index;
 }
@@ -119,6 +119,15 @@ int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots()
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
+int BosonStarSolution<initial_data_t, initial_state_t>
+    ::get_last_good_beta_index()
+{
+    if(std::isnan(m_ADM_mass))
+        calculate_ADM_mass();
+    return m_last_good_beta_index;
+}
+
+template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
 {
     //first calculate the grid values of the function for which the limit in the
@@ -132,13 +141,12 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
     }
 
     //Get the lower index between which the frequency should be evaluated
-    int eval_index_lower
-        = find_inflection_index(frequency_limit_function);
+    int lower_eval_index = find_inflection_index(frequency_limit_function);
 
     //Use linear interpolation to evaluate the frequency limit function midway
     //between grid points at the point the derivative is smallest.
-    m_frequency = 0.5 * (frequency_limit_function[eval_index_lower]
-        + frequency_limit_function[eval_index_lower + 1] );
+    m_frequency = 0.5 * (frequency_limit_function[lower_eval_index]
+        + frequency_limit_function[lower_eval_index + 1] );
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -156,12 +164,12 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
     }
 
     //Get the lower index between which the frequency should be evaluated
-    int eval_index_lower
+    m_last_good_beta_index
         = find_inflection_index(mass_aspect_function);
 
     //Use linear interpolation to get the ADM mass
-    m_ADM_mass = 0.5 * (mass_aspect_function[eval_index_lower]
-        + mass_aspect_function[eval_index_lower + 1] );
+    m_ADM_mass = 0.5 * (mass_aspect_function[m_last_good_beta_index]
+        + mass_aspect_function[m_last_good_beta_index + 1] );
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
