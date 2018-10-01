@@ -269,19 +269,19 @@ int main()
 
         if (max_err / max_chf > 0.00001)
         {
-            std::cout
-                << std::endl
-                << " -------------------------- Remark ---------------------------- "
-                << std::endl;
+            std::cout << std::endl
+                      << " -------------------------- Remark "
+                         "---------------------------- "
+                      << std::endl;
             std::cout << " Error will be at least O(10^-3) for given output "
                       << std::endl;
-            std::cout
-                << " This is because of the change from chi' to chi = pow(chi',2) "
-                << std::endl;
-            std::cout
-                << " -------------------------------------------------------------- "
-                << std::endl
-                << std::endl;
+            std::cout << " This is because of the change from chi' to chi = "
+                         "pow(chi',2) "
+                      << std::endl;
+            std::cout << " ----------------------------------------------------"
+                         "---------- "
+                      << std::endl
+                      << std::endl;
             std::cout << " --  " << UserVariables::variable_names[i]
                       << " Value = " << max_chf << std::endl;
             std::cout << " --  " << UserVariables::variable_names[i]
