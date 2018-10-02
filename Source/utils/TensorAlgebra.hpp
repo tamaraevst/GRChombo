@@ -9,6 +9,7 @@
 #include "AlwaysInline.hpp"
 #include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
+#include <array>
 
 template <class data_t> struct chris_t
 {

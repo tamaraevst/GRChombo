@@ -63,21 +63,21 @@ class SimulationParametersBase
         pp.load("fill_ratio", fill_ratio, 0.7);
 
         // Lapse evolution
-        pp.load("lapse_advec_coeff", lapse_advec_coeff);
-        pp.load("lapse_coeff", lapse_coeff);
-        pp.load("lapse_power", lapse_power);
+        pp.load("lapse_advec_coeff", lapse_advec_coeff, 1.0);
+        pp.load("lapse_coeff", lapse_coeff, 2.0);
+        pp.load("lapse_power", lapse_power, 1.0);
 
         // Shift Evolution
-        pp.load("shift_advec_coeff", shift_advec_coeff);
-        pp.load("shift_Gamma_coeff", shift_Gamma_coeff);
-        pp.load("eta", eta);
+        pp.load("shift_advec_coeff", shift_advec_coeff, 0.0);
+        pp.load("shift_Gamma_coeff", shift_Gamma_coeff, 0.75);
+        pp.load("eta", eta, 1.0);
 
         // CCZ4 parameters
         pp.load("formulation", formulation, 0);
-        pp.load("kappa1", kappa1);
-        pp.load("kappa2", kappa2);
-        pp.load("kappa3", kappa3);
-        pp.load("covariantZ4", covariantZ4);
+        pp.load("kappa1", kappa1, 0.1);
+        pp.load("kappa2", kappa2, 0.0);
+        pp.load("kappa3", kappa3, 1.0);
+        pp.load("covariantZ4", covariantZ4, 1);
 
         // Dissipation
         pp.load("sigma", sigma, 0.1);
