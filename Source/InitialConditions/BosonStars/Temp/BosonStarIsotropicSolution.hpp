@@ -26,27 +26,35 @@ public:
     tools::spline<initial_data_t> m_lapse;
     tools::spline<initial_data_t> m_phi;
 
-    //! Constructor
-    BosonStarIsotropicSolution(
+    //! New constructor which can be called before a polar areal solution is
+    //! computed
+    BosonStarIsotropicSolution(BosonStar::params_t a_params_BosonStar,
+    Potential::params_t a_params_potential, const double a_G_Newton = 1.0);
+
+    //! If the new constructor is used, this function must be called afterwards
+    //! to construct the isotropic solution from a polar-areal solution.
+    void makeFromPolarArealSolution(
         BosonStarSolution<initial_data_t, initial_state_t>
-        &a_polar_areal_solution, BosonStar::params_t a_params_BosonStar,
-        Potential::params_t a_params_potential, const double a_max_radius,
-        const double a_G_Newton = 1.0);
+        &a_polar_areal_solution, const double a_max_radius);
 
     //! This function calculates the isotropic grid from the polar areal grid.
-    void calculateIsotropicGrid(const double a_max_radius);
+    void calculateIsotropicGrid(
+        BosonStarSolution<initial_data_t, initial_state_t>
+        &a_polar_areal_solution, const double a_max_radius);
 
     //! Adds the points for the conformal factor chi interpolation function
-    void construct_chi();
+    void construct_chi(BosonStarSolution<initial_data_t, initial_state_t>
+        &a_polar_areal_solution);
 
     //! Adds the points for the lapse and scalar field interpolation functions
-    void construct_phi_and_lapse();
+    void construct_phi_and_lapse(
+        BosonStarSolution<initial_data_t, initial_state_t>
+        &a_polar_areal_solution);
 
 
 private:
     BosonStar::params_t m_params_BosonStar;
     Potential::params_t m_params_potential;
-    BosonStarSolution<initial_data_t, initial_state_t>& m_polar_areal_solution;
     initial_data_t<double> m_isotropic_grid = {};
     initial_data_t<double> m_polar_areal_grid = {};
     const double m_G_Newton;

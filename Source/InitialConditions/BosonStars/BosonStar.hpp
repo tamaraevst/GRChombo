@@ -32,8 +32,7 @@ class BosonStar
         double rel_error; //!< relative error tolerance for the 1D ODE integrator
         double initial_step_size; //!< initial step size for the 1D ODE integrator
         double max_radius; /*!< the maximum (rescaled) radius the 1D ODE
-        integrator will attempt to integrate up to. This should be set higher
-        than it will actually be able to reach.*/
+        integrator will attempt to integrate up to. */
         double binary_search_tol; /*!< This is the tolerance to which the shooting
         parameter (the central value of alpha) is found. */
         int max_binary_search_iter = 1e3; //!< the maximum number of binary search iterations.

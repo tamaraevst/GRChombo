@@ -20,7 +20,7 @@ int main()
     //Set parameters
     const BosonStar::params_t params_BosonStar{0.3, 1.0e-14, 1.0e-14,
         std::pow(2.0,-6), 200.0, std::pow(2.0,-51)};
-    const Potential::params_t params_potential{2.0, 4.0 * M_PI * 50.0};
+    const Potential::params_t params_potential{1.0, 4.0 * M_PI * 50.0};
 
     try
     {
@@ -31,8 +31,9 @@ int main()
         auto sol = binary_search.getShootedSolution();
 
         BosonStarIsotropicSolution<initial_data_t, initial_state_t>
-            isotropic_sol(sol, params_BosonStar, params_potential, 200.0);
+            isotropic_sol(params_BosonStar, params_potential);
 
+        isotropic_sol.makeFromPolarArealSolution(sol, 200.0);
 
         std::cout.precision(16);
         std::cout << std::fixed;
