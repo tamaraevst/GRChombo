@@ -23,6 +23,7 @@ src_dirs := $(GRCHOMBO_SOURCE)/utils \
             $(GRCHOMBO_SOURCE)/TaggingCriteria  \
             $(GRCHOMBO_SOURCE)/AMRInterpolator  \
             $(GRCHOMBO_SOURCE)/InitialConditions/BosonStars  \
+						$(GRCHOMBO_SOURCE)/InitialConditions/BosonStars/Temp  \
 						$(BOOST_ROOT)
 
 include $(CHOMBO_HOME)/mk/Make.test

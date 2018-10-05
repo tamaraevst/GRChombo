@@ -85,9 +85,6 @@ int BosonStarSolution<initial_data_t, initial_state_t>::
     auto inflection_index =
         start_index + std::distance(std::begin(array_abs_diff), iterator);
 
-    //std::cout << "min derivative = " << *(iterator) << " at rho = "
-    //    << m_initial_grid[inflection_index] << "\n";
-
     return inflection_index;
 }
 
@@ -159,8 +156,6 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
     {
         mass_aspect_function.push_back( 0.5 * m_initial_grid[i] *
             (1.0 - std::exp(-2.0 * m_beta_array[i])) );
-        //std::cout << "rho = " << m_initial_grid[i] << "\tM(rho) = "
-        //    << mass_aspect_function[i] << "\n";
     }
 
     //Get the lower index between which the frequency should be evaluated

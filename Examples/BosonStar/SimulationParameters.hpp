@@ -12,7 +12,7 @@
 // Problem specific includes:
 #include "CCZ4.hpp"
 #include "ComplexPotential.hpp"
-#include "BosonStar.hpp"
+#include "BosonStarParams.hpp"
 
 class SimulationParameters
 {
@@ -26,8 +26,14 @@ class SimulationParameters
         auto_read_params(pp);
 
         // Fill in the Matter Parameters
-        initial_params.central_amplitude_CSF = central_amplitude_CSF;
-        initial_params.star_centre = star_centre;
+        bosonstar_params.central_amplitude_CSF = central_amplitude_CSF;
+        bosonstar_params.abs_error = abs_error;
+        bosonstar_params.rel_error = rel_error;
+        bosonstar_params.initial_step_size = initial_step_size;
+        bosonstar_params.max_radius = max_radius;
+        bosonstar_params.binary_search_tol = binary_search_tol;
+        bosonstar_params.max_binary_search_iter = max_binary_search_iter;
+        bosonstar_params.star_centre = star_centre;
 
         // Fill in the potential parameters
         potential_params.scalar_mass = scalar_mass;
@@ -51,7 +57,7 @@ class SimulationParameters
 
     // Collection of parameters necessary for the CCZ4 RHS
     CCZ4::params_t ccz4_params;
-    BosonStar::params_t initial_params;
+    BosonStar_params_t bosonstar_params;
     Potential::params_t potential_params;
 };
 

@@ -1,4 +1,4 @@
-#include "BosonStar.hpp" //for BosonStar::params_t struct
+#include "BosonStarParams.hpp" //for BosonStar_params_t struct
 #include "ComplexPotential.hpp" //for Potential::params_t struct
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "BosonStarIntegrator.hpp" //for BosonStarIntegrator class
@@ -12,13 +12,12 @@
 typedef std::vector<double> initial_state_t;
 template<class T>
 using initial_data_t = std::vector<T>;
-typedef initial_data_t<double> initial_grid_t;
 
 int main()
 {
 
     //Set parameters
-    const BosonStar::params_t params_BosonStar{0.3, 1.0e-14, 1.0e-14,
+    const BosonStar_params_t params_BosonStar{0.3, 1.0e-14, 1.0e-14,
         std::pow(2.0,-6), 200.0, std::pow(2.0,-51)};
     const Potential::params_t params_potential{1.0, 4.0 * M_PI * 50.0};
 

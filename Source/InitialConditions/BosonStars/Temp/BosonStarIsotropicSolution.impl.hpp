@@ -12,7 +12,7 @@
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIsotropicSolution<initial_data_t, initial_state_t>
-    ::BosonStarIsotropicSolution(BosonStar::params_t a_params_BosonStar,
+    ::BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
     Potential::params_t a_params_potential, const double a_G_Newton)
     : m_params_BosonStar(a_params_BosonStar),
     m_params_potential(a_params_potential),

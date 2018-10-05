@@ -12,7 +12,7 @@
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
-    BosonStar::params_t a_params_BosonStar,
+    BosonStar_params_t a_params_BosonStar,
     Potential::params_t a_params_potential,
     BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
     BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max)
@@ -31,7 +31,7 @@ BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
-    BosonStar::params_t a_params_BosonStar,
+    BosonStar_params_t a_params_BosonStar,
     Potential::params_t a_params_potential, const double a_alpha_central_guess)
     : BosonStarIntegrator<initial_data_t, initial_state_t>
     (a_params_BosonStar, a_params_potential),

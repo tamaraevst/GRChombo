@@ -47,8 +47,14 @@ void BosonStarLevel::initialData()
     if (m_verbosity)
         pout() << "BosonStarLevel::initialData " << m_level << endl;
 
-    //First initalise a BosonStar object
-    BosonStar boson_star(m_p.initial_params, m_p.potential_params, m_dx);
+    // First initalise a BosonStar object
+    BosonStar boson_star(m_p.bosonstar_params, m_p.potential_params, m_dx);
+
+    // the max radius the code might need to calculate out to is 2*sqrt(3)*L
+    // 3.5 is an upper bound to 2*sqrt(3)
+    const double max_radius{m_p.L*3.5};
+
+    boson_star.compute_1d_solution(max_radius);
 
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star

@@ -12,7 +12,7 @@
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIntegrator<initial_data_t, initial_state_t>::BosonStarIntegrator(
-    BosonStar::params_t a_params_BosonStar,
+    BosonStar_params_t a_params_BosonStar,
     Potential::params_t a_params_potential)
     : m_params_BosonStar(a_params_BosonStar),
     m_boson_star_rhs(a_params_potential),
@@ -49,8 +49,7 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
     }
     catch (std::exception &exception)
     {
-        // TODO: change to pout when integrating into GRChombo
-        std::cout << exception.what() << " max radius = " <<
+        pout() << exception.what() << " max radius = " <<
             m_boson_star_solution.get_grid().back() << "\n";
     }
 }

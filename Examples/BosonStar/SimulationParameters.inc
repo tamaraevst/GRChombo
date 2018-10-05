@@ -36,9 +36,17 @@ void auto_read_params(GRParmParse& pp)
     //Dissipation
     pp.load("sigma",sigma);
 
-    //Boson Star initial data and CSF Potential
+    //Boson Star initial data params
     pp.load("central_amplitude_CSF", central_amplitude_CSF);
+    pp.load("abs_error", abs_error);
+    pp.load("rel_error", rel_error);
+    pp.load("initial_step_size", initial_step_size);
+    pp.load("max_radius", max_radius);
+    pp.load("binary_search_tol", binary_search_tol);
+    pp.load("max_binary_search_iter", max_binary_search_iter, 1e3);
     pp.load("star_centre", star_centre, {0.5*L, 0.5*L, 0.5*L});
+
+    //Potential params
     pp.load("scalar_mass", scalar_mass);
     pp.load("phi4_coeff", phi4_coeff, 0.0);
 
@@ -70,7 +78,9 @@ int covariantZ4;
 Real sigma; //Dissipation
 //Initial data for matter and potential
 double G_Newton;
-Real central_amplitude_CSF, scalar_mass, phi4_coeff;
+double central_amplitude_CSF, abs_error, rel_error, initial_step_size;
+double max_radius, binary_search_tol, max_binary_search_iter;
+double scalar_mass, phi4_coeff;
 std::array<double, CH_SPACEDIM> star_centre;
 //Relaxation params
 Real relaxtime, relaxspeed;

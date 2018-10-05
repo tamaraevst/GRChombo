@@ -6,13 +6,13 @@
 #ifndef BOSONSTARISOTROPICSOLUTION_HPP_
 #define BOSONSTARISOTROPICSOLUTION_HPP_
 
+#include "BosonStarParams.hpp"
 #include "BosonStarSolution.hpp"
 #include "ComplexPotential.hpp"
 #include <cmath>
 #include <algorithm>
 #include "SplineInterpolator.hpp"
 #include <boost/numeric/odeint.hpp>
-#include <iostream>
 #include <limits>
 
 //! This class constructs interpolation functions for the boson star solution
@@ -28,7 +28,7 @@ public:
 
     //! New constructor which can be called before a polar areal solution is
     //! computed
-    BosonStarIsotropicSolution(BosonStar::params_t a_params_BosonStar,
+    BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
     Potential::params_t a_params_potential, const double a_G_Newton = 1.0);
 
     //! If the new constructor is used, this function must be called afterwards
@@ -53,11 +53,11 @@ public:
 
 
 private:
-    BosonStar::params_t m_params_BosonStar;
+    BosonStar_params_t m_params_BosonStar;
     Potential::params_t m_params_potential;
     initial_data_t<double> m_isotropic_grid = {};
     initial_data_t<double> m_polar_areal_grid = {};
-    const double m_G_Newton;
+    const double m_G_Newton = 1.0;
 };
 
 #include "BosonStarIsotropicSolution.impl.hpp"

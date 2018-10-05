@@ -27,13 +27,13 @@ class BosonStarBinarySearch : \
 public:
     //! Constructor which requires pre-computed bounding solutions sol_min and
     //! sol_max
-    BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
+    BosonStarBinarySearch(BosonStar_params_t a_params_BosonStar,
         Potential::params_t a_params_potential,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max);
 
     //! Constructor which calls findInterval to find sol_min and sol_max
-    BosonStarBinarySearch(BosonStar::params_t a_params_BosonStar,
+    BosonStarBinarySearch(BosonStar_params_t a_params_BosonStar,
         Potential::params_t a_params_potential,
         const double a_alpha_central_guess = -0.5);
 

@@ -6,11 +6,12 @@
 #ifndef BOSONSTARINTEGRATOR_HPP_
 #define BOSONSTARINTEGRATOR_HPP_
 
-#include "BosonStar.hpp"
+#include "BosonStarParams.hpp"
 #include "BosonStarRHS.hpp"
 #include "BosonStarSolutionObserver.hpp"
 #include "BosonStarSolution.hpp"
 #include <boost/numeric/odeint.hpp>
+#include "parstream.H" //for pout
 
 
 //! Class that uses odeint to integrate the equations for a static, spherically
@@ -18,11 +19,9 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarIntegrator
 {
-    typedef initial_data_t<double> initial_grid_t;
-
 public:
     //! Constructor
-    BosonStarIntegrator(BosonStar::params_t a_params_BosonStar,
+    BosonStarIntegrator(BosonStar_params_t a_params_BosonStar,
         Potential::params_t a_params_potential);
 
     //! Do integration
@@ -32,7 +31,7 @@ public:
     BosonStarSolution<initial_data_t, initial_state_t>& getSolution();
 
 protected:
-    BosonStar::params_t m_params_BosonStar;
+    BosonStar_params_t m_params_BosonStar;
     BosonStarRHS m_boson_star_rhs;
     BosonStarSolution<initial_data_t, initial_state_t> m_boson_star_solution;
     BosonStarSolutionObserver<initial_data_t, initial_state_t> m_sol_observer;

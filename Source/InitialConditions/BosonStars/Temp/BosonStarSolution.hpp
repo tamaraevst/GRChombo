@@ -10,7 +10,6 @@
 #include <limits> //for double epsilon
 #include <algorithm> //for std::min_element and std::upper_bound
 #include <iterator> //for std::iterator
-#include <iostream> //TODO: remove after debuggingd
 
 //! Container class which stores the grid values of the rescaled Boson Star
 //! solutions in polar areal coordinates.
