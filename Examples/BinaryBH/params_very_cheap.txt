@@ -9,7 +9,7 @@ plot_prefix = BinaryBHPlot_
 N1 = 32
 N2 = 32
 N3 = 32
-L = 16 #100
+L = 100 #16
 
 massA = 1
 centerA = 6 8 8
@@ -57,3 +57,8 @@ covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
 
 #coefficient for KO numerical dissipation
 sigma = 0.3
+
+#gravitational wave extraction
+activate_extraction = 1
+extraction_level = 0
+extraction_radius = 50
