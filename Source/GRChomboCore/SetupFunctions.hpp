@@ -13,7 +13,7 @@
 using std::cerr;
 using std::endl;
 #include "AMRLevelFactory.H"
-//#include "DerivativeSetup.hpp"
+#include "DerivativeSetup.hpp"
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
 #include "SimulationParametersBase.hpp"

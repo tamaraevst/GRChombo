@@ -11,7 +11,6 @@
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
-#include "DerivativeSetup.hpp"
 #include "SimulationParameters.hpp"
 
 // Problem specific includes:
