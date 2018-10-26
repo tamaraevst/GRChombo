@@ -3,10 +3,10 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef USERVARIABLES_HPP_
-#define USERVARIABLES_HPP_
+#ifndef USERVARIABLES_HPP
+#define USERVARIABLES_HPP
 
-// assigns number to each variable
+// assign an enum to each variable
 enum
 {
     c_chi,
@@ -81,4 +81,4 @@ static constexpr char const *variable_names[NUM_VARS] = {
     "Ham",    "Mom1",   "Mom2",   "Mom3"};
 }
 
-#endif /* USERVARIABLES_HPP_ */
+#endif /* USERVARIABLES_HPP */
