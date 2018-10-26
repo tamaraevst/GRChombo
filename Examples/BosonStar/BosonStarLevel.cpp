@@ -59,7 +59,8 @@ void BosonStarLevel::initialData()
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
     BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS,
+                   disable_simd());
 }
 
 // Things to do before outputting a checkpoint file
