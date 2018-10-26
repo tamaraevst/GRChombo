@@ -93,7 +93,7 @@ int runInterpolatorTest(int argc, char *argv[])
     std::array<double, CH_SPACEDIM> origin;
     origin.fill(dx_scalar / 2);
 
-    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, origin, dx, 2);
+    AMRInterpolator<Lagrange<4>> interpolator(gr_amr, origin, dx, 0);
     interpolator.interp(query);
 
     int status = 0;
