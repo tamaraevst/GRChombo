@@ -15,10 +15,8 @@
 #include <iostream>
 #include <type_traits>
 
-#ifdef __cilk
-    #define SIMD_PRAGMA simd vectorlengthfor(t)
-#elif _OPENMP > 201510
-    #define SIMD_PRAGMA omp simd simdlen(SIMD_LEN)
+#if _OPENMP > 201510
+    #define SIMD_PRAGMA omp simd simdlen(8)
 #else
     #define SIMD_PRAGMA omp simd
 #endif
