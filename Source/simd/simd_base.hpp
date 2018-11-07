@@ -15,6 +15,14 @@
 #include <iostream>
 #include <type_traits>
 
+#ifdef __cilk
+    #define SIMD_PRAGMA simd vectorlengthfor(t)
+#elif _OPENMP > 201510
+    #define SIMD_PRAGMA omp simd simdlen(SIMD_LEN)
+#else
+    #define SIMD_PRAGMA omp simd
+#endif
+
 // This file provides functionalities for simd<t> whose implementation is
 // architecture independent.  Most importantly, all simd functions which have no
 // associated vector intrinsics, e.g. calls like ostream operator <<,  are
@@ -94,7 +102,7 @@ template <typename t> struct simd_base
         t out_arr[simd_traits<t>::simd_len];
         simd<t>::store(in_arr, m_value);
 
-#pragma simd vectorlengthfor(t)
+#pragma SIMD_PRAGMA
         for (int i = 0; i < simd_traits<t>::simd_len; ++i)
         {
             out_arr[i] = op(in_arr[i]);
@@ -112,7 +120,7 @@ template <typename t> struct simd_base
         simd<t>::store(in_arr, m_value);
         simd<t>::store(arg_arr, arg);
 
-#pragma simd vectorlengthfor(t)
+#pragma SIMD_PRAGMA
         for (int i = 0; i < simd_traits<t>::simd_len; ++i)
         {
             out_arr[i] = op(in_arr[i], arg_arr[i]);
