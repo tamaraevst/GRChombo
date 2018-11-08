@@ -14,6 +14,7 @@
 #include "SplineInterpolator.hpp"
 #include <boost/numeric/odeint.hpp>
 #include <limits>
+#include "parstream.H" //gives pout
 
 //! This class constructs interpolation functions for the boson star solution
 //! in isotropic coordinates given a rescaled solution in polar-areal coordinates

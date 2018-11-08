@@ -50,7 +50,7 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
 
     const double rho_match{a_polar_areal_solution.get_grid()[
         a_polar_areal_solution.get_last_good_beta_index()]};
-    std::cout << "match radius = " << rho_match << "\n";
+    pout() << "match radius = " << rho_match << "\n";
     //if we want a solution up to a larger radius than is possible from the
     //polar areal solution, we can use asymptotics.
     if(rho_match < m_params_potential.scalar_mass * a_max_radius)
