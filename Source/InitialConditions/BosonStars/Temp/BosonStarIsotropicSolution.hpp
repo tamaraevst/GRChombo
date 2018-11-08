@@ -25,6 +25,7 @@ public:
     tools::spline<initial_data_t> m_chi;
     tools::spline<initial_data_t> m_lapse;
     tools::spline<initial_data_t> m_phi;
+    double m_frequency;
 
     //! New constructor which can be called before a polar areal solution is
     //! computed

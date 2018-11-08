@@ -48,12 +48,20 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
 
-    // conformal metric is flat
+    double r = coords.get_radius();
+
+    //Complex scalar field values
+    vars.phi_Re = m_1d_sol.m_phi(r);
+    vars.phi_Im = 0.;
+    vars.Pi_Re = 0.;
+    vars.Pi_Im = -m_1d_sol.m_frequency * vars.phi_Re;
+
+    //conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;
 
-    //conformal factor and lapse set to unity for now
-    vars.chi = 1.;
-    vars.lapse = 1.;
+    //conformal factor and lapse
+    vars.chi = m_1d_sol.m_chi(r);
+    vars.lapse = m_1d_sol.m_lapse(r);
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);

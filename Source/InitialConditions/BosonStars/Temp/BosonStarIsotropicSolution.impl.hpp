@@ -29,6 +29,7 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     calculateIsotropicGrid(a_polar_areal_solution, a_max_radius);
     construct_chi(a_polar_areal_solution);
     construct_phi_and_lapse(a_polar_areal_solution);
+    m_frequency = a_polar_areal_solution.get_frequency();
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
