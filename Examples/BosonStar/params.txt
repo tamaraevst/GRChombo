@@ -13,13 +13,13 @@ N3 = 128
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L =  64
+L =  16
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
-regrid_threshold = 0.5
-regrid_threshold_K = 0.2
-regrid_threshold_phi = 0.1
+regrid_threshold = 0.3
+regrid_threshold_K = 0.1
+regrid_threshold_phi = 0.01
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
@@ -36,7 +36,7 @@ max_grid_size = 16
 # Min box size
 block_factor = 16
 # Determines how exactly regridding tries to fit the tagging
-fill_ratio = 0.7
+fill_ratio = 0.2
 #Periodicity and ghost cells
 isPeriodic = 1 1 1
 num_ghosts = 3
@@ -47,7 +47,7 @@ num_ghosts = 3
 checkpoint_interval = 20
 plot_interval = 5
 dt_multiplier = 0.25
-stop_time = 1.0
+stop_time = 0.0
 max_steps = 10000000
 
 #Lapse evolution
@@ -63,11 +63,11 @@ SpatialBetaDriverRadius = 1e12
 
 # CCZ4 parameters
 # if using BSSN the kappa values should be zero
-formulation = 1  # 1 for BSSN, 0 for CCZ4
-kappa1 = 0
-kappa2 = 0
-kappa3 = 0
-covariantZ4 = 0 # 0: default. 1: dampk1 -> dampk1/lapse
+formulation = 0  # 1 for BSSN, 0 for CCZ4
+kappa1 = 0.1
+kappa2 = 0.
+kappa3 = 1
+covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
 
 # coefficient for KO numerical dissipation
 # NB must be less than 0.5 for stability

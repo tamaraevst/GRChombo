@@ -15,6 +15,7 @@
 #include <boost/numeric/odeint.hpp>
 #include <limits>
 #include "parstream.H" //gives pout
+#include <iomanip> //for setprecision()
 
 //! This class constructs interpolation functions for the boson star solution
 //! in isotropic coordinates given a rescaled solution in polar-areal coordinates

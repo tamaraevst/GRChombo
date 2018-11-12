@@ -54,7 +54,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.phi_Re = m_1d_sol.m_phi(r);
     vars.phi_Im = 0.;
     vars.Pi_Re = 0.;
-    vars.Pi_Im = -m_1d_sol.m_frequency * vars.phi_Re;
+    vars.Pi_Im = -m_1d_sol.m_frequency * m_1d_sol.m_phi(r) / m_1d_sol.m_lapse(r);
 
     //conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;

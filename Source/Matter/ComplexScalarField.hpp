@@ -108,8 +108,8 @@ template <class potential_t = DefaultComplexPotential> class ComplexScalarField
         const vars_t<data_t> &vars,          //!< value of the variables
         const vars_t<Tensor<1, data_t>> &d1, //!< value of the 1st derivs
         const diff2_vars_t<Tensor<2, data_t>> &d2, //!< value of the 2nd derivs
-        const vars_t<data_t> &advec)
-        const; //!< the value of the advection terms
+        const vars_t<data_t> &advec)         //!< the value of the advection terms
+        const;
 
     //! The function which calculates the RHS for the matter field vars
     //! excluding the potential

@@ -26,6 +26,7 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     BosonStarSolution<initial_data_t, initial_state_t>
     &a_polar_areal_solution, const double a_max_radius)
 {
+    pout() << setprecision(12);
     calculateIsotropicGrid(a_polar_areal_solution, a_max_radius);
     construct_chi(a_polar_areal_solution);
     construct_phi_and_lapse(a_polar_areal_solution);
@@ -139,6 +140,15 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
             ( m_polar_areal_grid[i] * m_polar_areal_grid[i] );
     }
 
+    //For debugging
+    pout() << setw(16) << "R" << "\t" << setw(16) << "chi" << "\n";
+    for(int i = 0; i < static_cast<int>(m_isotropic_grid.size()); i++)
+    {
+        pout() << setw(16) << m_isotropic_grid[i] << "\t" << setw(16)
+        << chi_array[i] << "\n";
+    }
+
+
     //construct interpolation function
     m_chi.set_points(m_isotropic_grid, chi_array);
 }
@@ -189,6 +199,15 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
             phi_array[i] = psi_factor * psi_interp(rho_match) * std::exp(
                 - (rho - rho_match) * phi_decay_rate) * rho_match / rho;
         }
+    }
+
+    //For debugging
+    pout() << setw(16) << "R" << "\t" << setw(16) << "lapse" << "\t" << setw(16)
+    << "phi" << "\n";
+    for(int i = 0; i < static_cast<int>(m_isotropic_grid.size()); i++)
+    {
+        pout() << setw(16) << m_isotropic_grid[i] << "\t" << setw(16)
+        << lapse_array[i] << "\t" << setw(16) << phi_array[i] << "\n";
     }
 
     //construct interpolation functions

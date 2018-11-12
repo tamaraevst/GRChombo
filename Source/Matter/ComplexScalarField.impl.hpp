@@ -57,7 +57,7 @@ void ComplexScalarField<potential_t>::emtensor_excl_potential(
     const Tensor<3, data_t> &chris_ULL)
 {
     //initialise some useful quantities
-    data_t modulus_d1_phi_squared = 0;
+    data_t modulus_d1_phi_squared = 0.;
     data_t modulus_Pi_squared =
         vars_csf.Pi_Re * vars_csf.Pi_Re + vars_csf.Pi_Im * vars_csf.Pi_Im;
     FOR2(i, j)
@@ -73,7 +73,8 @@ void ComplexScalarField<potential_t>::emtensor_excl_potential(
     {
         out.Sij[i][j] =
             0.5 * (d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j]
-            - (modulus_d1_phi_squared - modulus_Pi_squared) / vars.chi);
+            - h[i][j] * (modulus_d1_phi_squared - modulus_Pi_squared)
+            / vars.chi);
     }
 
     // S = Tr_S_ij
