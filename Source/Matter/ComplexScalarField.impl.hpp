@@ -41,8 +41,11 @@ emtensor_t<data_t> ComplexScalarField<potential_t>::compute_emtensor(
 
     out.rho += 0.5 * V_of_modulus_phi_squared;
     out.S += -1.5 * V_of_modulus_phi_squared;
-    FOR2(i, j) { out.Sij[i][j] +=
-        -0.5 * vars.h[i][j] * V_of_modulus_phi_squared / vars.chi; }
+    FOR2(i, j)
+    {
+        out.Sij[i][j] +=
+            -0.5 * vars.h[i][j] * V_of_modulus_phi_squared / vars.chi;
+    }
 
     return out;
 }
@@ -72,8 +75,8 @@ void ComplexScalarField<potential_t>::emtensor_excl_potential(
     FOR2(i, j)
     {
         out.Sij[i][j] =
-            0.5 * (d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j]
-            - h[i][j] * (modulus_d1_phi_squared - modulus_Pi_squared)
+            d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j] 
+            - 0.5 * (vars.h[i][j] * (modulus_d1_phi_squared - modulus_Pi_squared)
             / vars.chi);
     }
 

@@ -20,7 +20,6 @@
 #include "ComplexPhiAndKTaggingCriterion.hpp"
 
 // Problem specific includes
-#include "ChiRelaxation.hpp"
 #include "ComputePack.hpp"
 #include "ComplexPotential.hpp"
 #include "BosonStar.hpp"
