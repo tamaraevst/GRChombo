@@ -7,6 +7,7 @@
 #define SIMULATIONPARAMETERSBASE_HPP_
 
 // General includes
+#include "BoundaryConditions.hpp"
 #include "CCZ4.hpp"
 #include "GRParmParse.hpp"
 
@@ -28,6 +29,10 @@ class SimulationParametersBase
     {
         // The read parameters code defined below
         auto_read_base_params(pp);
+
+        // boundary params
+        boundary_params.hi_boundary = hi_boundary;
+        boundary_params.lo_boundary = lo_boundary;
 
         // Fill in the ccz4Parameters
         ccz4_params.kappa1 = kappa1;
@@ -57,6 +62,24 @@ class SimulationParametersBase
                 {0.5 * L, 0.5 * L, 0.5 * L}); // default to center
         pp.load("regrid_threshold", regrid_threshold, 0.5);
         pp.load("isPeriodic", isPeriodic, {true, true, true});
+        int bc = BoundaryConditions::STATIC_BC;
+        pp.load("hi_boundary", hi_boundary, {bc, bc, bc});
+        pp.load("lo_boundary", lo_boundary, {bc, bc, bc});
+        nonperiodic_boundaries_exist = false;
+        symmetric_boundaries_exist = false;
+        for (int dir =0; dir < CH_SPACEDIM; dir++)
+        { 
+            if(isPeriodic[dir] == false)
+            {
+                nonperiodic_boundaries_exist = true;
+                if((hi_boundary[dir] == BoundaryConditions::SYMMETRIC_BC) ||
+                   (lo_boundary[dir] == BoundaryConditions::SYMMETRIC_BC))
+                {
+                    symmetric_boundaries_exist = true;
+                }
+            }
+        }
+
         pp.load("num_ghosts", num_ghosts, 3);
         pp.load("tag_buffer_size", tag_buffer_size, 3);
         pp.load("dt_multiplier", dt_multiplier, 0.25);
@@ -141,10 +164,10 @@ class SimulationParametersBase
         origin.fill(dx_scalar / 2.0);
 
         // Extraction params
-        pp.load("extraction_level", extraction_level, 3);
-        pp.load("extraction_radius", extraction_radius, 120.0);
-        pp.load("num_points_phi", num_points_phi, 8);
-        pp.load("num_points_theta", num_points_theta, 16);
+        pp.load("extraction_level", extraction_level, 0);
+        pp.load("extraction_radius", extraction_radius, 0.1);
+        pp.load("num_points_phi", num_points_phi, 2);
+        pp.load("num_points_theta", num_points_theta, 4);
         pp.load("extraction_center", extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
     }
@@ -188,7 +211,16 @@ class SimulationParametersBase
     int covariantZ4;
     // Kreiss Oliger dissipation
     double sigma;
-    // Collection of parameters necessary for the CCZ4 RHS and extraction
+
+    // Boundary conditions
+    std::array<int, CH_SPACEDIM> hi_boundary;
+    std::array<int, CH_SPACEDIM> lo_boundary;
+    bool nonperiodic_boundaries_exist;
+    bool symmetric_boundaries_exist;
+
+    // Collection of parameters necessary for the CCZ4 RHS
+    // and boundaries
+    BoundaryConditions::params_t boundary_params;
     CCZ4::params_t ccz4_params;
     extraction_params_t extraction_params;
 };

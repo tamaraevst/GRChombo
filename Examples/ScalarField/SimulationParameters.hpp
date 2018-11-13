@@ -41,7 +41,7 @@ class SimulationParameters : public SimulationParametersBase
 
     void auto_read_params(GRParmParse &pp)
     {
-        pp.load("regrid_threshold_K", regrid_threshold_K);
+        pp.load("regrid_threshold_chi", regrid_threshold_chi);
         pp.load("regrid_threshold_phi", regrid_threshold_phi);
 
         // Initial and SF data
@@ -57,7 +57,7 @@ class SimulationParameters : public SimulationParametersBase
     }
 
     // Problem specific parameters
-    Real regrid_threshold_K, regrid_threshold_phi;
+    Real regrid_threshold_chi, regrid_threshold_phi;
     // Initial data for matter and potential
     double G_Newton;
     Real amplitudeSF, widthSF, r_zero, scalar_mass;

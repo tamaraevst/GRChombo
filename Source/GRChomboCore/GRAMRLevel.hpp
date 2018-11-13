@@ -7,6 +7,7 @@
 #define GRAMRLEVEL_HPP_
 
 #include "AMRLevel.H"
+#include "BoundaryConditions.hpp"
 #include "CoarseAverage.H"
 #include "FourthOrderFillPatch.H"
 #include "GRAMR.hpp"
@@ -160,6 +161,8 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// between levels.
     virtual void fillIntralevelGhosts();
 
+    BoundaryConditions m_boundaries; // the class for implementing BCs
+
     GRLevelData m_state_old; //!< the solution at the old time
     GRLevelData m_state_new; //!< the solution at the new time
     Real m_dx;               //!< grid spacing
@@ -172,13 +175,14 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     int m_verbosity;          //!< Level of verbosity of the output
 
     Copier m_exchange_copier; //!< copier (for ghost cells on same level)
+    Copier m_boundary_copier; //!< copier (for copies where boundaries needed)
 
     CoarseAverage m_coarse_average; //!< Averages from fine to coarse level
 
     FourthOrderFillPatch
-        m_patcher; //!< Organises interpolation from coarse to fine levels
+        m_patcher; //!< Organises interpolation from coarse to fine levels of ghosts
     FourthOrderFineInterp
-        m_fine_interp; //!< executes the interpolation from coarse to fine
+        m_fine_interp; //!< executes the interpolation from coarse to fine when regridding
 
     DisjointBoxLayout m_grids; //!< Holds grid setup (the layout of boxes)
 
