@@ -50,6 +50,8 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("widthSF", widthSF);
         pp.load("r_zero", r_zero);
         pp.load("scalar_mass", scalar_mass);
+        pp.load("centerSF", centerSF,
+                {0.5 * L, 0.5 * L, 0.5 * L});
 
         // Relaxation params
         pp.load("relaxtime", relaxtime);
