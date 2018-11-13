@@ -295,10 +295,10 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
     m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
 
-    // maintain interlevel stuff, require 3 coarse ghost cells to be filled
+    // maintain interlevel stuff
     m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
-    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain, 3);
+    m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
     if (m_coarser_level_ptr != nullptr)
     {

@@ -175,7 +175,6 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     int m_verbosity;          //!< Level of verbosity of the output
 
     Copier m_exchange_copier; //!< copier (for ghost cells on same level)
-    Copier m_boundary_copier; //!< copier (for copies where boundaries needed)
 
     CoarseAverage m_coarse_average; //!< Averages from fine to coarse level
 

@@ -1,5 +1,6 @@
 pout.*
 *.pbs
+*.sh
 *.s
 d
 o
