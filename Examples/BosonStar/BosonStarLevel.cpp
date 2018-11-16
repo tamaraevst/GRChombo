@@ -55,6 +55,22 @@ void BosonStarLevel::initialData()
 
     boson_star.compute_1d_solution(max_radius);
 
+    /*
+    //For debugging
+    pout() << setprecision(12);
+    pout() << setw(16) << "R" << "\t" << setw(16) << "chi" << "\t" <<
+    setw(16) << "lapse" << "\t" << setw(16) << "phi" "\n";
+    double r;
+    for(int i = 1; i < 2 * static_cast<int>(m_p.L/m_dx); ++i)
+    {
+        r = i * m_dx;
+        pout() << setw(16) << r << "\t" << setw(16) <<
+        boson_star.m_1d_sol.m_chi(r) << "\t" << setw(16) <<
+        boson_star.m_1d_sol.m_lapse(r) << "\t" << setw(16) <<
+        boson_star.m_1d_sol.m_phi(r) << "\n";
+    }
+    */
+
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
     BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),

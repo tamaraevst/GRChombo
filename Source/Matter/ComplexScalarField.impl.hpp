@@ -75,7 +75,7 @@ void ComplexScalarField<potential_t>::emtensor_excl_potential(
     FOR2(i, j)
     {
         out.Sij[i][j] =
-            d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j] 
+            d1_phi_Re[i] * d1_phi_Re[j] + d1_phi_Im[i] * d1_phi_Im[j]
             - 0.5 * (vars.h[i][j] * (modulus_d1_phi_squared - modulus_Pi_squared)
             / vars.chi);
     }

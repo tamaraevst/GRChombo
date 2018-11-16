@@ -28,13 +28,16 @@ void auto_read_params(GRParmParse& pp)
 
     //CCZ4 parameters
     pp.load("formulation", formulation);
-    pp.load("kappa1",kappa1);
-    pp.load("kappa2",kappa2);
-    pp.load("kappa3",kappa3);
-    pp.load("covariantZ4",covariantZ4);
+    pp.load("kappa1", kappa1);
+    pp.load("kappa2", kappa2);
+    pp.load("kappa3", kappa3);
+    pp.load("covariantZ4", covariantZ4);
 
     //Dissipation
     pp.load("sigma",sigma);
+
+    //Newton's constant
+    pp.load("G_Newton", G_Newton, 1.0);
 
     //Boson Star initial data params
     pp.load("central_amplitude_CSF", central_amplitude_CSF);

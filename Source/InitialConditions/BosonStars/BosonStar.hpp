@@ -40,12 +40,13 @@ public:
     template <class data_t>
     void compute(Cell<data_t> current_cell) const;
 
+    BosonStarIsotropicSolution<initial_data_t, initial_state_t> m_1d_sol; /*<
+    The object that stores the solution found by the 1d ODE integrator */
+
 protected:
     double m_dx;
     const BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
     const Potential::params_t m_params_potential; //!< The potential params
-    BosonStarIsotropicSolution<initial_data_t, initial_state_t> m_1d_sol; /*<
-    The object that stores the solution found by the 1d ODE integrator */
 };
 
 #include "BosonStar.impl.hpp"
