@@ -64,19 +64,22 @@ class BoundaryConditions
         {
             if     ((idir==0) && (icomp == c_shift1 || icomp == c_B1 ||
                                   icomp == c_Gamma1 ||
-                                  icomp == c_h12 || icomp == c_h13))
+                                  icomp == c_h12 || icomp == c_h13 ||
+                                  icomp == c_A12 || icomp == c_A13))
             {
                 vars_parity[icomp] = -1;
             }
             else if((idir==1) && (icomp == c_shift2 || icomp == c_B2 ||
                                   icomp == c_Gamma2 ||
-                                  icomp == c_h12 || icomp == c_h23))
+                                  icomp == c_h12 || icomp == c_h23 ||
+                                  icomp == c_A12 || icomp == c_A23))
             {
                 vars_parity[icomp] = -1;
             }
             else if((idir==2) && (icomp == c_shift3 || icomp == c_B3 ||
                                   icomp == c_Gamma3 ||
-                                  icomp == c_h13 || icomp == c_h23))
+                                  icomp == c_h13 || icomp == c_h23 ||
+                                  icomp == c_A13 || icomp == c_A23))
             {
                 vars_parity[icomp] = -1;
             }
