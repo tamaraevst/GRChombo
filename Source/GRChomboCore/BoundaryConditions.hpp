@@ -57,6 +57,37 @@ class BoundaryConditions
         is_defined = true;
     }
 
+    std::array<int, NUM_VARS> get_vars_parity(int idir)
+    {
+        std::array<int, NUM_VARS> vars_parity;
+        for(int icomp = 0; icomp < NUM_VARS; icomp++)
+        {
+            if     ((idir==0) && (icomp == c_shift1 || icomp == c_B1 ||
+                                  icomp == c_Gamma1 ||
+                                  icomp == c_h12 || icomp == c_h13))
+            {
+                vars_parity[icomp] = -1;
+            }
+            else if((idir==1) && (icomp == c_shift2 || icomp == c_B2 ||
+                                  icomp == c_Gamma2 ||
+                                  icomp == c_h12 || icomp == c_h23))
+            {
+                vars_parity[icomp] = -1;
+            }
+            else if((idir==2) && (icomp == c_shift3 || icomp == c_B3 ||
+                                  icomp == c_Gamma3 ||
+                                  icomp == c_h13 || icomp == c_h23))
+            {
+                vars_parity[icomp] = -1;
+            }
+            else 
+            {
+                vars_parity[icomp] = 1;
+            }
+        }
+        return vars_parity;
+    }
+
     /// Fill the rhs boundary values appropriately based on the params set
     void fill_boundary_rhs(const Side::LoHiSide a_side, GRLevelData &a_soln, GRLevelData &a_rhs)
     {
@@ -124,6 +155,7 @@ class BoundaryConditions
                      }
                      case SYMMETRIC_BC:
                      {
+                         std::array<int, NUM_VARS> parity = get_vars_parity(dir);
                          IntVect iv_copy = iv;
                          /// where to copy the data from - mirror image in domain
                          if (a_side == Side::Lo)
@@ -138,7 +170,7 @@ class BoundaryConditions
                          // replace value at iv with value at iv_copy
                          for (int icomp = 0; icomp < NUM_VARS; icomp++)
                          {
-                             m_rhs_box(iv, icomp) = m_rhs_box(iv_copy, icomp);
+                             m_rhs_box(iv, icomp) = parity[icomp]*m_rhs_box(iv_copy, icomp);
                          }
                          break;
                      }
