@@ -24,7 +24,7 @@ void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
     define(a_coarser_level_ptr, physdomain, a_level, a_ref_ratio);
 
     // Also define the boundaries
-    m_boundaries.define(m_dx, m_p.boundary_params, physdomain, m_num_ghosts);
+    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, physdomain, m_num_ghosts);
 }
 
 void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
@@ -48,7 +48,7 @@ void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
     }
 
     // Also define the boundaries
-    m_boundaries.define(m_dx, m_p.boundary_params, a_problem_domain, m_num_ghosts);
+    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, a_problem_domain, m_num_ghosts);
 }
 
 /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible

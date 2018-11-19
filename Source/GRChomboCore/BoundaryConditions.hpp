@@ -39,6 +39,7 @@ class BoundaryConditions
     double m_dx;
     int m_num_ghosts;
     params_t m_params;
+    RealVect m_center;
     ProblemDomain m_domain;
     Box m_domain_box;
     bool is_defined;
@@ -47,13 +48,15 @@ class BoundaryConditions
     BoundaryConditions() { is_defined = false; }
 
     /// define function sets members and is_defined set to true
-    void define(double a_dx, params_t a_params, ProblemDomain a_domain, int a_num_ghosts)
+    void define(double a_dx, std::array<double, CH_SPACEDIM> a_center, 
+                params_t a_params, ProblemDomain a_domain, int a_num_ghosts)
     {
         m_dx = a_dx;
         m_params = a_params;
         m_domain = a_domain;
         m_domain_box = a_domain.domainBox();
         m_num_ghosts = a_num_ghosts;
+        FOR1(i) {m_center[i] = a_center[i];}
         is_defined = true;
     }
 
@@ -146,13 +149,66 @@ class BoundaryConditions
                      }
                      case SOMMERFELD_BC:
                      {
-                         RealVect loc(iv + 0.5 * RealVect::Unit);
+                         // get real position on the grid
+                         RealVect loc(iv + 0.5 * RealVect::Unit - m_center);
                          loc *= m_dx;
                          double radius_squared = 0.0;
                          FOR1(i) {radius_squared += loc[i]*loc[i];}
+                         double radius = sqrt(radius_squared);
+                         IntVect lo_local_offset = iv - m_soln_box.smallEnd();
+                         IntVect hi_local_offset = m_soln_box.bigEnd() - iv;
+
+                         // Apply Sommerfeld BCs to each variable
                          for (int icomp = 0; icomp < NUM_VARS; icomp++)
                          {
                              m_rhs_box(iv, icomp) = 0.0;
+                             FOR1(dir2)
+                             {
+                                 IntVect iv_offset1 = iv;
+                                 IntVect iv_offset2 = iv;
+                                 double d1;
+                                 // bit of work to get the right stencils for near the edges of the box
+                                 // only using second order stencils for now
+                                 if(lo_local_offset[dir2] < 1)
+                                 {
+                                     // near lo end
+                                     iv_offset1[dir2] += +1;
+                                     iv_offset2[dir2] += +2;
+                                     d1 = 1.0/m_dx*(- 1.5*m_soln_box(iv, icomp) 
+                                                    + 2.0*m_soln_box(iv_offset1, icomp)
+                                                    - 0.5*m_soln_box(iv_offset2, icomp));
+                                 }
+                                 else if(hi_local_offset[dir2] < 1)
+                                 {
+                                     // near hi end
+                                     iv_offset1[dir2] += -1;
+                                     iv_offset2[dir2] += -2;
+                                     d1 = 1.0/m_dx*(+ 1.5*m_soln_box(iv, icomp) 
+                                                    - 2.0*m_soln_box(iv_offset1, icomp)
+                                                    + 0.5*m_soln_box(iv_offset2, icomp));
+                                 }
+                                 else
+                                 {
+                                     // normal case
+                                     iv_offset1[dir2] += +1;
+                                     iv_offset2[dir2] += -1;
+                                     d1 = 0.5/m_dx*(m_soln_box(iv_offset1, icomp) - m_soln_box(iv_offset2, icomp));
+                                 }
+
+                                 // for each direction add dphidx * x^i / r
+                                 m_rhs_box(iv, icomp) += - d1 * loc[dir2] / radius;
+                             }
+
+                             // asymptotic values
+                             if(icomp == c_chi || icomp == c_lapse ||
+                                icomp == c_h11 || icomp == c_h22 || icomp == c_h33)
+                             {
+                                 m_rhs_box(iv,icomp) += (1.0 - m_soln_box(iv, icomp)) / radius;
+                             }
+                             else
+                             {
+                                 m_rhs_box(iv,icomp) += (0.0 - m_soln_box(iv, icomp)) / radius;
+                             }
                          }
                          break;
                      }
