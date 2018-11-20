@@ -35,8 +35,8 @@ public:
         if (m_boson_star_solution.get_num_grid_points() > 0)
         {
             //first remind us which variable we're referring to
-            auto alpha_new = a_vars[0];
-            auto beta_new = a_vars[1];
+            auto f_new = a_vars[0];
+            auto g_new = a_vars[1];
             auto psi_new = a_vars[2];
             auto Psi_new = a_vars[3];
             auto psi_old = m_boson_star_solution.get_psi_at_max_radius();
@@ -44,7 +44,7 @@ public:
 
             //if our solution has grown too large throw an exception
             if (std::abs(psi_new) > 2.0 * psi_central
-            || std::abs(alpha_new) > 1.0e4 || std::abs(beta_new) > 1.0e4 ||
+            || std::abs(f_new) > 1.0e4 || std::abs(g_new) > 1.0e4 ||
             std::abs(Psi_new) > 1.0e4)
             {
                 throw std::runtime_error("Solution blow up; "\

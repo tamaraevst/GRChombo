@@ -12,17 +12,17 @@
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution()
-    : m_initial_grid {}, m_alpha_array {}, m_beta_array {}, m_psi_array {},
+    : m_initial_grid {}, m_f_array {}, m_g_array {}, m_psi_array {},
     m_Psi_array {}, m_num_grid_points {0}, m_num_psi_roots {0},
-    m_last_good_beta_index {0}, m_frequency {NAN}, m_ADM_mass {NAN} {}
+    m_last_good_g_index {0}, m_frequency {NAN}, m_ADM_mass {NAN} {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::push_back(
     const initial_state_t a_vars, const double a_radius)
 {
     m_initial_grid.push_back(a_radius);
-    m_alpha_array.push_back(a_vars[0]);
-    m_beta_array.push_back(a_vars[1]);
+    m_f_array.push_back(a_vars[0]);
+    m_g_array.push_back(a_vars[1]);
     m_psi_array.push_back(a_vars[2]);
     m_Psi_array.push_back(a_vars[3]);
     ++m_num_grid_points;
@@ -32,8 +32,8 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::clear()
 {
     m_initial_grid.clear();
-    m_alpha_array.clear();
-    m_beta_array.clear();
+    m_f_array.clear();
+    m_g_array.clear();
     m_psi_array.clear();
     m_Psi_array.clear();
     m_num_grid_points = 0;
@@ -117,11 +117,11 @@ int BosonStarSolution<initial_data_t, initial_state_t>::get_num_psi_roots()
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 int BosonStarSolution<initial_data_t, initial_state_t>
-    ::get_last_good_beta_index()
+    ::get_last_good_g_index()
 {
     if(std::isnan(m_ADM_mass))
         calculate_ADM_mass();
-    return m_last_good_beta_index;
+    return m_last_good_g_index;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -133,8 +133,8 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
     frequency_limit_function.reserve(m_num_grid_points);
     for(int i = 0; i < m_num_grid_points; ++i)
     {
-        frequency_limit_function.push_back( std::exp( - m_alpha_array[i]
-            - m_beta_array[i] ) );
+        frequency_limit_function.push_back( std::exp( - m_f_array[i]
+            - m_g_array[i] ) );
     }
 
     //Get the lower index between which the frequency should be evaluated
@@ -155,16 +155,16 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
     for(int i = 0; i < m_num_grid_points; ++i)
     {
         mass_aspect_function.push_back( 0.5 * m_initial_grid[i] *
-            (1.0 - std::exp(-2.0 * m_beta_array[i])) );
+            (1.0 - std::exp(-2.0 * m_g_array[i])) );
     }
 
     //Get the lower index between which the frequency should be evaluated
-    m_last_good_beta_index
+    m_last_good_g_index
         = find_inflection_index(mass_aspect_function);
 
     //Use linear interpolation to get the ADM mass
-    m_ADM_mass = 0.5 * (mass_aspect_function[m_last_good_beta_index]
-        + mass_aspect_function[m_last_good_beta_index + 1] );
+    m_ADM_mass = 0.5 * (mass_aspect_function[m_last_good_g_index]
+        + mass_aspect_function[m_last_good_g_index + 1] );
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -192,16 +192,16 @@ initial_data_t<double>& BosonStarSolution<initial_data_t, initial_state_t>::
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 initial_data_t<double>& BosonStarSolution<initial_data_t, initial_state_t>::
-    get_alpha()
+    get_f()
 {
-    return m_alpha_array;
+    return m_f_array;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 initial_data_t<double>& BosonStarSolution<initial_data_t, initial_state_t>::
-    get_beta()
+    get_g()
 {
-    return m_beta_array;
+    return m_g_array;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>

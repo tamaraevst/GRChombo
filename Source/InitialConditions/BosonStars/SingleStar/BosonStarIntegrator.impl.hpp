@@ -20,19 +20,19 @@ BosonStarIntegrator<initial_data_t, initial_state_t>::BosonStarIntegrator(
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIntegrator<initial_data_t, initial_state_t>
-    ::doIntegration(const double a_alpha_central)
+    ::doIntegration(const double a_f_central)
 {
     //First clear arrays to make sure nothing has been left from the last
     //integration.
     m_boson_star_solution.clear();
 
     //identify fixed BCs
-    const double beta_central{0.0};
+    const double g_central{0.0};
     const double Psi_central{0.0};
     const double central_radius{0.0}; /*bit of a weird name but makes it easier
                                         to understand later on */
     //Set central BCs
-    initial_state_t central_vars{a_alpha_central, beta_central,
+    initial_state_t central_vars{a_f_central, g_central,
         m_params_BosonStar.central_amplitude_CSF, Psi_central};
 
     using namespace boost::numeric::odeint;

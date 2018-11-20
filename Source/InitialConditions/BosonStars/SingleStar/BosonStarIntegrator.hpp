@@ -25,7 +25,7 @@ public:
         Potential::params_t a_params_potential);
 
     //! Do integration
-    void doIntegration(const double a_alpha_central);
+    void doIntegration(const double a_f_central);
 
     //! Returns the solution in a BosonStarSolution object.
     BosonStarSolution<initial_data_t, initial_state_t>& getSolution();

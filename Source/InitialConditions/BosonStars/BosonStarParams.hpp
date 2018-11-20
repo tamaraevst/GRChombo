@@ -19,7 +19,7 @@ struct BosonStar_params_t
     double max_radius; /*!< the maximum (rescaled) radius the 1D ODE
     integrator will attempt to integrate up to. */
     double binary_search_tol; /*!< This is the tolerance to which the shooting
-    parameter (the central value of alpha) is found. */
+    parameter (the central value of f) is found. */
     int max_binary_search_iter = 1e3; //!< the maximum number of binary search iterations.
 };
 

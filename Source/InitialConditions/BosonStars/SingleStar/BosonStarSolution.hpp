@@ -44,8 +44,8 @@ public:
     //! Returns the number of roots in Psi
     int get_num_psi_roots();
 
-    //! Returns the last valid index for beta
-    int get_last_good_beta_index();
+    //! Returns the last valid index for g
+    int get_last_good_g_index();
 
     //! Calculates the complex oscillation frequency (divided by the scalar
     //! mass) of the solution and stores it in m_frequency
@@ -63,11 +63,11 @@ public:
     //! Returns m_initial_grid
     initial_data_t<double>& get_grid();
 
-    //! Returns the m_alpha_array
-    initial_data_t<double>& get_alpha();
+    //! Returns the m_f_array
+    initial_data_t<double>& get_f();
 
-    //! Returns the m_beta_array
-    initial_data_t<double>& get_beta();
+    //! Returns the m_g_array
+    initial_data_t<double>& get_g();
 
     //! Returns the m_psi_array
     initial_data_t<double>& get_psi();
@@ -77,14 +77,14 @@ public:
 
 private:
     initial_data_t<double> m_initial_grid; //!< array holding the grid radial coordinates
-    initial_data_t<double> m_alpha_array = {}; //!< array to hold alpha grid values
-    initial_data_t<double> m_beta_array = {}; //!< array to hold beta grid values
+    initial_data_t<double> m_f_array = {}; //!< array to hold f grid values
+    initial_data_t<double> m_g_array = {}; //!< array to hold g grid values
     initial_data_t<double> m_psi_array = {}; //!< array to hold psi grid values
     initial_data_t<double> m_Psi_array = {}; //!< array to hold Psi grid values
     int m_num_grid_points; //!< this stores the number of grid values per variable
     int m_num_psi_roots; //!< this stores the number of roots in psi
-    int m_last_good_beta_index; /*!< this stores the largest grid index for which
-                                beta is still valid (before growing modes take
+    int m_last_good_g_index; /*!< this stores the largest grid index for which
+                                g is still valid (before growing modes take
                                 over) */
     double m_frequency; //!< this stores the complex oscillation frequency/m
     double m_ADM_mass; //!< this stores the ADM mass in units of M_pl^2/m
