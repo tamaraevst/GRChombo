@@ -89,6 +89,17 @@ void BosonStarLevel::preCheckpointLevel()
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 }
 
+// Things to do before outputting a plot file
+void BosonStarLevel::prePlotLevel()
+{
+    fillAllGhosts();
+    Potential potential(m_p.potential_params);
+    ComplexScalarFieldWithPotential complex_scalar_field(potential);
+    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
+                       complex_scalar_field, m_dx, m_p.G_Newton),
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+}
+
 // Things to do in RHS update, at each RK4 step
 void BosonStarLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                                        const double a_time)
@@ -125,7 +136,7 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 void BosonStarLevel::specificWritePlotHeader(
     std::vector<int> &plot_states) const
 {
-    plot_states = {c_phi_Re, c_phi_Im, c_K};
+    plot_states = {c_phi_Re, c_phi_Im, c_chi, c_Ham};
 }
 
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,

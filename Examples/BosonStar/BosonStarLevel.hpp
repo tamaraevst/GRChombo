@@ -35,6 +35,9 @@ class BosonStarLevel : public GRAMRLevel
     //! routines to do before outputing checkpoint file
     virtual void preCheckpointLevel();
 
+    //! routines to do before outputing plot file
+    virtual void prePlotLevel();
+
     //! RHS routines used at each RK4 step
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                                  const double a_time);
