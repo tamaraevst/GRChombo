@@ -15,9 +15,10 @@
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar,
                     Potential::params_t a_params_potential, double a_dx)
-    : m_dx(a_dx), m_params_BosonStar(a_params_BosonStar),
-    m_params_potential(a_params_potential),
-    m_1d_sol(a_params_BosonStar, a_params_potential)
+    : m_1d_sol(a_params_BosonStar, a_params_potential), m_dx(a_dx),
+    m_params_BosonStar(a_params_BosonStar),
+    m_params_potential(a_params_potential)
+
 {
 }
 
