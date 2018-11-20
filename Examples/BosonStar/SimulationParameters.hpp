@@ -8,24 +8,27 @@
 
 // General includes
 #include "GRParmParse.hpp"
+#include "SimulationParametersBase.hpp"
 
 // Problem specific includes:
-#include "CCZ4.hpp"
 #include "ComplexPotential.hpp"
 #include "BosonStarParams.hpp"
 
-class SimulationParameters
+class SimulationParameters : public SimulationParametersBase
 {
-  public:
-    SimulationParameters(GRParmParse &pp) { readParams(pp); }
+public:
+    SimulationParameters(GRParmParse &pp) : SimulationParametersBase(pp)
+    {
+        // Read the problem specific params
+        readParams(pp);
+    }
 
     void readParams(GRParmParse &pp)
     {
-        // The automatically generated read parameters code defined in
-        // SimulationParameters.inc
+        // Read in all the parameters from the parameter file
         auto_read_params(pp);
 
-        // Fill in the Matter Parameters
+        // Fill in the boson star parameters struct
         bosonstar_params.central_amplitude_CSF = central_amplitude_CSF;
         bosonstar_params.abs_error = abs_error;
         bosonstar_params.rel_error = rel_error;
@@ -35,28 +38,45 @@ class SimulationParameters
         bosonstar_params.max_binary_search_iter = max_binary_search_iter;
         bosonstar_params.star_centre = star_centre;
 
-        // Fill in the potential parameters
+        // Fill in the potential parameters struct
         potential_params.scalar_mass = scalar_mass;
         potential_params.phi4_coeff = phi4_coeff;
-
-        // Fill in the ccz4Parameters
-        ccz4_params.kappa1 = kappa1;
-        ccz4_params.kappa2 = kappa2;
-        ccz4_params.kappa3 = kappa3;
-        ccz4_params.shift_Gamma_coeff = shift_Gamma_coeff;
-        ccz4_params.shift_advec_coeff = shift_advec_coeff;
-        ccz4_params.eta = eta;
-        ccz4_params.lapse_power = lapse_power;
-        ccz4_params.lapse_coeff = lapse_coeff;
-        ccz4_params.lapse_advec_coeff = lapse_advec_coeff;
     }
 
-// SimulationParameters.inc declares all variables and defines
-// auto_read_params(GRParmParse& pp)
-#include "SimulationParameters.inc"
+    void auto_read_params(GRParmParse& pp)
+    {
+        pp.load("regrid_threshold_K", regrid_threshold_K);
+        pp.load("regrid_threshold_phi", regrid_threshold_phi);
 
-    // Collection of parameters necessary for the CCZ4 RHS
-    CCZ4::params_t ccz4_params;
+        // Newton's constant
+        pp.load("G_Newton", G_Newton, 1.0);
+
+        // Boson Star initial data params
+        pp.load("central_amplitude_CSF", central_amplitude_CSF); //this will be divided by sqrt(4pi)
+        pp.load("abs_error", abs_error, 1.0e-14);
+        pp.load("rel_error", rel_error, 1.0e-14);
+        pp.load("initial_step_size", initial_step_size, 0.015625);
+        pp.load("max_radius", max_radius, 256.);
+        pp.load("binary_search_tol", binary_search_tol, 1.0e-15);
+        pp.load("max_binary_search_iter", max_binary_search_iter, 1e3);
+        pp.load("star_centre", star_centre, {0.5*L, 0.5*L, 0.5*L});
+
+        // Potential params
+        pp.load("scalar_mass", scalar_mass, 1.0);
+        pp.load("phi4_coeff", phi4_coeff, 0.0);
+    }
+
+    // Tagging thresholds
+    Real regrid_threshold_K, regrid_threshold_phi;
+
+    // Initial data for matter and potential
+    double G_Newton;
+    double central_amplitude_CSF, abs_error, rel_error, initial_step_size;
+    double max_radius, binary_search_tol, max_binary_search_iter;
+    double scalar_mass, phi4_coeff;
+    std::array<double, CH_SPACEDIM> star_centre;
+
+    // Parameter structs
     BosonStar_params_t bosonstar_params;
     Potential::params_t potential_params;
 };
