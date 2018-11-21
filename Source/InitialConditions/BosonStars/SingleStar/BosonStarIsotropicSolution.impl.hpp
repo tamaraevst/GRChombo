@@ -13,9 +13,10 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     ::BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, const double a_G_Newton)
+    Potential::params_t a_params_potential, int a_verbosity,
+    const double a_G_Newton)
     : m_params_BosonStar(a_params_BosonStar),
-    m_params_potential(a_params_potential),
+    m_params_potential(a_params_potential), m_verbosity(a_verbosity),
     m_G_Newton(a_G_Newton)
 {
 }
@@ -51,7 +52,13 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
 
     const double rho_match{a_polar_areal_solution.get_grid()[
         a_polar_areal_solution.get_last_good_g_index()]};
-    pout() << "match radius = " << rho_match << "\n";
+
+    if (m_verbosity >= 2)
+    {
+        pout() << "Switched to asymptotics at areal radius = "
+            << rho_match / m_params_potential.scalar_mass << "\n";
+    }
+
     //if we want a solution up to a larger radius than is possible from the
     //polar areal solution, we can use asymptotics.
     if(rho_match < m_params_potential.scalar_mass * a_max_radius)
@@ -212,7 +219,7 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
         << lapse_array[i] << "\t" << setw(16) << phi_array[i] << "\n";
     }
     */
-    
+
     //construct interpolation functions
     m_lapse.set_points(m_isotropic_grid, lapse_array);
     m_phi.set_points(m_isotropic_grid, phi_array);

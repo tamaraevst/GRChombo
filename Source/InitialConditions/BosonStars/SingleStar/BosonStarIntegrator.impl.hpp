@@ -13,10 +13,10 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIntegrator<initial_data_t, initial_state_t>::BosonStarIntegrator(
     BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential)
+    Potential::params_t a_params_potential, int a_verbosity)
     : m_params_BosonStar(a_params_BosonStar),
-    m_boson_star_rhs(a_params_potential),
-    m_sol_observer(m_boson_star_solution) {}
+    m_boson_star_rhs(a_params_potential), m_sol_observer(m_boson_star_solution),
+    m_verbosity(a_verbosity) {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIntegrator<initial_data_t, initial_state_t>
@@ -49,8 +49,11 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
     }
     catch (std::exception &exception)
     {
-        pout() << exception.what() << " max radius = " <<
-            m_boson_star_solution.get_grid().back() << "\n";
+        if (m_verbosity >= 2)
+        {
+            pout() << exception.what() << " Max areal radius = " <<
+                m_boson_star_solution.get_grid().back() << "\n";
+        }
     }
 }
 

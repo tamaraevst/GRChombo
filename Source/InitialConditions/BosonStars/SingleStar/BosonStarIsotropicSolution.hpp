@@ -32,7 +32,8 @@ public:
     //! New constructor which can be called before a polar areal solution is
     //! computed
     BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, const double a_G_Newton = 1.0);
+        Potential::params_t a_params_potential, int a_verbosity,
+        const double a_G_Newton = 1.0);
 
     //! If the new constructor is used, this function must be called afterwards
     //! to construct the isotropic solution from a polar-areal solution.
@@ -60,6 +61,7 @@ private:
     Potential::params_t m_params_potential;
     initial_data_t<double> m_isotropic_grid = {};
     initial_data_t<double> m_polar_areal_grid = {};
+    int m_verbosity;
     const double m_G_Newton = 1.0;
 };
 

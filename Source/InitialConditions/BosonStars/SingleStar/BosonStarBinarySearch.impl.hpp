@@ -10,6 +10,7 @@
 #ifndef BOSONSTARBINARYSEARCH_IMPL_HPP_
 #define BOSONSTARBINARYSEARCH_IMPL_HPP_
 
+/*
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
     BosonStar_params_t a_params_BosonStar,
@@ -28,20 +29,22 @@ BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
         " ground state soluion. Please try again!");
     }
 }
+*/
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
     BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, const double a_f_central_guess)
+    Potential::params_t a_params_potential, int a_verbosity,
+    const double a_f_central_guess)
     : BosonStarIntegrator<initial_data_t, initial_state_t>
-    (a_params_BosonStar, a_params_potential),
+    (a_params_BosonStar, a_params_potential, a_verbosity),
     m_f_central_max(a_f_central_guess)
 {
     findInterval();
     if( !checkValidInterval() )
     {
-        throw std::runtime_error("The interval provided does not bound a"\
-        " ground state soluion. Please try again!");
+        MayDay::Error("BosonStarBinarySearch: " \
+        "The found interval does not bound a ground state solution.");
     }
 }
 

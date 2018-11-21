@@ -22,7 +22,7 @@ class BosonStarIntegrator
 public:
     //! Constructor
     BosonStarIntegrator(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential);
+        Potential::params_t a_params_potential, int a_verbosity);
 
     //! Do integration
     void doIntegration(const double a_f_central);
@@ -35,6 +35,7 @@ protected:
     BosonStarRHS m_boson_star_rhs;
     BosonStarSolution<initial_data_t, initial_state_t> m_boson_star_solution;
     BosonStarSolutionObserver<initial_data_t, initial_state_t> m_sol_observer;
+    int m_verbosity;
 };
 
 #include "BosonStarIntegrator.impl.hpp"

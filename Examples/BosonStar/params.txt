@@ -1,6 +1,6 @@
 #Params for runtime inputs
 
-verbosity = 1
+verbosity = 0
 chk_prefix = BosonStar
 plot_prefix = BosonStarp_
 #restart_file = BosonStar_000060.3d.hdf5

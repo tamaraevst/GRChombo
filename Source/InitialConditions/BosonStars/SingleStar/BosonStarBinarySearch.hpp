@@ -9,6 +9,7 @@
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "BosonStarIntegrator.hpp" //for inheritance from BosonStarIntegrator class
 #include "ComplexPotential.hpp" //for Potential::params_t struct
+#include "MayDay.H"
 
 /*! Class that implements the binary search shooting algorithm to find the
 static, spherically-symmetric, ground state boson star solutions. It uses a
@@ -22,19 +23,21 @@ class BosonStarBinarySearch : \
     public BosonStarIntegrator<initial_data_t, initial_state_t>
 {
 public:
+    /*
     //! Constructor which requires pre-computed bounding solutions sol_min and
     //! sol_max - not used anymore
     BosonStarBinarySearch(BosonStar_params_t a_params_BosonStar,
         Potential::params_t a_params_potential,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_min,
         BosonStarSolution<initial_data_t, initial_state_t> &a_sol_max);
+    */
 
     //! Constructor which calls findInterval to find sol_min and sol_max
     BosonStarBinarySearch(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential,
+        Potential::params_t a_params_potential, int a_verbosity,
         const double a_f_central_guess = -0.5);
 
-    /*! Function called by the constructor to check the inputted values of
+    /*! Function called by the constructor to check the values of
     f_central_min and f_central_max bound the desired value of
     f_central. This checks that the sign of psi at the edge of the
     computational domain differs between the two solutions and that they have
