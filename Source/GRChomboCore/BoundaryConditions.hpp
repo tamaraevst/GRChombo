@@ -17,6 +17,8 @@
 /// cases where they are not periodic. Currently only options are static BCs, 
 /// sommerfeld (outgoing radiation) and symmetric. The conditions can differ in 
 /// the high and low directions.
+/// In cases where different variables/boundaries are required, the user should
+/// (usually) write their own conditions class which inherits from this one.
 class BoundaryConditions
 {
   public:
@@ -25,7 +27,7 @@ class BoundaryConditions
     {
         STATIC_BC,
         SOMMERFELD_BC,
-        SYMMETRIC_BC
+        REFLECTIVE_BC
     };
 
     /// Structure containing the boundary condition params
@@ -60,7 +62,12 @@ class BoundaryConditions
         is_defined = true;
     }
 
-    std::array<int, NUM_VARS> get_vars_parity(int idir)
+    // The function which returns the parity of each of the vars in UserVariables.hpp
+    // This works for the CCZ4 vars plus any vars which are parity even (e.g. scalar field).
+    // Note that this function can be overridden in the case where additional vector
+    // or tensor variables with odd parity are required (it is a virtual function).
+    // It is only required for reflective boundary conditions.
+    virtual std::array<int, NUM_VARS> get_vars_parity(int idir)
     {
         std::array<int, NUM_VARS> vars_parity;
         for(int icomp = 0; icomp < NUM_VARS; icomp++)
@@ -212,7 +219,7 @@ class BoundaryConditions
                          }
                          break;
                      }
-                     case SYMMETRIC_BC:
+                     case REFLECTIVE_BC:
                      {
                          std::array<int, NUM_VARS> parity = get_vars_parity(dir);
                          IntVect iv_copy = iv;
@@ -298,7 +305,7 @@ class BoundaryConditions
                 int boundary_condition = get_boundary_condition(a_side, dir);
 
                 // as a bit of a hack, just use the rhs update, since it is the same copying of cells
-                if (boundary_condition == SYMMETRIC_BC) 
+                if (boundary_condition == REFLECTIVE_BC) 
                 {
                     fill_boundary_rhs_dir(a_side, a_state, a_state, dir);
                 }

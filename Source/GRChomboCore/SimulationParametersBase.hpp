@@ -72,8 +72,8 @@ class SimulationParametersBase
             if(isPeriodic[dir] == false)
             {
                 nonperiodic_boundaries_exist = true;
-                if((hi_boundary[dir] == BoundaryConditions::SYMMETRIC_BC) ||
-                   (lo_boundary[dir] == BoundaryConditions::SYMMETRIC_BC))
+                if((hi_boundary[dir] == BoundaryConditions::REFLECTIVE_BC) ||
+                   (lo_boundary[dir] == BoundaryConditions::REFLECTIVE_BC))
                 {
                     symmetric_boundaries_exist = true;
                 }

@@ -481,7 +481,14 @@ void GRAMRLevel::writeCheckpointLevel(HDF5Handle &a_handle) const
         pout() << header << endl;
 
     write(a_handle, m_state_new.boxLayout());
-    write(a_handle, m_state_new, "data");
+
+    // only need to write ghosts when non periodic BCs exist
+    IntVect ghost_vector = IntVect::Zero;
+    if(m_p.nonperiodic_boundaries_exist)
+    {
+        ghost_vector = m_num_ghosts*IntVect::Unit;
+    }
+    write(a_handle, m_state_new, "data", ghost_vector);
 }
 
 void GRAMRLevel::readCheckpointHeader(HDF5Handle &a_handle)
@@ -864,11 +871,11 @@ void GRAMRLevel::defineSolnData(GRLevelData &newSoln,
 void GRAMRLevel::defineRHSData(GRLevelData &newRHS,
                                const GRLevelData &existingSoln)
 {
-    // only need ghosts for non periodic dirs where rhs needed
-    IntVect ghost_vector;
-    FOR1(idir)
+    // only need ghosts for non periodic boundary case
+    IntVect ghost_vector = IntVect::Zero;
+    if(m_p.nonperiodic_boundaries_exist)
     {
-        ghost_vector[idir] = 3 * !(m_problem_domain.isPeriodic(idir));
+        ghost_vector = m_num_ghosts*IntVect::Unit;
     }
     newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
                   ghost_vector);
