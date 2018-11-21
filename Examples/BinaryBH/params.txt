@@ -2,7 +2,7 @@
 verbosity = 1
 chk_prefix = outBinaryBH_
 plot_prefix = outBinaryBHp
-restart_file = outBinaryBH_000040.3d.hdf5
+#restart_file = outBinaryBH_000040.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -43,7 +43,7 @@ center = 0 0 0
 
 checkpoint_interval = 1
 dt_multiplier = 0.25
-stop_time = 21.0
+stop_time = 2.0
 
 nan_check = 1
 

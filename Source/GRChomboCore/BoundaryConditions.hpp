@@ -122,11 +122,14 @@ class BoundaryConditions
     void fill_boundary_rhs_dir(const Side::LoHiSide a_side, GRLevelData &a_soln,
                                  GRLevelData &a_rhs, const int dir)
     {
-        // iterate through the boxes
-        for (DataIterator dit = a_rhs.dataIterator(); dit.ok(); ++dit)
-        {
-            FArrayBox &m_rhs_box = a_rhs[dit()];
-            FArrayBox &m_soln_box = a_soln[dit()];
+        // iterate through the boxes, shared amongst threads
+        DataIterator dit = a_rhs.dataIterator();
+        int nbox = dit.size();
+#pragma omp parallel for default(shared)
+        for(int ibox = 0; ibox < nbox; ++ibox) {
+            DataIndex dind = dit[ibox];
+            FArrayBox &m_rhs_box = a_rhs[dind];
+            FArrayBox &m_soln_box = a_soln[dind];
             Box this_box = m_rhs_box.box();
             IntVect offset_lo = - this_box.smallEnd() + m_domain_box.smallEnd();
             IntVect offset_hi = + this_box.bigEnd()   - m_domain_box.bigEnd();
@@ -260,10 +263,13 @@ class BoundaryConditions
                 // only do something if this direction is not periodic
                 if (!m_domain.isPeriodic(dir))
                 {
-                    // iterate through the boxes
-                    for (DataIterator dit = a_dest.dataIterator(); dit.ok(); ++dit)
-                    {
-                        FArrayBox &m_dest_box = a_dest[dit()];
+                    // iterate through the boxes, shared amongst threads
+                    DataIterator dit = a_dest.dataIterator();
+                    int nbox = dit.size();
+#pragma omp parallel for default(shared)
+                    for(int ibox = 0; ibox < nbox; ++ibox) {
+                        DataIndex dind = dit[ibox];
+                        FArrayBox &m_dest_box = a_dest[dind];
                         Box this_box = m_dest_box.box();
                         IntVect offset_lo = - this_box.smallEnd() + m_domain_box.smallEnd();
                         IntVect offset_hi = + this_box.bigEnd()   - m_domain_box.bigEnd();
@@ -282,7 +288,7 @@ class BoundaryConditions
                             IntVect iv = bit();
                             for (int icomp = 0; icomp < NUM_VARS; icomp++)
                             {
-                                m_dest_box(iv, icomp) = a_src[dit()](iv, icomp);
+                                m_dest_box(iv, icomp) = a_src[dind](iv, icomp);
                             }
                         }         // end iterate over box
                     }             // end iterate over boxes
@@ -344,11 +350,14 @@ class BoundaryConditions
                 a_coarse_state.copyTo(a_coarse_state.interval(), coarsened_fine, 
                                       coarsened_fine.interval(), boundary_copier);
 
-                // iterate through the boxes, interpolating onto the fine cells
-                for (DataIterator dit = coarsened_layout.dataIterator(); dit.ok(); ++dit)
-                {
-                    FArrayBox &m_fine_box = a_fine_state[dit()];
-                    FArrayBox &m_coarse_box = coarsened_fine[dit()];
+                // iterate through the boxes, shared amongst threads
+                DataIterator dit = coarsened_layout.dataIterator();
+                int nbox = dit.size();
+#pragma omp parallel for default(shared)
+                for(int ibox = 0; ibox < nbox; ++ibox) {
+                    DataIndex dind = dit[ibox];
+                    FArrayBox &m_fine_box = a_fine_state[dind];
+                    FArrayBox &m_coarse_box = coarsened_fine[dind];
                     Box this_box = m_coarse_box.box();
                     Box fine_box = m_fine_box.box();
                     IntVect offset_lo = - this_box.smallEnd() + coarse_domain_box.smallEnd();
