@@ -1,22 +1,22 @@
 
-verbosity = 1
+verbosity = 0
 chk_prefix = outBinaryBH_
 plot_prefix = outBinaryBHp
-#restart_file = outBinaryBH_000040.3d.hdf5
+#restart_file = outBinaryBH_000007.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
 
-N1 = 8
-N2 = 8
-N3 = 8
-L = 16 #100
+N1 = 32
+N2 = 32
+N3 = 32
+L = 32 #100
 
-massA = 1.0
-centerA = 0 2 0
+massA = 0.5
+centerA = 0 5 0
 
-massB = 1.0
-centerB = 0 -2 0
+massB = 0.5
+centerB = 0 -5 0
 
 momentumA = 0. 0.0 0.0
 momentumB = 0. 0.0 0.0
@@ -26,7 +26,7 @@ max_level = 3
 regrid_interval = 1 1 1 1 0 0 0 0 0
 
 #Max and min box sizes
-max_grid_size = 32
+max_grid_size = 16
 block_factor = 8
 tag_buffer_size = 3
 #Periodic directions - 0 = false, 1 = true
@@ -43,7 +43,7 @@ center = 0 0 0
 
 checkpoint_interval = 1
 dt_multiplier = 0.25
-stop_time = 2.0
+stop_time = 1.0
 
 nan_check = 1
 

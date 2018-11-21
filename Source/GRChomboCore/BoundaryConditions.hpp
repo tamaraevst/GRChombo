@@ -105,6 +105,7 @@ class BoundaryConditions
     void fill_boundary_rhs(const Side::LoHiSide a_side, GRLevelData &a_soln, GRLevelData &a_rhs)
     {
         CH_assert(is_defined);
+        CH_TIME("BoundaryConditions::fill_boundary_rhs");
 
         // cycle through the directions
         for (int dir = 0; dir < CH_SPACEDIM; dir++)
@@ -254,6 +255,8 @@ class BoundaryConditions
     void copy_boundary_cells(const Side::LoHiSide a_side, const GRLevelData &a_src,
                            GRLevelData &a_dest)
     {
+        CH_TIME("BoundaryConditions::copy_boundary_cells");
+
         CH_assert(is_defined);
         if(a_src.boxLayout() == a_dest.boxLayout())
         {
@@ -301,6 +304,7 @@ class BoundaryConditions
     void enforce_symmetric_boundaries(const Side::LoHiSide a_side, GRLevelData &a_state)
     {
         CH_assert(is_defined);
+        CH_TIME("BoundaryConditions::enforce_symmetric_boundaries");
 
         // cycle through the directions
         for (int dir = 0; dir < CH_SPACEDIM; dir++)
@@ -324,6 +328,7 @@ class BoundaryConditions
                            GRLevelData &a_coarse_state, const Side::LoHiSide a_side)
     {
         CH_assert(is_defined);
+        CH_TIME("BoundaryConditions::interp_boundaries");
 
         // cycle through the directions
         for (int dir = 0; dir < CH_SPACEDIM; dir++)

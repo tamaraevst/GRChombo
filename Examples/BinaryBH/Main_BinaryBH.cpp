@@ -6,6 +6,7 @@
 #include "parstream.H" //Gives us pout()
 #include <chrono>
 #include <iostream>
+#include "CH_Timer.H"
 
 #include "DefaultLevelFactory.hpp"
 #include "GRAMR.hpp"
