@@ -412,6 +412,14 @@ class BoundaryConditions
                             }
                             else
                             {
+                                pout() << "dir = " << dir << endl;
+                                pout() << "dir2 = " << dir2 << endl;
+                                pout() << "position iv = " << iv << endl;
+                                pout() << "dx = " << m_dx << endl;
+                                pout() << "hi_offset = " << hi_local_offset << endl;
+                                pout() << "lo_offset = " << lo_local_offset << endl;
+                                pout() << "top end of box = " << m_coarse_box.bigEnd() << endl;
+                                pout() << "low end of box = " << m_coarse_box.smallEnd() << endl;
                                 MayDay::Error("BoundaryConditions::define bad boxes");
                             }
                         }
