@@ -31,7 +31,8 @@ class BosonStar
 public:
     //! The constructor
     BosonStar(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential, double a_dx, int a_verbosity);
+        Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
+        int a_verbosity);
 
     //! Computes the 1d solution and stores in m_1d_sol
     void compute_1d_solution(const double a_max_radius);
@@ -45,6 +46,7 @@ public:
 
 protected:
     double m_dx;
+    const double m_G_Newton;
     const BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
     const Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;

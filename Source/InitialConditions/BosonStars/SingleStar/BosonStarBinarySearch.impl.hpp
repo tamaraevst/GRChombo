@@ -34,10 +34,10 @@ BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarBinarySearch<initial_data_t, initial_state_t>::BosonStarBinarySearch(
     BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, int a_verbosity,
+    Potential::params_t a_params_potential, double a_G_Newton, int a_verbosity,
     const double a_f_central_guess)
     : BosonStarIntegrator<initial_data_t, initial_state_t>
-    (a_params_BosonStar, a_params_potential, a_verbosity),
+    (a_params_BosonStar, a_params_potential, a_G_Newton, a_verbosity),
     m_f_central_max(a_f_central_guess)
 {
     findInterval();

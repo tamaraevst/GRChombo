@@ -14,10 +14,10 @@
 #include "BosonStarBinarySearch.hpp" //for BosonStarBinarySearch class
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar,
-                    Potential::params_t a_params_potential, double a_dx,
-                    int a_verbosity)
-    : m_1d_sol(a_params_BosonStar, a_params_potential, a_verbosity), m_dx(a_dx),
-    m_params_BosonStar(a_params_BosonStar),
+                    Potential::params_t a_params_potential, double a_G_Newton,
+                    double a_dx, int a_verbosity)
+    : m_1d_sol(a_params_BosonStar, a_params_potential, a_G_Newton, a_verbosity),
+    m_dx(a_dx), m_G_Newton(a_G_Newton), m_params_BosonStar(a_params_BosonStar),
     m_params_potential(a_params_potential), m_verbosity(a_verbosity)
 
 {
@@ -28,7 +28,7 @@ void BosonStar::compute_1d_solution(const double a_max_radius)
     try
     {
         BosonStarBinarySearch<initial_data_t, initial_state_t> binary_search(
-        m_params_BosonStar, m_params_potential, m_verbosity);
+        m_params_BosonStar, m_params_potential, m_G_Newton, m_verbosity);
 
         binary_search.shoot();
         auto sol = binary_search.getShootedSolution();

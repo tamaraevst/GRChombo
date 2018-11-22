@@ -13,13 +13,10 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     ::BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, int a_verbosity,
-    const double a_G_Newton)
+    Potential::params_t a_params_potential, double a_G_Newton, int a_verbosity)
     : m_params_BosonStar(a_params_BosonStar),
-    m_params_potential(a_params_potential), m_verbosity(a_verbosity),
-    m_G_Newton(a_G_Newton)
-{
-}
+    m_params_potential(a_params_potential), m_G_Newton(a_G_Newton),
+    m_verbosity(a_verbosity) {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIsotropicSolution<initial_data_t, initial_state_t>

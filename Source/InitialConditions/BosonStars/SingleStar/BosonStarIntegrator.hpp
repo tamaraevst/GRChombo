@@ -15,14 +15,14 @@
 
 
 //! Class that uses odeint to integrate the equations for a static, spherically
-//! symmetric boson star.
+//! symmetric boson star in polar-areal coordinates.
 template <template<typename...> class initial_data_t, typename initial_state_t>
 class BosonStarIntegrator
 {
 public:
     //! Constructor
     BosonStarIntegrator(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential, int a_verbosity);
+        Potential::params_t a_params_potential, double a_G_Newton, int a_verbosity);
 
     //! Do integration
     void doIntegration(const double a_f_central);

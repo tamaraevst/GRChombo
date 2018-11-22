@@ -34,8 +34,8 @@ public:
 
     //! Constructor which calls findInterval to find sol_min and sol_max
     BosonStarBinarySearch(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential, int a_verbosity,
-        const double a_f_central_guess = -0.5);
+        Potential::params_t a_params_potential, double a_G_Newton,
+        int a_verbosity, const double a_f_central_guess = -0.5);
 
     /*! Function called by the constructor to check the values of
     f_central_min and f_central_max bound the desired value of

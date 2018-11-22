@@ -11,7 +11,7 @@
 #define BOSONSTARRHS_IMPL_HPP_
 
 BosonStarRHS::BosonStarRHS(Potential::params_t a_params_potential,
-    double a_G_Newton = 1.0)
+    double a_G_Newton)
     : m_rescaled_phi4_coeff(a_params_potential.phi4_coeff
         / (4.0 * M_PI * a_G_Newton * a_params_potential.scalar_mass *
         a_params_potential.scalar_mass)), m_G_Newton(a_G_Newton) {}

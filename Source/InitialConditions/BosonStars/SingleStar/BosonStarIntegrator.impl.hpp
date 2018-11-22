@@ -13,10 +13,10 @@
 template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarIntegrator<initial_data_t, initial_state_t>::BosonStarIntegrator(
     BosonStar_params_t a_params_BosonStar,
-    Potential::params_t a_params_potential, int a_verbosity)
+    Potential::params_t a_params_potential, double a_G_Newton, int a_verbosity)
     : m_params_BosonStar(a_params_BosonStar),
-    m_boson_star_rhs(a_params_potential), m_sol_observer(m_boson_star_solution),
-    m_verbosity(a_verbosity) {}
+    m_boson_star_rhs(a_params_potential, a_G_Newton),
+    m_sol_observer(m_boson_star_solution), m_verbosity(a_verbosity) {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarIntegrator<initial_data_t, initial_state_t>

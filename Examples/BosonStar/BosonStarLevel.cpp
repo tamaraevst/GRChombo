@@ -47,8 +47,8 @@ void BosonStarLevel::initialData()
         pout() << "BosonStarLevel::initialData " << m_level << endl;
 
     // First initalise a BosonStar object
-    BosonStar boson_star(m_p.bosonstar_params, m_p.potential_params, m_dx,
-                         m_verbosity);
+    BosonStar boson_star(m_p.bosonstar_params, m_p.potential_params,
+                         m_p.G_Newton, m_dx, m_verbosity);
 
     // the max radius the code might need to calculate out to is 2*sqrt(3)*L
     // 3.5 is an upper bound to 2*sqrt(3)

@@ -15,7 +15,7 @@
 #include <boost/numeric/odeint.hpp>
 #include <limits>
 #include "parstream.H" //gives pout
-#include <iomanip> //for setprecision()
+//#include <iomanip> //for setprecision()
 
 //! This class constructs interpolation functions for the boson star solution
 //! in isotropic coordinates given a rescaled solution in polar-areal coordinates
@@ -32,8 +32,8 @@ public:
     //! New constructor which can be called before a polar areal solution is
     //! computed
     BosonStarIsotropicSolution(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential, int a_verbosity,
-        const double a_G_Newton = 1.0);
+        Potential::params_t a_params_potential, double a_G_Newton,
+        int a_verbosity);
 
     //! If the new constructor is used, this function must be called afterwards
     //! to construct the isotropic solution from a polar-areal solution.
@@ -61,8 +61,8 @@ private:
     Potential::params_t m_params_potential;
     initial_data_t<double> m_isotropic_grid = {};
     initial_data_t<double> m_polar_areal_grid = {};
+    const double m_G_Newton;
     int m_verbosity;
-    const double m_G_Newton = 1.0;
 };
 
 #include "BosonStarIsotropicSolution.impl.hpp"

@@ -28,7 +28,7 @@ public:
 
 private:
     const double m_rescaled_phi4_coeff = 0.0;
-    const double m_G_Newton = 1.0;
+    const double m_G_Newton;
 };
 
 #include "BosonStarRHS.impl.hpp"
