@@ -67,26 +67,26 @@ class BoundaryConditions
     // Note that this function can be overridden in the case where additional vector
     // or tensor variables with odd parity are required (it is a virtual function).
     // It is only required for reflective boundary conditions.
-    virtual std::array<int, NUM_VARS> get_vars_parity(int idir)
+    virtual std::array<int, NUM_VARS> get_vars_parity(int a_dir)
     {
         std::array<int, NUM_VARS> vars_parity;
         for(int icomp = 0; icomp < NUM_VARS; icomp++)
         {
-            if     ((idir==0) && (icomp == c_shift1 || icomp == c_B1 ||
+            if     ((a_dir==0) && (icomp == c_shift1 || icomp == c_B1 ||
                                   icomp == c_Gamma1 ||
                                   icomp == c_h12 || icomp == c_h13 ||
                                   icomp == c_A12 || icomp == c_A13))
             {
                 vars_parity[icomp] = -1;
             }
-            else if((idir==1) && (icomp == c_shift2 || icomp == c_B2 ||
+            else if((a_dir==1) && (icomp == c_shift2 || icomp == c_B2 ||
                                   icomp == c_Gamma2 ||
                                   icomp == c_h12 || icomp == c_h23 ||
                                   icomp == c_A12 || icomp == c_A23))
             {
                 vars_parity[icomp] = -1;
             }
-            else if((idir==2) && (icomp == c_shift3 || icomp == c_B3 ||
+            else if((a_dir==2) && (icomp == c_shift3 || icomp == c_B3 ||
                                   icomp == c_Gamma3 ||
                                   icomp == c_h13 || icomp == c_h23 ||
                                   icomp == c_A13 || icomp == c_A23))
@@ -108,12 +108,12 @@ class BoundaryConditions
         CH_TIME("BoundaryConditions::fill_boundary_rhs");
 
         // cycle through the directions
-        for (int dir = 0; dir < CH_SPACEDIM; dir++)
+        for (int idir = 0; idir < CH_SPACEDIM; idir++)
         {
             // only do something if this direction is not periodic
-            if (!m_domain.isPeriodic(dir))
+            if (!m_domain.isPeriodic(idir))
             {
-                fill_boundary_rhs_dir(a_side, a_soln, a_rhs, dir);
+                fill_boundary_rhs_dir(a_side, a_soln, a_rhs, idir);
             }
         }
     }
@@ -121,7 +121,7 @@ class BoundaryConditions
     /// Fill the boundary values appropriately based on the params set
     // in the direction dir
     void fill_boundary_rhs_dir(const Side::LoHiSide a_side, GRLevelData &a_soln,
-                                 GRLevelData &a_rhs, const int dir)
+                                 GRLevelData &a_rhs, const int idir)
     {
         // iterate through the boxes, shared amongst threads
         DataIterator dit = a_rhs.dataIterator();
@@ -139,8 +139,8 @@ class BoundaryConditions
             // problem domain ie remove all outer ghost cells
             this_box &= m_domain_box;
             // get the boundary box (may be Empty) and the condition on it
-            int boundary_condition = get_boundary_condition(a_side, dir);
-            Box boundary_box = get_boundary_box(a_side, dir, offset_lo, offset_hi,
+            int boundary_condition = get_boundary_condition(a_side, idir);
+            Box boundary_box = get_boundary_box(a_side, idir, offset_lo, offset_hi,
                                                  this_box);
 
             // now we have the appropriate box, fill it!
@@ -173,27 +173,27 @@ class BoundaryConditions
                          for (int icomp = 0; icomp < NUM_VARS; icomp++)
                          {
                              m_rhs_box(iv, icomp) = 0.0;
-                             FOR1(dir2)
+                             FOR1(idir2)
                              {
                                  IntVect iv_offset1 = iv;
                                  IntVect iv_offset2 = iv;
                                  double d1;
                                  // bit of work to get the right stencils for near the edges of the box
                                  // only using second order stencils for now
-                                 if(lo_local_offset[dir2] < 1)
+                                 if(lo_local_offset[idir2] < 1)
                                  {
                                      // near lo end
-                                     iv_offset1[dir2] += +1;
-                                     iv_offset2[dir2] += +2;
+                                     iv_offset1[idir2] += +1;
+                                     iv_offset2[idir2] += +2;
                                      d1 = 1.0/m_dx*(- 1.5*m_soln_box(iv, icomp) 
                                                     + 2.0*m_soln_box(iv_offset1, icomp)
                                                     - 0.5*m_soln_box(iv_offset2, icomp));
                                  }
-                                 else if(hi_local_offset[dir2] < 1)
+                                 else if(hi_local_offset[idir2] < 1)
                                  {
                                      // near hi end
-                                     iv_offset1[dir2] += -1;
-                                     iv_offset2[dir2] += -2;
+                                     iv_offset1[idir2] += -1;
+                                     iv_offset2[idir2] += -2;
                                      d1 = 1.0/m_dx*(+ 1.5*m_soln_box(iv, icomp) 
                                                     - 2.0*m_soln_box(iv_offset1, icomp)
                                                     + 0.5*m_soln_box(iv_offset2, icomp));
@@ -201,13 +201,13 @@ class BoundaryConditions
                                  else
                                  {
                                      // normal case
-                                     iv_offset1[dir2] += +1;
-                                     iv_offset2[dir2] += -1;
+                                     iv_offset1[idir2] += +1;
+                                     iv_offset2[idir2] += -1;
                                      d1 = 0.5/m_dx*(m_soln_box(iv_offset1, icomp) - m_soln_box(iv_offset2, icomp));
                                  }
 
                                  // for each direction add dphidx * x^i / r
-                                 m_rhs_box(iv, icomp) += - d1 * loc[dir2] / radius;
+                                 m_rhs_box(iv, icomp) += - d1 * loc[idir2] / radius;
                              }
 
                              // asymptotic values
@@ -225,16 +225,16 @@ class BoundaryConditions
                      }
                      case REFLECTIVE_BC:
                      {
-                         std::array<int, NUM_VARS> parity = get_vars_parity(dir);
+                         std::array<int, NUM_VARS> parity = get_vars_parity(idir);
                          IntVect iv_copy = iv;
                          /// where to copy the data from - mirror image in domain
                          if (a_side == Side::Lo)
                          {
-                             iv_copy[dir] = -iv[dir] - 1;
+                             iv_copy[idir] = -iv[idir] - 1;
                          }
                          else
                          {
-                             iv_copy[dir] = 2*m_domain_box.bigEnd(dir) - iv[dir] + 1;
+                             iv_copy[idir] = 2*m_domain_box.bigEnd(idir) - iv[idir] + 1;
                          }
 
                          // replace value at iv with value at iv_copy
@@ -261,10 +261,10 @@ class BoundaryConditions
         if(a_src.boxLayout() == a_dest.boxLayout())
         {
             // cycle through the directions
-            for (int dir = 0; dir < CH_SPACEDIM; dir++)
+            for (int idir = 0; idir < CH_SPACEDIM; idir++)
             {
                 // only do something if this direction is not periodic
-                if (!m_domain.isPeriodic(dir))
+                if (!m_domain.isPeriodic(idir))
                 {
                     // iterate through the boxes, shared amongst threads
                     DataIterator dit = a_dest.dataIterator();
@@ -282,7 +282,7 @@ class BoundaryConditions
                         this_box &= m_domain_box;
 
                         // get the boundary box (may be Empty)
-                        Box boundary_box = get_boundary_box(a_side, dir, offset_lo, offset_hi,
+                        Box boundary_box = get_boundary_box(a_side, idir, offset_lo, offset_hi,
                                                  this_box);
             
                         BoxIterator bit(boundary_box);
@@ -307,17 +307,17 @@ class BoundaryConditions
         CH_TIME("BoundaryConditions::enforce_symmetric_boundaries");
 
         // cycle through the directions
-        for (int dir = 0; dir < CH_SPACEDIM; dir++)
+        for (int idir = 0; idir < CH_SPACEDIM; idir++)
         {
             // only do something if this direction is not periodic and symmetric
-            if (!m_domain.isPeriodic(dir))
+            if (!m_domain.isPeriodic(idir))
             {
-                int boundary_condition = get_boundary_condition(a_side, dir);
+                int boundary_condition = get_boundary_condition(a_side, idir);
 
                 // as a bit of a hack, just use the rhs update, since it is the same copying of cells
                 if (boundary_condition == REFLECTIVE_BC) 
                 {
-                    fill_boundary_rhs_dir(a_side, a_state, a_state, dir);
+                    fill_boundary_rhs_dir(a_side, a_state, a_state, idir);
                 }
             }
         }
@@ -331,10 +331,10 @@ class BoundaryConditions
         CH_TIME("BoundaryConditions::interp_boundaries");
 
         // cycle through the directions
-        for (int dir = 0; dir < CH_SPACEDIM; dir++)
+        for (int idir = 0; idir < CH_SPACEDIM; idir++)
         {
             // only do something if this direction is not periodic
-            if (!m_domain.isPeriodic(dir))
+            if (!m_domain.isPeriodic(idir))
             {
                 // Ref ratio is always two
                 int ref_ratio = 2;
@@ -374,13 +374,11 @@ class BoundaryConditions
 
                     // get the boundary box - remove one cell as we only want 2 coarse cells
                     // filled in each direction to fill the 3 fine cells above
-                    Box boundary_box = get_boundary_box(a_side, dir, offset_lo, offset_hi,
+                    Box boundary_box = get_boundary_box(a_side, idir, offset_lo, offset_hi,
                                                  this_box, 1);
 
                     //define standard stencil for interp where not near boundaries in other dirs
-                    IntVect default_offset = IntVect::Zero;
-                    if (a_side == Side::Hi) {default_offset[dir] = +2;}
-                    if (a_side == Side::Lo) {default_offset[dir] = -2;}
+                    IntVect default_offset = IntVect::Zero + sign(a_side)*2*BASISV(idir);
                     FourthOrderInterpStencil default_stencil(default_offset, ref_ratio);
 
                     // now interp the box
@@ -394,31 +392,31 @@ class BoundaryConditions
                         // bit of work to get the right stencils for near the edges of the box
                         bool near_boundary = false;
                         IntVect local_boundary_offset = IntVect::Zero;
-                        for (int dir2=0; dir2 < CH_SPACEDIM; dir2++)
+                        for (int idir2=0; idir2 < CH_SPACEDIM; idir2++)
                         {
-                            if(dir2 == dir)
+                            if(idir2 == idir)
                             {
-                                local_boundary_offset[dir2] = default_offset[dir2];
+                                local_boundary_offset[idir2] = default_offset[idir2];
                             }
-                            else if((dir2 !=dir) && (lo_local_offset[dir2] > 1) 
-                                        && (hi_local_offset[dir2] > 1))
+                            else if((idir2 !=idir) && (lo_local_offset[idir2] > 1) 
+                                        && (hi_local_offset[idir2] > 1))
                             {
-                                local_boundary_offset[dir2] = 0;
+                                local_boundary_offset[idir2] = 0;
                             }
-                            else if((dir2 != dir) && (lo_local_offset[dir2] == 1))
+                            else if((idir2 != idir) && (lo_local_offset[idir2] == 1))
                             {
-                                local_boundary_offset[dir2] = -2;
+                                local_boundary_offset[idir2] = -2;
                                 near_boundary = true;
                             }
-                            else if((dir2 !=dir) && (hi_local_offset[dir2] == 1))
+                            else if((idir2 !=idir) && (hi_local_offset[idir2] == 1))
                             {
-                                local_boundary_offset[dir2] = +2;
+                                local_boundary_offset[idir2] = +2;
                                 near_boundary = true;
                             }
                             else
                             {
-                                pout() << "dir = " << dir << endl;
-                                pout() << "dir2 = " << dir2 << endl;
+                                pout() << "idir = " << idir << endl;
+                                pout() << "idir2 = " << idir2 << endl;
                                 pout() << "position iv = " << iv << endl;
                                 pout() << "dx = " << m_dx << endl;
                                 pout() << "hi_offset = " << hi_local_offset << endl;
@@ -443,26 +441,26 @@ class BoundaryConditions
                     }  // end loop box
                 }      // end loop boxes
             }          // end if isPeriodic
-        }              // end loop dir
+        }              // end loop idir
     }
 
-    /// Get the boundary condition for dir and a_side
-    int get_boundary_condition(const Side::LoHiSide a_side, const int dir)
+    /// Get the boundary condition for a_dir and a_side
+    int get_boundary_condition(const Side::LoHiSide a_side, const int a_dir)
     {
         int boundary_condition = 0;
         if (a_side == Side::Lo)
         {
-            boundary_condition = m_params.lo_boundary[dir];
+            boundary_condition = m_params.lo_boundary[a_dir];
         }
         else
         {
-            boundary_condition = m_params.hi_boundary[dir];
+            boundary_condition = m_params.hi_boundary[a_dir];
         }
         return boundary_condition;
     }
 
     /// get the boundary box to fill if we are at a boundary
-    Box get_boundary_box(const Side::LoHiSide a_side, const int dir, const IntVect &offset_lo,
+    Box get_boundary_box(const Side::LoHiSide a_side, const int a_dir, const IntVect &offset_lo,
                    const IntVect &offset_hi, Box &this_ghostless_box, int shrink_for_coarse = 0)
     {
         // default constructor gives empty box
@@ -470,49 +468,49 @@ class BoundaryConditions
 
         // check if we are over the edges of the domain - are we a boundary box?
         // if so create the box of the cells we want to fill
-        if (((a_side == Side::Hi) && (offset_hi[dir] > 0)) || 
-            ((a_side == Side::Lo) && (offset_lo[dir] > 0)))
+        if (((a_side == Side::Hi) && (offset_hi[a_dir] > 0)) || 
+            ((a_side == Side::Lo) && (offset_lo[a_dir] > 0)))
         {
             // Get just the boundary box to iterate over, m_num_ghosts ghost
             // cells unless we are filling the coarse cells in the interp case
             // where we want to fill only two coarse ghost cells (to cover 3 fine ones)
             if (a_side == Side::Lo)
             {
-                boundary_box = adjCellLo(this_ghostless_box, dir, m_num_ghosts - shrink_for_coarse);
+                boundary_box = adjCellLo(this_ghostless_box, a_dir, m_num_ghosts - shrink_for_coarse);
             }
             else
             {
-                boundary_box = adjCellHi(this_ghostless_box, dir, m_num_ghosts - shrink_for_coarse);
+                boundary_box = adjCellHi(this_ghostless_box, a_dir, m_num_ghosts - shrink_for_coarse);
             }
 
             // adjust for any offsets - catches the corners etc
             // but only want to fill them once, so x fills y and z, y fills z etc
-            for (int dir2 = 0 ; dir2 < CH_SPACEDIM ; dir2 ++)
+            for (int idir = 0 ; idir < CH_SPACEDIM ; idir ++)
             {
-                if (offset_lo[dir2] > 0) // this direction is a low end boundary
+                if (offset_lo[idir] > 0) // this direction is a low end boundary
                 {
-                    if ((dir2 > dir) && !(m_domain.isPeriodic(dir2)))
+                    if ((idir > a_dir) && !(m_domain.isPeriodic(idir)))
                     {
                         //grow it to fill the corners
-                        boundary_box.growLo(dir2, m_num_ghosts - shrink_for_coarse);
+                        boundary_box.growLo(idir, m_num_ghosts - shrink_for_coarse);
                     }
                 }
                 else // cut off end ghost cell
                 {
-                    if (dir2 != dir) {boundary_box.growLo(dir2, - shrink_for_coarse);}
+                    if (idir != a_dir) {boundary_box.growLo(idir, - shrink_for_coarse);}
                 }
 
-                if (offset_hi[dir2] > 0) //this direction is a high end boundary
+                if (offset_hi[idir] > 0) //this direction is a high end boundary
                 {
-                    if ((dir2 > dir) && !(m_domain.isPeriodic(dir2)))
+                    if ((idir > a_dir) && !(m_domain.isPeriodic(idir)))
                     {
                         //grow it to fill the corners
-                        boundary_box.growHi(dir2, m_num_ghosts - shrink_for_coarse);
+                        boundary_box.growHi(idir, m_num_ghosts - shrink_for_coarse);
                     }
                 }
                 else // cut off end ghost cell
                 {
-                    if (dir2 != dir) {boundary_box.growHi(dir2, - shrink_for_coarse);}
+                    if (idir != a_dir) {boundary_box.growHi(idir, - shrink_for_coarse);}
                 }
             }
         }
