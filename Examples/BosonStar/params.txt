@@ -1,6 +1,6 @@
 #Params for runtime inputs
 
-verbosity = 3
+verbosity = 0
 chk_prefix = BosonStar
 plot_prefix = BosonStarp_
 #restart_file = BosonStar_000060.3d.hdf5
@@ -22,7 +22,7 @@ regrid_threshold_phi = 0.005
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 3 # There are (max_level+1) grids, so min is zero
+max_level = 2 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -68,7 +68,7 @@ sigma = 0.3
 
 # Change the gravitational constant of the Universe!
 # Default is 1.0, for standard geometric units
-G_Newton = 0.07957747154594767 # 1/(4pi)
+# G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
 central_amplitude_CSF = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
@@ -82,5 +82,5 @@ binary_search_tol = 5e-16 # precision to which the central value of 0.5 * log(g_
 #star_centre = 32 32 32
 
 # Potential params
-scalar_mass = 1.0
+scalar_mass = 0.5
 phi4_coeff = 0.0

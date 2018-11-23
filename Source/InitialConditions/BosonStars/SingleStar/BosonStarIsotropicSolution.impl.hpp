@@ -70,9 +70,9 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
 
         //Note the division by scalar_mass as a_max_radius is not rescaled
         //but max_computed_radius is rescaled
-        int num_extra_points = std::ceil((a_max_radius
-             - max_computed_radius / m_params_potential.scalar_mass)
-             / m_params_BosonStar.initial_step_size);
+        int num_extra_points = std::ceil((m_params_potential.scalar_mass
+            * a_max_radius - max_computed_radius)
+            / m_params_BosonStar.initial_step_size);
         extended_grid.reserve(static_cast<int>(extended_grid.size())
             + num_extra_points);
         exp_g_array.reserve(extended_grid.size());
