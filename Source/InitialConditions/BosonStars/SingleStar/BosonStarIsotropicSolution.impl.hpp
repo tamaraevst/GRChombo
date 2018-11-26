@@ -28,7 +28,6 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
     calculateIsotropicGrid(a_polar_areal_solution, a_max_radius);
     construct_chi(a_polar_areal_solution);
     construct_phi_and_lapse(a_polar_areal_solution);
-    m_frequency = a_polar_areal_solution.get_frequency();
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -178,21 +177,22 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
 
 
     //make arrays to hold the isotropic grid values of the
-    //lapse = (omega/m) * e^(f) and phi
+    //lapse = (frequency/m) * e^(f) and phi
     initial_data_t<double> lapse_array(m_polar_areal_grid.size());
     initial_data_t<double> phi_array(m_polar_areal_grid.size());
 
     double r, rho;
     double psi_factor = 1.0 / std::sqrt(4.0 * M_PI * m_G_Newton);
-    double omega_over_m = a_polar_areal_solution.get_frequency();
-    double phi_decay_rate = std::sqrt(1.0 - omega_over_m * omega_over_m);
+    m_frequency_over_mass = a_polar_areal_solution.get_frequency_over_mass();
+    double phi_decay_rate
+            = std::sqrt(1.0 - m_frequency_over_mass * m_frequency_over_mass);
     for(int i = 0; i < static_cast<int>(m_polar_areal_grid.size()); i++)
     {
         r = m_polar_areal_grid[i];
         rho = m_params_potential.scalar_mass * r;
         if(m_polar_areal_grid[i] <= r_match)
         {
-            lapse_array[i] = omega_over_m * std::exp(f_interp(rho));
+            lapse_array[i] = m_frequency_over_mass * std::exp(f_interp(rho));
             phi_array[i] = psi_factor * psi_interp(rho);
         }
         else
@@ -200,7 +200,7 @@ void BosonStarIsotropicSolution<initial_data_t, initial_state_t>
             //for large radii, lapse ~ sqrt(1 - 2M/rho)
             lapse_array[i] = std::sqrt(1.0 -
                 2.0 * a_polar_areal_solution.get_ADM_mass() / rho);
-            //for large radii, psi ~ K/rho * exp( -rho * sqrt(1 - omega^2/m^2))
+            //for large radii, psi ~ K/rho * exp( -rho * sqrt(1 - frequency^2/m^2))
             phi_array[i] = psi_factor * psi_interp(rho_match) * std::exp(
                 - (rho - rho_match) * phi_decay_rate) * rho_match / rho;
         }

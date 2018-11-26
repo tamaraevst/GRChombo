@@ -14,7 +14,7 @@ template <template<typename...> class initial_data_t, typename initial_state_t>
 BosonStarSolution<initial_data_t, initial_state_t>::BosonStarSolution()
     : m_initial_grid {}, m_f_array {}, m_g_array {}, m_psi_array {},
     m_Psi_array {}, m_num_grid_points {0}, m_num_psi_roots {0},
-    m_last_good_g_index {0}, m_frequency {NAN}, m_ADM_mass {NAN} {}
+    m_last_good_g_index {0}, m_frequency_over_mass {NAN}, m_ADM_mass {NAN} {}
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
 void BosonStarSolution<initial_data_t, initial_state_t>::push_back(
@@ -38,7 +38,7 @@ void BosonStarSolution<initial_data_t, initial_state_t>::clear()
     m_Psi_array.clear();
     m_num_grid_points = 0;
     m_num_psi_roots = 0;
-    m_frequency = NAN;
+    m_frequency_over_mass = NAN;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
@@ -125,7 +125,8 @@ int BosonStarSolution<initial_data_t, initial_state_t>
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
+void BosonStarSolution<initial_data_t, initial_state_t>
+    ::calculate_frequency_over_mass()
 {
     //first calculate the grid values of the function for which the limit in the
     //far field is the frequency/m
@@ -142,7 +143,7 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_frequency()
 
     //Use linear interpolation to evaluate the frequency limit function midway
     //between grid points at the point the derivative is smallest.
-    m_frequency = 0.5 * (frequency_limit_function[lower_eval_index]
+    m_frequency_over_mass = 0.5 * (frequency_limit_function[lower_eval_index]
         + frequency_limit_function[lower_eval_index + 1] );
 }
 
@@ -158,7 +159,7 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
             (1.0 - std::exp(-2.0 * m_g_array[i])) );
     }
 
-    //Get the lower index between which the frequency should be evaluated
+    //Get the lower index between which the ADM mass should be evaluated
     m_last_good_g_index
         = find_inflection_index(mass_aspect_function);
 
@@ -168,11 +169,12 @@ void BosonStarSolution<initial_data_t, initial_state_t>::calculate_ADM_mass()
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>
-double BosonStarSolution<initial_data_t, initial_state_t>::get_frequency()
+double BosonStarSolution<initial_data_t, initial_state_t>
+    ::get_frequency_over_mass()
 {
-    if(std::isnan(m_frequency))
-        calculate_frequency();
-    return m_frequency;
+    if(std::isnan(m_frequency_over_mass))
+        calculate_frequency_over_mass();
+    return m_frequency_over_mass;
 }
 
 template <template<typename...> class initial_data_t, typename initial_state_t>

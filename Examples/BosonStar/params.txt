@@ -1,6 +1,6 @@
 #Params for runtime inputs
 
-verbosity = 0
+verbosity = 2
 chk_prefix = BosonStar
 plot_prefix = BosonStarp_
 #restart_file = BosonStar_000060.3d.hdf5
@@ -68,7 +68,7 @@ sigma = 0.3
 
 # Change the gravitational constant of the Universe!
 # Default is 1.0, for standard geometric units
-# G_Newton = 0.07957747154594767 # 1/(4pi)
+G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
 central_amplitude_CSF = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
@@ -82,5 +82,5 @@ binary_search_tol = 5e-16 # precision to which the central value of 0.5 * log(g_
 #star_centre = 32 32 32
 
 # Potential params
-scalar_mass = 0.5
-phi4_coeff = 0.0
+scalar_mass = 2.0
+phi4_coeff = 100.

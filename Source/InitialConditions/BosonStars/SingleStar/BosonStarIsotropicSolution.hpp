@@ -27,7 +27,7 @@ public:
     tools::spline<initial_data_t> m_chi;
     tools::spline<initial_data_t> m_lapse;
     tools::spline<initial_data_t> m_phi;
-    double m_frequency;
+    double m_frequency_over_mass;
 
     //! New constructor which can be called before a polar areal solution is
     //! computed
@@ -41,6 +41,14 @@ public:
         BosonStarSolution<initial_data_t, initial_state_t>
         &a_polar_areal_solution, const double a_max_radius);
 
+private:
+    BosonStar_params_t m_params_BosonStar;
+    Potential::params_t m_params_potential;
+    initial_data_t<double> m_isotropic_grid = {};
+    initial_data_t<double> m_polar_areal_grid = {};
+    const double m_G_Newton;
+    int m_verbosity;
+
     //! This function calculates the isotropic grid from the polar areal grid.
     void calculateIsotropicGrid(
         BosonStarSolution<initial_data_t, initial_state_t>
@@ -51,18 +59,10 @@ public:
         &a_polar_areal_solution);
 
     //! Adds the points for the lapse and scalar field interpolation functions
+    //! and gets the frequency/mass from the polar-areal solution.
     void construct_phi_and_lapse(
         BosonStarSolution<initial_data_t, initial_state_t>
         &a_polar_areal_solution);
-
-
-private:
-    BosonStar_params_t m_params_BosonStar;
-    Potential::params_t m_params_potential;
-    initial_data_t<double> m_isotropic_grid = {};
-    initial_data_t<double> m_polar_areal_grid = {};
-    const double m_G_Newton;
-    int m_verbosity;
 };
 
 #include "BosonStarIsotropicSolution.impl.hpp"

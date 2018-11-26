@@ -49,13 +49,13 @@ public:
 
     //! Calculates the complex oscillation frequency (divided by the scalar
     //! mass) of the solution and stores it in m_frequency
-    void calculate_frequency();
+    void calculate_frequency_over_mass();
 
     //! Calculates the ADM mass of the solution
     void calculate_ADM_mass();
 
-    //! Returns the frequency (divided by the scalar mass)
-    double get_frequency();
+    //! Returns the frequency divided by the scalar mass
+    double get_frequency_over_mass();
 
     //! Returns the ADM mass in rescaled units (M_pl^2/m)
     double get_ADM_mass();
@@ -86,7 +86,7 @@ private:
     int m_last_good_g_index; /*!< this stores the largest grid index for which
                                 g is still valid (before growing modes take
                                 over) */
-    double m_frequency; //!< this stores the complex oscillation frequency/m
+    double m_frequency_over_mass; //!< this stores the complex oscillation frequency/m
     double m_ADM_mass; //!< this stores the ADM mass in units of M_pl^2/m
 
     //! Function to count the number of roots in psi and store in m_num_psi_roots
