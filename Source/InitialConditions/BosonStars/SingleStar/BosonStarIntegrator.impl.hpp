@@ -52,8 +52,7 @@ void BosonStarIntegrator<initial_data_t, initial_state_t>
         if (m_verbosity >= 2)
         {
             pout() << exception.what() << " Max areal radius = " <<
-                m_boson_star_solution.get_grid().back()
-                / m_params_potential.scalar_mass << "\n";
+                m_boson_star_solution.get_grid().back() << " / m." << "\n";
         }
     }
 }
