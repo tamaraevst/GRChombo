@@ -5,6 +5,7 @@
 
 #include "parstream.H" //Gives us pout()
 #include <iostream>
+#include <chrono>
 
 #include "DefaultLevelFactory.hpp"
 #include "GRAMR.hpp"
@@ -31,9 +32,22 @@ int runGRChombo(int argc, char *argv[])
                                                                   sim_params);
     setupAMRObject(gr_amr, boson_star_level_fact);
 
-    // Engage! Run the evolution
+    using Clock = std::chrono::steady_clock;
+    using Minutes = std::chrono::duration<double, std::ratio<60, 1>>;
+
+    std::chrono::time_point<Clock> start_time = Clock::now();
+
+    // Engage! Run the evolution.
     gr_amr.run(sim_params.stop_time, sim_params.max_steps);
+
+    auto now = Clock::now();
+    auto duration = std::chrono::duration_cast<Minutes>(now - start_time);
+    pout() << "Total simulation time (mins): " << duration.count() << ".\n";
+
     gr_amr.conclude();
+
+    // Write Chombo timer report
+    CH_TIMER_REPORT();
 
     return 0;
 }

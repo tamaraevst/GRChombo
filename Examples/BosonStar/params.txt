@@ -1,28 +1,28 @@
 #Params for runtime inputs
 
 verbosity = 2
-chk_prefix = BosonStar
-plot_prefix = BosonStarp_
+chk_prefix = /nfs/st01/hpc-gr-epss/mr618/BosonStar
+plot_prefix = /nfs/st01/hpc-gr-epss/mr618/BosonStarp_
 #restart_file = BosonStar_000060.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
-N1 = 64
-N2 = 64
-N3 = 64
+N1 = 128
+N2 = 128
+N3 = 128
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L = 32
+L = 128
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
-regrid_threshold_K = 0.1
+regrid_threshold_K = 5
 regrid_threshold_phi = 0.005
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 6 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -31,7 +31,7 @@ regrid_interval = 50 50 5 5 5 5 5
 max_box_size = 16
 min_box_size = 8
 # Determines how exactly regridding tries to fit the tagging
-fill_ratio = 0.2
+fill_ratio = 0.7
 #Periodicity and ghost cells
 isPeriodic = 1 1 1
 num_ghosts = 3
@@ -79,8 +79,8 @@ max_radius = 128. # max radius the 1d ODE solver attempts to integrate out to. I
 binary_search_tol = 5e-16 # precision to which the central value of 0.5 * log(g_tt) is found
 
 # centre of the star - only uncomment if you want star off centre
-#star_centre = 32 32 32
+#star_centre = 64 64 64
 
 # Potential params
-scalar_mass = 2.0
-phi4_coeff = 100.
+scalar_mass = 1.0
+phi4_coeff = 0.0
