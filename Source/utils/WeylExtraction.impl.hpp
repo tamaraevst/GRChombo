@@ -112,12 +112,9 @@ WeylExtraction::integrate_surface(int es, int el, int em,
                 using namespace SphericalHarmonics;
                 double theta = (itheta + 0.5) * m_dtheta;
                 int idx = itheta * m_params.num_points_phi + iphi;
-                double x = m_params.extraction_center[0] +
-                           m_params.extraction_radius * sin(theta) * cos(phi);
-                double y = m_params.extraction_center[1] +
-                           m_params.extraction_radius * sin(theta) * sin(phi);
-                double z = m_params.extraction_center[2] +
-                           m_params.extraction_radius * cos(theta);
+                double x = m_params.extraction_radius * sin(theta) * cos(phi);
+                double y = m_params.extraction_radius * sin(theta) * sin(phi);
+                double z = m_params.extraction_radius * cos(theta);
                 Y_lm_t<double> Y_lm = spin_Y_lm(x, y, z, es, el, em);
                 double integrand_re = m_state_ptr_re[idx] * Y_lm.Real +
                                       m_state_ptr_im[idx] * Y_lm.Im;
