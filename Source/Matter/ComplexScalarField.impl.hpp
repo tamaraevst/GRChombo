@@ -136,9 +136,9 @@ void ComplexScalarField<potential_t>::add_matter_rhs(
     total_rhs.phi_Re = rhs_csf.phi_Re;
     total_rhs.phi_Im = rhs_csf.phi_Im;
     total_rhs.Pi_Re =
-        rhs_csf.Pi_Re - vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Re;
+        rhs_csf.Pi_Re + vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Re;
     total_rhs.Pi_Im =
-        rhs_csf.Pi_Im - vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Im;
+        rhs_csf.Pi_Im + vars.lapse * dVdmodulus_phi_squared * vars_csf.phi_Im;
 }
 
 // the RHS excluding the potential terms
