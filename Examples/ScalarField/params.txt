@@ -22,7 +22,7 @@ regrid_threshold_phi = 0.6
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 4 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -30,6 +30,8 @@ regrid_interval = 5 5 5 5 5 5 5
 # Max and min box size - for load balancing
 max_box_size = 32
 min_box_size = 32
+
+#boundaries and periodicity of grid
 #Periodic directions - 0 = false, 1 = true
 isPeriodic = 0 0 0
 # if not periodic, then specify the boundary type
@@ -38,6 +40,27 @@ isPeriodic = 0 0 0
 hi_boundary = 1 1 1
 lo_boundary = 2 2 2
 center = 0.0 0.0 0.0
+
+# if sommerfeld boundaries selected, must select 
+# asymptotic values (in order given by UserVariables.hpp)
+# 0 = even
+# 1,2,3 = odd x, y, z
+# 4,5,6 = odd xy, yz, xz
+vars_parity            = 0 0 4 6 0 5 0    #chi and hij
+                         0 0 4 6 0 5 0    #K and Aij
+                         0 1 2 3          #Theta and Gamma
+                         0 1 2 3 1 2 3    #lapse shift and B
+                         0 0              #phi and Pi
+                         0 1 2 3          #Ham and Mom
+
+# if reflective boundaries selected, must set
+# parity of all vars (in order given by UserVariables.hpp)
+vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
+                         0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
+                         0.0 0.0 0.0 0.0             #Theta and Gamma
+                         1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B
+                         0.0 0.0                     #phi and Pi
+                         0.0 0.0 0.0 0.0             #Ham and Mom
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
@@ -78,9 +101,6 @@ amplitudeSF = 0.001
 widthSF = 1.0
 r_zero = 5.0
 scalar_mass = 0.001
-# parameter for bubble centre - defaulted to center of grid
-# so only uncomment if you want to place it off center
-#center = 32 32 32
 
 # Relaxation paramters
 # how long and how fast to relax
