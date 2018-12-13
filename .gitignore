@@ -1,6 +1,8 @@
 pout.*
+.bashrc
 *.pbs
 *.s
+jobscript*
 d
 o
 p
