@@ -53,7 +53,6 @@ class SimulationParameters : public SimulationParametersBase
     Potential::params_t potential_params;
     // Relaxation params
     Real relaxtime, relaxspeed;
-
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

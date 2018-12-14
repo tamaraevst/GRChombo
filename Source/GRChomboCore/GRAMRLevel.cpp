@@ -24,7 +24,8 @@ void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
     define(a_coarser_level_ptr, physdomain, a_level, a_ref_ratio);
 
     // Also define the boundaries
-    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, physdomain, m_num_ghosts);
+    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, physdomain,
+                        m_num_ghosts);
 }
 
 void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
@@ -48,7 +49,8 @@ void GRAMRLevel::define(AMRLevel *a_coarser_level_ptr,
     }
 
     // Also define the boundaries
-    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, a_problem_domain, m_num_ghosts);
+    m_boundaries.define(m_dx, m_p.center, m_p.boundary_params, a_problem_domain,
+                        m_num_ghosts);
 }
 
 /// Do casting from AMRLevel to GRAMRLevel and stop if this isn't possible
@@ -107,8 +109,9 @@ Real GRAMRLevel::advance()
     m_state_new.copyTo(m_state_new.interval(), m_state_old,
                        m_state_old.interval());
 
-    //Specifically copy boundary cells as copyTo does not copy cells outside domain
-    if(m_p.nonperiodic_boundaries_exist)
+    // Specifically copy boundary cells as copyTo does not copy cells outside
+    // domain
+    if (m_p.nonperiodic_boundaries_exist)
     {
         m_boundaries.copy_boundary_cells(Side::Hi, m_state_new, m_state_old);
         m_boundaries.copy_boundary_cells(Side::Lo, m_state_new, m_state_old);
@@ -157,7 +160,7 @@ Real GRAMRLevel::advance()
     specificAdvance();
 
     // enforce symmetric BCs - in case of updates in specificAdvance
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, m_state_new);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, m_state_new);
@@ -186,7 +189,7 @@ void GRAMRLevel::postTimeStep()
 
     // enforce symmetric BCs - this is required after the averaging
     // and postentially after specificPostTimeStep actions
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, m_state_new);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, m_state_new);
@@ -284,8 +287,9 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     m_state_new.copyTo(m_state_new.interval(), m_state_old,
                        m_state_old.interval());
 
-    //Specifically copy boundary cells as copyTo does not cover cells outside domain
-    if(m_p.nonperiodic_boundaries_exist)
+    // Specifically copy boundary cells as copyTo does not cover cells outside
+    // domain
+    if (m_p.nonperiodic_boundaries_exist)
     {
         m_boundaries.copy_boundary_cells(Side::Hi, m_state_new, m_state_old);
         m_boundaries.copy_boundary_cells(Side::Lo, m_state_new, m_state_old);
@@ -312,12 +316,12 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
                                    coarser_gr_amr_level_ptr->m_state_new);
 
         // also interpolate fine boundary cells
-        if(m_p.nonperiodic_boundaries_exist)
+        if (m_p.nonperiodic_boundaries_exist)
         {
-            m_boundaries.interp_boundaries(m_state_new,
-                                   coarser_gr_amr_level_ptr->m_state_new, Side::Hi);
-            m_boundaries.interp_boundaries(m_state_new,
-                                   coarser_gr_amr_level_ptr->m_state_new, Side::Lo);
+            m_boundaries.interp_boundaries(
+                m_state_new, coarser_gr_amr_level_ptr->m_state_new, Side::Hi);
+            m_boundaries.interp_boundaries(
+                m_state_new, coarser_gr_amr_level_ptr->m_state_new, Side::Lo);
         }
     }
 
@@ -325,15 +329,16 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     m_state_old.copyTo(m_state_old.interval(), m_state_new,
                        m_state_new.interval());
 
-    //Specifically copy boundary cells (only if same layout, otherwise intepolated)
-    if(m_p.nonperiodic_boundaries_exist)
+    // Specifically copy boundary cells (only if same layout, otherwise
+    // intepolated)
+    if (m_p.nonperiodic_boundaries_exist)
     {
         m_boundaries.copy_boundary_cells(Side::Hi, m_state_old, m_state_new);
         m_boundaries.copy_boundary_cells(Side::Lo, m_state_old, m_state_new);
     }
 
     // enforce symmetric BCs (overwriting any interpolation)
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, m_state_new);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, m_state_new);
@@ -372,7 +377,7 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
 }
 
 // things to do after initialization
-void GRAMRLevel::postInitialize() { m_restart_time = 0.;}
+void GRAMRLevel::postInitialize() { m_restart_time = 0.; }
 
 // compute dt
 Real GRAMRLevel::computeDt()
@@ -484,9 +489,9 @@ void GRAMRLevel::writeCheckpointLevel(HDF5Handle &a_handle) const
 
     // only need to write ghosts when non periodic BCs exist
     IntVect ghost_vector = IntVect::Zero;
-    if(m_p.nonperiodic_boundaries_exist)
+    if (m_p.nonperiodic_boundaries_exist)
     {
-        ghost_vector = m_num_ghosts*IntVect::Unit;
+        ghost_vector = m_num_ghosts * IntVect::Unit;
     }
     write(a_handle, m_state_new, "data", ghost_vector);
 }
@@ -614,7 +619,7 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
 
     // Get the periodicity info
     bool isPeriodic[SpaceDim] = {
-        false}; //default to false unless other info is available
+        false}; // default to false unless other info is available
     for (int dir = 0; dir < SpaceDim; ++dir)
     {
         char dir_str[20];
@@ -791,7 +796,8 @@ void GRAMRLevel::evalRHS(GRLevelData &rhs, GRLevelData &soln,
                          Real time, Real fluxWeight)
 {
     CH_TIME("GRAMRLevel::evalRHS");
-    if (m_verbosity) pout() << "GRAMRLevel::evalRHS" << endl;
+    if (m_verbosity)
+        pout() << "GRAMRLevel::evalRHS" << endl;
 
     soln.exchange(m_exchange_copier);
 
@@ -825,7 +831,7 @@ void GRAMRLevel::evalRHS(GRLevelData &rhs, GRLevelData &soln,
     }
 
     // enforce symmetric BCs after interpolation
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, soln);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, soln);
@@ -834,7 +840,7 @@ void GRAMRLevel::evalRHS(GRLevelData &rhs, GRLevelData &soln,
     specificEvalRHS(soln, rhs, time); // Call the problem specific rhs
 
     // evolution of the boundaries according to conditions
-    if(m_p.nonperiodic_boundaries_exist)
+    if (m_p.nonperiodic_boundaries_exist)
     {
         m_boundaries.fill_boundary_rhs(Side::Lo, soln, rhs);
         m_boundaries.fill_boundary_rhs(Side::Hi, soln, rhs);
@@ -850,7 +856,7 @@ void GRAMRLevel::updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt)
     specificUpdateODE(soln, rhs, dt);
 
     // enforce symmetric BCs after specificUpdateODE (trace removal etc)
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, soln);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, soln);
@@ -873,9 +879,9 @@ void GRAMRLevel::defineRHSData(GRLevelData &newRHS,
 {
     // only need ghosts for non periodic boundary case
     IntVect ghost_vector = IntVect::Zero;
-    if(m_p.nonperiodic_boundaries_exist)
+    if (m_p.nonperiodic_boundaries_exist)
     {
-        ghost_vector = m_num_ghosts*IntVect::Unit;
+        ghost_vector = m_num_ghosts * IntVect::Unit;
     }
     newRHS.define(existingSoln.disjointBoxLayout(), existingSoln.nComp(),
                   ghost_vector);
@@ -886,9 +892,9 @@ void GRAMRLevel::copySolnData(GRLevelData &dest, const GRLevelData &src)
 {
     src.copyTo(src.interval(), dest, dest.interval());
 
-    //Specifically copy boundary cells if non periodic as
-    //cells outside the domain are not copied by default
-    if(m_p.nonperiodic_boundaries_exist)
+    // Specifically copy boundary cells if non periodic as
+    // cells outside the domain are not copied by default
+    if (m_p.nonperiodic_boundaries_exist)
     {
         m_boundaries.copy_boundary_cells(Side::Hi, src, dest);
         m_boundaries.copy_boundary_cells(Side::Lo, src, dest);
@@ -912,7 +918,7 @@ void GRAMRLevel::fillAllGhosts()
     fillIntralevelGhosts();
 
     // enforce symmetric BCs after filling ghosts
-    if(m_p.symmetric_boundaries_exist)
+    if (m_p.symmetric_boundaries_exist)
     {
         m_boundaries.enforce_symmetric_boundaries(Side::Hi, m_state_new);
         m_boundaries.enforce_symmetric_boundaries(Side::Lo, m_state_new);

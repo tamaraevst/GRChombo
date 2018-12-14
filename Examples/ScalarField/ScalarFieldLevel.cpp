@@ -130,6 +130,6 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
     BoxLoops::loop(ChiAndPhiTaggingCriterion(m_dx, m_p.regrid_threshold_chi,
-                                           m_p.regrid_threshold_phi),
+                                             m_p.regrid_threshold_phi),
                    current_state, tagging_criterion);
 }

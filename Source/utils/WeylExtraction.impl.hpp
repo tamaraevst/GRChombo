@@ -96,11 +96,11 @@ WeylExtraction::integrate_surface(int es, int el, int em,
     // only rank 0 does the integral, but use OMP threads if available
     if (rank == 0)
     {
-    // integrate the values over the sphere (normalised by r^2)
-    // assumes spacings constant, uses trapezium rule for phi and rectangles for
-    // theta  note we don't have to fudge the end points for phi because the
-    // function is periodic  and so the last point (implied but not part of
-    // vector) is equal to the first point
+        // integrate the values over the sphere (normalised by r^2)
+        // assumes spacings constant, uses trapezium rule for phi and rectangles
+        // for theta  note we don't have to fudge the end points for phi because
+        // the function is periodic  and so the last point (implied but not part
+        // of vector) is equal to the first point
 #pragma omp parallel for
         for (int iphi = 0; iphi < m_params.num_points_phi; ++iphi)
         {
@@ -146,7 +146,7 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
 #else
     rank = 0;
     FILE *file;
-    file = fopen(filename,"a");
+    file = fopen(filename, "a");
 #endif
     // only rank 0 does the write out
     if (rank == 0)
@@ -162,7 +162,7 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
             MPI_File_write(mpi_file, header, strlen(header), MPI_CHAR,
                            MPI_STATUS_IGNORE);
 #else
-            fwrite(header,sizeof(char),strlen(header),file);
+            fwrite(header, sizeof(char), strlen(header), file);
 #endif
         }
         // Now the data
@@ -173,7 +173,7 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
         MPI_File_write(mpi_file, data, strlen(data), MPI_CHAR,
                        MPI_STATUS_IGNORE);
 #else
-        fwrite(data,sizeof(char),strlen(data),file);
+        fwrite(data, sizeof(char), strlen(data), file);
 #endif
     }
 #ifdef CH_MPI
@@ -206,7 +206,7 @@ inline void WeylExtraction::write_extraction(char *file_prefix,
                   MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_APPEND,
                   MPI_INFO_NULL, &mpi_file);
 #else
-    file = fopen(filename,"a");
+    file = fopen(filename, "a");
 #endif
     // only rank 0 does the write out
     if (rank == 0)
@@ -222,7 +222,7 @@ inline void WeylExtraction::write_extraction(char *file_prefix,
         MPI_File_write(mpi_file, header1, strlen(header1), MPI_CHAR,
                        MPI_STATUS_IGNORE);
 #else
-        fwrite(header1,sizeof(char),strlen(header1),file);
+        fwrite(header1, sizeof(char), strlen(header1), file);
 #endif
         char header2[70] = "";
         strcat(header2, "# theta     phi     ");
@@ -233,7 +233,7 @@ inline void WeylExtraction::write_extraction(char *file_prefix,
         MPI_File_write(mpi_file, header2, strlen(header2), MPI_CHAR,
                        MPI_STATUS_IGNORE);
 #else
-        fwrite(header2,sizeof(char),strlen(header2),file);
+        fwrite(header2, sizeof(char), strlen(header2), file);
 #endif
 
         // Now the data
@@ -251,7 +251,7 @@ inline void WeylExtraction::write_extraction(char *file_prefix,
             MPI_File_write(mpi_file, data, strlen(data), MPI_CHAR,
                            MPI_STATUS_IGNORE);
 #else
-            fwrite(data,sizeof(char),strlen(data),file);
+            fwrite(data, sizeof(char), strlen(data), file);
 #endif
         }
     }

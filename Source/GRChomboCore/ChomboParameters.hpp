@@ -32,37 +32,44 @@ class ChomboParameters
         int bc = BoundaryConditions::STATIC_BC;
         pp.load("hi_boundary", boundary_params.hi_boundary, {bc, bc, bc});
         pp.load("lo_boundary", boundary_params.lo_boundary, {bc, bc, bc});
-        //set defaults, then override them where appropriate
+        // set defaults, then override them where appropriate
         boundary_params.vars_parity.fill(BoundaryConditions::EVEN);
         boundary_params.vars_asymptotic_values.fill(0.0);
         boundary_params.is_periodic.fill(true);
         nonperiodic_boundaries_exist = false;
         symmetric_boundaries_exist = false;
         FOR1(idir)
-        { 
-            if(isPeriodic[idir] == false)
+        {
+            if (isPeriodic[idir] == false)
             {
                 nonperiodic_boundaries_exist = true;
                 boundary_params.is_periodic[idir] = false;
-             
-                // read in relevent params - note that no defaults are set so as to force 
-                // the user to specify them where the relevant BCs are selected
-                if((boundary_params.hi_boundary[idir] == BoundaryConditions::REFLECTIVE_BC) ||
-                   (boundary_params.lo_boundary[idir] == BoundaryConditions::REFLECTIVE_BC))
+
+                // read in relevent params - note that no defaults are set so as
+                // to force the user to specify them where the relevant BCs are
+                // selected
+                if ((boundary_params.hi_boundary[idir] ==
+                     BoundaryConditions::REFLECTIVE_BC) ||
+                    (boundary_params.lo_boundary[idir] ==
+                     BoundaryConditions::REFLECTIVE_BC))
                 {
                     symmetric_boundaries_exist = true;
                     pp.load("vars_parity", boundary_params.vars_parity);
                 }
-                if((boundary_params.hi_boundary[idir] == BoundaryConditions::SOMMERFELD_BC) ||
-                   (boundary_params.lo_boundary[idir] == BoundaryConditions::SOMMERFELD_BC))
+                if ((boundary_params.hi_boundary[idir] ==
+                     BoundaryConditions::SOMMERFELD_BC) ||
+                    (boundary_params.lo_boundary[idir] ==
+                     BoundaryConditions::SOMMERFELD_BC))
                 {
-                    pp.load("vars_asymptotic_values", boundary_params.vars_asymptotic_values);
+                    pp.load("vars_asymptotic_values",
+                            boundary_params.vars_asymptotic_values);
                 }
             }
         }
-        if(nonperiodic_boundaries_exist)
+        if (nonperiodic_boundaries_exist)
         {
-            // write out boundary conditions where non periodic - useful for debug
+            // write out boundary conditions where non periodic - useful for
+            // debug
             BoundaryConditions::write_boundary_conditions(boundary_params);
         }
 
@@ -125,12 +132,12 @@ class ChomboParameters
     int verbosity;
     double L;                               // Physical sidelength of the grid
     std::array<double, CH_SPACEDIM> center; // grid center
-    IntVect ivN;         // The number of grid cells in each dimension
-    double coarsest_dx;  // The coarsest resolution
-    int max_level;       // the max number of regriddings to do
-    int num_ghosts;      // must be at least 3 for KO dissipation
-    int tag_buffer_size; // Amount the tagged region is grown by
-    Vector<int> ref_ratios;                   // ref ratios between levels
+    IntVect ivN;                 // The number of grid cells in each dimension
+    double coarsest_dx;          // The coarsest resolution
+    int max_level;               // the max number of regriddings to do
+    int num_ghosts;              // must be at least 3 for KO dissipation
+    int tag_buffer_size;         // Amount the tagged region is grown by
+    Vector<int> ref_ratios;      // ref ratios between levels
     Vector<int> regrid_interval; // steps between regrid at each level
     int max_steps;
     bool ignore_checkpoint_name_mismatch;   // ignore mismatch of variable names
@@ -142,14 +149,13 @@ class ChomboParameters
     std::string checkpoint_prefix, plot_prefix; // naming of files
 
     // Boundary conditions
-    std::array<bool, CH_SPACEDIM> isPeriodic; // periodicity
-    BoundaryConditions::params_t boundary_params; //set boundaries in each dir
+    std::array<bool, CH_SPACEDIM> isPeriodic;     // periodicity
+    BoundaryConditions::params_t boundary_params; // set boundaries in each dir
     bool nonperiodic_boundaries_exist;
     bool symmetric_boundaries_exist;
 
     // For tagging
     double regrid_threshold;
-
 };
 
 #endif /* CHOMBOPARAMETERS_HPP_ */

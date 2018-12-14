@@ -101,7 +101,7 @@ class GRAMRLevel : public AMRLevel, public InterpSource
                  Real newCrseTime,               //!< new crse time
                  Real time,      //!< current time centering of soln
                  Real fluxWeight //!< weight to apply to fluxRegister updates
-                 );
+    );
 
     /// implements soln += dt*rhs
     void updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt);
@@ -181,10 +181,10 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     CoarseAverage m_coarse_average; //!< Averages from fine to coarse level
 
-    FourthOrderFillPatch
-        m_patcher; //!< Organises interpolation from coarse to fine levels of ghosts
-    FourthOrderFineInterp
-        m_fine_interp; //!< executes the interpolation from coarse to fine when regridding
+    FourthOrderFillPatch m_patcher; //!< Organises interpolation from coarse to
+                                    //!< fine levels of ghosts
+    FourthOrderFineInterp m_fine_interp; //!< executes the interpolation from
+                                         //!< coarse to fine when regridding
 
     DisjointBoxLayout m_grids; //!< Holds grid setup (the layout of boxes)
 
