@@ -32,32 +32,38 @@ class ChomboParameters
         int bc = BoundaryConditions::STATIC_BC;
         pp.load("hi_boundary", boundary_params.hi_boundary, {bc, bc, bc});
         pp.load("lo_boundary", boundary_params.lo_boundary, {bc, bc, bc});
+        //set defaults, then override them where appropriate
+        boundary_params.vars_parity.fill(BoundaryConditions::EVEN);
+        boundary_params.vars_asymptotic_values.fill(0.0);
+        boundary_params.is_periodic.fill(true);
         nonperiodic_boundaries_exist = false;
         symmetric_boundaries_exist = false;
-        boundary_params.vars_parity.fill(BoundaryConditions::EVEN_PARITY);
-        boundary_params.vars_asymptotic_values.fill(0.0);
         FOR1(idir)
         { 
             if(isPeriodic[idir] == false)
             {
                 nonperiodic_boundaries_exist = true;
+                boundary_params.is_periodic[idir] = false;
              
-                // read in relevent params   
+                // read in relevent params - note that no defaults are set so as to force 
+                // the user to specify them where the relevant BCs are selected
                 if((boundary_params.hi_boundary[idir] == BoundaryConditions::REFLECTIVE_BC) ||
                    (boundary_params.lo_boundary[idir] == BoundaryConditions::REFLECTIVE_BC))
                 {
                     symmetric_boundaries_exist = true;
-                    pp.getarr("vars_parity", boundary_params.vars_parity, 0, NUM_VARS-1);
+                    pp.load("vars_parity", boundary_params.vars_parity);
                 }
                 if((boundary_params.hi_boundary[idir] == BoundaryConditions::SOMMERFELD_BC) ||
                    (boundary_params.lo_boundary[idir] == BoundaryConditions::SOMMERFELD_BC))
                 {
-                    pp.getarr("vars_asymptotic_values", boundary_params.vars_asymptotic_values, 0, NUM_VARS-1);
+                    pp.load("vars_asymptotic_values", boundary_params.vars_asymptotic_values);
                 }
-
-                // write out boundary conditions
-                BoundaryConditions::write_boundary_conditions(boundary_params);
             }
+        }
+        if(nonperiodic_boundaries_exist)
+        {
+            // write out boundary conditions where non periodic - useful for debug
+            BoundaryConditions::write_boundary_conditions(boundary_params);
         }
 
         // Misc

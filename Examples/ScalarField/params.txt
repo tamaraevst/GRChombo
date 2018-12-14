@@ -18,18 +18,18 @@ L =  16
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
 regrid_threshold_chi = 0.6
-regrid_threshold_phi = 0.6
+regrid_threshold_phi = 1.2
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 4 # There are (max_level+1) grids, so min is zero
+max_level = 3 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 5 5 5 5 5 5 5
+regrid_interval = 16 8 4 2
 # Max and min box size - for load balancing
 max_box_size = 32
-min_box_size = 32
+min_box_size = 8
 
 #boundaries and periodicity of grid
 #Periodic directions - 0 = false, 1 = true

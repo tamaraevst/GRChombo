@@ -38,7 +38,7 @@ class BoundaryConditions
         ODD_Y,
         ODD_Z,
         ODD_XY,
-        ODD_XZ,
+        ODD_YZ,
         ODD_XZ
     };
 
@@ -47,6 +47,7 @@ class BoundaryConditions
     {
         std::array<int, CH_SPACEDIM> hi_boundary;
         std::array<int, CH_SPACEDIM> lo_boundary;
+        std::array<bool, CH_SPACEDIM> is_periodic;
         std::array<int, NUM_VARS> vars_parity;
         std::array<double, NUM_VARS> vars_asymptotic_values;
     };
@@ -86,95 +87,111 @@ class BoundaryConditions
     }
 
     // write out boundary params (used during setup)
-    static void write_boundary_parameters(params_t a_params)
+    static void write_boundary_conditions(params_t a_params)
     {
         pout() << "You are using non periodic boundary conditions." << endl; 
         pout() << "The boundary params chosen are:  " << endl;
+        pout() << "---------------------------------" << endl;
         FOR1(idir)
         {
-            // high directions
-            if(a_params.hi_boundary(idir) == STATIC_BC)
+            if(!a_params.is_periodic[idir])
             {
-                pout() << "Static boundaries in direction high " << idir << endl;
-            }
-            else if(a_params.hi_boundary(idir) == REFLECTIVE_BC)
-            {
-                pout() << "Reflective boundaries in direction high " << idir << endl;
-                pout() << "The variables that are parity odd in this direction are : " << endl;
-                for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                // high directions
+                if     (a_params.hi_boundary[idir] == STATIC_BC)
                 {
-                    int parity = get_vars_parity(icomp, idir, a_params);
-                    if (parity ==-1) {pout() << UserVariables::variable_names[icomp] << endl;}
+                    pout() << "- Static boundaries in direction high " << idir << endl;
                 }
-            }
-            else if(a_params.hi_boundary(idir) == SOMMERFELD_BC)
-            {
-                pout() << "Sommerfeld boundaries in direction low " << idir << endl;
-                pout() << "The asymptotic values of the variables in this direction are : " << endl;
-                for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                else if(a_params.hi_boundary[idir] == REFLECTIVE_BC)
                 {
-                    pout() << UserVariables::variable_names[icomp] 
-                           << " " << a_params.vars_asymptotic_values[icomp] << endl;
+                    pout() << "- Reflective boundaries in direction high " << idir << endl;
+                    pout() << "The variables that are parity odd in this direction are : " << endl;
+                    for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                    {
+                        int parity = get_vars_parity(icomp, idir, a_params);
+                        if (parity ==-1) {pout() << UserVariables::variable_names[icomp] << "    ";}
+                    }
+                    pout() << endl;
                 }
-            }
+                else if(a_params.hi_boundary[idir] == SOMMERFELD_BC)
+                {
+                    pout() << "- Sommerfeld boundaries in direction high " << idir << endl;
+                    pout() << "The non zero asymptotic values of the variables in this direction are : " << endl;
+                    for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                    {
+                        if(a_params.vars_asymptotic_values[icomp] != 0)
+                        {
+                            pout() << UserVariables::variable_names[icomp] 
+                                   << " = " << a_params.vars_asymptotic_values[icomp] << "    ";
+                        }
+                    }
+                    pout() << endl;
+                }
 
-            // low directions
-            if(a_params.lo_boundary(idir) == STATIC_BC)
-            {
-                pout() << "Static boundaries in direction low " << idir << endl;
-            }
-            else if(a_params.lo_boundary(idir) == REFLECTIVE_BC)
-            {
-                pout() << "Reflective boundaries in direction low " << idir << endl;
-                pout() << "The variables that are parity odd in this direction are : " << endl;
-                for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                // low directions
+                if(a_params.lo_boundary[idir] == STATIC_BC)
                 {
-                    int parity = get_vars_parity(icomp, idir, a_params);
-                    if (parity ==-1) {pout() << UserVariables::variable_names[icomp] << endl;}
+                    pout() << "- Static boundaries in direction low " << idir << endl;
                 }
-            }
-            else if(a_params.lo_boundary(idir) == SOMMERFELD_BC)
-            {
-                pout() << "Sommerfeld boundaries in direction high " << idir << endl;
-                pout() << "The asymptotic values of the variables in this direction are : " << endl;
-                for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                else if(a_params.lo_boundary[idir] == REFLECTIVE_BC)
                 {
-                    pout() << UserVariables::variable_names[icomp] 
-                           << " " << a_params.vars_asymptotic_values[icomp] << endl;
+                    pout() << "- Reflective boundaries in direction low " << idir << endl;
+                    pout() << "The variables that are parity odd in this direction are : " << endl;
+                    for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                    {
+                        int parity = get_vars_parity(icomp, idir, a_params);
+                        if (parity ==-1) {pout() << UserVariables::variable_names[icomp] << "    ";}
+                    }
+                    pout() << endl;
+                }
+                else if(a_params.lo_boundary[idir] == SOMMERFELD_BC)
+                {
+                    pout() << "- Sommerfeld boundaries in direction high " << idir << endl;
+                    pout() << "The non zero asymptotic values of the variables in this direction are : " << endl;
+                    for (int icomp = 0; icomp < NUM_VARS; icomp++)
+                    {
+                        if(a_params.vars_asymptotic_values[icomp] != 0)
+                        {
+                            pout() << UserVariables::variable_names[icomp] 
+                                   << " = " << a_params.vars_asymptotic_values[icomp] << "    ";
+                        }
+                    }
+                    pout() << endl;
                 }
             }
         }
+        pout() << "---------------------------------" << endl;
     }
 
     // The function which returns the parity of each of the vars in UserVariables.hpp
-    // This works for the CCZ4 vars plus any vars which are parity even (e.g. scalar field).
-    // Note that this function can be overridden in the case where additional vector
-    // or tensor variables with odd parity are required (it is a virtual function).
-    // It is only required for reflective boundary conditions.
-    const int get_vars_parity(int a_comp, int a_dir)
+    // The parity should be defined in the params file, and will be output to the pout
+    // files for checking at start/restart of simulation
+    // (It is only required for reflective boundary conditions.)
+    int get_vars_parity(int a_comp, int a_dir)
     {
-        get_vars_parity(a_comp, a_dir, m_params);
+        int vars_parity = get_vars_parity(a_comp, a_dir, m_params);
+
+        return vars_parity;
     }
 
     // static version used for pout
     static int get_vars_parity(int a_comp, int a_dir, params_t a_params)
     {
         int vars_parity = 1;
-        if     ((a_dir==0) && (a_params.vars_parity[a_comp] == ODD_PARITY_X 
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_XY
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_XZ))
+        if     ((a_dir==0) && (a_params.vars_parity[a_comp] == ODD_X 
+                               || a_params.vars_parity[a_comp] == ODD_XY
+                               || a_params.vars_parity[a_comp] == ODD_XZ))
         {
             vars_parity = -1;
         }
-        else if((a_dir==1) && (a_params.vars_parity[a_comp] == ODD_PARITY_Y 
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_XY
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_YZ))
+        else if((a_dir==1) && (a_params.vars_parity[a_comp] == ODD_Y 
+                               || a_params.vars_parity[a_comp] == ODD_XY
+                               || a_params.vars_parity[a_comp] == ODD_YZ))
         {
             vars_parity = -1;
         }
-        else if((a_dir==2) && (a_params.vars_parity[a_comp] == ODD_PARITY_Z
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_XZ
-                               || a_params.vars_parity[a_comp] == ODD_PARITY_YZ))
+        else if((a_dir==2) && (a_params.vars_parity[a_comp] == ODD_Z
+                               || a_params.vars_parity[a_comp] == ODD_XZ
+                               || a_params.vars_parity[a_comp] == ODD_YZ))
         {
             vars_parity = -1;
         }
@@ -191,7 +208,7 @@ class BoundaryConditions
         FOR1(idir)
         {
             // only do something if this direction is not periodic
-            if (!m_domain.isPeriodic(idir))
+            if (!m_params.is_periodic[idir])
             {
                 fill_boundary_rhs_dir(a_side, a_soln, a_rhs, idir);
             }
@@ -290,7 +307,7 @@ class BoundaryConditions
                                  m_rhs_box(iv, icomp) += - d1 * loc[idir2] / radius;
                              }
 
-                             // asymptotic values
+                             // asymptotic values - these need to have been set in the params file
                              m_rhs_box(iv,icomp) += (m_params.vars_asymptotic_values[icomp] - m_soln_box(iv, icomp)) / radius;
                          }
                          break;
@@ -336,7 +353,7 @@ class BoundaryConditions
             FOR1(idir)
             {
                 // only do something if this direction is not periodic
-                if (!m_domain.isPeriodic(idir))
+                if (!m_params.is_periodic[idir])
                 {
                     // iterate through the boxes, shared amongst threads
                     DataIterator dit = a_dest.dataIterator();
@@ -382,7 +399,7 @@ class BoundaryConditions
         FOR1(idir)
         {
             // only do something if this direction is not periodic and symmetric
-            if (!m_domain.isPeriodic(idir))
+            if (!m_params.is_periodic[idir])
             {
                 int boundary_condition = get_boundary_condition(a_side, idir);
 
@@ -406,7 +423,7 @@ class BoundaryConditions
         FOR1(idir)
         {
             // only do something if this direction is not periodic
-            if (!m_domain.isPeriodic(idir))
+            if (!m_params.is_periodic[idir])
             {
                 // Ref ratio is always two
                 int ref_ratio = 2;
@@ -504,7 +521,7 @@ class BoundaryConditions
                         }
                     }  // end loop box
                 }      // end loop boxes
-            }          // end if isPeriodic
+            }          // end if is_periodic
         }              // end loop idir
     }
 
@@ -553,7 +570,7 @@ class BoundaryConditions
             {
                 if (offset_lo[idir] > 0) // this direction is a low end boundary
                 {
-                    if ((idir > a_dir) && !(m_domain.isPeriodic(idir)))
+                    if ((idir > a_dir) && !(m_params.is_periodic[idir]))
                     {
                         //grow it to fill the corners
                         boundary_box.growLo(idir, m_num_ghosts - shrink_for_coarse);
@@ -566,7 +583,7 @@ class BoundaryConditions
 
                 if (offset_hi[idir] > 0) //this direction is a high end boundary
                 {
-                    if ((idir > a_dir) && !(m_domain.isPeriodic(idir)))
+                    if ((idir > a_dir) && !(m_params.is_periodic[idir]))
                     {
                         //grow it to fill the corners
                         boundary_box.growHi(idir, m_num_ghosts - shrink_for_coarse);
