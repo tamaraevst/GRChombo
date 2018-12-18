@@ -8,6 +8,7 @@
 
 // General includes
 #include "GRParmParse.hpp"
+#include "BoundaryConditions.hpp"
 
 class ChomboParameters
 {
