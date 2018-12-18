@@ -109,12 +109,8 @@ template <> struct simd<double> : public simd_base<double>
         return _mm512_exp2a23_pd(a);
     }
 #else
-    friend ALWAYS_INLINE simd exp2(const simd &a)
-    {
-        return _mm512_exp2_pd(a);
-    }
+    friend ALWAYS_INLINE simd exp2(const simd &a) { return _mm512_exp2_pd(a); }
 #endif
-
 
 #ifdef LOW_PRECISION
     // This approximation has really low precision. Leaving it here mostly for
@@ -210,10 +206,7 @@ template <> struct simd<float> : public simd_base<float>
         return _mm512_exp2a23_ps(a);
     }
 #else
-    friend ALWAYS_INLINE simd exp2(const simd &a)
-    {
-        return _mm512_exp2_ps(a);
-    }
+    friend ALWAYS_INLINE simd exp2(const simd &a) { return _mm512_exp2_ps(a); }
 #endif
 
 #ifdef LOW_PRECISION
