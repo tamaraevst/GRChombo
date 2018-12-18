@@ -1,8 +1,8 @@
 #Params for runtime inputs
 
 verbosity = 2
-chk_prefix = /nfs/st01/hpc-gr-epss/mr618/BosonStar
-plot_prefix = /nfs/st01/hpc-gr-epss/mr618/BosonStarp_
+chk_prefix = BosonStar_
+plot_prefix = BosonStarp_
 #restart_file = BosonStar_000060.3d.hdf5
 
 # Set up grid spacings and regrid params
@@ -22,7 +22,7 @@ regrid_threshold_phi = 0.005
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 6 # There are (max_level+1) grids, so min is zero
+max_level = 4 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -31,10 +31,38 @@ regrid_interval = 50 50 5 5 5 5 5
 max_box_size = 16
 min_box_size = 8
 # Determines how exactly regridding tries to fit the tagging
-fill_ratio = 0.7
-#Periodicity and ghost cells
-isPeriodic = 1 1 1
-num_ghosts = 3
+fill_ratio = 0.8
+
+# boundaries and periodicity of grid
+# Periodic directions - 0 = false, 1 = true
+isPeriodic = 0 0 0
+# if not periodic, then specify the boundary type
+# 0 = static, 1 = sommerfeld, 2 = reflective
+# (see BoundaryConditions.hpp for details)
+hi_boundary = 1 1 1
+lo_boundary = 1 1 1
+
+# if sommerfeld boundaries selected, must select
+# asymptotic values (in order given by UserVariables.hpp)
+# 0 = even
+# 1,2,3 = odd x, y, z
+# 4,5,6 = odd xy, yz, xz
+vars_parity            = 0 0 4 6 0 5 0    #chi and hij
+                         0 0 4 6 0 5 0    #K and Aij
+                         0 1 2 3          #Theta and Gamma
+                         0 1 2 3 1 2 3    #lapse shift and B
+                         0 0              #phi and Pi
+                         0 1 2 3          #Ham and Mom
+
+# if reflective boundaries selected, must set
+# parity of all vars (in order given by UserVariables.hpp)
+vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
+                         0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
+                         0.0 0.0 0.0 0.0             #Theta and Gamma
+                         1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B
+                         0.0 0.0 0.0 0.0             #phi and Pi (Re and Im)
+                         0.0 0.0 0.0 0.0             #Ham and Mom
+
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
