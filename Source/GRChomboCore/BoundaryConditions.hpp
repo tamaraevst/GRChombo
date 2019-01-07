@@ -340,12 +340,6 @@ class BoundaryConditions
 
                             // for each direction add dphidx * x^i / r
                             m_rhs_box(iv, icomp) += -d1 * loc[idir2] / radius;
-//DEBUG
-if(icomp == c_phi && iv[0]==0 &&iv[1]==0) 
-{
-pout() << "idir, iv " << idir2 << " , " << iv << " d1 " << d1 << " dir " << dir << endl;
-pout() << "loc, radius, rhs " << loc[idir2] << " , " << radius << " , " << m_rhs_box(iv, icomp) << endl;
-}
                         }
 
                         // asymptotic values - these need to have been set in
@@ -354,11 +348,6 @@ pout() << "loc, radius, rhs " << loc[idir2] << " , " << radius << " , " << m_rhs
                             (m_params.vars_asymptotic_values[icomp] -
                              m_soln_box(iv, icomp)) /
                             radius;
-//DEBUG
-if(icomp == c_phi && iv[0]==0 &&iv[1]==0) 
-{
-pout() << "rhs2 " << m_rhs_box(iv, icomp) << endl;
-}
                     }
                     break;
                 }
