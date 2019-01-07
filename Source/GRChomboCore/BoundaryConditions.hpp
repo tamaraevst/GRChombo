@@ -167,7 +167,7 @@ class BoundaryConditions
                 }
                 else if (a_params.lo_boundary[idir] == SOMMERFELD_BC)
                 {
-                    pout() << "- Sommerfeld boundaries in direction high "
+                    pout() << "- Sommerfeld boundaries in direction low "
                            << idir << endl;
                     pout() << "The non zero asymptotic values of the variables "
                               "in this direction are : "
@@ -246,7 +246,7 @@ class BoundaryConditions
     /// Fill the boundary values appropriately based on the params set
     // in the direction dir
     void fill_boundary_rhs_dir(const Side::LoHiSide a_side, GRLevelData &a_soln,
-                               GRLevelData &a_rhs, const int idir)
+                               GRLevelData &a_rhs, const int dir)
     {
         // iterate through the boxes, shared amongst threads
         DataIterator dit = a_rhs.dataIterator();
@@ -265,9 +265,9 @@ class BoundaryConditions
             // problem domain ie remove all outer ghost cells
             this_box &= m_domain_box;
             // get the boundary box (may be Empty) and the condition on it
-            int boundary_condition = get_boundary_condition(a_side, idir);
+            int boundary_condition = get_boundary_condition(a_side, dir);
             Box boundary_box =
-                get_boundary_box(a_side, idir, offset_lo, offset_hi, this_box);
+                get_boundary_box(a_side, dir, offset_lo, offset_hi, this_box);
 
             // now we have the appropriate box, fill it!
             BoxIterator bit(boundary_box);
@@ -287,8 +287,9 @@ class BoundaryConditions
                 case SOMMERFELD_BC:
                 {
                     // get real position on the grid
-                    RealVect loc(iv + 0.5 * RealVect::Unit - m_center);
+                    RealVect loc(iv + 0.5 * RealVect::Unit);
                     loc *= m_dx;
+                    loc -= m_center;
                     double radius_squared = 0.0;
                     FOR1(i) { radius_squared += loc[i] * loc[i]; }
                     double radius = sqrt(radius_squared);
@@ -305,7 +306,7 @@ class BoundaryConditions
                             IntVect iv_offset2 = iv;
                             double d1;
                             // bit of work to get the right stencils for near
-                            // the edges of the box only using second order
+                            // the edges of the domain only using second order
                             // stencils for now
                             if (lo_local_offset[idir2] < 1)
                             {
@@ -356,18 +357,18 @@ class BoundaryConditions
                     /// where to copy the data from - mirror image in domain
                     if (a_side == Side::Lo)
                     {
-                        iv_copy[idir] = -iv[idir] - 1;
+                        iv_copy[dir] = -iv[dir] - 1;
                     }
                     else
                     {
-                        iv_copy[idir] =
-                            2 * m_domain_box.bigEnd(idir) - iv[idir] + 1;
+                        iv_copy[dir] =
+                            2 * m_domain_box.bigEnd(dir) - iv[dir] + 1;
                     }
 
                     // replace value at iv with value at iv_copy
                     for (int icomp = 0; icomp < NUM_VARS; icomp++)
                     {
-                        int parity = get_vars_parity(icomp, idir);
+                        int parity = get_vars_parity(icomp, dir);
                         m_rhs_box(iv, icomp) =
                             parity * m_rhs_box(iv_copy, icomp);
                     }
