@@ -9,9 +9,11 @@
 #include "AMRInterpolator.hpp"
 #include "InterpolationQuery.hpp"
 #include "Lagrange.hpp"
+#include "SimulationParametersBase.hpp"
 #include "UserVariables.hpp"
 #include <fstream>
 #include <iostream>
+#include <memory>
 
 //!  The class allows extraction of the values of a single variable at points on
 //!  a spherical shell
@@ -22,41 +24,30 @@
 */
 class SphericalExtraction
 {
-  public:
-    struct params_t
-    {
-        double extraction_radius = 0;
-        std::array<double, CH_SPACEDIM> extraction_center = {0.0, 0.0, 0.0};
-        int num_points_phi = 1;
-        int num_points_theta = 1;
-        int extraction_level = 0;
-    };
-
   private:
     //! Params for extraction
-    const params_t m_params;
+    const extraction_params_t m_params;
     const int m_extraction_comp;
     const double m_dt;
     const double m_time;
-    int m_num_points;
+    const int m_num_points;
     std::unique_ptr<double[]> m_state_ptr{new double[m_num_points]};
     std::unique_ptr<double[]> m_interp_x{new double[m_num_points]};
     std::unique_ptr<double[]> m_interp_y{new double[m_num_points]};
     std::unique_ptr<double[]> m_interp_z{new double[m_num_points]};
-    double m_dphi;
-    double m_dtheta;
+    const double m_dphi;
+    const double m_dtheta;
 
   public:
     //! The constructor
-    SphericalExtraction(int a_extraction_comp, params_t a_params, double a_dt,
-                        double a_time)
+    SphericalExtraction(int a_extraction_comp, extraction_params_t a_params,
+                        double a_dt, double a_time)
         : m_extraction_comp(a_extraction_comp), m_params(a_params), m_dt(a_dt),
           m_time(a_time),
-          m_num_points(m_params.num_points_phi * m_params.num_points_theta)
-    {
-        m_dphi = 2.0 * M_PI / m_params.num_points_phi;
-        m_dtheta = M_PI / m_params.num_points_theta;
-    }
+          m_num_points(m_params.num_points_phi * m_params.num_points_theta),
+          m_dphi(2.0 * M_PI / m_params.num_points_phi),
+          m_dtheta(M_PI / m_params.num_points_theta)
+    {}
 
     //! Execute the interpolation query
     void execute_query(AMRInterpolator<Lagrange<4>> *m_interpolator) const;

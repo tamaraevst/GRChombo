@@ -14,6 +14,11 @@
 inline void SphericalExtraction::execute_query(
     AMRInterpolator<Lagrange<4>> *m_interpolator) const
 {
+    if (m_interpolator == nullptr)
+    {
+        MayDay::Error("Interpolator has not been initialised in GRAMR class.");
+    }
+
     // Work out the coordinates
     for (int idx = 0; idx < m_num_points; ++idx)
     {
@@ -45,7 +50,12 @@ inline void SphericalExtraction::execute_query(
 inline void SphericalExtraction::write_extraction(string file_prefix) const
 {
     int rank;
+#ifdef CH_MPI
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
+#else
+    rank = 0;
+#endif
+
     // only rank 0 does the write out
     if (rank == 0)
     {
@@ -56,7 +66,7 @@ inline void SphericalExtraction::write_extraction(string file_prefix) const
         sprintf(comp_str, UserVariables::variable_names[m_extraction_comp]);
 
         // write out complete data to a separate file at each step
-        ofstream outfile;
+        std::ofstream outfile;
         outfile.open(file_str);
         if (!outfile.is_open())
         {
@@ -91,33 +101,44 @@ inline void SphericalExtraction::write_extraction(string file_prefix) const
 //! integrate over a spherical shell
 inline double SphericalExtraction::integrate_surface() const
 {
+    int rank;
+#ifdef CH_MPI
+    MPI_Comm_rank(Chombo_MPI::comm, &rank);
+#else
+    rank = 0;
+#endif
     std::vector<double> integrand;
-    for (int idx = 0; idx < m_num_points; ++idx)
+
+    // only rank 0 does the integral
+    if (rank == 0)
     {
-        // setup the integrand for next stage
-        double x = m_interp_x[idx] - m_params.extraction_center[0];
-        double y = m_interp_y[idx] - m_params.extraction_center[1];
-        double z = m_interp_z[idx] - m_params.extraction_center[2];
-        integrand[idx] = m_state_ptr[idx];
-    }
-    // integrate the values over the sphere (normalised by r^2)
-    // assumes spacings constant, uses trapezium rule for phi and rectangles for
-    // theta  note we don't have to fudge the end points for phi because the
-    // function is periodic  and so the last point (implied but not part of
-    // vector) is equal to the first point
-    double integral = 0;
-    for (int iphi = 0; iphi < m_params.num_points_phi; ++iphi)
-    {
-        double phi = iphi * 2 * M_PI / m_params.num_points_phi;
-        double inner_integral = 0;
-        for (int itheta = 0; itheta < m_params.num_points_theta; itheta++)
+        for (int idx = 0; idx < m_num_points; ++idx)
         {
-            double theta = (itheta + 0.5) * m_dtheta;
-            int idx = itheta * m_params.num_points_phi + iphi;
-            double f_theta_phi = integrand[idx] * sin(theta);
-            inner_integral += m_dtheta * f_theta_phi;
+            // setup the integrand for next stage
+            double x = m_interp_x[idx] - m_params.extraction_center[0];
+            double y = m_interp_y[idx] - m_params.extraction_center[1];
+            double z = m_interp_z[idx] - m_params.extraction_center[2];
+            integrand[idx] = m_state_ptr[idx];
         }
-        integral += m_dphi * inner_integral;
+        // integrate the values over the sphere (normalised by r^2)
+        // assumes spacings constant, uses trapezium rule for phi and rectangles for
+        // theta  note we don't have to fudge the end points for phi because the
+        // function is periodic  and so the last point (implied but not part of
+        // vector) is equal to the first point
+        double integral = 0;
+        for (int iphi = 0; iphi < m_params.num_points_phi; ++iphi)
+        {
+            double phi = iphi * 2 * M_PI / m_params.num_points_phi;
+            double inner_integral = 0;
+            for (int itheta = 0; itheta < m_params.num_points_theta; itheta++)
+            {
+                double theta = (itheta + 0.5) * m_dtheta;
+                int idx = itheta * m_params.num_points_phi + iphi;
+                double f_theta_phi = integrand[idx] * sin(theta);
+                inner_integral += m_dtheta * f_theta_phi;
+            }
+            integral += m_dphi * inner_integral;
+        }
     }
     return integral;
 }
@@ -127,7 +148,11 @@ inline void SphericalExtraction::write_integral(double integral,
                                                 string file_name) const
 {
     int rank;
+#ifdef CH_MPI
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
+#else
+    rank = 0;
+#endif
     // only rank 0 does the write out
     if (rank == 0)
     {
