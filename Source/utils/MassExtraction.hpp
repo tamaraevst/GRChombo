@@ -23,4 +23,4 @@ class MassExtraction : public SphericalExtraction
         double Madm = SphericalExtraction::integrate_surface();
         SphericalExtraction::write_integral(Madm, "ADMMass");
     }
-}
+};
