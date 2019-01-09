@@ -24,3 +24,5 @@ class MassExtraction : public SphericalExtraction
         SphericalExtraction::write_integral(Madm, "ADMMass");
     }
 };
+
+#endif /* MASSEXTRACTION_HPP_ */
