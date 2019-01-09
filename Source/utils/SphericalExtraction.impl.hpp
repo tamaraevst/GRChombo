@@ -108,6 +108,7 @@ inline double SphericalExtraction::integrate_surface() const
     rank = 0;
 #endif
     std::vector<double> integrand;
+    double integral = 0.;
 
     // only rank 0 does the integral
     if (rank == 0)
@@ -125,7 +126,6 @@ inline double SphericalExtraction::integrate_surface() const
         // theta  note we don't have to fudge the end points for phi because the
         // function is periodic  and so the last point (implied but not part of
         // vector) is equal to the first point
-        double integral = 0;
         for (int iphi = 0; iphi < m_params.num_points_phi; ++iphi)
         {
             double phi = iphi * 2 * M_PI / m_params.num_points_phi;
