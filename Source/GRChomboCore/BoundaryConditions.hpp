@@ -646,7 +646,7 @@ class BoundaryConditions
             {
                 if (offset_lo[idir] > 0) // this direction is a low end boundary
                 {
-                    if ((idir > a_dir) && !(m_params.is_periodic[idir]))
+                    if ((idir > a_dir) || (m_params.is_periodic[idir]))
                     {
                         // grow it to fill the corners
                         boundary_box.growLo(idir,
@@ -664,7 +664,7 @@ class BoundaryConditions
                 if (offset_hi[idir] > 0) // this direction is a high end
                                          // boundary
                 {
-                    if ((idir > a_dir) && !(m_params.is_periodic[idir]))
+                    if ((idir > a_dir) || (m_params.is_periodic[idir]))
                     {
                         // grow it to fill the corners
                         boundary_box.growHi(idir,
