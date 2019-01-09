@@ -32,6 +32,11 @@ int runGRChombo(int argc, char *argv[])
                                                                   sim_params);
     setupAMRObject(gr_amr, boson_star_level_fact);
 
+    // Instantiate AMR interpolator for mass/GW extraction
+    AMRInterpolator<Lagrange<4>> interpolator(
+        gr_amr, sim_params.origin, sim_params.dx, sim_params.verbosity);
+    gr_amr.set_interpolator(&interpolator);
+
     using Clock = std::chrono::steady_clock;
     using Minutes = std::chrono::duration<double, std::ratio<60, 1>>;
 

@@ -27,31 +27,36 @@ class BosonStarLevel : public GRAMRLevel
     typedef ComplexScalarField<Potential> ComplexScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
-    virtual void specificAdvance();
+    virtual void specificAdvance() override;
 
     //! Initialize data for the field and metric variables
-    virtual void initialData();
+    virtual void initialData() override;
 
     //! routines to do before outputing checkpoint file
-    virtual void preCheckpointLevel();
+    virtual void preCheckpointLevel() override;
 
     //! routines to do before outputing plot file
-    virtual void prePlotLevel();
+    virtual void prePlotLevel() override;
 
     //! RHS routines used at each RK4 step
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
-                                 const double a_time);
+                                 const double a_time) override;
 
     //! Things to do in UpdateODE step, after soln + rhs update
     virtual void specificUpdateODE(GRLevelData &a_soln,
-                                   const GRLevelData &a_rhs, Real a_dt);
+                                   const GRLevelData &a_rhs,
+                                   Real a_dt) override;
 
     //! Specify which variables to write at plot intervals
     virtual void specificWritePlotHeader(std::vector<int> &plot_states) const;
 
     //! Tell Chombo how to tag cells for regridding
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
-                                         const FArrayBox &current_state);
+                                         const FArrayBox &current_state)
+                                         override;
+
+    //! Things to do after every time step on each level
+    virtual void specificPostTimeStep() override;
 };
 
 #endif /* BOSONSTARLEVEL_HPP_ */
