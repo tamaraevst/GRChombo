@@ -18,9 +18,14 @@ log*
 *.out
 *.hdf5
 *.dSYM
+<<<<<<< HEAD
 .gcc-flags.json
 *.o
 test
 *.dat
+=======
+*.dat
+*.gcc-flags.json
+>>>>>>> feature/spherical_extraction
 
 Doxygen/html

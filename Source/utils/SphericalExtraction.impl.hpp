@@ -172,7 +172,7 @@ inline void SphericalExtraction::write_integral(double integral,
             outfile2 << std::setw(20) << "integral" << std::endl;
         }
         outfile2 << std::setw(20) << m_time;
-        outfile2 << std::setw(20) << integral << std::setprecision(9)
+        outfile2 << std::setw(20) << std::setprecision(9) << integral
                  << std::endl;
         outfile2.close();
     }

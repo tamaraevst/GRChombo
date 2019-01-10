@@ -33,11 +33,10 @@ class ADMMass
         m_deriv; //!< An object for calculating derivatives of the variables
     const double m_dx;
     const double m_L;
-    const double m_G_Newton;
 
   public:
-    ADMMass(double a_L, double a_dx, double a_G_Newton)
-        : m_deriv(a_dx), m_dx(a_dx), m_L(a_L), m_G_Newton(a_G_Newton) {}
+    ADMMass(double a_L, double a_dx)
+        : m_deriv(a_dx), m_dx(a_dx), m_L(a_L) {}
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
@@ -61,10 +60,10 @@ class ADMMass
         data_t Madm = 0.0;
         FOR4(i, j, k, l)
         {
-            Madm += dS[i] / (16. * M_PI * m_G_Newton) * h_UU[j][k]
-                    * h_UU[i][l] * (pow(vars.chi, -0.5) * (d1.h[l][k][j]
-                    - d1.h[j][k][l]) - pow(vars.chi, -1.5) * (vars.h[l][j]
-                    * d1.chi[j] - vars.h[j][k] * d1.chi[l]));
+            Madm += dS[i] / (16. * M_PI) * h_UU[j][k] * h_UU[i][l]
+                    * (pow(vars.chi, -0.5) * (d1.h[l][k][j] - d1.h[j][k][l])
+                    - pow(vars.chi, -1.5) * (vars.h[l][j] * d1.chi[j]
+                    - vars.h[j][k] * d1.chi[l]));
         }
 
         // spin about z axis
@@ -76,14 +75,14 @@ class ADMMass
 
         FOR3(i, j, k)
         {
-            Jadm += -dS[i] / (8. * M_PI * m_G_Newton) * epsilon[2][j][k] *
+            Jadm += -dS[i] / (8. * M_PI) * epsilon[2][j][k] *
                     pow(vars.chi, -1.5) * x[j] * vars.K *
                     TensorAlgebra::delta(i, k);
 
             FOR2(l, m)
             {
-                Jadm += dS[i] / (8. * M_PI * m_G_Newton) * epsilon[2][j][k]
-                        * x[j] * h_UU[i][l] * h_UU[k][m] * pow(vars.chi, -0.5) *
+                Jadm += dS[i] / (8. * M_PI) * epsilon[2][j][k] * x[j]
+                        * h_UU[i][l] * h_UU[k][m] * pow(vars.chi, -0.5) *
                         (vars.A[l][m] + 1.0 / 3.0 * vars.K * vars.h[l][m]);
             }
         }
