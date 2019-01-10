@@ -37,7 +37,7 @@ class ADMMass
 
   public:
     ADMMass(double a_L, double a_dx, double a_G_Newton)
-        : m_deriv(a_dx), m_L(a_L), m_dx(a_dx), m_G_Newton(a_G_Newton) {}
+        : m_deriv(a_dx), m_dx(a_dx), m_L(a_L), m_G_Newton(a_G_Newton) {}
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
