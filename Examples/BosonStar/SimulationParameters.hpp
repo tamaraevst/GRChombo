@@ -26,8 +26,8 @@ public:
     void readParams(GRParmParse &pp)
     {
         // for regridding
-        pp.load("regrid_threshold_K", regrid_threshold_K);
         pp.load("regrid_threshold_phi", regrid_threshold_phi);
+        pp.load("regrid_threshold_chi", regrid_threshold_chi);
 
         // Gravitional constant
         pp.load("G_Newton", G_Newton, 1.0);
@@ -67,7 +67,7 @@ public:
     }
 
     // Tagging thresholds
-    Real regrid_threshold_K, regrid_threshold_phi;
+    Real regrid_threshold_phi, regrid_threshold_chi;
 
     // Initial data for matter and potential
     double G_Newton;

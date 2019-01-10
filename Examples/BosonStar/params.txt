@@ -17,12 +17,13 @@ L = 128
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
-regrid_threshold_K = 5
-regrid_threshold_phi = 0.005
+regrid_threshold_phi = 1
+regrid_threshold_chi = 1
+
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 4 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -71,7 +72,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
 checkpoint_interval = 10
 plot_interval = 2
 dt_multiplier = 0.25
-stop_time = 5.0
+stop_time = 0.0
 
 #Lapse evolution
 lapse_power = 1.0

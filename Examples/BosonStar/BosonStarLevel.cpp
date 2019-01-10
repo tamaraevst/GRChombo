@@ -17,7 +17,7 @@
 #include "MatterConstraints.hpp"
 
 // For tag cells
-#include "ComplexPhiAndKTaggingCriterion.hpp"
+#include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ComputePack.hpp"
@@ -146,7 +146,7 @@ void BosonStarLevel::specificPostTimeStep()
         CH_TIME("BosonStarLevel::specificPostTimeStep");
         if (m_verbosity)
             pout() << "Extracting Mass." << endl;
-        
+
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
         ADMMass adm_mass(m_p.L, m_dx, m_p.G_Newton);
@@ -171,7 +171,8 @@ void BosonStarLevel::specificWritePlotHeader(
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
-    BoxLoops::loop(ComplexPhiAndKTaggingCriterion(m_dx, m_p.regrid_threshold_phi,
-                                           m_p.regrid_threshold_K),
+    BoxLoops::loop(ComplexPhiAndChiExtractionTaggingCriterion(m_dx, m_level,
+        m_p.mass_extraction_params, m_p.regrid_threshold_phi,
+        m_p.regrid_threshold_chi),
                    current_state, tagging_criterion);
 }
