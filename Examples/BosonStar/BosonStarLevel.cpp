@@ -149,7 +149,7 @@ void BosonStarLevel::specificPostTimeStep()
 
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
-        ADMMass adm_mass(m_p.L, m_dx, m_p.G_Newton);
+        ADMMass adm_mass(m_p.L, m_dx);
         BoxLoops::loop(make_compute_pack(adm_mass), m_state_new, m_state_new,
                         EXCLUDE_GHOST_CELLS);
 
