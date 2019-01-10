@@ -63,7 +63,7 @@ inline void SphericalExtraction::write_extraction(string file_prefix) const
         int step = m_time / m_dt;
         string file_str = file_prefix + std::to_string(step);
         char comp_str[20];
-        sprintf(comp_str, UserVariables::variable_names[m_extraction_comp]);
+        strcpy(comp_str, UserVariables::variable_names[m_extraction_comp]);
 
         // write out complete data to a separate file at each step
         std::ofstream outfile;
@@ -107,20 +107,11 @@ inline double SphericalExtraction::integrate_surface() const
 #else
     rank = 0;
 #endif
-    std::vector<double> integrand;
     double integral = 0.;
 
     // only rank 0 does the integral
     if (rank == 0)
     {
-        for (int idx = 0; idx < m_num_points; ++idx)
-        {
-            // setup the integrand for next stage
-            double x = m_interp_x[idx] - m_params.extraction_center[0];
-            double y = m_interp_y[idx] - m_params.extraction_center[1];
-            double z = m_interp_z[idx] - m_params.extraction_center[2];
-            integrand[idx] = m_state_ptr[idx];
-        }
         // integrate the values over the sphere (normalised by r^2)
         // assumes spacings constant, uses trapezium rule for phi and rectangles for
         // theta  note we don't have to fudge the end points for phi because the
@@ -128,13 +119,13 @@ inline double SphericalExtraction::integrate_surface() const
         // vector) is equal to the first point
         for (int iphi = 0; iphi < m_params.num_points_phi; ++iphi)
         {
-            double phi = iphi * 2 * M_PI / m_params.num_points_phi;
+            //double phi = iphi * 2 * M_PI / m_params.num_points_phi;
             double inner_integral = 0;
             for (int itheta = 0; itheta < m_params.num_points_theta; itheta++)
             {
                 double theta = (itheta + 0.5) * m_dtheta;
                 int idx = itheta * m_params.num_points_phi + iphi;
-                double f_theta_phi = integrand[idx] * sin(theta);
+                double f_theta_phi = m_state_ptr[idx] * sin(theta);
                 inner_integral += m_dtheta * f_theta_phi;
             }
             integral += m_dphi * inner_integral;
@@ -157,7 +148,6 @@ inline void SphericalExtraction::write_integral(double integral,
     if (rank == 0)
     {
         // and append the integral output to a file - one file for whole run
-        int step = m_time / m_dt;
         string file_str = file_name;
         std::ofstream outfile2;
         if (m_time == m_dt)

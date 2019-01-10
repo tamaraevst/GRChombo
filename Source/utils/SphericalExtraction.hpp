@@ -42,7 +42,7 @@ class SphericalExtraction
     //! The constructor
     SphericalExtraction(int a_extraction_comp, extraction_params_t a_params,
                         double a_dt, double a_time)
-        : m_extraction_comp(a_extraction_comp), m_params(a_params), m_dt(a_dt),
+        : m_params(a_params), m_extraction_comp(a_extraction_comp), m_dt(a_dt),
           m_time(a_time),
           m_num_points(m_params.num_points_phi * m_params.num_points_theta),
           m_dphi(2.0 * M_PI / m_params.num_points_phi),
