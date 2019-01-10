@@ -19,7 +19,7 @@ class MassExtraction : public SphericalExtraction
     //! Extract the mass
     void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator) const
     {
-        CH_TIME(MassExtraction::execute_query);
+        CH_TIME("MassExtraction::execute_query");
         SphericalExtraction::execute_query(a_interpolator);
         double Madm = SphericalExtraction::integrate_surface();
         SphericalExtraction::write_integral(Madm, "ADMmass.dat");
