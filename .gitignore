@@ -15,5 +15,6 @@ log*
 *.out
 *.hdf5
 *.dSYM
+Weyl_integral*
 
 Doxygen/html
