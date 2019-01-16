@@ -142,11 +142,6 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
 #else
     rank = 0;
-<<<<<<< HEAD
-    FILE *file;
-    file = fopen(filename, "a");
-=======
->>>>>>> master
 #endif
     // only rank 0 does the write out
     if (rank == 0)
@@ -170,40 +165,16 @@ inline void WeylExtraction::write_integral(std::array<double, 2> integral,
         // Header data at first timestep
         if (m_time == m_dt)
         {
-<<<<<<< HEAD
-            char header[char_length];
-            snprintf(header, char_length,
-                     "# m_time      integral Re   integral Im \n");
-#ifdef CH_MPI
-            MPI_File_write(mpi_file, header, strlen(header), MPI_CHAR,
-                           MPI_STATUS_IGNORE);
-#else
-            fwrite(header, sizeof(char), strlen(header), file);
-#endif
-=======
             outfile << "#" << std::setw(9) << "time";
             outfile << std::setw(20) << "integral Re";
             outfile << std::setw(20) << "integral Im" << std::endl;
->>>>>>> master
         }
 
         // Now the data
-<<<<<<< HEAD
-        char data[char_length];
-        snprintf(data, char_length, "%f     %e     %e \n", m_time, integral[0],
-                 integral[1]);
-#ifdef CH_MPI
-        MPI_File_write(mpi_file, data, strlen(data), MPI_CHAR,
-                       MPI_STATUS_IGNORE);
-#else
-        fwrite(data, sizeof(char), strlen(data), file);
-#endif
-=======
         outfile << std::fixed << std::setw(10) << m_time;
         outfile << std::scientific << std::setw(20) << std::setprecision(10);
         outfile << integral[0] << std::setw(20) << integral[1] << std::endl;
         outfile.close();
->>>>>>> master
     }
 }
 
@@ -217,52 +188,10 @@ inline void WeylExtraction::write_extraction(std::string file_prefix,
     MPI_Comm_rank(Chombo_MPI::comm, &rank);
 #else
     rank = 0;
-<<<<<<< HEAD
-    FILE *file;
-#endif
-    char step_str[10];
-    sprintf(step_str, "%d", (int)round(m_time / m_dt));
-    char filename[20] = "";
-    strcat(filename, file_prefix);
-    strcat(filename, step_str);
-#ifdef CH_MPI
-    MPI_File_open(Chombo_MPI::comm, filename,
-                  MPI_MODE_CREATE | MPI_MODE_WRONLY | MPI_MODE_APPEND,
-                  MPI_INFO_NULL, &mpi_file);
-#else
-    file = fopen(filename, "a");
-=======
->>>>>>> master
 #endif
     // only rank 0 does the write out
     if (rank == 0)
     {
-<<<<<<< HEAD
-        // Header data
-        char comp_str_re[20];
-        char comp_str_im[20];
-        sprintf(comp_str_re, UserVariables::variable_names[m_re_comp]);
-        sprintf(comp_str_im, UserVariables::variable_names[m_im_comp]);
-        char header1[20];
-        snprintf(header1, 20, "# m_time : %f \n", m_time);
-#ifdef CH_MPI
-        MPI_File_write(mpi_file, header1, strlen(header1), MPI_CHAR,
-                       MPI_STATUS_IGNORE);
-#else
-        fwrite(header1, sizeof(char), strlen(header1), file);
-#endif
-        char header2[70] = "";
-        strcat(header2, "# theta     phi     ");
-        strcat(header2, comp_str_re);
-        strcat(header2, comp_str_im);
-        strcat(header2, "/n");
-#ifdef CH_MPI
-        MPI_File_write(mpi_file, header2, strlen(header2), MPI_CHAR,
-                       MPI_STATUS_IGNORE);
-#else
-        fwrite(header2, sizeof(char), strlen(header2), file);
-#endif
-=======
         // set up file names and component names
         int step = std::round(m_time / m_dt);
         std::string file_str = file_prefix + std::to_string(step);
@@ -284,7 +213,6 @@ inline void WeylExtraction::write_extraction(std::string file_prefix,
         outfile << std::setw(12) << "phi";
         outfile << std::setw(20) << comp_str_re;
         outfile << std::setw(20) << comp_str_im << "\n";
->>>>>>> master
 
         // Now the data
         for (int idx = 0; idx < m_num_points; ++idx)
@@ -294,24 +222,12 @@ inline void WeylExtraction::write_extraction(std::string file_prefix,
             // don't put a point at z = 0
             double theta = (itheta + 0.5) * m_dtheta;
             double phi = iphi * m_dphi;
-<<<<<<< HEAD
-            char data[70];
-            snprintf(data, 70, "%f     %f     %e     %e \n", theta, phi,
-                     m_state_ptr_re[idx], m_state_ptr_im[idx]);
-#ifdef CH_MPI
-            MPI_File_write(mpi_file, data, strlen(data), MPI_CHAR,
-                           MPI_STATUS_IGNORE);
-#else
-            fwrite(data, sizeof(char), strlen(data), file);
-#endif
-=======
             outfile << std::fixed << std::setprecision(7);
             outfile << std::setw(12) << theta;
             outfile << std::setw(12) << phi;
             outfile << std::scientific << std::setprecision(10);
             outfile << std::setw(20) << m_state_ptr_re[idx];
             outfile << std::setw(20) << m_state_ptr_im[idx] << "\n";
->>>>>>> master
         }
         outfile.close();
     }
