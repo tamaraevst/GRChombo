@@ -546,7 +546,7 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
 
     // Get the periodicity info
     bool isPeriodic[SpaceDim] = {
-        false}; //default to false unless other info is available
+        false}; // default to false unless other info is available
     for (int dir = 0; dir < SpaceDim; ++dir)
     {
         char dir_str[20];
