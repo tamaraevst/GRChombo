@@ -19,6 +19,7 @@ log*
 *.hdf5
 *.dSYM
 <<<<<<< HEAD
+<<<<<<< HEAD
 .gcc-flags.json
 *.o
 test
@@ -27,5 +28,8 @@ test
 *.dat
 *.gcc-flags.json
 >>>>>>> feature/spherical_extraction
+=======
+Weyl_integral*
+>>>>>>> master
 
 Doxygen/html
