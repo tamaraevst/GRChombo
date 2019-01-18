@@ -147,33 +147,32 @@ inline void SphericalExtraction::write_integral(double integral,
     // only rank 0 does the write out
     if (rank == 0)
     {
-        // and append the integral output to a file - one file for whole run
-        string file_str = file_name;
+        // overwrite file if this is the first timestep, otherwise append.
         std::ofstream outfile2;
         if (m_time == m_dt)
         {
-            outfile2.open(file_str);
+            outfile2.open(file_name);
         }
         else
         {
-            outfile2.open(file_str, std::ios_base::app);
+            outfile2.open(file_name, std::ios_base::app);
         }
         if (!outfile2.is_open())
         {
             MayDay::Error(
-                "in SphericalExtraction::error opening output file for "
-                "extraction integral");
+                "SphericalExtraction::write_integral: error opening output "
+                "file");
         }
 
         // Header data at first timestep
         if (m_time == m_dt)
         {
-            outfile2 << "#" << std::setw(19) << "m_time";
+            outfile2 << "#" << std::setw(9) << "time";
             outfile2 << std::setw(20) << "integral" << std::endl;
         }
-        outfile2 << std::setw(20) << m_time;
-        outfile2 << std::setw(20) << std::setprecision(9) << integral
-                 << std::endl;
+        outfile2 << std::fixed << std::setw(10) << m_time;
+        outfile2 << std::scientific <<std::setw(20) << std::setprecision(10);
+        outfile2 << integral << std::endl;
         outfile2.close();
     }
 }
