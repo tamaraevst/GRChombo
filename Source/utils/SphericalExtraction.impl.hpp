@@ -160,8 +160,8 @@ inline void SphericalExtraction::write_integral(double integral,
         if (!outfile2.is_open())
         {
             MayDay::Error(
-                "SphericalExtraction::write_integral: error opening output
-                file");
+                "SphericalExtraction::write_integral: error opening output "
+                "file");
         }
 
         // Header data at first timestep
