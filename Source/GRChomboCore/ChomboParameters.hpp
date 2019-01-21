@@ -7,8 +7,8 @@
 #define CHOMBOPARAMETERS_HPP_
 
 // General includes
-#include "GRParmParse.hpp"
 #include "BoundaryConditions.hpp"
+#include "GRParmParse.hpp"
 
 class ChomboParameters
 {

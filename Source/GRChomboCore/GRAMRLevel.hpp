@@ -131,8 +131,12 @@ class GRAMRLevel : public AMRLevel, public InterpSource
                                          const FArrayBox &current_state) = 0;
 
     /// This function shouldbe overriden to fill ghost cells outside the domain
-    /// (for non-periodic boundary conditions)
+    /// (for non-periodic boundary conditions, where values depend on state)
     virtual void fillBdyGhosts() {}
+
+    /// This function shouldbe overriden to copy ghost cells outside the domain
+    /// (for non-periodic boundary conditions, where boundaries evolve via rhs)
+    virtual void copyBdyGhosts() {}
 
 #ifdef CH_USE_HDF5
     /// Things to do immediately before checkpointing

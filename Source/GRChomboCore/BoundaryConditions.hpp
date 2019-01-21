@@ -19,6 +19,9 @@
 /// the high and low directions.
 /// In cases where different variables/boundaries are required, the user should
 /// (usually) write their own conditions class which inherits from this one.
+/// Note that these conditions enforce a certain rhs based on the current values
+/// of the grid variables. (Another option would be to enforce grid values, e.g.
+/// by extrapolating from within the grid.)
 class BoundaryConditions
 {
   public:
@@ -54,16 +57,16 @@ class BoundaryConditions
 
   protected:
     // Member values
-    double m_dx;
-    int m_num_ghosts;
-    params_t m_params;
-    RealVect m_center;
-    ProblemDomain m_domain;
-    Box m_domain_box;
-    bool is_defined;
+    double m_dx;            // The grid spacing
+    int m_num_ghosts;       // the number of ghosts (usually 3)
+    params_t m_params;      // the boundary params
+    RealVect m_center;      // the position of the center of the grid
+    ProblemDomain m_domain; // the problem domain (excludes boundary cells)
+    Box m_domain_box;       // The box representing the domain
+    bool is_defined; // whether the BoundaryConditions class members are defined
 
   public:
-    /// Default constructor - need to call define
+    /// Default constructor - need to call define afterwards
     BoundaryConditions() { is_defined = false; }
 
     /// define function sets members and is_defined set to true
@@ -79,7 +82,7 @@ class BoundaryConditions
         is_defined = true;
     }
 
-    // change the asymptotic values of the variables for the sommerfeld BCs
+    // change the asymptotic values of the variables for the Sommerfeld BCs
     // this will allow them to evolve during a simulation if necessary
     void set_vars_asymptotic_values(
         std::array<double, NUM_VARS> &vars_asymptotic_values)
@@ -87,7 +90,7 @@ class BoundaryConditions
         m_params.vars_asymptotic_values = vars_asymptotic_values;
     }
 
-    // write out boundary params (used during setup)
+    // write out boundary params (used during setup for debugging)
     static void write_boundary_conditions(params_t a_params)
     {
         pout() << "You are using non periodic boundary conditions." << endl;
@@ -200,7 +203,7 @@ class BoundaryConditions
         return vars_parity;
     }
 
-    // static version used for pout
+    // static version used for initial output of boundary values
     static int get_vars_parity(int a_comp, int a_dir, params_t a_params)
     {
         int vars_parity = 1;
@@ -232,7 +235,7 @@ class BoundaryConditions
         CH_assert(is_defined);
         CH_TIME("BoundaryConditions::fill_boundary_rhs");
 
-        // cycle through the directions
+        // cycle through the directions, filling the rhs
         FOR1(idir)
         {
             // only do something if this direction is not periodic
@@ -276,6 +279,7 @@ class BoundaryConditions
                 IntVect iv = bit();
                 switch (boundary_condition)
                 {
+                // simplest case - boundary values are fixed to the initial ones
                 case STATIC_BC:
                 {
                     for (int icomp = 0; icomp < NUM_VARS; icomp++)
@@ -284,6 +288,8 @@ class BoundaryConditions
                     }
                     break;
                 }
+                // assumes an asymptotic value + radial waves and permits them
+                // to exit grid with minimal reflections
                 case SOMMERFELD_BC:
                 {
                     // get real position on the grid
@@ -306,7 +312,7 @@ class BoundaryConditions
                             IntVect iv_offset2 = iv;
                             double d1;
                             // bit of work to get the right stencils for near
-                            // the edges of the domain only using second order
+                            // the edges of the domain, only using second order
                             // stencils for now
                             if (lo_local_offset[idir2] < 1)
                             {
@@ -351,6 +357,10 @@ class BoundaryConditions
                     }
                     break;
                 }
+                // assume boundary is a reflection of values within the grid
+                // care must be taken with variable parity to maintain correct
+                // values on reflection, e.g. x components of vectors are odd
+                // parity in the x direction
                 case REFLECTIVE_BC:
                 {
                     IntVect iv_copy = iv;
@@ -383,6 +393,7 @@ class BoundaryConditions
     }
 
     /// Copy the boundary values from src to dest
+    /// NB assumes same box layout of input and output data
     void copy_boundary_cells(const Side::LoHiSide a_side,
                              const GRLevelData &a_src, GRLevelData &a_dest)
     {
@@ -450,7 +461,7 @@ class BoundaryConditions
                 int boundary_condition = get_boundary_condition(a_side, idir);
 
                 // as a bit of a hack, just use the rhs update, since it is the
-                // same copying of cells
+                // same copying of cells which we require for the solution
                 if (boundary_condition == REFLECTIVE_BC)
                 {
                     fill_boundary_rhs_dir(a_side, a_state, a_state, idir);
@@ -460,6 +471,7 @@ class BoundaryConditions
     }
 
     /// Fill the fine boundary values in a_state
+    /// Required for interpolating onto finer levels at boundaries
     void interp_boundaries(GRLevelData &a_fine_state,
                            GRLevelData &a_coarse_state,
                            const Side::LoHiSide a_side)
@@ -499,7 +511,7 @@ class BoundaryConditions
                                       coarsened_fine.interval(),
                                       boundary_copier);
 
-                // iterate through the boxes, shared amongst threads
+                // iterate through the coarse boxes, shared amongst threads
                 DataIterator dit = coarsened_layout.dataIterator();
                 int nbox = dit.size();
 #pragma omp parallel for default(shared)
@@ -520,8 +532,8 @@ class BoundaryConditions
                     this_box &= coarse_domain_box;
 
                     // get the boundary box - remove one cell as we only want 2
-                    // coarse cells filled in each direction to fill the 3 fine
-                    // cells above
+                    // coarse cells filled in each direction, to fill the 3 fine
+                    // cells on the level above
                     Box boundary_box = get_boundary_box(a_side, idir, offset_lo,
                                                         offset_hi, this_box, 1);
 
@@ -532,7 +544,7 @@ class BoundaryConditions
                     FourthOrderInterpStencil default_stencil(default_offset,
                                                              ref_ratio);
 
-                    // now interp the box
+                    // now interp the box from coarse to fine
                     BoxIterator bit(boundary_box);
                     for (bit.begin(); bit.ok(); ++bit)
                     {
@@ -641,7 +653,8 @@ class BoundaryConditions
 
             // adjust for any offsets - catches the corners etc
             // but only want to fill them once, so x fills y and z, y fills z
-            // etc
+            // etc. Required in periodic direction corners in cases where there
+            // are mixed boundaries, (otherwise these corners are full of nans)
             FOR1(idir)
             {
                 if (offset_lo[idir] > 0) // this direction is a low end boundary
