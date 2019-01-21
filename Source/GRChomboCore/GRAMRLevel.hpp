@@ -130,14 +130,6 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state) = 0;
 
-    /// This function shouldbe overriden to fill ghost cells outside the domain
-    /// (for non-periodic boundary conditions, where values depend on state)
-    virtual void fillBdyGhosts() {}
-
-    /// This function shouldbe overriden to copy ghost cells outside the domain
-    /// (for non-periodic boundary conditions, where boundaries evolve via rhs)
-    virtual void copyBdyGhosts() {}
-
 #ifdef CH_USE_HDF5
     /// Things to do immediately before checkpointing
     virtual void preCheckpointLevel() {}
@@ -167,6 +159,14 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// Fill ghosts cells from boxes on this level only. Do not interpolate
     /// between levels.
     virtual void fillIntralevelGhosts();
+
+    /// This function is used to fill ghost cells outside the domain
+    /// (for non-periodic boundary conditions, where values depend on state)
+    virtual void fillBdyGhosts(GRLevelData &a_state);
+
+    /// This function is used to copy ghost cells outside the domain
+    /// (for non-periodic boundary conditions, where boundaries evolve via rhs)
+    virtual void copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest);
 
     BoundaryConditions m_boundaries; // the class for implementing BCs
 

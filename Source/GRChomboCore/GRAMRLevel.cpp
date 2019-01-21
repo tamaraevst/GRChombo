@@ -822,7 +822,7 @@ void GRAMRLevel::updateODE(GRLevelData &soln, const GRLevelData &rhs, Real dt)
     soln.plus(rhs, dt);
 
     specificUpdateODE(soln, rhs, dt);
-    fillBdyGhosts(soln)
+    fillBdyGhosts(soln);
 }
 
 // define data holder newSoln based on existingSoln,
@@ -892,7 +892,7 @@ void GRAMRLevel::fillBdyGhosts(GRLevelData &a_state)
     }
 }
 
-void GRAMRLevel::copyBdyGhosts(GRLevelData &a_src, GRLevelData &a_dest)
+void GRAMRLevel::copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest)
 {
     // Specifically copy boundary cells if non periodic as
     // cells outside the domain are not copied by default
