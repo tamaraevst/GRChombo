@@ -1,6 +1,9 @@
+jobscript
+.bashrc
 pout.*
 .bashrc
 *.pbs
+*.sh
 *.s
 jobscript*
 d
@@ -17,5 +20,7 @@ log*
 *.dSYM
 *.dat
 *.gcc-flags.json
+Weyl_integral*
+
 
 Doxygen/html
