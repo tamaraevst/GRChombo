@@ -27,7 +27,7 @@ class SimulationParameters : public SimulationParametersBase
     void readParams(GRParmParse &pp)
     {
         // for regridding
-        pp.load("regrid_threshold_K", regrid_threshold_K);
+        pp.load("regrid_threshold_chi", regrid_threshold_chi);
         pp.load("regrid_threshold_phi", regrid_threshold_phi);
 
         // Initial and SF data
@@ -44,8 +44,9 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("relaxspeed", relaxspeed);
     }
 
-    // Regrid parameters
-    Real regrid_threshold_K, regrid_threshold_phi;
+    // Problem specific parameters
+    Real regrid_threshold_chi, regrid_threshold_phi;
+
     // Initial data for matter and potential
     double G_Newton;
     ScalarBubble::params_t initial_params;
