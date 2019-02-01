@@ -16,11 +16,11 @@
 #include <iostream>
 
 //!  The class allows extraction of the values of the Weyl scalar components on
-//!  a spherical shell, and integration over that shell
+//!  spherical shells at specified radii, and integration over those shells
 /*!
-   The class allows the user to extract data from the grid for thr Weyl
-   components over a spherical shell. The values may then be written to an
-   output file, or integrated across the surface.
+   The class allows the user to extract data from the grid for the Weyl
+   components over spherical shells at specified radii. The values may then be
+   written to an output file, or integrated across the surfaces.
 */
 class WeylExtraction
 {
@@ -31,7 +31,7 @@ class WeylExtraction
     const int m_im_comp = c_Weyl4_Im;
     const double m_dt;
     const double m_time;
-    const int m_num_points;
+    const int m_num_points; // number of points per extraction radius
     const double m_dphi;
     const double m_dtheta;
 
@@ -52,16 +52,18 @@ class WeylExtraction
     void execute_query(AMRInterpolator<Lagrange<4>> *m_interpolator) const;
 
   private:
-    //! integrate over a spherical shell with given harmonics
-    std::array<double, 2> integrate_surface(int es, int el, int em,
-                                            const double *m_state_ptr_re,
-                                            const double *m_state_ptr_im) const;
+    //! integrate over a spherical shell with given harmonics for each
+    //! extraction radius
+    std::vector<double> integrate_surface(int es, int el, int em,
+                                          const double *m_state_ptr_re,
+                                          const double *m_state_ptr_im) const;
 
-    //! Write out calculated value of integral
-    void write_integral(std::array<double, 2> integral,
+    //! Write out calculated values of integral for each extraction radius
+    void write_integral(std::vector<double> integral,
                         std::string filename) const;
 
     //! Write out the result of the extraction in phi and theta at each timestep
+    //! for each extraction radius
     void write_extraction(std::string file_prefix, const double *m_state_ptr_re,
                           const double *m_state_ptr_im) const;
 };
