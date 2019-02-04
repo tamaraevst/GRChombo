@@ -12,7 +12,7 @@
 
 //! Set up and execute the interpolation query
 inline void SphericalExtraction::execute_query(
-    AMRInterpolator<Lagrange<4>> *a_interpolator) const
+    AMRInterpolator<Lagrange<4>> *a_interpolator)
 {
     if (a_interpolator == nullptr)
     {
@@ -159,8 +159,8 @@ inline std::vector<double> SphericalExtraction::integrate_surface() const
 }
 
 //! Write out calculated value of integral
-inline void SphericalExtraction::write_integral(const std::vector a_integral,
-                                                std::string a_filename) const
+inline void SphericalExtraction::write_integral(
+            const std::vector<double> a_integral, std::string a_filename) const
 {
     int rank;
 #ifdef CH_MPI

@@ -50,7 +50,7 @@ class SphericalExtraction
     {}
 
     //! Execute the interpolation query
-    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator) const;
+    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator);
 
     //! Write out the result of the extraction in phi and theta at each timestep
     void write_extraction(std::string a_file_prefix = "Interpolation") const;
