@@ -140,8 +140,7 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 // Things to do after every time step after each level
 void BosonStarLevel::specificPostTimeStep()
 {
-    if ((m_p.activate_mass_extraction == 1) &&
-        (m_level == m_p.mass_extraction_params.extraction_level))
+    if (m_p.activate_mass_extraction == 1)
     {
         CH_TIME("BosonStarLevel::specificPostTimeStep");
         if (m_verbosity)
@@ -153,11 +152,19 @@ void BosonStarLevel::specificPostTimeStep()
         BoxLoops::loop(make_compute_pack(adm_mass), m_state_new, m_state_new,
                         EXCLUDE_GHOST_CELLS);
 
-        // Now refresh the interpolator and do the interpolation
-        m_gr_amr.m_interpolator->refresh();
-        MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
+        // Do the extraction on the min extraction level
+        auto min_extraction_level_it = std::min_element(
+            m_p.mass_extraction_params.extraction_levels.begin(),
+            m_p.mass_extraction_params.extraction_levels.end());
+        int min_extraction_level = *(min_extraction_level_it);
+        if (m_level == min_extraction_level)
+        {
+            // Now refresh the interpolator and do the interpolation
+            m_gr_amr.m_interpolator->refresh();
+            MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
                                         m_time);
-        mass_extraction.execute_query(m_gr_amr.m_interpolator);
+            mass_extraction.execute_query(m_gr_amr.m_interpolator);
+        }
     }
 }
 
