@@ -118,7 +118,8 @@ phi4_coeff = 0.0
 # Mass extraction params
 #mass_extraction_center = 64 64 64
 activate_mass_extraction = 1
-mass_extraction_radius = 60
-mass_extraction_level = 0
+num_mass_extraction_radii = 3
+mass_extraction_radii = 40. 50. 60.
+mass_extraction_levels = 0 0 0
 num_points_phi_mass = 16
 num_points_theta_mass = 24

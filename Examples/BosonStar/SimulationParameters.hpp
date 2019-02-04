@@ -53,14 +53,18 @@ public:
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
-        pp.load("mass_extraction_level",
-                mass_extraction_params.extraction_level, 0);
-        pp.load("mass_extraction_radius",
-                mass_extraction_params.extraction_radius, 0.1);
+        pp.load("num_mass_extraction_radii",
+                mass_extraction_params.num_extraction_radii, 1);
+        pp.load("mass_extraction_levels",
+                mass_extraction_params.extraction_levels,
+                mass_extraction_params.num_extraction_radii, 0);
+        pp.load("mass_extraction_radii",
+                mass_extraction_params.extraction_radii,
+                mass_extraction_params.num_extraction_radii, 0.1);
         pp.load("num_points_phi_mass", mass_extraction_params.num_points_phi,
                 2);
-        pp.load("num_points_phi_mass", mass_extraction_params.num_points_theta,
-                4);
+        pp.load("num_points_theta_mass",
+                mass_extraction_params.num_points_theta, 4);
         pp.load("mass_extraction_center",
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
