@@ -21,7 +21,7 @@ class MassExtraction : public SphericalExtraction
     {
         CH_TIME("MassExtraction::execute_query");
         SphericalExtraction::execute_query(a_interpolator);
-        double Madm = SphericalExtraction::integrate_surface();
+        std::vector<double> Madm = SphericalExtraction::integrate_surface();
         SphericalExtraction::write_integral(Madm, "ADMmass.dat");
     }
 };
