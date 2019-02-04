@@ -30,11 +30,11 @@ class SphericalExtraction
     const int m_extraction_comp;
     const double m_dt;
     const double m_time;
-    const int m_num_points;
-    std::unique_ptr<double[]> m_state_ptr{new double[m_num_points]};
-    std::unique_ptr<double[]> m_interp_x{new double[m_num_points]};
-    std::unique_ptr<double[]> m_interp_y{new double[m_num_points]};
-    std::unique_ptr<double[]> m_interp_z{new double[m_num_points]};
+    const int m_num_points; // number of points per extraction radius
+    std::vector<double> m_interp_var;
+    std::vector<double> m_interp_x;
+    std::vector<double> m_interp_y;
+    std::vector<double> m_interp_z;
     const double m_dphi;
     const double m_dtheta;
 
@@ -50,16 +50,17 @@ class SphericalExtraction
     {}
 
     //! Execute the interpolation query
-    void execute_query(AMRInterpolator<Lagrange<4>> *m_interpolator) const;
+    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator) const;
 
     //! Write out the result of the extraction in phi and theta at each timestep
-    void write_extraction(string file_prefix = "Interpolation") const;
+    void write_extraction(std::string a_file_prefix = "Interpolation") const;
 
     //! integrate extracted values over a spherical shell
-    double integrate_surface() const;
+    std::vector<double> integrate_surface() const;
 
     //! Write out calculated value of intergal
-    void write_integral(double integral, string file_prefix = "Integral") const;
+    void write_integral(std::vector<double> a_integral,
+                        std::string a_filename = "Integral") const;
 };
 
 #include "SphericalExtraction.impl.hpp"
