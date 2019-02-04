@@ -17,7 +17,7 @@ class MassExtraction : public SphericalExtraction
         : SphericalExtraction(c_Madm, a_params, a_dt, a_time) {}
 
     //! Extract the mass
-    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator) const
+    void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {
         CH_TIME("MassExtraction::execute_query");
         SphericalExtraction::execute_query(a_interpolator);
