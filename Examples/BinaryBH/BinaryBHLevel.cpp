@@ -91,18 +91,14 @@ void BinaryBHLevel::specificPostTimeStep()
         BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
                        m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
-        // Do the extraction on the min extraction level
-        auto min_extraction_level_it =
-            std::min_element(m_p.extraction_params.extraction_levels.begin(),
-                             m_p.extraction_params.extraction_levels.end());
-        int min_extraction_level = *(min_extraction_level_it);
-        if (m_level == min_extraction_level)
-        {
-            // Now refresh the interpolator and do the interpolation
-            m_gr_amr.m_interpolator->refresh();
-            WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time);
-            my_extraction.execute_query(m_gr_amr.m_interpolator);
-        }
+       // Do the extraction on the min extraction level
+       if (m_level == m_p.extraction_params.min_extraction_level)
+       {
+           // Now refresh the interpolator and do the interpolation
+           m_gr_amr.m_interpolator->refresh();
+           WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time);
+           my_extraction.execute_query(m_gr_amr.m_interpolator);
+       }
     }
 }
 
