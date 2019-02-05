@@ -20,6 +20,7 @@ struct extraction_params_t
     int num_points_phi;
     int num_points_theta;
     std::vector<int> extraction_levels;
+    int min_extraction_level;
 };
 
 class SimulationParametersBase : public ChomboParameters
@@ -84,6 +85,13 @@ class SimulationParametersBase : public ChomboParameters
             pp.load("extraction_radius", extraction_params.extraction_radii, 1,
                     0.1);
         }
+
+        // Work out the minimum extraction level
+        auto min_extraction_level_it =
+            std::min_element(extraction_params.extraction_levels.begin(),
+                             extraction_params.extraction_levels.end());
+        extraction_params.min_extraction_level = *(min_extraction_level_it);
+
         pp.load("num_points_phi", extraction_params.num_points_phi, 2);
         pp.load("num_points_theta", extraction_params.num_points_theta, 4);
         pp.load("extraction_center", extraction_params.extraction_center,
@@ -100,6 +108,7 @@ class SimulationParametersBase : public ChomboParameters
     std::array<double, CH_SPACEDIM> origin,
         dx; // location of coarsest origin and dx
 
+    // Collection of parameters necessary for the CCZ4 RHS and extraction
     CCZ4::params_t ccz4_params;
     extraction_params_t extraction_params;
 };
