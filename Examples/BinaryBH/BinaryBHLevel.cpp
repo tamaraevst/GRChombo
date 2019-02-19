@@ -100,6 +100,13 @@ void BinaryBHLevel::specificPostTimeStep()
            my_extraction.execute_query(m_gr_amr.m_interpolator);
        }
     }
+
+    if (m_level == 0)
+    {
+        double L2Ham = m_gr_amr.compute_norm(c_Ham, 2, m_dx);
+        pout() << "L2 norm of the Hamiltonian constraint violation = "
+               << L2Ham << "\n";
+    }
 }
 
 // Things to do before a plot level - need to calculate the Weyl scalars
