@@ -12,10 +12,11 @@
 #include <iterator>
 #include <cmath>
 
+// This is used by computeSum, computeNorm, etc.
 Vector<LevelData<FArrayBox>* > GRAMR::getLevelDataPtrs()
 {
     // First get a std::vector of AMRLevel pointers
-    const std::vector<AMRLevel*> level_ptrs = getAMRLevels().stdVector();
+    const std::vector<AMRLevel*> level_ptrs {getAMRLevels().stdVector()};
 
     // Instatiate a Vector of LevelData<FArrayBox> pointers as this is the
     // the format that Chombo's computeSum requires
@@ -32,7 +33,7 @@ Vector<LevelData<FArrayBox>* > GRAMR::getLevelDataPtrs()
 
     return level_data_ptrs;
 }
-
+// Returns the volume-weighted sum of a grid variable
 Real GRAMR::compute_sum(const int a_comp, const Real a_dx_coarse)
 {
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
@@ -40,26 +41,32 @@ Real GRAMR::compute_sum(const int a_comp, const Real a_dx_coarse)
                       Interval(a_comp, a_comp), 0);
 }
 
-Real GRAMR::compute_norm(const int a_comp, const double a_p,
+// Returns the volume-weighted p-norm of an interval of grid variables
+Real GRAMR::compute_norm(const Interval a_comps, const double a_p,
                         const Real a_dx_coarse)
 {
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeNorm(level_data_ptrs, m_ref_ratios, a_dx_coarse,
-                       Interval(a_comp, a_comp), a_p, 0);
+                       a_comps, a_p, 0);
 }
 
+// Returns the max value of an interval of grid variables
 Real GRAMR::compute_max(const Interval a_comps)
 {
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeMax(level_data_ptrs, m_ref_ratios, a_comps, 0);
 }
 
+// Returns the min value of an interval of grid variables
 Real GRAMR::compute_min(const Interval a_comps)
 {
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeMin(level_data_ptrs, m_ref_ratios, a_comps, 0);
 }
 
+// Returns the Infinity norm of an interval of grid variables
+// This function is a bit pointless because a_p = 0 in compute_norm does the
+// same thing
 Real GRAMR::compute_inf_norm(const Interval a_comps)
 {
     return std::max(std::abs(compute_max(a_comps)),

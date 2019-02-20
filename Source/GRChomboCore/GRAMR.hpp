@@ -50,8 +50,8 @@ class GRAMR : public AMR
     // Returns the volume-weighted sum of a grid variable
     Real compute_sum(const int a_comp, const Real a_dx_coarse);
 
-    // Returns the volume-weighted p-norm of a grid variable
-    Real compute_norm(const int a_comp, const double a_p,
+    // Returns the volume-weighted p-norm of an interval of grid variables
+    Real compute_norm(const Interval a_comps, const double a_p,
                      const Real a_dx_coarse);
 
     // Returns the max value of an interval of grid variables
@@ -61,6 +61,8 @@ class GRAMR : public AMR
     Real compute_min(const Interval a_comps);
 
     // Returns the Infinity norm of an interval of grid variables
+    // This function is a bit pointless because a_p = 0 in compute_norm does the
+    // same thing
     Real compute_inf_norm(const Interval a_comps);
 };
 

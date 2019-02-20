@@ -103,9 +103,10 @@ void BinaryBHLevel::specificPostTimeStep()
 
     if (m_level == 0)
     {
-        double L2Ham = m_gr_amr.compute_norm(c_Ham, 2, m_dx);
-        pout() << "L2 norm of the Hamiltonian constraint violation = "
-               << L2Ham << "\n";
+        Real L2Ham = m_gr_amr.compute_norm(Interval(c_Ham, c_Ham), 2, m_dx);
+        Real L2Mom = m_gr_amr.compute_norm(Interval(c_Mom1, c_Mom3), 2, m_dx);
+        pout() << "L2 norms of constraint violations:\n";
+        pout() << "Ham: " << L2Ham << "\tMom: " << L2Mom << "\n";
     }
 }
 
