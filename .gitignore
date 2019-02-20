@@ -19,5 +19,6 @@ log*
 *.hdf5
 *.dSYM
 Weyl_integral*
+*.dat
 
 Doxygen/html

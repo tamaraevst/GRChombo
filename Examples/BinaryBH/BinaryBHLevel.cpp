@@ -16,6 +16,7 @@
 #include "TraceARemoval.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
+#include "ConstraintViolations.hpp"
 
 void BinaryBHLevel::specificAdvance()
 {
@@ -101,13 +102,21 @@ void BinaryBHLevel::specificPostTimeStep()
        }
     }
 
+    fillAllGhosts();
+    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
+                   EXCLUDE_GHOST_CELLS);
     if (m_level == 0)
     {
-        Real L2Ham = m_gr_amr.compute_norm(Interval(c_Ham, c_Ham), 2, m_dx);
-        Real L2Mom = m_gr_amr.compute_norm(Interval(c_Mom1, c_Mom3), 2, m_dx);
+        ConstraintViolations constraint_violations(c_Ham,
+            Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
+            "ConstraintViolations.dat");
+        constraint_violations.execute();
+        auto violations = constraint_violations.get_norms();
         pout() << "L2 norms of constraint violations:\n";
-        pout() << "Ham: " << L2Ham << "\tMom: " << L2Mom << "\n";
+        pout() << "Ham: " << violations.first << "\t";
+        pout() << "Mom: " << violations.second << "\n";
     }
+
 }
 
 // Things to do before a plot level - need to calculate the Weyl scalars
