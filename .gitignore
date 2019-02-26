@@ -23,5 +23,6 @@ log*
 test
 *.dat
 Weyl_integral*
+*.dat
 
 Doxygen/html
