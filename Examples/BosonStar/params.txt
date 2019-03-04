@@ -96,9 +96,13 @@ covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
 # NB must be less than 0.5 for stability
 sigma = 0.3
 
+# Vars to output infinity norm for at end of coarse time steps
+num_vars_inf_norm = 3
+vars_inf_norm = 0 7 15 # chi, K, Gamma1
+
 # Change the gravitational constant of the Universe!
 # Default is 1.0, for standard geometric units
-G_Newton = 0.07957747154594767 # 1/(4pi)
+# G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
 central_amplitude_CSF = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future

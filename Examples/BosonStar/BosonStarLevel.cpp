@@ -15,6 +15,7 @@
 
 // For constraints calculation
 #include "MatterConstraints.hpp"
+#include "ConstraintViolations.hpp"
 
 // For tag cells
 #include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
@@ -166,13 +167,37 @@ void BosonStarLevel::specificPostTimeStep()
             mass_extraction.execute_query(m_gr_amr.m_interpolator);
         }
     }
+
+    fillAllGhosts();
+    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
+                   INCLUDE_GHOST_CELLS);
+    if (m_level == 0)
+    {
+        // Write constraint violations to file
+        ConstraintViolations constraint_violations(c_Ham,
+            Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
+            "ConstraintViolations.dat");
+        constraint_violations.execute();
+
+        // Calculate the infinity-norm of all variables specified in params file
+        // and output them
+        pout() << "Variable infinity norms:\n";
+        for (int icomp : m_p.vars_inf_norm)
+        {
+            std::string var_name = UserVariables::variable_names[icomp];
+            double var_norm = m_gr_amr.compute_norm(Interval(icomp, icomp), 0.,
+                                                    m_p.coarsest_dx);
+            pout() << var_name << ": " << var_norm << "\t";
+        }
+        pout() << std::endl;
+    }
 }
 
 // Specify if you want any plot files to be written, with which vars
 void BosonStarLevel::specificWritePlotHeader(
     std::vector<int> &plot_states) const
 {
-    plot_states = {c_phi_Re, c_phi_Im, c_chi, c_Ham};
+    plot_states = {c_phi_Re, c_phi_Im, c_chi, c_K, c_Ham};
 }
 
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,

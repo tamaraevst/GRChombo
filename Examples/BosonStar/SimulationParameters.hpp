@@ -68,6 +68,10 @@ public:
         pp.load("mass_extraction_center",
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
+
+        // Variables for outputting inf-norm
+        pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
+        pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
     }
 
     // Tagging thresholds
@@ -81,6 +85,10 @@ public:
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
+
+    // Vars for outputting inf-norms
+    int num_vars_inf_norm;
+    std::vector<int> vars_inf_norm;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */
