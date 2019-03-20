@@ -354,22 +354,6 @@ class BoundaryConditions
                             (m_params.vars_asymptotic_values[icomp] -
                              m_soln_box(iv, icomp)) /
                             radius;
-
-                        // now set RHS for overlapping ghost cells to 0
-                        // the exchange copier should copy the correct values
-                        FOR1(idir2)
-                        {
-                            if(idir2 != dir)
-                            {
-                                if((lo_local_offset[idir2] < m_num_ghosts + 1
-                                    && offset_lo[idir2] > 0) ||
-                                    (hi_local_offset[idir2] < m_num_ghosts + 1
-                                    && offset_hi[idir2] > 0))
-                                {
-                                    m_rhs_box(iv, icomp) = 0.0;
-                                }
-                            }
-                        }
                     }
                     break;
                 }
