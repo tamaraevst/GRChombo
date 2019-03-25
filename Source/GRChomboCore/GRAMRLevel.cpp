@@ -281,21 +281,7 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
 
     // maintain interlevel stuff
-    // Trick to make the exchange copier exchange overlapping ghost cells in the
-    // boundary (grow problem domain to include boundary ghosts)
-    if(m_p.nonperiodic_boundaries_exist)
-    {
-        ProblemDomain grown_problem_domain = m_problem_domain;
-        grown_problem_domain.grow(m_num_ghosts);
-        DisjointBoxLayout grown_level_domain;
-        grown_level_domain.deepCopy(level_domain, grown_problem_domain);
-        grown_level_domain.close();
-        m_exchange_copier.exchangeDefine(grown_level_domain, iv_ghosts);
-    }
-    else
-    {// periodic case
-        m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    }
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -350,23 +336,7 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
     m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
     m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 
-
-    // Trick to make the exchange copier exchange overlapping ghost cells in the
-    // boundary (grow problem domain to include boundary ghosts)
-    if(m_p.nonperiodic_boundaries_exist)
-    {
-        ProblemDomain grown_problem_domain = m_problem_domain;
-        grown_problem_domain.grow(m_num_ghosts);
-        DisjointBoxLayout grown_level_domain;
-        grown_level_domain.deepCopy(level_domain, grown_problem_domain);
-        grown_level_domain.close();
-        m_exchange_copier.exchangeDefine(grown_level_domain, iv_ghosts);
-    }
-    else
-    {// periodic case
-        m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    }
-
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -664,22 +634,7 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
     // maintain interlevel stuff
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
 
-    // Trick to make the exchange copier exchange overlapping ghost cells in the
-    // boundary (grow problem domain to include boundary ghosts)
-    if(m_p.nonperiodic_boundaries_exist)
-    {
-        ProblemDomain grown_problem_domain = m_problem_domain;
-        grown_problem_domain.grow(m_num_ghosts);
-        DisjointBoxLayout grown_level_domain;
-        grown_level_domain.deepCopy(level_domain, grown_problem_domain);
-        grown_level_domain.close();
-        m_exchange_copier.exchangeDefine(grown_level_domain, iv_ghosts);
-    }
-    else
-    {// periodic case
-        m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
-    }
-
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -947,4 +902,21 @@ void GRAMRLevel::copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest)
         m_boundaries.copy_boundary_cells(Side::Hi, a_src, a_dest);
         m_boundaries.copy_boundary_cells(Side::Lo, a_src, a_dest);
     }
+}
+
+void GRAMRLevel::defineExchangeCopier(const DisjointBoxLayout &a_level_grids)
+{
+    // if there are Sommerfeld BCs, expand boxes along those sides
+    if(m_p.nonperiodic_boundaries_exist)
+    {
+        m_boundaries.expand_grids_to_boundaries(m_grown_grids,
+                                                a_level_grids);
+    }
+    else
+    {// nothing to do if periodic BCs
+        m_grown_grids = a_level_grids;
+    }
+
+    IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
+    m_exchange_copier.exchangeDefine(m_grown_grids, iv_ghosts);
 }
