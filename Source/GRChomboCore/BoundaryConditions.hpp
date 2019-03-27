@@ -6,12 +6,12 @@
 #ifndef BOUNDARYCONDITIONS_HPP_
 #define BOUNDARYCONDITIONS_HPP_
 
-#include "RealVect.H"
 #include "BoxIterator.H"
 #include "Copier.H"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderInterpStencil.H"
 #include "GRLevelData.hpp"
+#include "RealVect.H"
 #include "UserVariables.hpp"
 
 /// Class which deals with the boundaries at the edge of the physical domain in
@@ -74,21 +74,21 @@ class BoundaryConditions
     void define(double a_dx, std::array<double, CH_SPACEDIM> a_center,
                 params_t a_params, ProblemDomain a_domain, int a_num_ghosts);
 
-    // change the asymptotic values of the variables for the Sommerfeld BCs
-    // this will allow them to evolve during a simulation if necessary
+    /// change the asymptotic values of the variables for the Sommerfeld BCs
+    /// this will allow them to evolve during a simulation if necessary
     void set_vars_asymptotic_values(
         std::array<double, NUM_VARS> &vars_asymptotic_values);
 
-    // write out boundary params (used during setup for debugging)
+    /// write out boundary params (used during setup for debugging)
     static void write_boundary_conditions(params_t a_params);
 
-    // The function which returns the parity of each of the vars in
-    // UserVariables.hpp The parity should be defined in the params file, and
-    // will be output to the pout files for checking at start/restart of
-    // simulation (It is only required for reflective boundary conditions.)
+    /// The function which returns the parity of each of the vars in
+    /// UserVariables.hpp The parity should be defined in the params file, and
+    /// will be output to the pout files for checking at start/restart of
+    /// simulation (It is only required for reflective boundary conditions.)
     int get_vars_parity(int a_comp, int a_dir);
 
-    // static version used for initial output of boundary values
+    /// static version used for initial output of boundary values
     static int get_vars_parity(int a_comp, int a_dir, params_t a_params);
 
     /// Fill the rhs boundary values appropriately based on the params set
@@ -123,10 +123,11 @@ class BoundaryConditions
                          const IntVect &offset_lo, const IntVect &offset_hi,
                          Box &this_ghostless_box, int shrink_for_coarse = 0);
 
-
     /// This function takes a default constructed open DisjointBoxLayout and
     /// grows the boxes lying along the boundary to include the boundaries if
-    /// necessary (i.e. in the Sommerfeld BC case)
+    /// necessary (i.e. in the Sommerfeld BC case). It is used to define the
+    /// correct DisjointBoxLayout for the exchange copier so that shared
+    /// boundary ghosts are exchanged correctly.
     void expand_grids_to_boundaries(DisjointBoxLayout &a_out_grids,
                                     const DisjointBoxLayout &a_in_grids);
 
@@ -137,15 +138,17 @@ class BoundaryConditions
 /// boxes along the Sommerfeld BC boundaries
 class ExpandGridsToBoundaries : public BaseTransform
 {
-public:
-    ExpandGridsToBoundaries(BoundaryConditions& a_boundaries)
-        : m_boundaries(a_boundaries) {}
+  public:
+    ExpandGridsToBoundaries(BoundaryConditions &a_boundaries)
+        : m_boundaries(a_boundaries)
+    {
+    }
 
     /// Operator called by transform to grow the boxes where required
-    Box operator()(const Box& a_in_box) override;
+    Box operator()(const Box &a_in_box) override;
 
-protected:
-    BoundaryConditions& m_boundaries;
+  protected:
+    BoundaryConditions &m_boundaries;
 };
 
 #endif /* BOUNDARYCONDITIONS_HPP_ */

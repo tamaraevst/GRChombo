@@ -20,16 +20,15 @@ void BoundaryConditions::define(double a_dx,
     is_defined = true;
 }
 
-
-// change the asymptotic values of the variables for the Sommerfeld BCs
-// this will allow them to evolve during a simulation if necessary
+/// change the asymptotic values of the variables for the Sommerfeld BCs
+/// this will allow them to evolve during a simulation if necessary
 void BoundaryConditions::set_vars_asymptotic_values(
     std::array<double, NUM_VARS> &vars_asymptotic_values)
 {
     m_params.vars_asymptotic_values = vars_asymptotic_values;
 }
 
-// write out boundary params (used during setup for debugging)
+/// write out boundary params (used during setup for debugging)
 void BoundaryConditions::write_boundary_conditions(params_t a_params)
 {
     pout() << "You are using non periodic boundary conditions." << endl;
@@ -47,8 +46,8 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
             }
             else if (a_params.hi_boundary[idir] == REFLECTIVE_BC)
             {
-                pout() << "- Reflective boundaries in direction high "
-                       << idir << endl;
+                pout() << "- Reflective boundaries in direction high " << idir
+                       << endl;
                 pout() << "The variables that are parity odd in this "
                           "direction are : "
                        << endl;
@@ -57,16 +56,16 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
                     int parity = get_vars_parity(icomp, idir, a_params);
                     if (parity == -1)
                     {
-                        pout() << UserVariables::variable_names[icomp]
-                               << "    ";
+                        pout()
+                            << UserVariables::variable_names[icomp] << "    ";
                     }
                 }
                 pout() << endl;
             }
             else if (a_params.hi_boundary[idir] == SOMMERFELD_BC)
             {
-                pout() << "- Sommerfeld boundaries in direction high "
-                       << idir << endl;
+                pout() << "- Sommerfeld boundaries in direction high " << idir
+                       << endl;
                 pout() << "The non zero asymptotic values of the variables "
                           "in this direction are : "
                        << endl;
@@ -76,8 +75,7 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
                     {
                         pout()
                             << UserVariables::variable_names[icomp] << " = "
-                            << a_params.vars_asymptotic_values[icomp]
-                            << "    ";
+                            << a_params.vars_asymptotic_values[icomp] << "    ";
                     }
                 }
                 pout() << endl;
@@ -91,8 +89,8 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
             }
             else if (a_params.lo_boundary[idir] == REFLECTIVE_BC)
             {
-                pout() << "- Reflective boundaries in direction low "
-                       << idir << endl;
+                pout() << "- Reflective boundaries in direction low " << idir
+                       << endl;
                 pout() << "The variables that are parity odd in this "
                           "direction are : "
                        << endl;
@@ -101,16 +99,16 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
                     int parity = get_vars_parity(icomp, idir, a_params);
                     if (parity == -1)
                     {
-                        pout() << UserVariables::variable_names[icomp]
-                               << "    ";
+                        pout()
+                            << UserVariables::variable_names[icomp] << "    ";
                     }
                 }
                 pout() << endl;
             }
             else if (a_params.lo_boundary[idir] == SOMMERFELD_BC)
             {
-                pout() << "- Sommerfeld boundaries in direction low "
-                       << idir << endl;
+                pout() << "- Sommerfeld boundaries in direction low " << idir
+                       << endl;
                 pout() << "The non zero asymptotic values of the variables "
                           "in this direction are : "
                        << endl;
@@ -120,8 +118,7 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
                     {
                         pout()
                             << UserVariables::variable_names[icomp] << " = "
-                            << a_params.vars_asymptotic_values[icomp]
-                            << "    ";
+                            << a_params.vars_asymptotic_values[icomp] << "    ";
                     }
                 }
                 pout() << endl;
@@ -131,10 +128,10 @@ void BoundaryConditions::write_boundary_conditions(params_t a_params)
     pout() << "---------------------------------" << endl;
 }
 
-// The function which returns the parity of each of the vars in
-// UserVariables.hpp The parity should be defined in the params file, and
-// will be output to the pout files for checking at start/restart of
-// simulation (It is only required for reflective boundary conditions.)
+/// The function which returns the parity of each of the vars in
+/// UserVariables.hpp The parity should be defined in the params file, and
+/// will be output to the pout files for checking at start/restart of
+/// simulation (It is only required for reflective boundary conditions.)
 int BoundaryConditions::get_vars_parity(int a_comp, int a_dir)
 {
     int vars_parity = get_vars_parity(a_comp, a_dir, m_params);
@@ -142,9 +139,9 @@ int BoundaryConditions::get_vars_parity(int a_comp, int a_dir)
     return vars_parity;
 }
 
-// static version used for initial output of boundary values
+/// static version used for initial output of boundary values
 int BoundaryConditions::get_vars_parity(int a_comp, int a_dir,
-                                               params_t a_params)
+                                        params_t a_params)
 {
     int vars_parity = 1;
     if ((a_dir == 0) && (a_params.vars_parity[a_comp] == ODD_X ||
@@ -314,16 +311,14 @@ void BoundaryConditions::fill_boundary_rhs_dir(const Side::LoHiSide a_side,
                 }
                 else
                 {
-                    iv_copy[dir] =
-                        2 * m_domain_box.bigEnd(dir) - iv[dir] + 1;
+                    iv_copy[dir] = 2 * m_domain_box.bigEnd(dir) - iv[dir] + 1;
                 }
 
                 // replace value at iv with value at iv_copy
                 for (int icomp = 0; icomp < NUM_VARS; icomp++)
                 {
                     int parity = get_vars_parity(icomp, dir);
-                    m_rhs_box(iv, icomp) =
-                        parity * m_rhs_box(iv_copy, icomp);
+                    m_rhs_box(iv, icomp) = parity * m_rhs_box(iv_copy, icomp);
                 }
                 break;
             }
@@ -371,8 +366,8 @@ void BoundaryConditions::copy_boundary_cells(const Side::LoHiSide a_side,
                     this_box &= m_domain_box;
 
                     // get the boundary box (may be Empty)
-                    Box boundary_box = get_boundary_box(
-                        a_side, idir, offset_lo, offset_hi, this_box);
+                    Box boundary_box = get_boundary_box(a_side, idir, offset_lo,
+                                                        offset_hi, this_box);
 
                     BoxIterator bit(boundary_box);
                     for (bit.begin(); bit.ok(); ++bit)
@@ -391,7 +386,7 @@ void BoundaryConditions::copy_boundary_cells(const Side::LoHiSide a_side,
 
 /// enforce symmetric boundary conditions, e.g. after interpolation
 void BoundaryConditions::enforce_symmetric_boundaries(
-                            const Side::LoHiSide a_side, GRLevelData &a_state)
+    const Side::LoHiSide a_side, GRLevelData &a_state)
 {
     CH_assert(is_defined);
     CH_TIME("BoundaryConditions::enforce_symmetric_boundaries");
@@ -432,8 +427,7 @@ void BoundaryConditions::interp_boundaries(GRLevelData &a_fine_state,
             // Ref ratio is always two
             int ref_ratio = 2;
 
-            // create a coarsened fin#ifndef BOUNDARYCONDITIONS_IMPL_HPP_
-#define BOUNDARYCONDITIONS_IMPL_HPP_e layout and copy the coarse data onto
+            // create a coarsened fine layout and copy the coarse data onto
             // it
             DisjointBoxLayout coarsened_layout;
             coarsen(coarsened_layout, a_fine_state.disjointBoxLayout(),
@@ -453,8 +447,7 @@ void BoundaryConditions::interp_boundaries(GRLevelData &a_fine_state,
                 coarsened_fine.disjointBoxLayout(), grown_domain_box,
                 m_num_ghosts * IntVect::Unit, m_num_ghosts * IntVect::Unit);
             a_coarse_state.copyTo(a_coarse_state.interval(), coarsened_fine,
-                                  coarsened_fine.interval(),
-                                  boundary_copier);
+                                  coarsened_fine.interval(), boundary_copier);
 
             // iterate through the coarse boxes, shared amongst threads
             DataIterator dit = coarsened_layout.dataIterator();
@@ -537,15 +530,13 @@ void BoundaryConditions::interp_boundaries(GRLevelData &a_fine_state,
                     // otherwise use the one calculated locally
                     if (!near_boundary)
                     {
-                        default_stencil.fillFine(m_fine_box, m_coarse_box,
-                                                 iv);
+                        default_stencil.fillFine(m_fine_box, m_coarse_box, iv);
                     }
                     else
                     {
                         FourthOrderInterpStencil local_stencil(
                             local_boundary_offset, ref_ratio);
-                        local_stencil.fillFine(m_fine_box, m_coarse_box,
-                                               iv);
+                        local_stencil.fillFine(m_fine_box, m_coarse_box, iv);
                     }
                 } // end loop box
             }     // end loop boxes
@@ -570,12 +561,9 @@ int BoundaryConditions::get_boundary_condition(const Side::LoHiSide a_side,
 }
 
 /// get the boundary box to fill if we are at a boundary
-Box BoundaryConditions::get_boundary_box(const Side::LoHiSide a_side,
-                                         const int a_dir,
-                                         const IntVect &offset_lo,
-                                         const IntVect &offset_hi,
-                                         Box &this_ghostless_box,
-                                         int shrink_for_coarse)
+Box BoundaryConditions::get_boundary_box(
+    const Side::LoHiSide a_side, const int a_dir, const IntVect &offset_lo,
+    const IntVect &offset_hi, Box &this_ghostless_box, int shrink_for_coarse)
 {
     // default constructor gives empty box
     Box boundary_box;
@@ -611,8 +599,7 @@ Box BoundaryConditions::get_boundary_box(const Side::LoHiSide a_side,
                 if ((idir < a_dir) || (m_params.is_periodic[idir]))
                 {
                     // grow it to fill the corners
-                    boundary_box.growLo(idir,
-                                        m_num_ghosts - shrink_for_coarse);
+                    boundary_box.growLo(idir, m_num_ghosts - shrink_for_coarse);
                 }
             }
             else // cut off end ghost cell
@@ -629,8 +616,7 @@ Box BoundaryConditions::get_boundary_box(const Side::LoHiSide a_side,
                 if ((idir < a_dir) || (m_params.is_periodic[idir]))
                 {
                     // grow it to fill the corners
-                    boundary_box.growHi(idir,
-                                        m_num_ghosts - shrink_for_coarse);
+                    boundary_box.growHi(idir, m_num_ghosts - shrink_for_coarse);
                 }
             }
             else // cut off end ghost cell
@@ -646,23 +632,24 @@ Box BoundaryConditions::get_boundary_box(const Side::LoHiSide a_side,
 }
 
 /// Operator called by transform to grow the boxes where required
-Box ExpandGridsToBoundaries::operator()(const Box& a_in_box)
+Box ExpandGridsToBoundaries::operator()(const Box &a_in_box)
 {
     Box out_box = a_in_box;
-    IntVect offset_lo = -out_box.smallEnd()
-                     + m_boundaries.m_domain_box.smallEnd();
-    IntVect offset_hi = +out_box.bigEnd()
-                     - m_boundaries.m_domain_box.bigEnd();
+    IntVect offset_lo =
+        -out_box.smallEnd() + m_boundaries.m_domain_box.smallEnd();
+    IntVect offset_hi = +out_box.bigEnd() - m_boundaries.m_domain_box.bigEnd();
 
     FOR1(idir)
     {
-        if (m_boundaries.get_boundary_condition(Side::Lo, idir)
-            == BoundaryConditions::SOMMERFELD_BC && offset_lo[idir] == 0)
+        if (m_boundaries.get_boundary_condition(Side::Lo, idir) ==
+                BoundaryConditions::SOMMERFELD_BC &&
+            offset_lo[idir] == 0)
         {
             out_box.growLo(idir, m_boundaries.m_num_ghosts);
         }
-        if (m_boundaries.get_boundary_condition(Side::Hi, idir)
-            == BoundaryConditions::SOMMERFELD_BC && offset_hi[idir] == 0)
+        if (m_boundaries.get_boundary_condition(Side::Hi, idir) ==
+                BoundaryConditions::SOMMERFELD_BC &&
+            offset_hi[idir] == 0)
         {
             out_box.growHi(idir, m_boundaries.m_num_ghosts);
         }
@@ -672,21 +659,18 @@ Box ExpandGridsToBoundaries::operator()(const Box& a_in_box)
 
 /// This function takes a default constructed open DisjointBoxLayout and
 /// grows the boxes lying along the boundary to include the boundaries if
-/// necessary (i.e. in the Sommerfeld BC case)
+/// necessary (i.e. in the Sommerfeld BC case). It is used to define the correct
+/// DisjointBoxLayout for the exchange copier so that shared boundary ghosts are
+/// exchanged correctly.
 void BoundaryConditions::expand_grids_to_boundaries(
-                                DisjointBoxLayout &a_out_grids,
-                                const DisjointBoxLayout &a_in_grids)
+    DisjointBoxLayout &a_out_grids, const DisjointBoxLayout &a_in_grids)
 {
-    /*if (a_out_grids.isClosed())
-    {
-        MayDay::Error("output to expand_grids_to_boundaries must be open");
-    }*/
     if (!a_in_grids.isClosed())
     {
         MayDay::Error("input to expand_grids_to_boundaries must be closed");
     }
 
-    //
+    // Grow the problem domain to include the boundary ghosts
     ProblemDomain domain_with_boundaries = a_in_grids.physDomain();
     FOR1(idir)
     {
@@ -700,6 +684,7 @@ void BoundaryConditions::expand_grids_to_boundaries(
         }
     }
 
+    // Copy grids and apply transformation
     a_out_grids.deepCopy(a_in_grids, domain_with_boundaries);
     ExpandGridsToBoundaries expand_grids_to_boundaries(*this);
     a_out_grids.transform(expand_grids_to_boundaries);

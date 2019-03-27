@@ -907,13 +907,12 @@ void GRAMRLevel::copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest)
 void GRAMRLevel::defineExchangeCopier(const DisjointBoxLayout &a_level_grids)
 {
     // if there are Sommerfeld BCs, expand boxes along those sides
-    if(m_p.nonperiodic_boundaries_exist)
+    if (m_p.nonperiodic_boundaries_exist)
     {
-        m_boundaries.expand_grids_to_boundaries(m_grown_grids,
-                                                a_level_grids);
+        m_boundaries.expand_grids_to_boundaries(m_grown_grids, a_level_grids);
     }
     else
-    {// nothing to do if periodic BCs
+    { // nothing to do if periodic BCs
         m_grown_grids = a_level_grids;
     }
 

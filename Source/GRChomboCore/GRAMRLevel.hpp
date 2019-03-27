@@ -194,7 +194,7 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     FourthOrderFineInterp m_fine_interp; //!< executes the interpolation from
                                          //!< coarse to fine when regridding
 
-    DisjointBoxLayout m_grids; //!< Holds grid setup (the layout of boxes)
+    DisjointBoxLayout m_grids;       //!< Holds grid setup (the layout of boxes)
     DisjointBoxLayout m_grown_grids; //!< Holds grown grid setup (for
                                      //!< Sommerfeld BCs)
 
