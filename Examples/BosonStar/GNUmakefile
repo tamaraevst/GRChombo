@@ -10,6 +10,8 @@ ifndef BOOST_ROOT
 		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
 endif
 
+GRCHOMBO_SOURCE = ../../Source
+
 ebase := Main_BosonStar
 
 LibNames := AMRTimeDependent AMRTools BoxTools
