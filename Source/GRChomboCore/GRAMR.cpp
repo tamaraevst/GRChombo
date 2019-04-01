@@ -36,6 +36,7 @@ Vector<LevelData<FArrayBox>* > GRAMR::getLevelDataPtrs()
 // Returns the volume-weighted sum of a grid variable
 Real GRAMR::compute_sum(const int a_comp, const Real a_dx_coarse)
 {
+    CH_TIME("GRAMR::compute_sum");
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeSum(level_data_ptrs, m_ref_ratios, a_dx_coarse,
                       Interval(a_comp, a_comp), 0);
@@ -45,6 +46,7 @@ Real GRAMR::compute_sum(const int a_comp, const Real a_dx_coarse)
 Real GRAMR::compute_norm(const Interval a_comps, const double a_p,
                         const Real a_dx_coarse)
 {
+    CH_TIME("GRAMR::compute_norm");
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeNorm(level_data_ptrs, m_ref_ratios, a_dx_coarse,
                        a_comps, a_p, 0);
@@ -53,6 +55,7 @@ Real GRAMR::compute_norm(const Interval a_comps, const double a_p,
 // Returns the max value of an interval of grid variables
 Real GRAMR::compute_max(const Interval a_comps)
 {
+    CH_TIME("GRAMR::compute_max");
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeMax(level_data_ptrs, m_ref_ratios, a_comps, 0);
 }
@@ -60,6 +63,7 @@ Real GRAMR::compute_max(const Interval a_comps)
 // Returns the min value of an interval of grid variables
 Real GRAMR::compute_min(const Interval a_comps)
 {
+    CH_TIME("GRAMR::compute_min");
     const Vector<LevelData<FArrayBox>* > level_data_ptrs {getLevelDataPtrs()};
     return computeMin(level_data_ptrs, m_ref_ratios, a_comps, 0);
 }
@@ -69,6 +73,7 @@ Real GRAMR::compute_min(const Interval a_comps)
 // same thing
 Real GRAMR::compute_inf_norm(const Interval a_comps)
 {
+    CH_TIME("GRAMR::compute_inf_norm");
     return std::max(std::abs(compute_max(a_comps)),
                     std::abs(compute_min(a_comps)));
 }
