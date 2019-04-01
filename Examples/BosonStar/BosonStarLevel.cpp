@@ -61,22 +61,6 @@ void BosonStarLevel::initialData()
 
     boson_star.compute_1d_solution(max_radius);
 
-    /*
-    //For debugging
-    pout() << setprecision(12);
-    pout() << setw(16) << "R" << "\t" << setw(16) << "chi" << "\t" <<
-    setw(16) << "lapse" << "\t" << setw(16) << "phi" "\n";
-    double r;
-    for(int i = 1; i < 2 * static_cast<int>(m_p.L/m_dx); ++i)
-    {
-        r = i * m_dx;
-        pout() << setw(16) << r << "\t" << setw(16) <<
-        boson_star.m_1d_sol.m_chi(r) << "\t" << setw(16) <<
-        boson_star.m_1d_sol.m_lapse(r) << "\t" << setw(16) <<
-        boson_star.m_1d_sol.m_phi(r) << "\n";
-    }
-    */
-
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
     BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),
@@ -141,9 +125,9 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 // Things to do after every time step after each level
 void BosonStarLevel::specificPostTimeStep()
 {
+    CH_TIME("BosonStarLevel::specificPostTimeStep");
     if (m_p.activate_mass_extraction == 1)
     {
-        CH_TIME("BosonStarLevel::specificPostTimeStep");
         if (m_verbosity)
             pout() << "Extracting Mass." << endl;
 
@@ -154,11 +138,7 @@ void BosonStarLevel::specificPostTimeStep()
                         EXCLUDE_GHOST_CELLS);
 
         // Do the extraction on the min extraction level
-        auto min_extraction_level_it = std::min_element(
-            m_p.mass_extraction_params.extraction_levels.begin(),
-            m_p.mass_extraction_params.extraction_levels.end());
-        int min_extraction_level = *(min_extraction_level_it);
-        if (m_level == min_extraction_level)
+        if (m_level == m_p.mass_extraction_params.min_extraction_level)
         {
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
@@ -169,27 +149,36 @@ void BosonStarLevel::specificPostTimeStep()
     }
 
     fillAllGhosts();
-    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
-                   INCLUDE_GHOST_CELLS);
+    Potential potential(m_p.potential_params);
+    ComplexScalarFieldWithPotential complex_scalar_field(potential);
+    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
+                   complex_scalar_field, m_dx, m_p.G_Newton),
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
     if (m_level == 0)
     {
-        // Write constraint violations to file
-        ConstraintViolations constraint_violations(c_Ham,
-            Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
-            "ConstraintViolations.dat");
-        constraint_violations.execute();
+        if (m_p.calculate_constraint_violations)
+        {
+            // Write constraint violations to file
+            ConstraintViolations constraint_violations(c_Ham,
+                Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
+                m_time, "ConstraintViolations.dat");
+            constraint_violations.execute();
+        }
 
         // Calculate the infinity-norm of all variables specified in params file
         // and output them
-        pout() << "Variable infinity norms:\n";
-        for (int icomp : m_p.vars_inf_norm)
+        if (m_p.num_vars_inf_norm > 0)
         {
-            std::string var_name = UserVariables::variable_names[icomp];
-            double var_norm = m_gr_amr.compute_norm(Interval(icomp, icomp), 0.,
-                                                    m_p.coarsest_dx);
-            pout() << var_name << ": " << var_norm << "\t";
+            pout() << "Variable infinity norms:\n";
+            for (int icomp : m_p.vars_inf_norm)
+            {
+                std::string var_name = UserVariables::variable_names[icomp];
+                double var_norm = m_gr_amr.compute_norm(Interval(icomp, icomp),
+                                    0., m_p.coarsest_dx);
+                pout() << var_name << ": " << var_norm << "\t";
+            }
+            pout() << std::endl;
         }
-        pout() << std::endl;
     }
 }
 
@@ -197,14 +186,13 @@ void BosonStarLevel::specificPostTimeStep()
 void BosonStarLevel::specificWritePlotHeader(
     std::vector<int> &plot_states) const
 {
-    plot_states = {c_phi_Re, c_phi_Im, c_chi, c_K, c_Ham};
+    plot_states = m_p.plot_vars;
 }
 
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
     BoxLoops::loop(ComplexPhiAndChiExtractionTaggingCriterion(m_dx, m_level,
-        m_p.mass_extraction_params, m_p.regrid_threshold_phi,
-        m_p.regrid_threshold_chi),
-                   current_state, tagging_criterion);
+                   m_p.mass_extraction_params, m_p.regrid_threshold_phi,
+                   m_p.regrid_threshold_chi), current_state, tagging_criterion);
 }

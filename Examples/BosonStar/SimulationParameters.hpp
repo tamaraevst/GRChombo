@@ -69,6 +69,14 @@ public:
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
+        // Do we cant to calculate L2 norms of constraint violations
+        pp.load("calculate_constraint_violations",
+                calculate_constraint_violations, false);
+
+        // Variables for outputting to plot files
+        pp.load("num_plot_vars", num_plot_vars, 0);
+        pp.load("plot_vars", plot_vars, num_plot_vars, 0);
+
         // Variables for outputting inf-norm
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
         pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
@@ -85,6 +93,13 @@ public:
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
+
+    // Do we want to write a file with the L2 norms of contraints?
+    bool calculate_constraint_violations;
+
+    // Vars for outputting in plot files
+    int num_plot_vars;
+    std::vector<int> plot_vars;
 
     // Vars for outputting inf-norms
     int num_vars_inf_norm;

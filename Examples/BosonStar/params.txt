@@ -96,6 +96,14 @@ covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
 # NB must be less than 0.5 for stability
 sigma = 0.3
 
+# If 1, a file called ConstraintViolations.dat will be written with the
+# L2 norms of the constraints at every coarse timestep
+calculate_constraint_violations = 1
+
+# Vars to write to plot files
+num_plot_vars = 5
+plot_vars = 0 7 25 26 31 # chi, K, phi_Re, phi_Im, Ham
+
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3
 vars_inf_norm = 0 7 15 # chi, K, Gamma1
