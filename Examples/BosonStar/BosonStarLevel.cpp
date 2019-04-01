@@ -71,23 +71,31 @@ void BosonStarLevel::initialData()
 // Things to do before outputting a checkpoint file
 void BosonStarLevel::preCheckpointLevel()
 {
+    // I don't think this is necessary given the constraints are put on the grid
+    // in specificPostTimeStep
+    /*
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
     BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
                        complex_scalar_field, m_dx, m_p.G_Newton),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+    */
 }
 
 // Things to do before outputting a plot file
 void BosonStarLevel::prePlotLevel()
 {
+    // I don't think this is necessary given the constraints are put on the grid
+    // in specificPostTimeStep
+    /*
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
     BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
                        complex_scalar_field, m_dx, m_p.G_Newton),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+    */
 }
 
 // Things to do in RHS update, at each RK4 step
