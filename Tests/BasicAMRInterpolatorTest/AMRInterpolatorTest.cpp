@@ -24,6 +24,7 @@
 using std::endl;
 #include "GRAMR.hpp"
 
+#include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
 
