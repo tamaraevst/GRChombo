@@ -85,17 +85,16 @@ class SimulationParametersBase : public ChomboParameters
             pp.load("extraction_radius", extraction_params.extraction_radii, 1,
                     0.1);
         }
+        pp.load("num_points_phi", extraction_params.num_points_phi, 2);
+        pp.load("num_points_theta", extraction_params.num_points_theta, 4);
+        pp.load("extraction_center", extraction_params.extraction_center,
+                {0.5 * L, 0.5 * L, 0.5 * L});
 
         // Work out the minimum extraction level
         auto min_extraction_level_it =
             std::min_element(extraction_params.extraction_levels.begin(),
                              extraction_params.extraction_levels.end());
         extraction_params.min_extraction_level = *(min_extraction_level_it);
-
-        pp.load("num_points_phi", extraction_params.num_points_phi, 2);
-        pp.load("num_points_theta", extraction_params.num_points_theta, 4);
-        pp.load("extraction_center", extraction_params.extraction_center,
-                {0.5 * L, 0.5 * L, 0.5 * L});
     }
 
   public:
