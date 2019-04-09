@@ -73,6 +73,9 @@ public:
         pp.load("calculate_constraint_violations",
                 calculate_constraint_violations, false);
 
+        // Do we want to calculate and write the Noether Charge to a file
+        pp.load("calculate_noether_charge", calculate_noether_charge, false);
+
         // Variables for outputting to plot files
         pp.load("num_plot_vars", num_plot_vars, 0);
         pp.load("plot_vars", plot_vars, num_plot_vars, 0);
@@ -96,6 +99,9 @@ public:
 
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;
+
+    // Do we want to write the Noether Charge to a file
+    bool calculate_noether_charge;
 
     // Vars for outputting in plot files
     int num_plot_vars;

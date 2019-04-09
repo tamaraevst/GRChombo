@@ -32,6 +32,7 @@
 #include "MassExtraction.hpp"
 
 // For Noether Charge calculation
+#include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
@@ -158,9 +159,10 @@ void BosonStarLevel::specificPostTimeStep()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
-                   complex_scalar_field, m_dx, m_p.G_Newton),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
+    BoxLoops::loop(make_compute_pack(
+                    MatterConstraints<ComplexScalarFieldWithPotential>(
+                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
     if (m_level == 0)
     {
         if (m_p.calculate_constraint_violations)
@@ -170,6 +172,21 @@ void BosonStarLevel::specificPostTimeStep()
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
                 m_time, "ConstraintViolations.dat");
             constraint_violations.execute();
+        }
+
+        if (m_p.calculate_noether_charge)
+        {
+            // compute integrated volume weighted noether charge integral
+            double noether_charge = m_gr_amr.compute_sum(c_N, m_dx);
+            SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
+                                            m_restart_time,
+                                            SmallDataIO::APPEND);
+            noether_charge_file.remove_duplicate_time_data();
+            if (m_time == m_dt)
+            {
+                noether_charge_file.write_header_line({"Noether Charge"});
+            }
+            noether_charge_file.write_time_data_line({noether_charge});
         }
 
         // Calculate the infinity-norm of all variables specified in params file

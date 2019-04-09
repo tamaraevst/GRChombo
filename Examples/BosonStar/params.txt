@@ -100,6 +100,10 @@ sigma = 0.3
 # L2 norms of the constraints at every coarse timestep
 calculate_constraint_violations = 1
 
+# If 1, a file called NoetherCharge.dat will be written with the integrated
+# Noether charge at every coarse timestep
+calculate_noether_charge = 1
+
 # Vars to write to plot files
 num_plot_vars = 5
 plot_vars = 0 7 25 26 31 # chi, K, phi_Re, phi_Im, Ham
