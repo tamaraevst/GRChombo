@@ -51,6 +51,8 @@ enum
     c_Madm,
     c_Jadm,
 
+    c_N, // Noether Charge integrand
+
     c_Ham,
 
     c_Mom1,
@@ -84,6 +86,8 @@ static constexpr char const *variable_names[NUM_VARS] = {
     "phi_Re",   "phi_Im",   "Pi_Re",    "Pi_Im",
 
     "Madm",   "Jadm",
+
+    "N",
 
     "Ham",    "Mom1",   "Mom2",   "Mom3"};
 }

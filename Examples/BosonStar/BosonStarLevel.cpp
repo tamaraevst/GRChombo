@@ -31,6 +31,9 @@
 #include "ADMMass.hpp"
 #include "MassExtraction.hpp"
 
+// For Noether Charge calculation
+#include "NoetherCharge.hpp"
+
 // Things to do at each advance step, after the RK4 is calculated
 void BosonStarLevel::specificAdvance()
 {
@@ -71,31 +74,27 @@ void BosonStarLevel::initialData()
 // Things to do before outputting a checkpoint file
 void BosonStarLevel::preCheckpointLevel()
 {
-    // I don't think this is necessary given the constraints are put on the grid
-    // in specificPostTimeStep
-    /*
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
-                       complex_scalar_field, m_dx, m_p.G_Newton),
+    BoxLoops::loop(make_compute_pack(
+                    MatterConstraints<ComplexScalarFieldWithPotential>(
+                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
-    */
+
 }
 
 // Things to do before outputting a plot file
 void BosonStarLevel::prePlotLevel()
 {
-    // I don't think this is necessary given the constraints are put on the grid
-    // in specificPostTimeStep
-    /*
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
-                       complex_scalar_field, m_dx, m_p.G_Newton),
+    BoxLoops::loop(make_compute_pack(
+                    MatterConstraints<ComplexScalarFieldWithPotential>(
+                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
-    */
+
 }
 
 // Things to do in RHS update, at each RK4 step

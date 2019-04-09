@@ -6,9 +6,9 @@
 # Included makefiles need an absolute path to the Chombo installation
 # CHOMBO_HOME := Please set the CHOMBO_HOME locally (e.g. export CHOMBO_HOME=... in bash)
 
-ifndef BOOST_ROOT
-		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
-endif
+#ifndef BOOST_ROOT
+#		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
+#endif
 
 GRCHOMBO_SOURCE = ../../Source
 
@@ -25,7 +25,6 @@ src_dirs := $(GRCHOMBO_SOURCE)/utils \
             $(GRCHOMBO_SOURCE)/TaggingCriteria  \
             $(GRCHOMBO_SOURCE)/AMRInterpolator  \
             $(GRCHOMBO_SOURCE)/InitialConditions/BosonStars  \
-						$(GRCHOMBO_SOURCE)/InitialConditions/BosonStars/SingleStar  \
-						$(BOOST_ROOT)
+						$(GRCHOMBO_SOURCE)/InitialConditions/BosonStars/SingleStar 
 
 include $(CHOMBO_HOME)/mk/Make.test
