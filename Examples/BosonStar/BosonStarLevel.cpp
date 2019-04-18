@@ -136,9 +136,6 @@ void BosonStarLevel::specificPostTimeStep()
     CH_TIME("BosonStarLevel::specificPostTimeStep");
     if (m_p.activate_mass_extraction == 1)
     {
-        if (m_verbosity)
-            pout() << "Extracting Mass." << endl;
-
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
         ADMMass adm_mass(m_p.L, m_dx);
@@ -148,6 +145,9 @@ void BosonStarLevel::specificPostTimeStep()
         // Do the extraction on the min extraction level
         if (m_level == m_p.mass_extraction_params.min_extraction_level)
         {
+            if (m_verbosity)
+                pout() << "Extracting Mass." << endl;
+
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
