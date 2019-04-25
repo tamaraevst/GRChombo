@@ -281,7 +281,7 @@ void GRAMRLevel::regrid(const Vector<Box> &a_new_grids)
     m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
 
     // maintain interlevel stuff
-    m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -336,7 +336,7 @@ void GRAMRLevel::initialGrid(const Vector<Box> &a_new_grids)
     m_state_new.define(level_domain, NUM_VARS, iv_ghosts);
     m_state_old.define(level_domain, NUM_VARS, iv_ghosts);
 
-    m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -633,7 +633,8 @@ void GRAMRLevel::readCheckpointLevel(HDF5Handle &a_handle)
 
     // maintain interlevel stuff
     IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
-    m_exchange_copier.exchangeDefine(level_domain, iv_ghosts);
+
+    defineExchangeCopier(level_domain);
     m_coarse_average.define(level_domain, NUM_VARS, m_ref_ratio);
     m_fine_interp.define(level_domain, NUM_VARS, m_ref_ratio, m_problem_domain);
 
@@ -704,7 +705,8 @@ void GRAMRLevel::writePlotLevel(HDF5Handle &a_handle) const
             pout() << header << endl;
 
         const DisjointBoxLayout &levelGrids = m_state_new.getBoxes();
-        LevelData<FArrayBox> plot_data(levelGrids, num_states);
+        IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
+        LevelData<FArrayBox> plot_data(levelGrids, num_states, iv_ghosts);
 
         for (int comp = 0; comp < num_states; comp++)
         {
@@ -715,9 +717,16 @@ void GRAMRLevel::writePlotLevel(HDF5Handle &a_handle) const
 
         plot_data.exchange(plot_data.interval());
 
+        // only need to write ghosts when non periodic BCs exist
+        IntVect ghost_vector = IntVect::Zero;
+        if (m_p.write_plot_ghosts)
+        {
+            ghost_vector = m_num_ghosts * IntVect::Unit;
+        }
+
         // Write the data for this level
         write(a_handle, levelGrids);
-        write(a_handle, plot_data, "data");
+        write(a_handle, plot_data, "data", ghost_vector);
     }
 }
 
@@ -901,4 +910,20 @@ void GRAMRLevel::copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest)
         m_boundaries.copy_boundary_cells(Side::Hi, a_src, a_dest);
         m_boundaries.copy_boundary_cells(Side::Lo, a_src, a_dest);
     }
+}
+
+void GRAMRLevel::defineExchangeCopier(const DisjointBoxLayout &a_level_grids)
+{
+    // if there are Sommerfeld BCs, expand boxes along those sides
+    if (m_p.nonperiodic_boundaries_exist)
+    {
+        m_boundaries.expand_grids_to_boundaries(m_grown_grids, a_level_grids);
+    }
+    else
+    { // nothing to do if periodic BCs
+        m_grown_grids = a_level_grids;
+    }
+
+    IntVect iv_ghosts = m_num_ghosts * IntVect::Unit;
+    m_exchange_copier.exchangeDefine(m_grown_grids, iv_ghosts);
 }

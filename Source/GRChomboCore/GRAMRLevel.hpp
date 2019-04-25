@@ -140,6 +140,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// Specify which variables to write at plot intervals
     virtual void
     specificWritePlotHeader(std::vector<int> &plot_states) const {};
+
+    /// Things to do immediately after restart from checkpoint
+    virtual void postRestart() {}
 #endif
 
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
@@ -168,6 +171,10 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// (for non-periodic boundary conditions, where boundaries evolve via rhs)
     virtual void copyBdyGhosts(const GRLevelData &a_src, GRLevelData &a_dest);
 
+    /// This function is used to define the exchange copiers required for
+    /// copying ghost cells between boxes
+    virtual void defineExchangeCopier(const DisjointBoxLayout &a_level_domain);
+
     BoundaryConditions m_boundaries; // the class for implementing BCs
 
     GRLevelData m_state_old; //!< the solution at the old time
@@ -190,7 +197,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     FourthOrderFineInterp m_fine_interp; //!< executes the interpolation from
                                          //!< coarse to fine when regridding
 
-    DisjointBoxLayout m_grids; //!< Holds grid setup (the layout of boxes)
+    DisjointBoxLayout m_grids;       //!< Holds grid setup (the layout of boxes)
+    DisjointBoxLayout m_grown_grids; //!< Holds grown grid setup (for
+                                     //!< Sommerfeld BCs)
 
   public:
     const int m_num_ghosts; //!< Number of ghost cells
