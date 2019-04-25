@@ -61,59 +61,36 @@ inline void SphericalExtraction::execute_query(
 inline void SphericalExtraction::write_extraction(
                 std::string a_file_prefix) const
 {
-    int rank;
-#ifdef CH_MPI
-    MPI_Comm_rank(Chombo_MPI::comm, &rank);
-#else
-    rank = 0;
-#endif
+    CH_TIME("SphericalExtraction::write_extraction");
+    SmallDataIO extraction_file(a_file_prefix, m_dt, m_time, m_restart_time,
+                                SmallDataIO::NEW);
 
-    // only rank 0 does the write out
-    if (rank == 0)
+    for (int iradius = 0; iradius < m_params.num_extraction_radii; ++iradius)
     {
-        // set up file names and component names
-        int step = std::round(m_time / m_dt);
-        std::string file_str = a_file_prefix + std::to_string(step);
-        std::string comp_str = UserVariables::variable_names[m_extraction_comp];
+        // Write headers
+        std::vector<std::string> header1_strings = {
+            "time = " + std::to_string(m_time) + ",",
+            "r = " + std::to_string(m_params.extraction_radii[iradius])};
+        extraction_file.write_header_line(header1_strings, "");
+        std::vector<std::string> components = {
+            UserVariables::variable_names[m_extraction_comp]};
+        std::vector<std::string> coords = {"theta", "phi"};
+        extraction_file.write_header_line(components, coords);
 
-        // write out complete data to a separate file at each step
-        std::ofstream outfile;
-        outfile.open(file_str);
-        if (!outfile)
+        // Now the data
+        for (int idx = iradius * m_num_points;
+             idx < (iradius + 1) * m_num_points; ++idx)
         {
-            MayDay::Error(
-                "SphericalExtraction::write_extraction: error opening output "
-                "file");
-        }
-        // header data
-        for (int iradius = 0; iradius < m_params.num_extraction_radii;
-             ++iradius)
-        {
-            outfile << "# time : " << m_time << ", r = ";
-            outfile << m_params.extraction_radii[iradius] << "\n";
-            outfile << "#" << std::setw(11) << "theta";
-            outfile << std::setw(12) << "phi";
-            outfile << std::setw(20) << comp_str << "\n";
+            int itheta =
+                (idx - iradius * m_num_points) / m_params.num_points_phi;
+            int iphi = idx % m_params.num_points_phi;
+            // don't put a point at z = 0
+            double theta = (itheta + 0.5) * m_dtheta;
+            double phi = iphi * m_dphi;
 
-            // Now the data
-            for (int idx = iradius * m_num_points;
-                 idx < (iradius + 1) * m_num_points; ++idx)
-            {
-                int itheta =
-                    (idx - iradius * m_num_points) / m_params.num_points_phi;
-                int iphi = idx % m_params.num_points_phi;
-                // don't put a point at z = 0
-                double theta = (itheta + 0.5) * m_dtheta;
-                double phi = iphi * m_dphi;
-                outfile << std::fixed << std::setprecision(7);
-                outfile << std::setw(12) << theta;
-                outfile << std::setw(12) << phi;
-                outfile << std::scientific << std::setprecision(10);
-                outfile << std::setw(20) << m_interp_var[idx] << "\n";
-            }
-            outfile << "\n\n";
+            extraction_file.write_data_line({m_interp_var[idx]}, {theta, phi});
         }
-        outfile.close();
+        extraction_file.line_break();
     }
 }
 
@@ -162,61 +139,37 @@ inline std::vector<double> SphericalExtraction::integrate_surface() const
 inline void SphericalExtraction::write_integral(
             const std::vector<double> a_integral, std::string a_filename) const
 {
-    int rank;
-#ifdef CH_MPI
-    MPI_Comm_rank(Chombo_MPI::comm, &rank);
-#else
-    rank = 0;
-#endif
-    // only rank 0 does the write out
-    if (rank == 0)
+    CH_TIME("SphericalExtraction::write_integral");
+    // open file for writing
+    SmallDataIO integral_file(a_filename, m_dt, m_time, m_restart_time,
+                              SmallDataIO::APPEND);
+
+    // remove any duplicate data if this is a restart
+    // note that this only does something if this is the first timestep after
+    // a restart
+    integral_file.remove_duplicate_time_data();
+
+    // need to write headers if this is the first timestep
+    if (m_time == m_dt)
     {
-        // overwrite file if this is the first timestep, otherwise append.
-        std::ofstream outfile;
-        if (m_time == m_dt)
-        {
-            outfile.open(a_filename);
-        }
-        else
-        {
-            outfile.open(a_filename, std::ios_base::app);
-        }
-        if (!outfile)
-        {
-            MayDay::Error(
-                "SphericalExtraction::write_integral: error opening output "
-                "file");
-        }
-
-        if (m_time == m_dt)
-        {
-            outfile << "#" << std::setw(9) << "time";
-            for (int iradius = 0; iradius < m_params.num_extraction_radii;
-                 ++iradius)
-            {
-                outfile << std::setw(20) << "integral";
-            }
-            outfile << "\n";
-            outfile << "#" << std::setw(9) << "r =";
-            for (int iradius = 0;
-                 iradius < m_params.num_extraction_radii; ++iradius)
-            {
-                outfile << std::setw(20) << m_params.extraction_radii[iradius];
-            }
-            outfile << "\n";
-        }
-
-
-        outfile << std::fixed << std::setw(10) << m_time;
-        outfile << std::scientific << std::setprecision(10);
+        // make header strings
+        std::vector<std::string> header1_strings(m_params.num_extraction_radii);
+        std::vector<std::string> header2_strings(m_params.num_extraction_radii);
         for (int iradius = 0; iradius < m_params.num_extraction_radii;
              ++iradius)
         {
-            outfile << std::setw(20) << a_integral[iradius];
+            header1_strings[iradius] = "ADM mass";
+            header2_strings[iradius] =
+                std::to_string(m_params.extraction_radii[iradius]);
         }
-        outfile << std::endl;
-        outfile.close();
+
+        // write headers
+        integral_file.write_header_line(header1_strings);
+        integral_file.write_header_line(header2_strings, "r = ");
     }
+
+    // write data
+    integral_file.write_time_data_line(a_integral);
 }
 
 #endif /* SPHERICALEXTRACTION_IMPL_HPP_ */
