@@ -19,10 +19,12 @@ public:
     ConstraintViolations(const int a_Ham_comp, const Interval a_Mom_comps,
                          GRAMR *a_gr_amr, const double a_dx_coarse,
                          const double a_dt, const double a_time,
+                         const double a_restart_time,
                          const std::string a_filename,
                          const double a_norm_exponent = 2.)
         : m_Ham_comp(a_Ham_comp), m_Mom_comps(a_Mom_comps), m_gr_amr(a_gr_amr),
         m_dx_coarse(a_dx_coarse), m_dt(a_dt), m_time(a_time),
+        m_restart_time(a_restart_time),
         m_filename(a_filename), m_norm_exponent(a_norm_exponent) {}
 
     // Calculates norms and writes to file
@@ -38,6 +40,7 @@ private:
     const double m_dx_coarse;
     const double m_dt;
     const double m_time;
+    const double m_restart_time;
     const std::string m_filename;
     const double m_norm_exponent;
     double m_Ham_norm;

@@ -110,7 +110,7 @@ void BinaryBHLevel::specificPostTimeStep()
     {
         ConstraintViolations constraint_violations(c_Ham,
             Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
-            "ConstraintViolations.dat");
+            m_restart_time, "ConstraintViolations.dat");
         constraint_violations.execute();
         auto violations = constraint_violations.get_norms();
         pout() << "L2 norms of constraint violations:\n";
