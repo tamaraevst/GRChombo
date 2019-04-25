@@ -30,48 +30,29 @@ void ConstraintViolations::compute_norms()
 
 void ConstraintViolations::write_norms() const
 {
-    int rank;
-#ifdef CH_MPI
-    MPI_Comm_rank(Chombo_MPI::comm, &rank);
-#else
-    rank = 0;
-#endif
-    // only rank 0 does the write out
-    if (rank == 0)
+    CH_TIME("ConstraintViolations::write_norms");
+
+    SmallDataIO file(m_filename, m_dt, m_time, m_restart_time,
+                     SmallDataIO::APPEND);
+
+    // remove any duplicate data if this is a restart
+    // note that this only does something if this is the first timestep after
+    // a restart
+    file.remove_duplicate_time_data();
+
+    // need to write headers if this is the first timestep
+    if (m_time == m_dt)
     {
-        std::ofstream outfile;
-        // overwrite file if this is the first timestep, otherwise append.
-        if (m_time == m_dt)
-        {
-            outfile.open(m_filename);
-        }
-        else
-        {
-            outfile.open(m_filename, std::ios_base::app);
-        }
-        if (!outfile)
-        {
-            MayDay::Error(
-                "ConstraintViolations::write_norms: error opening output file");
-        }
-
-        //Header data at first timestep
-        if (m_time == m_dt)
-        {
-            outfile << '#' << std::setw(9) << "time";
-            outfile << std::setw(20) << "L^" << m_norm_exponent << "_Ham";
-            outfile << std::setw(20) << "L^" << m_norm_exponent << "_Mom\n";
-        }
-
-        // Now the data
-        outfile << std::fixed << std::setw(10) << m_time;
-        outfile << std::scientific << std::setprecision(10);
-        outfile << std::setw(20) << m_Ham_norm;
-        outfile << std::setw(20) << m_Mom_norm;
-        outfile << std::endl;
-
-        outfile.close();
+        std::string Ham_header_string = "L^" + std::to_string(m_norm_exponent) +
+                                        "_Ham";
+        std::string Mom_header_string = "L^" + std::to_string(m_norm_exponent) +
+                                        "_Mom";
+        // write headers
+        file.write_header_line({Ham_header_string, Mom_header_string});
     }
+
+    // write data
+    file.write_time_data_line({m_Ham_norm, m_Mom_norm});
 }
 
 #endif /* CONSTRAINTVIOLATIONS_IMPL_HPP_ */
