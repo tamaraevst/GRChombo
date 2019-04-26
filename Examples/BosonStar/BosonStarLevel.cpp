@@ -151,7 +151,7 @@ void BosonStarLevel::specificPostTimeStep()
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
-                                        m_time);
+                                        m_time, m_restart_time);
             mass_extraction.execute_query(m_gr_amr.m_interpolator);
         }
     }
@@ -170,7 +170,7 @@ void BosonStarLevel::specificPostTimeStep()
             // Write constraint violations to file
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
-                m_time, "ConstraintViolations.dat");
+                m_time, m_restart_time, "ConstraintViolations.dat");
             constraint_violations.execute();
         }
 
