@@ -43,10 +43,10 @@ void ConstraintViolations::write_norms() const
     // need to write headers if this is the first timestep
     if (m_time == m_dt)
     {
-        std::string Ham_header_string = "L^" + std::to_string(m_norm_exponent) +
-                                        "_Ham";
-        std::string Mom_header_string = "L^" + std::to_string(m_norm_exponent) +
-                                        "_Mom";
+        std::sstream norm_exponent_ss;
+        norm_exponent_ss << m_norm_exponent;
+        std::string Ham_header_string = "L^" + norm_exponent_ss.str() + "_Ham";
+        std::string Mom_header_string = "L^" + norm_exponent_ss.str() + "_Mom";
         // write headers
         file.write_header_line({Ham_header_string, Mom_header_string});
     }

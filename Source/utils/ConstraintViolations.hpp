@@ -9,7 +9,7 @@
 #include "GRAMR.hpp"
 #include "Interval.H"
 #include "SmallDataIO.hpp"
-#include <fstream>
+#include <sstream>
 
 //! This class calculates the p-norm of the Hamiltonian and Momentum
 //! constraints and writes them to a file
