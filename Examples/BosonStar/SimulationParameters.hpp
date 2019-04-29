@@ -69,6 +69,12 @@ public:
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
+        // Work out the minimum extraction level
+        auto min_extraction_level_it =
+            std::min_element(mass_extraction_params.extraction_levels.begin(),
+                             mass_extraction_params.extraction_levels.end());
+        mass_extraction_params.min_extraction_level = *(min_extraction_level_it);
+
         // Do we cant to calculate L2 norms of constraint violations
         pp.load("calculate_constraint_violations",
                 calculate_constraint_violations, false);
