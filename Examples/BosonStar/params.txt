@@ -119,6 +119,7 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 
 # BosonStar Initial data parameters
 central_amplitude_CSF = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
+phase = 0.0
 abs_error = 1.0e-14 # absolute error tolerance of the 1d ODE solver
 rel_error = 1.0e-14 # relative error tolerance of the 1d ODE solver
 initial_step_size = 0.015625 # initial step size for the 1d ODE solver

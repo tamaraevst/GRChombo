@@ -53,11 +53,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double r = coords.get_radius();
 
     //Complex scalar field values
-    vars.phi_Re = m_1d_sol.m_phi(r);
-    vars.phi_Im = 0.;
-    vars.Pi_Re = 0.;
+    vars.phi_Re = m_1d_sol.m_phi(r) * cos(m_params_BosonStar.phase);
+    vars.phi_Im = m_1d_sol.m_phi(r) * sin(m_params_BosonStar.phase);
+    vars.Pi_Re = m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
+                 * m_params_potential.scalar_mass
+                 * sin(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
     vars.Pi_Im = -m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
-                * m_params_potential.scalar_mass / m_1d_sol.m_lapse(r);
+                  * m_params_potential.scalar_mass
+                  * cos(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
 
     //conformal metric is flat
     FOR1(i) vars.h[i][i] = 1.;

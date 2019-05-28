@@ -35,6 +35,7 @@ public:
         // Boson Star initial data params
         pp.load("central_amplitude_CSF",
                 bosonstar_params.central_amplitude_CSF);
+        pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("abs_error", bosonstar_params.abs_error, 1.0e-14);
         pp.load("rel_error", bosonstar_params.rel_error, 1.0e-14);
         pp.load("initial_step_size", bosonstar_params.initial_step_size,
