@@ -1,6 +1,6 @@
 #Params for runtime inputs
 
-verbosity = 0
+verbosity = 2
 chk_prefix = BinaryBS_
 plot_prefix = BinaryBSp_
 #restart_file = BosonStar_000060.3d.hdf5
@@ -15,11 +15,25 @@ N3 = 32
 # NB if non cubic, this determines dx for all sides
 L = 64
 
+# Boson Star 1 profile and centre
+central_amplitude_CSF1 = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
+phase1 = 0.0
+star_centre1 = 40 32 32
+
+# Boson Star 2 profile and centre
+identical = 1 # If 1, then central_amplitude_CSF2 is ignored and set to central_amplitude_CSF1
+central_amplitude_CSF2 = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
+phase2 = 0.0
+star_centre2 = 24 32 32
+
+# Potential params
+scalar_mass = 1.0
+phi4_coeff = 0.0
+
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
 regrid_threshold_phi = 0.7
 regrid_threshold_chi = 1
-
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
@@ -27,7 +41,7 @@ max_level = 2 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 256 128 64 32 16 8 4 2
+regrid_interval = 64 32 16 4 8 2 2 2
 # Max and min box size - for load balancing
 max_box_size = 32
 min_box_size = 8
@@ -45,18 +59,6 @@ lo_boundary = 1 1 1
 
 # if sommerfeld boundaries selected, must select
 # asymptotic values (in order given by UserVariables.hpp)
-# 0 = even
-# 1,2,3 = odd x, y, z
-# 4,5,6 = odd xy, yz, xz
-vars_parity            = 0 0 4 6 0 5 0    #chi and hij
-                         0 0 4 6 0 5 0    #K and Aij
-                         0 1 2 3          #Theta and Gamma
-                         0 1 2 3 1 2 3    #lapse shift and B
-                         0 0              #phi and Pi
-                         0 1 2 3          #Ham and Mom
-
-# if reflective boundaries selected, must set
-# parity of all vars (in order given by UserVariables.hpp)
 vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
                          0.0 0.0 0.0 0.0             #Theta and Gamma
@@ -65,7 +67,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0                     #Madm and Jadm
                          0.0                         #N(oether charge density)
                          0.0 0.0 0.0 0.0             #Ham and Mom
-
+                         0.0 0.0                     #Weyl4_Re and Weyl4_Re
 
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
@@ -103,7 +105,7 @@ calculate_constraint_violations = 1
 
 # If 1, a file called NoetherCharge.dat will be written with the integrated
 # Noether charge at every coarse timestep
-calculate_noether_charge = 1
+calculate_noether_charge = 0
 
 # Vars to write to plot files
 num_plot_vars = 5
@@ -117,17 +119,6 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 # Default is 1.0, for standard geometric units
 # G_Newton = 0.07957747154594767 # 1/(4pi)
 
-# Boson Star 1 profile and centre
-central_amplitude_CSF1 = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
-phase1 = 0.0
-star_centre1 = 56 64 64
-
-# Boson Star 2 profile and centre
-identical = 1 # If 1, then central_amplitude_CSF2 is ignored and set to central_amplitude_CSF1
-central_amplitude_CSF2 = 0.1 # Note this is divided by sqrt(4 pi G_Newton) - may be changed in future
-phase2 = 0.0
-star_centre2 = 72 64 64
-
 # Boson Star profile ODE solver params
 abs_error = 1.0e-14 # absolute error tolerance of the 1d ODE solver
 rel_error = 1.0e-14 # relative error tolerance of the 1d ODE solver
@@ -135,17 +126,13 @@ initial_step_size = 0.015625 # initial step size for the 1d ODE solver
 max_radius = 128. # max radius the 1d ODE solver attempts to integrate out to. It should be set larger than it will actually be able to achieve.
 binary_search_tol = 5e-16 # precision to which the central value of 0.5 * log(g_tt) is found
 
-# Potential params
-scalar_mass = 1.0
-phi4_coeff = 0.0
-
 #extraction params
 #default center to grid center, uncomment to change
 #extraction_center = 64 64 64
 activate_gw_extraction = 0
 num_extraction_radii = 3
-extraction_radii = 10. 30. 50.
-extraction_levels = 2 1 1
+extraction_radii = 10. 20. 30.
+extraction_levels = 1 0 0
 num_points_phi = 16
 num_points_theta = 24
 
@@ -153,7 +140,7 @@ num_points_theta = 24
 #mass_extraction_center = 64 64 64
 activate_mass_extraction = 0
 num_mass_extraction_radii = 3
-mass_extraction_radii = 40. 50. 60.
-mass_extraction_levels = 0 0 0
+mass_extraction_radii = 10. 20. 30.
+mass_extraction_levels = 1 0 0
 num_points_phi_mass = 16
 num_points_theta_mass = 24
