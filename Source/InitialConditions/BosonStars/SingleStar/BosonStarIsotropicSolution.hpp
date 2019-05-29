@@ -46,7 +46,7 @@ private:
     Potential::params_t m_params_potential;
     initial_data_t<double> m_isotropic_grid = {};
     initial_data_t<double> m_polar_areal_grid = {};
-    const double m_G_Newton;
+    double m_G_Newton;
     int m_verbosity;
 
     //! This function calculates the isotropic grid from the polar areal grid.

@@ -47,9 +47,9 @@ public:
 
 protected:
     double m_dx;
-    const double m_G_Newton;
-    const BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
-    const Potential::params_t m_params_potential; //!< The potential params
+    double m_G_Newton;
+    BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
+    Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
 };
 
