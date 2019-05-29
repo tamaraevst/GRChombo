@@ -1,8 +1,8 @@
 #Params for runtime inputs
 
-verbosity = 2
-chk_prefix = BosonStar_
-plot_prefix = BosonStarp_
+verbosity = 0
+chk_prefix = BinaryBS_
+plot_prefix = BinaryBSp_
 #restart_file = BosonStar_000060.3d.hdf5
 
 # Set up grid spacings and regrid params
