@@ -46,28 +46,30 @@ template <class data_t>
 void BosonStar::compute(Cell<data_t> current_cell) const
 {
     MatterCCZ4<ComplexScalarField<>>::Vars<data_t> vars;
-    VarsTools::assign(vars, 0.); // Set only the non-zero components below
+    // Load variables (should be set to zero if this is a single BS)
+    current_cell.load_vars(vars);
+    //VarsTools::assign(vars, 0.); // Set only the non-zero components below
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
 
     double r = coords.get_radius();
 
     //Complex scalar field values
-    vars.phi_Re = m_1d_sol.m_phi(r) * cos(m_params_BosonStar.phase);
-    vars.phi_Im = m_1d_sol.m_phi(r) * sin(m_params_BosonStar.phase);
-    vars.Pi_Re = m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
-                 * m_params_potential.scalar_mass
-                 * sin(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
-    vars.Pi_Im = -m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
-                  * m_params_potential.scalar_mass
-                  * cos(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
+    vars.phi_Re += m_1d_sol.m_phi(r) * cos(m_params_BosonStar.phase);
+    vars.phi_Im += m_1d_sol.m_phi(r) * sin(m_params_BosonStar.phase);
+    vars.Pi_Re  += m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
+                   * m_params_potential.scalar_mass
+                   * sin(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
+    vars.Pi_Im  += -m_1d_sol.m_frequency_over_mass * m_1d_sol.m_phi(r)
+                   * m_params_potential.scalar_mass
+                   * cos(m_params_BosonStar.phase) / m_1d_sol.m_lapse(r);
 
     //conformal metric is flat
-    FOR1(i) vars.h[i][i] = 1.;
+    FOR1(i) vars.h[i][i] += 1.;
 
     //conformal factor and lapse
-    vars.chi = m_1d_sol.m_chi(r);
-    vars.lapse = m_1d_sol.m_lapse(r);
+    vars.chi += m_1d_sol.m_chi(r);
+    vars.lapse += m_1d_sol.m_lapse(r);
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);

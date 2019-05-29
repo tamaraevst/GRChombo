@@ -27,6 +27,7 @@ class BosonStar
     typedef std::vector<double> initial_state_t;
     template<class T>
     using initial_data_t = std::vector<T>;
+    friend class BinaryBS;
 
 public:
     //! The constructor
