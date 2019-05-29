@@ -117,7 +117,7 @@ void BinaryBSLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     MatterCCZ4<ComplexScalarFieldWithPotential> my_ccz4_matter(
         complex_scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
         m_p.G_Newton);
-    SetValue set_constraints_and_adm_zero(0.0, Interval(c_Madm, c_Mom3));
+    SetValue set_constraints_and_adm_zero(0.0, Interval(c_Madm, c_Weyl4_Im));
     auto compute_pack2 =
         make_compute_pack(my_ccz4_matter, set_constraints_and_adm_zero);
     BoxLoops::loop(compute_pack2, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
