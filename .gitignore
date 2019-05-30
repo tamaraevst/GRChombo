@@ -1,5 +1,4 @@
-jobscript
-.bashrc
+jobscript*
 pout.*
 .bashrc
 *.pbs
@@ -24,5 +23,6 @@ test
 *.dat
 Weyl_integral*
 *.dat
+ExtractionOut_*
 
 Doxygen/html
