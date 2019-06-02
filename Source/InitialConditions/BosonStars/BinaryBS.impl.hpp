@@ -61,18 +61,49 @@ void BinaryBS::compute_profiles(const double a_L)
 template <class data_t>
 void BinaryBS::compute(Cell<data_t> current_cell) const
 {
-    // First just superpose all variables
-    m_boson_star1.compute(current_cell);
-    m_boson_star2.compute(current_cell);
-
-    // Now manipulate here
-    CCZ4Vars::VarsWithGauge<data_t> vars;
+    MatterCCZ4<ComplexScalarField<>>::Vars<data_t> vars;
+    // Load variables (should be set to zero before)
     current_cell.load_vars(vars);
 
-    // Substract off Minkowski metric
-    FOR1(i) vars.h[i][i] -= 1.;
-    vars.chi -= 1.;
-    vars.lapse -= 1.;
+    // Get two different Coordinate objects centred on each star
+    Coordinates<data_t> coords1(current_cell, m_dx,
+        m_boson_star1.m_params_BosonStar.star_centre);
+    Coordinates<data_t> coords2(current_cell, m_dx,
+        m_boson_star2.m_params_BosonStar.star_centre);
+
+    // Get the distance from the centre of each star
+    double r1 = coords1.get_radius();
+    double r2 = coords2.get_radius();
+
+    // CCZ4 variable superposition
+    data_t chi1 = m_boson_star1.m_1d_sol.m_chi(r1);
+    data_t chi2 = m_boson_star2.m_1d_sol.m_chi(r2);
+    data_t lapse1 = m_boson_star1.m_1d_sol.m_lapse(r1);
+    data_t lapse2 = m_boson_star2.m_1d_sol.m_lapse(r2);
+
+    // 1/chi = 1/chi1 + 1/chi2 - 1
+    vars.chi += (chi1 * chi2) / (chi1 + chi2 - chi1 * chi2);
+    // lapse^2 = lapse1^2 + lapse2^2 - 1
+    vars.lapse += sqrt(lapse1 * lapse1 + lapse2 * lapse2 - 1);
+
+    // Conformal metric is flat
+    FOR1(i) vars.h[i][i] += 1.;
+
+    // Matter superposition
+    double phase1 = m_boson_star1.m_params_BosonStar.phase;
+    double phase2 = m_boson_star2.m_params_BosonStar.phase;
+    double frequency1 = m_boson_star1.m_1d_sol.m_frequency_over_mass
+                        * m_boson_star1.m_params_potential.scalar_mass;
+    double frequency2 = m_boson_star2.m_1d_sol.m_frequency_over_mass
+                        * m_boson_star2.m_params_potential.scalar_mass;
+    data_t mod_phi1 = m_boson_star1.m_1d_sol.m_phi(r1);
+    data_t mod_phi2 = m_boson_star2.m_1d_sol.m_phi(r2);
+    vars.phi_Re += mod_phi1 * cos(phase1) + mod_phi2 * cos(phase2);
+    vars.phi_Im += mod_phi2 * sin(phase1) + mod_phi2 * sin(phase2);
+    vars.Pi_Re += frequency1 * mod_phi1 * sin(phase1) / lapse1
+                + frequency2 * mod_phi2 * sin(phase2) / lapse2;
+    vars.Pi_Im += -frequency1 * mod_phi1 * cos(phase1) / lapse1
+                 - frequency2 * mod_phi2 * cos(phase2) / lapse2;
 
     // Store variables
     current_cell.store_vars(vars);
