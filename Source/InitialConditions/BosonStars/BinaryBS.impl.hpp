@@ -99,7 +99,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     data_t mod_phi1 = m_boson_star1.m_1d_sol.m_phi(r1);
     data_t mod_phi2 = m_boson_star2.m_1d_sol.m_phi(r2);
     vars.phi_Re += mod_phi1 * cos(phase1) + mod_phi2 * cos(phase2);
-    vars.phi_Im += mod_phi2 * sin(phase1) + mod_phi2 * sin(phase2);
+    vars.phi_Im += mod_phi1 * sin(phase1) + mod_phi2 * sin(phase2);
     vars.Pi_Re += frequency1 * mod_phi1 * sin(phase1) / lapse1
                 + frequency2 * mod_phi2 * sin(phase2) / lapse2;
     vars.Pi_Im += -frequency1 * mod_phi1 * cos(phase1) / lapse1
