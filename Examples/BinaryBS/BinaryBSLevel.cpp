@@ -117,10 +117,10 @@ void BinaryBSLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     MatterCCZ4<ComplexScalarFieldWithPotential> my_ccz4_matter(
         complex_scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
         m_p.G_Newton);
-    SetValue set_constraints_and_adm_zero(0.0, Interval(c_Madm, c_Weyl4_Im));
-    auto compute_pack2 =
-        make_compute_pack(my_ccz4_matter, set_constraints_and_adm_zero);
-    BoxLoops::loop(compute_pack2, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+    SetValue set_analysis_vars_zero(0.0, Interval(c_Pi_Im + 1, NUM_VARS - 1));
+    auto compute_pack =
+        make_compute_pack(my_ccz4_matter, set_analysis_vars_zero);
+    BoxLoops::loop(compute_pack, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
 
 }
 
@@ -207,6 +207,19 @@ void BinaryBSLevel::specificPostTimeStep()
             }
             noether_charge_file.write_time_data_line({noether_charge});
         }
+
+        // Compute the maximum of mod_phi and write it to a file
+        double mod_phi_max = m_gr_amr.compute_max(
+                                Interval(c_mod_phi, c_mod_phi));
+        SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
+                                     m_restart_time,
+                                     SmallDataIO::APPEND);
+        mod_phi_max_file.remove_duplicate_time_data();
+        if (m_time == m_dt)
+        {
+            mod_phi_max_file.write_header_line({"max mod phi"});
+        }
+        mod_phi_max_file.write_time_data_line({mod_phi_max});
 
         // Calculate the infinity-norm of all variables specified in params file
         // and output them

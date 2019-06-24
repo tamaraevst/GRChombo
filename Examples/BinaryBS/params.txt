@@ -64,6 +64,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0 0.0 0.0             #Theta and Gamma
                          1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B
                          0.0 0.0 0.0 0.0             #phi and Pi (Re and Im)
+                         0.0                         #mod_phi
                          0.0 0.0                     #Madm and Jadm
                          0.0                         #N(oether charge density)
                          0.0 0.0 0.0 0.0             #Ham and Mom
