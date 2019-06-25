@@ -82,7 +82,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
         current_state, tagging_criterion);
 }
 
-void BinaryBHLevel::specificPostTimeStep()
+void BinaryBHLevel::doAnalysis()
 {
     CH_TIME("BinaryBHLevel::specificPostTimeStep");
     if (m_p.activate_extraction == 1)
@@ -95,10 +95,11 @@ void BinaryBHLevel::specificPostTimeStep()
         // Do the extraction on the min extraction level
         if (m_level == m_p.extraction_params.min_extraction_level)
         {
+            bool called_here = true;
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
-                                         m_restart_time);
+                                         m_restart_time, called_here);
             my_extraction.execute_query(m_gr_amr.m_interpolator);
         }
     }

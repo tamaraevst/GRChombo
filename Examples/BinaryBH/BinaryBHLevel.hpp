@@ -39,8 +39,8 @@ class BinaryBHLevel : public GRAMRLevel
     computeTaggingCriterion(FArrayBox &tagging_criterion,
                             const FArrayBox &current_state) override;
 
-    // to do post each time step on every level
-    virtual void specificPostTimeStep() override;
+    // to do analysis after a timestep and after restart/initialization
+    virtual void doAnalysis() override;
 
     /// Any actions that should happen just before plot files output
     virtual void prePlotLevel() override;
