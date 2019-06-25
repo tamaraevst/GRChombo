@@ -142,7 +142,7 @@ inline void SphericalExtraction::write_integral(
     CH_TIME("SphericalExtraction::write_integral");
     // open file for writing
     SmallDataIO integral_file(a_filename, m_dt, m_time, m_restart_time,
-                              SmallDataIO::APPEND);
+                              SmallDataIO::APPEND, m_called_in_do_analysis);
 
     // remove any duplicate data if this is a restart
     // note that this only does something if this is the first timestep after
