@@ -132,22 +132,24 @@ void BinaryBSLevel::specificUpdateODE(GRLevelData &a_soln,
     BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
 }
 
-// Things to do after every time step after each level
-void BinaryBSLevel::specificPostTimeStep()
+// Things to do for analysis after each timestep and at the start
+void BinaryBSLevel::doAnalysis()
 {
     CH_TIME("BinaryBSLevel::specificPostTimeStep");
 
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    auto compute_pack_post_timestep =
+    auto analysis_compute_pack =
         make_compute_pack(Weyl4(m_p.extraction_params.extraction_center, m_dx),
                           ADMMass(m_p.L, m_dx),
                           MatterConstraints<ComplexScalarFieldWithPotential>(
                           complex_scalar_field, m_dx, m_p.G_Newton),
                           NoetherCharge());
-    BoxLoops::loop(compute_pack_post_timestep, m_state_new, m_state_new,
+    BoxLoops::loop(analysis_compute_pack, m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
+
+    bool called_in_do_analysis = true;
 
     // Do the extraction on the min extraction level
     if (m_p.activate_gw_extraction == 1 &&
@@ -162,7 +164,7 @@ void BinaryBSLevel::specificPostTimeStep()
         // Refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
         WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
-                                     m_restart_time);
+                                     m_restart_time, called_in_do_analysis);
         gw_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
@@ -178,7 +180,8 @@ void BinaryBSLevel::specificPostTimeStep()
         // Now refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
         MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
-                                    m_time, m_restart_time);
+                                    m_time, m_restart_time,
+                                    called_in_do_analysis);
         mass_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
@@ -189,7 +192,8 @@ void BinaryBSLevel::specificPostTimeStep()
             // Write constraint violations to file
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
-                m_time, m_restart_time, "ConstraintViolations.dat");
+                m_time, m_restart_time, "ConstraintViolations.dat",
+                called_in_do_analysis);
             constraint_violations.execute();
         }
 
@@ -199,9 +203,10 @@ void BinaryBSLevel::specificPostTimeStep()
             double noether_charge = m_gr_amr.compute_sum(c_N, m_dx);
             SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
                                             m_restart_time,
-                                            SmallDataIO::APPEND);
+                                            SmallDataIO::APPEND,
+                                            called_in_do_analysis);
             noether_charge_file.remove_duplicate_time_data();
-            if (m_time == m_dt)
+            if (m_time == 0.)
             {
                 noether_charge_file.write_header_line({"Noether Charge"});
             }
@@ -213,9 +218,10 @@ void BinaryBSLevel::specificPostTimeStep()
                                 Interval(c_mod_phi, c_mod_phi));
         SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
                                      m_restart_time,
-                                     SmallDataIO::APPEND);
+                                     SmallDataIO::APPEND,
+                                     called_in_do_analysis);
         mod_phi_max_file.remove_duplicate_time_data();
-        if (m_time == m_dt)
+        if (m_time == 0.)
         {
             mod_phi_max_file.write_header_line({"max mod phi"});
         }

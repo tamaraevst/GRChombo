@@ -55,8 +55,8 @@ class BinaryBSLevel : public GRAMRLevel
                                          const FArrayBox &current_state)
                                          override;
 
-    //! Things to do after every time step on each level
-    virtual void specificPostTimeStep() override;
+    //! Things to do for analysis after each timestep and at the start
+    virtual void doAnalysis() override;
 };
 
 #endif /* BINARYBSLEVEL_HPP_ */

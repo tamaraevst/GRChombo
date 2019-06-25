@@ -129,10 +129,11 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
     BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
 }
 
-// Things to do after every time step after each level
-void BosonStarLevel::specificPostTimeStep()
+// Things to do for analysis after each timestep and at the start
+void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
+    bool called_in_do_analysis = true;
     if (m_p.activate_mass_extraction == 1)
     {
         // First compute the ADM Mass integrand values on the grid
@@ -150,7 +151,8 @@ void BosonStarLevel::specificPostTimeStep()
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
-                                        m_time, m_restart_time);
+                                        m_time, m_restart_time,
+                                        called_in_do_analysis);
             mass_extraction.execute_query(m_gr_amr.m_interpolator);
         }
     }
@@ -169,7 +171,8 @@ void BosonStarLevel::specificPostTimeStep()
             // Write constraint violations to file
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
-                m_time, m_restart_time, "ConstraintViolations.dat");
+                m_time, m_restart_time, "ConstraintViolations.dat",
+                called_in_do_analysis);
             constraint_violations.execute();
         }
 
@@ -179,9 +182,10 @@ void BosonStarLevel::specificPostTimeStep()
             double noether_charge = m_gr_amr.compute_sum(c_N, m_dx);
             SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
                                             m_restart_time,
-                                            SmallDataIO::APPEND);
+                                            SmallDataIO::APPEND,
+                                            called_in_do_analysis);
             noether_charge_file.remove_duplicate_time_data();
-            if (m_time == m_dt)
+            if (m_time == 0.)
             {
                 noether_charge_file.write_header_line({"Noether Charge"});
             }
@@ -192,9 +196,10 @@ void BosonStarLevel::specificPostTimeStep()
                                 Interval(c_mod_phi, c_mod_phi));
         SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
                                      m_restart_time,
-                                     SmallDataIO::APPEND);
+                                     SmallDataIO::APPEND,
+                                     called_in_do_analysis);
         mod_phi_max_file.remove_duplicate_time_data();
-        if (m_time == m_dt)
+        if (m_time == 0.)
         {
             mod_phi_max_file.write_header_line({"max mod phi"});
         }
