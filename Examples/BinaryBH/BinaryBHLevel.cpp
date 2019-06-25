@@ -85,33 +85,32 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 void BinaryBHLevel::doAnalysis()
 {
     CH_TIME("BinaryBHLevel::specificPostTimeStep");
-    if (m_p.activate_extraction == 1)
-    {
-        // Populate the Weyl Scalar values on the grid
-        fillAllGhosts();
-        BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
-                       m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
-        // Do the extraction on the min extraction level
-        if (m_level == m_p.extraction_params.min_extraction_level)
-        {
-            bool called_here = true;
-            // Now refresh the interpolator and do the interpolation
-            m_gr_amr.m_interpolator->refresh();
-            WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
-                                         m_restart_time, called_here);
-            my_extraction.execute_query(m_gr_amr.m_interpolator);
-        }
+    // Populate the Weyl Scalar values and Constraint violations on the grid
+    fillAllGhosts();
+    BoxLoops::loop(make_compute_pack(Constraints(m_dx),
+                   Weyl4(m_p.extraction_params.extraction_center, m_dx)),
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+
+    bool called_in_do_analysis = true;
+
+    // Do the extraction on the min extraction level
+    if (m_level == m_p.extraction_params.min_extraction_level
+            && m_p.activate_extraction == 1)
+    {
+
+        // Now refresh the interpolator and do the interpolation
+        m_gr_amr.m_interpolator->refresh();
+        WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
+                                     m_restart_time, called_in_do_analysis);
+        my_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
-    fillAllGhosts();
-    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
-                   EXCLUDE_GHOST_CELLS);
     if (m_level == 0)
     {
         ConstraintViolations constraint_violations(c_Ham,
             Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
-            m_restart_time, "ConstraintViolations.dat");
+            m_restart_time, "ConstraintViolations.dat", called_in_do_analysis);
         constraint_violations.execute();
         auto violations = constraint_violations.get_norms();
         pout() << "L2 norms of constraint violations:\n";
