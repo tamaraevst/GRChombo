@@ -101,14 +101,18 @@ void SmallDataIO::remove_duplicate_time_data()
         std::string line;
         std::string temp_filename = m_filename + ".temp";
         std::ofstream temp_file(temp_filename);
+        // if called in doAnalysis, need to get rid of the data calculated
+        // at time = restart_time.
+        double cutoff_time = (m_called_in_do_analysis) ?
+                               m_restart_time + epsilon :
+                               m_restart_time - epsilon ;
         while (std::getline(m_file, line))
         {
             if (!(line.find("#") == std::string::npos))
             {
                 temp_file << line << "\n";
             }
-            else if (std::stod(line.substr(0, m_coords_width)) <=
-                     m_restart_time + epsilon)
+            else if (std::stod(line.substr(0, m_coords_width)) < cutoff_time)
             {
                 temp_file << line << "\n";
             }

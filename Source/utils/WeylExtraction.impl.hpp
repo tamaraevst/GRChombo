@@ -105,8 +105,14 @@ WeylExtraction::integrate_surface(int es, int el, int em,
         // the function is periodic  and so the last point (implied but not part
         // of vector) is equal to the first point
 #ifdef _OPENMP
+#if __GNUC__ > 8
+#define OPENMP_CONST_SHARED shared(a_re_part, a_im_part)
+#else
+#define OPENMP_CONST_SHARED
+#endif
 #pragma omp parallel for collapse(2) default(none)                             \
-    shared(es, el, em, integral_re, integral_im)
+    shared(es, el, em, integral_re, integral_im) OPENMP_CONST_SHARED
+#undef OPENMP_CONST_SHARED
 #endif
         for (int iradius = 0; iradius < m_params.num_extraction_radii;
              ++iradius)
@@ -164,7 +170,7 @@ WeylExtraction::write_integral(const std::vector<double> a_integral_re,
     CH_TIME("WeylExtraction::write_integral");
     // open file for writing
     SmallDataIO integral_file(a_filename, m_dt, m_time, m_restart_time,
-                              SmallDataIO::APPEND);
+                              SmallDataIO::APPEND, m_called_in_do_analysis);
 
     // remove any duplicate data if this is a restart
     // note that this only does something if this is the first timestep after
@@ -172,7 +178,8 @@ WeylExtraction::write_integral(const std::vector<double> a_integral_re,
     integral_file.remove_duplicate_time_data();
 
     // need to write headers if this is the first timestep
-    if (m_time == m_dt)
+    if ((m_time == m_dt && !m_called_in_do_analysis) ||
+        (m_time == 0 && m_called_in_do_analysis))
     {
         // make header strings
         std::vector<std::string> header1_strings(2 *
@@ -219,7 +226,7 @@ WeylExtraction::write_extraction(std::string a_file_prefix,
 {
     CH_TIME("WeylExtraction::write_extraction");
     SmallDataIO extraction_file(a_file_prefix, m_dt, m_time, m_restart_time,
-                                SmallDataIO::NEW);
+                                SmallDataIO::NEW, m_called_in_do_analysis);
 
     for (int iradius = 0; iradius < m_params.num_extraction_radii; ++iradius)
     {

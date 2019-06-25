@@ -61,6 +61,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// regrid
     virtual void regrid(const Vector<Box> &a_new_grids);
 
+    /// things to do after regridding
+    virtual void postRegrid(int a_base_level);
+
     /// initialize grids
     virtual void initialGrid(const Vector<Box> &a_new_grids);
 
@@ -122,6 +125,10 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     /// Virtual function for the problem specific parts of postTimeStep
     virtual void specificPostTimeStep() {}
+
+    /// Virtual function for analysis called in postTimeStep
+    /// and after AMR set up
+    virtual void doAnalysis() {}
 
     /// (Pure) virtual function for the initial data calculation
     virtual void initialData() = 0;

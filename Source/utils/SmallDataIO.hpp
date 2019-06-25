@@ -39,6 +39,9 @@ class SmallDataIO
     const double m_restart_time;
     int m_step;
     const Mode m_mode;
+    const bool m_called_in_do_analysis; // by default this class assumes it is
+    // called only in specificPostTimeStep so isn't called until time = m_dt.
+    // if called in doAnalysis, it will be first called at time = 0.
     const int m_data_precision;
     const int m_data_width;
     const int m_coords_precision;
@@ -49,10 +52,12 @@ class SmallDataIO
   public:
     //! Constructor (opens file)
     SmallDataIO(std::string a_filename, double a_dt, double a_time,
-                double a_restart_time, Mode a_mode, int a_data_precision = 10,
+                double a_restart_time, Mode a_mode,
+                bool a_called_in_do_analysis = false, int a_data_precision = 10,
                 int a_coords_precision = 7)
         : m_filename(a_filename), m_dt(a_dt), m_time(a_time),
           m_restart_time(a_restart_time), m_mode(a_mode),
+          m_called_in_do_analysis(a_called_in_do_analysis),
           m_data_precision(a_data_precision),
           // data columns need extra space for scientific notation
           // compared to coords columns
@@ -71,7 +76,8 @@ class SmallDataIO
             std::ios::openmode file_openmode;
             if (m_mode == APPEND)
             {
-                if (m_time == m_dt)
+                if ((m_time == m_dt && !m_called_in_do_analysis) ||
+                    (m_time == 0. && m_called_in_do_analysis))
                 {
                     // overwrite any existing file if starting from time 0
                     file_openmode = std::ios::out;
