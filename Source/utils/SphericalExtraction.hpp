@@ -29,6 +29,7 @@ class SphericalExtraction
     const double m_dt;
     const double m_time;
     const double m_restart_time;
+    const bool m_called_in_do_analysis;
     const int m_num_points; // number of points per extraction radius
     std::vector<double> m_interp_var;
     std::vector<double> m_interp_x;
@@ -40,9 +41,11 @@ class SphericalExtraction
   public:
     //! The constructor
     SphericalExtraction(int a_extraction_comp, extraction_params_t a_params,
-                        double a_dt, double a_time, double a_restart_time = 0.0)
+                        double a_dt, double a_time, double a_restart_time = 0.0,
+                        bool a_called_in_do_analysis = false)
         : m_params(a_params), m_extraction_comp(a_extraction_comp), m_dt(a_dt),
           m_time(a_time), m_restart_time(a_restart_time),
+          m_called_in_do_analysis(a_called_in_do_analysis),
           m_num_points(m_params.num_points_phi * m_params.num_points_theta),
           m_dphi(2.0 * M_PI / m_params.num_points_phi),
           m_dtheta(M_PI / m_params.num_points_theta)
