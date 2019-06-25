@@ -30,6 +30,8 @@ class WeylExtraction
     const double m_dt;
     const double m_time;
     const double m_restart_time;
+    const bool m_called_in_do_analysis; // if called in doAnalysis, extraction
+                                        // will happen at time = 0
     const int m_num_points; // number of points per extraction radius
     const double m_dphi;
     const double m_dtheta;
@@ -37,9 +39,11 @@ class WeylExtraction
   public:
     //! The constructor
     WeylExtraction(extraction_params_t a_params, double a_dt, double a_time,
-                   double a_restart_time = 0.0)
+                   double a_restart_time = 0.0,
+                   bool a_called_in_do_analysis = false)
         : m_params(a_params), m_dt(a_dt), m_time(a_time),
           m_restart_time(a_restart_time),
+          m_called_in_do_analysis(a_called_in_do_analysis),
           m_num_points(m_params.num_points_phi * m_params.num_points_theta),
           m_dphi(2.0 * M_PI / m_params.num_points_phi),
           m_dtheta(M_PI / m_params.num_points_theta)

@@ -33,7 +33,7 @@ void ConstraintViolations::write_norms() const
     CH_TIME("ConstraintViolations::write_norms");
 
     SmallDataIO file(m_filename, m_dt, m_time, m_restart_time,
-                     SmallDataIO::APPEND);
+                     SmallDataIO::APPEND, m_called_in_do_analysis);
 
     // remove any duplicate data if this is a restart
     // note that this only does something if this is the first timestep after
@@ -41,7 +41,8 @@ void ConstraintViolations::write_norms() const
     file.remove_duplicate_time_data();
 
     // need to write headers if this is the first timestep
-    if (m_time == m_dt)
+    if ((m_time == m_dt && !m_called_in_do_analysis) ||
+        (m_time == 0 && m_called_in_do_analysis))
     {
         std::stringstream norm_exponent_ss;
         norm_exponent_ss << m_norm_exponent;
