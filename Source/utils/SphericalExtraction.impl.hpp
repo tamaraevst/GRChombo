@@ -150,7 +150,8 @@ inline void SphericalExtraction::write_integral(
     integral_file.remove_duplicate_time_data();
 
     // need to write headers if this is the first timestep
-    if (m_time == m_dt)
+    if ((m_time == m_dt && !m_called_in_do_analysis) ||
+        (m_time == 0 && m_called_in_do_analysis))
     {
         // make header strings
         std::vector<std::string> header1_strings(m_params.num_extraction_radii);
