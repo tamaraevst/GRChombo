@@ -23,10 +23,10 @@ BosonStarSolution::BosonStarSolution()
 
 void BosonStarSolution::main()
 {
-    std::cout << "\33[30;41m" << " Central Density: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-  	std::cout << PC << std::endl;
-    std::cout << "\33[30;41m" << " Max Radius: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-  	std::cout << L << std::endl;
+    //std::cout << "\33[30;41m" << " Central Density: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
+  	//std::cout << PC << std::endl;
+    //std::cout << "\33[30;41m" << " Max Radius: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
+  	//std::cout << L << std::endl;
 
   	// finds the eigenvalue. WW is big then it descends to the correct w+ and w- then uses interval bisection to find best ww to machine precision
   	WW = find_WW();
@@ -51,8 +51,8 @@ void BosonStarSolution::main()
     initialise();
     rk4_asymp(mid_int, false, ww); // (false) no large radius adaptive stepsize this time as we already know the asymptotics
 
-    std::cout << "\33[30;41m" << " Origial Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-    std::cout << "w: " << sqrt(ww)  << ", PSI_INF: " << PSI_INF << ", OM_INF: " << OM_INF << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
+    //std::cout << "\33[30;41m" << " Origial Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
+    //std::cout << "w: " << sqrt(ww)  << ", PSI_INF: " << PSI_INF << ", OM_INF: " << OM_INF << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
 
     // Now we rescale all appropriate variables by the large radius vlaues of conformal factor and lapse
     for (int i = 0; i < gridsize; ++i)
@@ -70,8 +70,8 @@ void BosonStarSolution::main()
     ww *= 1./(OM_INF*OM_INF); // rescale the original eigenvalue by the lapse at large radius
 
 
-    std::cout << "\33[30;41m" << " Renormalised Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-    std::cout << "w: " << sqrt(ww) << ", ADM M: " << adm_mass << ", Aspect M: " << aspect_mass << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
+    //std::cout << "\33[30;41m" << " Renormalised Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
+    //std::cout << "w: " << sqrt(ww) << ", ADM M: " << adm_mass << ", Aspect M: " << aspect_mass << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
 
 }
 
