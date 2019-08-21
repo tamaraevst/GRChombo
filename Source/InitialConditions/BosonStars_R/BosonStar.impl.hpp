@@ -45,12 +45,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
 
-    double r = coords.get_radius();
+    // define coords wrt first star centre 
+    double x = coords.x-32;
+    double y = coords.y;
+    double z = coords.z;
+    
+    double r = sqrt(x*x+y*y+z*z);
     double p_ = m_1d_sol.get_p_interp(r);
     double lapse_ = m_1d_sol.get_lapse_interp(r);
     double w_ = m_1d_sol.get_w();
     double chi_ = m_1d_sol.get_chi_interp(r);
-    double phi_ = 0.;//m_params_BosonStar.phase;
+    double phi_ = m_params_BosonStar.phase;
 
     //Complex scalar field values
     vars.phi_Re += p_*cos(phi_);
@@ -58,12 +63,31 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.Pi_Re += p_*sin(phi_)*w_/lapse_;
     vars.Pi_Im += -p_*cos(phi_)*w_/lapse_;
 
-    //conformal metric is flat
-    FOR1(i) vars.h[i][i] += 1.;
-
     //conformal factor and lapse
     vars.chi += chi_;
     vars.lapse += lapse_;
+
+    // now superpose the second star
+    x += 64;
+    r = sqrt(x*x+y*y+z*z);
+    p_ = m_1d_sol.get_p_interp(r);
+    lapse_ = m_1d_sol.get_lapse_interp(r);
+    w_ = m_1d_sol.get_w(); // can make w negative for opposite phase rotation
+    chi_ = m_1d_sol.get_chi_interp(r);
+    phi_ = m_params_BosonStar.phase;
+
+    //Complex scalar field values
+    vars.phi_Re += p_*cos(phi_);
+    vars.phi_Im += p_*sin(phi_);
+    vars.Pi_Re += p_*sin(phi_)*w_/lapse_;
+    vars.Pi_Im += -p_*cos(phi_)*w_/lapse_;
+    
+    //conformal factor and lapse
+    vars.chi += chi_;
+    vars.lapse += lapse_;
+
+    //conformal metric is flat
+    FOR1(i) vars.h[i][i] += 1.;
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);
