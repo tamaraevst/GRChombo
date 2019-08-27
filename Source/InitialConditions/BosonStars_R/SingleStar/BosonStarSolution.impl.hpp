@@ -42,6 +42,18 @@ void BosonStarSolution::main()
     rk4_asymp(mid_int, true, ww); // (true) uses large radius adaptive stepsize to get asymptotics (integrates vacuum metric out to huge radius ~ 10^10 to measure asymptotics).
     PSI_INF = psi[gridsize-1];
     OM_INF = omega[gridsize-1];
+  
+    PSC/=PSI_INF;
+    OMC/=OM_INF;
+    ww/=OM_INF*OM_INF;
+    initialise();
+    rk4(ww);
+    mid_int = find_midint();
+    rk4_asymp(mid_int-gridsize/200,false,ww);
+    
+    
+
+    /*
     dx/=PSI_INF; // change dx to make the rescaled physics scale correct
 
     // just rescaled dx by the asymptotic value of the conformal factor and now re-integrate
@@ -57,18 +69,21 @@ void BosonStarSolution::main()
     // Now we rescale all appropriate variables by the large radius vlaues of conformal factor and lapse
     for (int i = 0; i < gridsize; ++i)
     {
-        radius_array[i] *= PSI_INF;
+        radius_array[i] = double(i)*dx*PSI_INF;
         psi[i] *= 1./PSI_INF;
         dpsi[i] *= pow(PSI_INF,-2);
         omega[i] *= 1./OM_INF;
-    }
+    }*/
 
     //calculate the ADM mass and aspect mass at the edge of physical domain. Aspect is more accurate but ADM should be relativiely similar.
     adm_mass = -psi[gridsize-1]*dpsi[gridsize-1]*radius_array[gridsize-1]*radius_array[gridsize-1];
     aspect_mass = 2.*radius_array[gridsize-1]*(sqrt(psi[gridsize-1])-1.);
 
-    ww *= 1./(OM_INF*OM_INF); // rescale the original eigenvalue by the lapse at large radius
+    //ww *= 1./(OM_INF*OM_INF); // rescale the original eigenvalue by the lapse at large radius
 
+
+
+    std::cout << "Finished producing Bosonstar with ADM mass : " << adm_mass << " and aspect mass : "  << aspect_mass << std::endl;    
 
     //std::cout << "\33[30;41m" << " Renormalised Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
     //std::cout << "w: " << sqrt(ww) << ", ADM M: " << adm_mass << ", Aspect M: " << aspect_mass << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
@@ -154,7 +169,7 @@ int BosonStarSolution::find_midint()
     		if (abs(p[i+1]) > abs(p[i]))
     		{
       			mid_int = i;
-      			std::cout << "Truncation error: " << p[i]/PC << std::endl;
+      			//std::cout << "Truncation error: " << p[i]/PC << std::endl;
       			return mid_int;
     		}
   	}
@@ -389,13 +404,9 @@ void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const dou
   		  std::cout << "\33[30;41m" << " Asymptotic Radius Too Small" << "\x1B[0m" << std::endl;
         std::cout << x_ << std::endl;
   	}
-    if (adaptive)
-    {
-        std::cout << "\33[30;41m" << " Radius ~ Inf" << "\x1B[0m" << std::endl;
-        std::cout << x_ << std::endl;
-    }
 }
-
+  
+    
 
 // these functions return the right hand side of the ode's
 // small_P_RHS is valid for large redius when the scalar field is small.
@@ -427,7 +438,7 @@ double BosonStarSolution::PSI_RHS(const double x, const double P, const double D
 
 double BosonStarSolution::DPSI_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
 {
-  	double RHS = DPSI*DPSI/(2.*PSI) - 2.*DPSI/sqrt(x*x + 0.0001) - 2*M_PI*G*(V(P)*pow(PSI,3) + DP*DP*PSI + ww_*PSI*pow(P*PSI/OM,2));
+  	double RHS = DPSI*DPSI/(2.*PSI) - 2.*DPSI/sqrt(x*x + 0.000001) - 2*M_PI*G*(V(P)*pow(PSI,3) + DP*DP*PSI + ww_*PSI*pow(P*PSI/OM,2));
   	return RHS;
 }
 
@@ -443,7 +454,7 @@ double BosonStarSolution::V(const double P)
 {
   	if (!solitonic)
   	{
-  		  return MM*P*P + lambda*P*P*P*P;
+  		  return MM*P*P + 0.5* lambda*P*P*P*P;
   	}
   	else
   	{
@@ -454,7 +465,7 @@ double BosonStarSolution::DV(const double P)
 {
   	if (!solitonic)
   	{
-  		  return MM + 2.*lambda*P*P;
+  		  return MM + lambda*P*P;
   	}
   	else
   	{

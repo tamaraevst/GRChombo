@@ -67,14 +67,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.chi += chi_;
     vars.lapse += lapse_;
 
+    
     // now superpose the second star
     x += 64;
     r = sqrt(x*x+y*y+z*z);
     p_ = m_1d_sol.get_p_interp(r);
     lapse_ = m_1d_sol.get_lapse_interp(r);
-    w_ = m_1d_sol.get_w(); // can make w negative for opposite phase rotation
+    w_ = m_1d_sol.get_w(); // can make negative for opposite phase rotation
     chi_ = m_1d_sol.get_chi_interp(r);
-    phi_ = m_params_BosonStar.phase;
 
     //Complex scalar field values
     vars.phi_Re += p_*cos(phi_);
@@ -83,8 +83,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.Pi_Im += -p_*cos(phi_)*w_/lapse_;
     
     //conformal factor and lapse
-    vars.chi += chi_;
-    vars.lapse += lapse_;
+    vars.chi += chi_-1;
+    vars.lapse += lapse_-1;
 
     //conformal metric is flat
     FOR1(i) vars.h[i][i] += 1.;

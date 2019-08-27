@@ -8,14 +8,14 @@ class BosonStarSolution
 
 private: // private member variables/arrays
     double MM, PC; //Klein Gordon mass squared, KG scalr field central amplitude
-    const double G = 1.;//  1 is like GRChombo 1./(M_PI*4.); // rescales KG field in ODE's
-    const double PSC=2., OMC=0.5; // central density of scalar field (0.272 for kaup)  PSC and OMC are central values of conformal factor and lapse, not important as long as they are sensible (i.e. order 1)
+    const double G = 1;// 1./(M_PI*4.); // rescales KG field in ODE's
+    double PSC=2., OMC=0.5; // central density of scalar field (0.272 for kaup)  PSC and OMC are central values of conformal factor and lapse, not important as long as they are sensible (i.e. order 1)
     double lambda; // phi 4 coupling in Klein gordon potential
     double sigma; // 0.2 works with PC = 0.05 // parameter for solitonic stars
     bool solitonic; // false fro mini/lambda star. true for solitonic star
     double EIGEN; // the desired eigenstate, 0 for ground
-    const int gridsize = 2000000, adaptive_buffer = gridsize/5; // anywhere from 2000-2M is ok
-    const int adaptive_stepsize_repetitions = 10;//50; // 0 for no adaptive
+    const int gridsize = 200000, adaptive_buffer = gridsize/5; // anywhere from 2k-200k is ok
+    const int adaptive_stepsize_repetitions = 19;//50; // 0 for no adaptive
   	double L, dx, WW, ww; // L, length of domain, dx.
   	double OM_INF, PSI_INF; // asymptotics of lapse and cpnformal factpr
   	int mid_int; // integer where growing mode becomes relevant
