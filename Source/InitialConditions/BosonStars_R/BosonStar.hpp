@@ -41,12 +41,14 @@ public:
     BosonStarSolution m_1d_sol; /*<
     The object that stores the solution found by the 1d ODE integrator */
 
+
 protected:
     double m_dx;
     double m_G_Newton;
     BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
     Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
+
 };
 
 #include "BosonStar.impl.hpp"

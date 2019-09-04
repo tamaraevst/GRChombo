@@ -10,15 +10,8 @@
 #ifndef BOSONSTARSOLUTION_IMPL_HPP_
 #define BOSONSTARSOLUTION_IMPL_HPP_
 
-
 BosonStarSolution::BosonStarSolution()
 {
-    p.resize(gridsize); //scalar field modulus
-    dp.resize(gridsize); //scalar field modulus gradient
-    psi.resize(gridsize); //conformal factor
-    dpsi.resize(gridsize); //conformal factor gradient
-    omega.resize(gridsize); // lapse
-    radius_array.resize(gridsize); //radius
 }
 
 void BosonStarSolution::main()
@@ -43,6 +36,7 @@ void BosonStarSolution::main()
     PSI_INF = psi[gridsize-1];
     OM_INF = omega[gridsize-1];
   
+    
     PSC/=PSI_INF;
     OMC/=OM_INF;
     ww/=OM_INF*OM_INF;
@@ -50,11 +44,9 @@ void BosonStarSolution::main()
     rk4(ww);
     mid_int = find_midint();
     rk4_asymp(mid_int-gridsize/200,false,ww);
-    
-    
 
-    /*
-    dx/=PSI_INF; // change dx to make the rescaled physics scale correct
+    
+    /*dx/=PSI_INF; // change dx to make the rescaled physics scale correct
 
     // just rescaled dx by the asymptotic value of the conformal factor and now re-integrate
     rk4(ww);
@@ -505,6 +497,23 @@ double BosonStarSolution::get_p_interp(const double r) const
     return interpolated_value;
 }
 
+double BosonStarSolution::get_dp_interp(const double r) const
+{
+    int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
+    double a = (r/dx)-floor(r/dx)-0.5; //fraction from midpoint of two values, a = +- 1/2 is the nearest gridpoints
+    double interpolated_value = 0, f1, f2, f3, f4;
+    f1 = ((iter==0)?dp[1]:dp[iter-1]); // conditionl/ternary imposing zero gradeint at r=0
+    f2 = dp[iter];
+    f3 = dp[iter+1];
+    f4 = dp[iter+2];
+
+    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+
+    // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    return interpolated_value;
+}
+
 double BosonStarSolution::get_lapse_interp(const double r) const
 {
     int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
@@ -522,7 +531,7 @@ double BosonStarSolution::get_lapse_interp(const double r) const
     return interpolated_value;
 }
 
-double BosonStarSolution::get_chi_interp(const double r) const
+double BosonStarSolution::get_psi_interp(const double r) const
 {
     int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
     double a = (r/dx)-floor(r/dx)-0.5; //fraction from midpoint of two values, a = +- 1/2 is the nearest gridpoints
@@ -536,7 +545,7 @@ double BosonStarSolution::get_chi_interp(const double r) const
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
-    return 1./(interpolated_value*interpolated_value);
+    return interpolated_value;
 }
 
 
@@ -554,6 +563,15 @@ double BosonStarSolution::get_w() const
 
 void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_BosonStar, Potential::params_t m_params_potential, const double max_r)
 {
+    gridsize = m_params_BosonStar.gridpoints;
+    adaptive_buffer = gridsize/50; // numer of gridpoints to intergate more carefully
+    p.resize(gridsize); //scalar field modulus
+    dp.resize(gridsize); //scalar field modulus gradient
+    psi.resize(gridsize); //conformal factor
+    dpsi.resize(gridsize); //conformal factor gradient
+    omega.resize(gridsize); // lapse
+    radius_array.resize(gridsize); //radius
+
     PC = m_params_BosonStar.central_amplitude_CSF;
     EIGEN = m_params_BosonStar.eigen;
     MM = m_params_potential.scalar_mass*m_params_potential.scalar_mass;

@@ -11,10 +11,14 @@
 //! A structure for the input params for the boson star
 struct BosonStar_params_t
 {
+    int gridpoints; // numer of gridpoints used to create boson star
     double central_amplitude_CSF; //!< Central amplitude of the star
     double phase;
     int eigen; // radial eigenstate of the boson star (0=ground)
-    std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
+    double BS_separation;
+    bool BS_binary;
+    double BS_rapidity;
+    std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star    
 };
 
 #endif /* BOSONSTARPARAMS_HPP_ */

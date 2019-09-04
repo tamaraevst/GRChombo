@@ -46,48 +46,77 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         m_params_BosonStar.star_centre);
 
     // define coords wrt first star centre 
-    double x = coords.x-32;
-    double y = coords.y;
+    double rapidity = m_params_BosonStar.BS_rapidity;
+    bool binary = m_params_BosonStar.BS_binary;
+    double separation = m_params_BosonStar.BS_separation;
+    double t = coords.y*sinh(rapidity);
+    double x = coords.x-separation/2.;
+    double y = coords.y*cosh(rapidity); //boosting star along y direction
     double z = coords.z;
     
     double r = sqrt(x*x+y*y+z*z);
     double p_ = m_1d_sol.get_p_interp(r);
-    double lapse_ = m_1d_sol.get_lapse_interp(r);
+    double dp_ = m_1d_sol.get_dp_interp(r);
+    double alpha_ = m_1d_sol.get_lapse_interp(r);
+    double psi_ = m_1d_sol.get_psi_interp(r);
+    double lapse_ = psi_*alpha_/sqrt(pow(psi_*cosh(rapidity),2)-pow(alpha_*sinh(rapidity),2));
+    double gamma_ = pow(psi_,4)*(pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2));
     double w_ = m_1d_sol.get_w();
-    double chi_ = m_1d_sol.get_chi_interp(r);
-    double phi_ = m_params_BosonStar.phase;
+    double chi_ = pow(gamma_,-1./3.);
+    double phase_ = m_params_BosonStar.phase + w_*t;
+    double g_zz = psi_*psi_;
+    double g_yy = pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2);
 
     //Complex scalar field values
-    vars.phi_Re += p_*cos(phi_);
-    vars.phi_Im += p_*sin(phi_);
-    vars.Pi_Re += p_*sin(phi_)*w_/lapse_;
-    vars.Pi_Im += -p_*cos(phi_)*w_/lapse_;
+    vars.phi_Re += p_*cos(phase_);
+    vars.phi_Im += p_*sin(phase_);
+    vars.Pi_Re += -(psi_*cosh(rapidity)/(alpha_*sqrt(gamma_)))*( -w_*psi_*psi_*p_*sin(phase_)  +  ((coords.y/sqrt(r*r + 0.00001)))*alpha_*alpha_*dp_*sinh(rapidity)*cos(phase_) );
+    vars.Pi_Im += -(psi_*cosh(rapidity)/(alpha_*sqrt(gamma_)))*( w_*psi_*psi_*p_*cos(phase_)  +  ((coords.y/sqrt(r*r + 0.00001)))*alpha_*alpha_*dp_*sinh(rapidity)*sin(phase_) );
 
     //conformal factor and lapse
     vars.chi += chi_;
     vars.lapse += lapse_;
+    vars.shift[1] += sinh(rapidity)*cosh(rapidity)*(alpha_*alpha_-psi_*psi_)/( (pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2)) ); // beta^y shift
+
+    if (binary)
+    {
+        // now superpose the second star
+        t = coords.y*sinh(-rapidity); //
+        x = coords.x+separation/2.;
+        y = coords.y*cosh(-rapidity); //boosting star along -y
+        z = coords.z;
+        r = sqrt(x*x+y*y+z*z);
+        p_ = m_1d_sol.get_p_interp(r);
+        dp_ = m_1d_sol.get_dp_interp(r);
+        alpha_ = m_1d_sol.get_lapse_interp(r);
+        psi_ = m_1d_sol.get_psi_interp(r);
+        lapse_ = psi_*alpha_/sqrt(pow(psi_*cosh(rapidity),2)-pow(alpha_*sinh(rapidity),2));
+        gamma_ = pow(psi_,4)*(pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2));
+        w_ = m_1d_sol.get_w(); // can make negative for opposite phase rotation
+        chi_ = pow(gamma_,-1./3.);
+        phase_ = m_params_BosonStar.phase + w_*t;
+        g_yy += pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2)-1.;
+        g_zz += psi_*psi_-1.;
+
+        //Complex scalar field values
+        vars.phi_Re += p_*cos(phase_);
+        vars.phi_Im += p_*sin(phase_);
+        vars.Pi_Re += -(psi_*cosh(-rapidity)/(alpha_*sqrt(gamma_)))*( -w_*psi_*psi_*p_*sin(phase_)  +  ((coords.y/sqrt(r*r + 0.00001)))*alpha_*alpha_*dp_*sinh(-rapidity)*cos(phase_) );
+        vars.Pi_Im += -(psi_*cosh(-rapidity)/(alpha_*sqrt(gamma_)))*( w_*psi_*psi_*p_*cos(phase_)  +  ((coords.y/sqrt(r*r + 0.00001)))*alpha_*alpha_*dp_*sinh(-rapidity)*sin(phase_) );
 
     
-    // now superpose the second star
-    x += 64;
-    r = sqrt(x*x+y*y+z*z);
-    p_ = m_1d_sol.get_p_interp(r);
-    lapse_ = m_1d_sol.get_lapse_interp(r);
-    w_ = m_1d_sol.get_w(); // can make negative for opposite phase rotation
-    chi_ = m_1d_sol.get_chi_interp(r);
-
-    //Complex scalar field values
-    vars.phi_Re += p_*cos(phi_);
-    vars.phi_Im += p_*sin(phi_);
-    vars.Pi_Re += p_*sin(phi_)*w_/lapse_;
-    vars.Pi_Im += -p_*cos(phi_)*w_/lapse_;
-    
-    //conformal factor and lapse
-    vars.chi += chi_-1;
-    vars.lapse += lapse_-1;
+        //conformal factor and lapse
+        vars.chi += chi_-1;
+        vars.lapse += lapse_-1;
+        vars.shift[1] += sinh(rapidity)*cosh(rapidity)*(alpha_*alpha_-psi_*psi_)/( (pow(cosh(rapidity)*psi_,2)-pow(sinh(rapidity)*alpha_,2)) ); // beta^y shift
+    }
 
     //conformal metric is flat
-    FOR1(i) vars.h[i][i] += 1.;
+    chi_ = pow(g_zz*g_zz*g_yy,-1/3);
+    vars.h[0][0] += chi_*g_zz; //g_zz = g_zz as we boost along y
+    vars.h[1][1] += chi_*g_yy;
+    vars.h[2][2] += chi_*g_zz;
+
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);

@@ -14,8 +14,8 @@ private: // private member variables/arrays
     double sigma; // 0.2 works with PC = 0.05 // parameter for solitonic stars
     bool solitonic; // false fro mini/lambda star. true for solitonic star
     double EIGEN; // the desired eigenstate, 0 for ground
-    const int gridsize = 200000, adaptive_buffer = gridsize/5; // anywhere from 2k-200k is ok
-    const int adaptive_stepsize_repetitions = 19;//50; // 0 for no adaptive
+    int gridsize, adaptive_buffer; // anywhere from 2k-200k is ok
+    const int adaptive_stepsize_repetitions = 4;//50; // 0 for no adaptive
   	double L, dx, WW, ww; // L, length of domain, dx.
   	double OM_INF, PSI_INF; // asymptotics of lapse and cpnformal factpr
   	int mid_int; // integer where growing mode becomes relevant
@@ -58,7 +58,8 @@ public:
     void set_initialcondition_params(BosonStar_params_t m_params_BosonStar, Potential::params_t m_params_potential, const double max_r);
     double get_p_interp(const double r) const;
     double get_lapse_interp(const double r) const;
-    double get_chi_interp(const double r) const;
+    double get_psi_interp(const double r) const;
+    double get_dp_interp(const double r) const;
     double get_mass() const;
     double get_w() const;
     void shout() const;

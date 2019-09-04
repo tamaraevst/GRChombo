@@ -37,6 +37,7 @@ public:
                 bosonstar_params.central_amplitude_CSF);
         pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("eigen", bosonstar_params.eigen, 0);
+        pp.load("gridpoints",bosonstar_params.gridpoints,50000);
         pp.load("star_centre", bosonstar_params.star_centre,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
@@ -45,6 +46,9 @@ public:
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);
         pp.load("solitonic", potential_params.solitonic, false);
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
+        pp.load("BS_binary", bosonstar_params.BS_binary, false);
+        pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
+        pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
