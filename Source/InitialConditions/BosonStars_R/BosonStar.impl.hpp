@@ -45,6 +45,68 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
 
+
+    double rapidity = m_params_BosonStar.BS_rapidity;
+    bool binary = m_params_BosonStar.BS_binary;
+    double separation = m_params_BosonStar.BS_separation;
+    double c_ = cosh(rapidity);
+    double s_ = sinh(rapidity);
+    double t = 0.;//coords.z*s_ + 0.*s_; //set /tilde{t} to zero
+    double x = coords.x-separation/2.;
+    double z = coords.z;//*c_;
+    double y = coords.y;
+    double r = coords.get_radius(); //sqrt(x*x+y*y+z*z);
+    double p_ = m_1d_sol.get_p_interp(r);
+    double dp_ = m_1d_sol.get_dp_interp(r);
+    double alpha_ = m_1d_sol.get_lapse_interp(r);
+    double alpha_prime_ = 1000.*(m_1d_sol.get_lapse_interp(r+0.0005)-m_1d_sol.get_lapse_interp(r-0.0005));
+    double psi_ = m_1d_sol.get_psi_interp(r);
+    double psi_prime_ = m_1d_sol.get_dpsi_interp(r);
+    double pc_os = psi_*psi_*c_*c_ - alpha_*alpha_*s_*s_;
+    double lapse_ = alpha_*psi_/(sqrt(pc_os));
+    double gamma_ = pow(psi_,4)*(pc_os);
+    double w_ = m_1d_sol.get_w();
+    double chi_ = pow(gamma_,-1./3.);
+    double phase_ = m_params_BosonStar.phase;// + w_*t;
+    double beta_z = s_*c_*(alpha_*alpha_-psi_*psi_)/(pc_os);
+    double g_xx = psi_*psi_;
+    double g_zz = pc_os;
+    double lapse_prime_ = (pow(psi_,3)*c_*c_*alpha_prime_ - pow(alpha_,3)*s_*s_*psi_prime_)/(pow(pc_os,1.5));
+    double beta_z_prime_ = (psi_*alpha_*sinh(2.*rapidity)*(psi_*alpha_prime_-alpha_*psi_prime_))/(pc_os*pc_os);
+    double L_n_gamma_1 = -(z/(lapse_*r))*(s_-beta_z*c_); // two coefficients of the lie derivative of 3 metric which nicely splits into 2 matrices
+    double L_n_gamma_2 = (1./(2.*lapse_*lapse_*r))*(lapse_*beta_z_prime_-beta_z*lapse_prime_)*pc_os;
+    vars.phi_Re += p_*cos(phase_);
+    vars.phi_Im += p_*sin(phase_);
+    //vars.Pi_Re += -(1./lapse_)*( (x/r)*(s_-beta_z*c_)*dp_*cos(phase_) - w_*(c_-beta_z*s_)*p_*sin(phase_) );
+    //vars.Pi_Im += -(1./lapse_)*( (x/r)*(s_-beta_z*c_)*dp_*sin(phase_) + w_*(c_-beta_z*s_)*p_*cos(phase_) );
+    vars.Pi_Re += -(w_/alpha_)*p_*(-sin(phase_));
+    vars.Pi_Im += -(w_/alpha_)*p_*(cos(phase_));
+    vars.chi += pow(psi_,-2);//chi_;
+    vars.lapse += alpha_;//lapse_;
+    vars.shift[2] += 0.;//beta_z;
+    vars.h[0][0] += 1.;//pow(g_xx*g_xx*g_zz,-1./3.)*g_xx;
+    vars.h[1][1] += 1.;//pow(g_xx*g_xx*g_zz,-1./3.)*g_xx;
+    vars.h[2][2] += 1.;//pow(g_xx*g_xx*g_zz,-1./3.)*g_zz;
+    double K11 = L_n_gamma_1*psi_prime_*psi_;
+    double K22 = L_n_gamma_1*psi_prime_*psi_;
+    double K33 = L_n_gamma_1*(c_*c_*psi_*psi_prime_-s_*s_*lapse_*lapse_prime_) + L_n_gamma_2*2.*z*c_;
+    double K13 = L_n_gamma_2*x ;
+    double K23 = L_n_gamma_2*y ;
+    double K12 = 0.;
+    double one_third = 1./3.;
+    vars.K += 0.;//(K11+K22)/g_xx + K33/g_zz;
+    vars.A[0][0] += 0.;//chi_*(K11-one_third*vars.K*g_xx);
+    vars.A[1][1] += 0.;//chi_*(K22-one_third*vars.K*g_xx);
+    vars.A[2][2] += 0.;//chi_*(K33-one_third*vars.K*g_zz);
+    vars.A[0][1] += 0.;//chi_*K12;
+    vars.A[0][2] += 0.;//chi_*K13;
+    vars.A[1][2] += 0.;//chi_*K23;
+
+
+
+
+    /*
+
     // define coords wrt first star centre
     // define coords wrt first star centre
     double rapidity = m_params_BosonStar.BS_rapidity;
@@ -118,6 +180,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.h[1][1] += chi_*g_yy;
     vars.h[2][2] += chi_*g_zz;
 
+    */
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);

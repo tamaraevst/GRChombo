@@ -37,13 +37,26 @@ void BosonStarSolution::main()
     OM_INF = omega[gridsize-1];
   
     
+    for (int q=0; q<5; q++)
+    {
+        PSC/=PSI_INF;
+        OMC/=OM_INF;
+        ww/=OM_INF*OM_INF;
+        initialise();
+        rk4(ww);
+        mid_int = find_midint();
+        rk4_asymp(mid_int,true,ww);
+        PSI_INF = psi[gridsize-1];
+        OM_INF = omega[gridsize-1];
+    }
+
     PSC/=PSI_INF;
     OMC/=OM_INF;
     ww/=OM_INF*OM_INF;
     initialise();
     rk4(ww);
     mid_int = find_midint();
-    rk4_asymp(mid_int-gridsize/200,false,ww);
+    rk4_asymp(mid_int,false,ww);//(mid_int-gridsize/200,false,ww);
 
     
     /*dx/=PSI_INF; // change dx to make the rescaled physics scale correct
@@ -358,32 +371,32 @@ void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const dou
     		}
     		h = dx/2.;
 
-    		k1 = dx*small_P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-    		q1 = dx*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+    		//k1 = dx*small_P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+    		//q1 = dx*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
     		o1 = dx*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
     		s1 = dx*PSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
     		r1 = dx*DPSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
 
-    		k2 = dx*small_P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-    		q2 = dx*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+    		//k2 = dx*small_P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+    		//q2 = dx*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
         o2 = dx*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		s2 = dx*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		r2 = dx*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
 
-    		k3 = dx*small_P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-    		q3 = dx*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+    		//k3 = dx*small_P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+    		//q3 = dx*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
         o3 = dx*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		s3 = dx*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		r3 = dx*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
 
-    		k4 = dx*small_P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-    		q4 = dx*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+    		//k4 = dx*small_P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+    		//q4 = dx*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
         o4 = dx*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		s4 = dx*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		r4 = dx*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
 
-    		p[i] = p[i-1] + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
-    		dp[i] = dp[i-1] + (q1 + 2.*q2 + 2.*q3 + q4)/6.;
+    		p[i] = 0.;//p[i-1] + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
+    		dp[i] = 0.;//dp[i-1] + (q1 + 2.*q2 + 2.*q3 + q4)/6.;
     		psi[i] = psi[i-1] + (s1 + 2.*s2 + 2.*s3 + s4)/6.;
     		dpsi[i] = dpsi[i-1] + (r1 + 2.*r2 + 2.*r3 + r4)/6.;
     		omega[i] = omega[i-1] + (o1 + 2.*o2 + 2.*o3 + o4)/6.;
@@ -436,8 +449,7 @@ double BosonStarSolution::DPSI_RHS(const double x, const double P, const double 
 
 double BosonStarSolution::OMEGA_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
 {
-  	double RHS = (4.*M_PI*G*x*pow(PSI*OM,2)*(DP*DP - PSI*PSI*V(P) + ww_*pow(P*PSI/OM,2)) - OM*OM*DPSI*(x*DPSI+2.*PSI) )/(2.*PSI*OM*(x*DPSI + PSI)) ;
-  	return RHS;
+  	return (4.*M_PI*G*x*pow(PSI*OM,2)*(DP*DP - PSI*PSI*V(P) + ww_*pow(P*PSI/OM,2)) - OM*OM*DPSI*(x*DPSI+2.*PSI) )/(2.*PSI*OM*(x*DPSI + PSI));
 }
 
 
@@ -493,7 +505,7 @@ double BosonStarSolution::get_p_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -510,7 +522,7 @@ double BosonStarSolution::get_dp_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -527,7 +539,7 @@ double BosonStarSolution::get_lapse_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -544,7 +556,47 @@ double BosonStarSolution::get_psi_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    return interpolated_value;
+}
+
+
+
+
+double BosonStarSolution::get_dpsi_interp(const double r) const
+{
+    int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
+    double a = (r/dx)-floor(r/dx)-0.5; //fraction from midpoint of two values, a = +- 1/2 is the nearest gridpoints
+    double interpolated_value = 0, f1, f2, f3, f4;
+    f1 = ((iter==0)?dpsi[1]:dpsi[iter-1]); // conditionl/ternary imposing zero gradeint at r=0
+    f2 = dpsi[iter];
+    f3 = dpsi[iter+1];
+    f4 = dpsi[iter+2];
+
+    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+
+    // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    return interpolated_value;
+}
+
+
+
+
+double BosonStarSolution::get_dlapse_interp(const double r) const
+{
+    int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
+    double a = (r/dx)-floor(r/dx)-0.5; //fraction from midpoint of two values, a = +- 1/2 is the nearest gridpoints
+    double interpolated_value = 0, f1, f2, f3, f4;
+    f1 = ((iter==0)?0.:0.); 
+    f2 = 0.;//OMEGA_RHS(iter*dx,p[iter],dp[iter],psi[iter],dpsi[iter],omega[iter],ww);
+    f3 = 0.;//OMEGA_RHS((iter+1)*dx,p[iter+1],dp[iter+1],psi[iter+1],dpsi[iter+1],omega[iter+1],ww);
+    f4 = 0.;//OMEGA_RHS((iter+2)*dx,p[iter+2],dp[iter+2],psi[iter+2],dpsi[iter+2],omega[iter+2],ww);
+
+    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+
+    // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
+    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -564,7 +616,7 @@ double BosonStarSolution::get_w() const
 void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_BosonStar, Potential::params_t m_params_potential, const double max_r)
 {
     gridsize = m_params_BosonStar.gridpoints;
-    adaptive_buffer = gridsize/50; // numer of gridpoints to intergate more carefully
+    adaptive_buffer = gridsize/10; // numer of gridpoints to intergate more carefully
     p.resize(gridsize); //scalar field modulus
     dp.resize(gridsize); //scalar field modulus gradient
     psi.resize(gridsize); //conformal factor

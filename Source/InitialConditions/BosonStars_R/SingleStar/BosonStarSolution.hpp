@@ -15,7 +15,7 @@ private: // private member variables/arrays
     bool solitonic; // false fro mini/lambda star. true for solitonic star
     double EIGEN; // the desired eigenstate, 0 for ground
     int gridsize, adaptive_buffer; // anywhere from 2k-200k is ok
-    const int adaptive_stepsize_repetitions = 4;//50; // 0 for no adaptive
+    const int adaptive_stepsize_repetitions = 20;//50; // 0 for no adaptive
   	double L, dx, WW, ww; // L, length of domain, dx.
   	double OM_INF, PSI_INF; // asymptotics of lapse and cpnformal factpr
   	int mid_int; // integer where growing mode becomes relevant
@@ -59,7 +59,9 @@ public:
     double get_p_interp(const double r) const;
     double get_lapse_interp(const double r) const;
     double get_psi_interp(const double r) const;
+    double get_dpsi_interp(const double r) const;
     double get_dp_interp(const double r) const;
+    double get_dlapse_interp(const double r) const;
     double get_mass() const;
     double get_w() const;
     void shout() const;
