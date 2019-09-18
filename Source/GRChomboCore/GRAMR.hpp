@@ -24,32 +24,29 @@ class GRAMR : public AMR
     using Clock = std::chrono::steady_clock;
     using Hours = std::chrono::duration<double, std::ratio<3600, 1>>;
     std::chrono::time_point<Clock> start_time = Clock::now();
- 
-   // the info for the puncture tracks
+
+    // the info for the puncture tracks
     int m_num_punctures;
     std::vector<double> m_puncture_coords;
 
   public:
     AMRInterpolator<Lagrange<4>> *m_interpolator; //!< The interpolator pointer
 
-    GRAMR() 
-    { 
-        m_interpolator = nullptr; 
-        m_num_punctures = 2;
-        m_puncture_coords.resize(3*m_num_punctures);
+    GRAMR()
+    {
+        m_interpolator = nullptr;
+        m_num_punctures = 2; // default to 2 for now
+        m_puncture_coords.resize(CH_SPACEDIM * m_num_punctures);
     }
 
     // function to set punctures
-    void set_puncture_coords(std::vector<double>& a_puncture_coords)
+    void set_puncture_coords(std::vector<double> &a_puncture_coords)
     {
         m_puncture_coords = a_puncture_coords;
     }
 
     // function to get punctures
-    std::vector<double> get_puncture_coords()
-    {
-        return m_puncture_coords;
-    }
+    std::vector<double> get_puncture_coords() { return m_puncture_coords; }
 
     auto get_walltime()
     {
