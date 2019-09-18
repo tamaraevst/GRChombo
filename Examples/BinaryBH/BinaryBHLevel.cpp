@@ -12,6 +12,7 @@
 #include "Constraints.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
+#include "PunctureTracking.hpp"
 #include "SetValue.hpp"
 #include "TraceARemoval.hpp"
 #include "Weyl4.hpp"
@@ -76,8 +77,10 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
+    std::vector<double> puncture_coords = m_gr_amr.get_puncture_coords();
     BoxLoops::loop(
-        ChiExtractionTaggingCriterion(m_dx, m_level, m_p.extraction_params),
+        ChiExtractionTaggingCriterion(m_dx, m_level, m_p.max_level, m_p.extraction_params,
+        puncture_coords, m_p.activate_extraction, m_p.track_punctures),
         current_state, tagging_criterion);
 }
 
@@ -100,6 +103,13 @@ void BinaryBHLevel::specificPostTimeStep()
                                          m_restart_time);
             my_extraction.execute_query(m_gr_amr.m_interpolator);
         }
+    }
+
+    // do puncture tracking on a coarser level
+    if (m_p.track_punctures == 1 && m_level == m_p.max_level - 2)
+    {
+        PunctureTracker mypunctures(m_time, m_restart_time, m_dt, m_p.checkpoint_prefix);
+        mypunctures.execute_tracking(m_gr_amr);
     }
 }
 
