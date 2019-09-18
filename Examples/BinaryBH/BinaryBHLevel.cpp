@@ -39,6 +39,9 @@ void BinaryBHLevel::initialData()
     // Set up the compute class for the BinaryBH initial data
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
 
+    // setup initial puncture coords for tracking
+    m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+
     // First set everything to zero (to avoid undefinded values in constraints)
     // then calculate initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.), binary), m_state_new,

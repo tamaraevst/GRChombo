@@ -33,10 +33,18 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("momentumB", bh2_params.momentum);
         pp.load("activate_extraction", activate_extraction, 0);
         pp.load("track_punctures", track_punctures, 0);
+
+        puncture_coords.resize(2 * CH_SPACEDIM);
+        FOR1(idir)
+        {
+            puncture_coords[0 + idir] = bh1_params.center[idir];
+            puncture_coords[CH_SPACEDIM + idir] = bh2_params.center[idir];
+        }
     }
 
     // Initial data
     int activate_extraction, track_punctures;
+    std::vector<double> puncture_coords;
     Real massA, massB;
     std::array<double, CH_SPACEDIM> centerA, centerB;
     std::array<double, CH_SPACEDIM> momentumA, momentumB;
