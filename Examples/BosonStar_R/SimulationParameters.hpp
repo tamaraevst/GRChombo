@@ -37,7 +37,7 @@ public:
                 bosonstar_params.central_amplitude_CSF);
         pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("eigen", bosonstar_params.eigen, 0);
-        pp.load("gridpoints",bosonstar_params.gridpoints,50000);
+        pp.load("gridpoints",bosonstar_params.gridpoints,400000);
         pp.load("star_centre", bosonstar_params.star_centre,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 

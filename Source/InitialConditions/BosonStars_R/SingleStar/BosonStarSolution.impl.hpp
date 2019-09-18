@@ -31,6 +31,7 @@ void BosonStarSolution::main()
 
     // force the scalar field to zero after the turning point and reintegrate the lapse and shift
     force_flat(mid_int);
+    rk4_asymp(mid_int-1,false,ww);
     initialise();
     rk4_asymp(mid_int, true, ww); // (true) uses large radius adaptive stepsize to get asymptotics (integrates vacuum metric out to huge radius ~ 10^10 to measure asymptotics).
     PSI_INF = psi[gridsize-1];
@@ -132,7 +133,7 @@ void BosonStarSolution::fix()
 // sets scalar field and gradient to zero after the point decided by function find_midint
 void BosonStarSolution::force_flat(const int iter_crit)
 {
-  	for (int i = iter_crit; i < gridsize; ++i)
+  	for (int i = iter_crit+1; i < gridsize; ++i)
   	{
     		p[i] = 0.;
     		dp[i] = 0.;
@@ -276,14 +277,15 @@ double BosonStarSolution::ww_IB(double lower_ww_, double upper_ww_)
 void BosonStarSolution::rk4(const double ww_)
 {
   	double k1, k2, k3, k4, q1, q2, q3, q4, x_=0., h = dx/2.;
-  	const double DX = dx;
+  	const double DX = dx; 
+        double DX_ = DX;
   	double o1, o2, o3, o4, s1, s2, s3, s4, r1, r2, r3, r4;
   	int index, jmax=0;
   	radius_array[0] = 0.;
 
   	for (int i = 1; i < gridsize; ++i)
     {
-    		dx = DX;
+    		DX_ = DX;
     		jmax = 0;
     		if (i<adaptive_buffer)
     		{
@@ -291,33 +293,34 @@ void BosonStarSolution::rk4(const double ww_)
     		}
     		for (int j=0; j<=jmax; j++)
     		{
-      			dx = DX/( (double)(1+jmax) );
-      			h = dx/2.;
+      			DX_ = DX/( (double)(1+jmax) );
+      			h = DX_/2.;
+                        x_ = (i-1)*dx+j*DX_; 
 
 
-      			k1 = dx*P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-      			q1 = dx*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-      			o1 = dx*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-      			s1 = dx*PSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-      			r1 = dx*DPSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+      			k1 = DX_*P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+      			q1 = DX_*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+      			o1 = DX_*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+      			s1 = DX_*PSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+      			r1 = DX_*DPSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
 
-      			k2 = dx*P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-      			q2 = dx*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-      	    o2 = dx*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-      			s2 = dx*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-      			r2 = dx*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      			k2 = DX_*P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      			q2 = DX_*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      	                o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      			s2 = DX_*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      			r2 = DX_*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
 
-      			k3 = dx*P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-      			q3 = dx*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-      	    o3 = dx*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-      			s3 = dx*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-      			r3 = dx*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+      			k3 = DX_*P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+      			q3 = DX_*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+      	                o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+      			s3 = DX_*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+      			r3 = DX_*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
 
-      			k4 = dx*P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-      			q4 = dx*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-      	    o4 = dx*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-      			s4 = dx*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-      			r4 = dx*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      			k4 = DX_*P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      			q4 = DX_*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      	                o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      			s4 = DX_*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      			r4 = DX_*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
 
       			index = i-1;
       			if(j==jmax)
@@ -330,16 +333,10 @@ void BosonStarSolution::rk4(const double ww_)
       			psi[index] = psi[i-1] + (s1 + 2.*s2 + 2.*s3 + s4)/6.;
       			dpsi[index] = dpsi[i-1] + (r1 + 2.*r2 + 2.*r3 + r4)/6.;
       			omega[index] = omega[i-1] + (o1 + 2.*o2 + 2.*o3 + o4)/6.;
-
-      			x_ += dx;
-
     		}
-
-  	radius_array[i] = x_;
-
+  	radius_array[i] = dx*i;
   	}
 
-  	dx = DX;
 }
 
 // takes an integrated ODE system and starts at point (iter) and re-integrates but enforcing scalara field to decaay or be in vacuum
@@ -347,67 +344,68 @@ void BosonStarSolution::rk4(const double ww_)
 // bool adaaptive is true if stepsize is supposed to be adaptive aat large radius and false for constant stepsize
 void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const double ww_)
 {
-  	double k1=0, k2=0, k3=0, k4=0, q1=0, q2=0, q3=0, q4=0, x_ = radius_array[iter], h = dx/2., delta = (double)gridsize;
-  	const double DX = dx;
-  	double o1, o2, o3, o4, s1, s2, s3, s4, r1, r2, r3, r4;
-    double N_ = gridsize-iter, L_ = pow(11.,11);
+    double k1, k2, k3, k4, q1, q2, q3, q4, x_=iter*dx, h, delta = (double)gridsize;
+    const double DX = dx;
+    double DX_= DX;
+    double o1, o2, o3, o4, s1, s2, s3, s4, r1, r2, r3, r4;
+    double N_ = gridsize-iter, L_ = pow(9.,9);
     int i_;
 
     double k_ = log(L_)/N_;
 
   	for (int i = iter+1; i < gridsize; ++i)
   	{
-      i_ = i-iter;
+                i_ = double(i-iter);
     		if (adaptive)
     		{
-      			if (x_<10e10)
+      			if (x_<8e8)
       			{
-      				    dx = k_*exp(k_*i_);
+      				    DX_ = (exp(k_)-1.)*exp(k_*i_);
       			}
       			else
       			{
-      				    dx = DX;
+      				    DX_ = DX;
       			}
     		}
-    		h = dx/2.;
+    		h = DX_/2.;
 
     		//k1 = dx*small_P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
     		//q1 = dx*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-    		o1 = dx*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-    		s1 = dx*PSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
-    		r1 = dx*DPSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+    		o1 = DX_*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+    		s1 = DX_*PSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
+    		r1 = DX_*DPSI_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
 
     		//k2 = dx*small_P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		//q2 = dx*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-        o2 = dx*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-    		s2 = dx*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-    		r2 = dx*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+                o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+    		s2 = DX_*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+    		r2 = DX_*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
 
     		//k3 = dx*small_P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		//q3 = dx*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-        o3 = dx*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-    		s3 = dx*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-    		r3 = dx*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+                o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+    		s3 = DX_*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+    		r3 = DX_*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
 
     		//k4 = dx*small_P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		//q4 = dx*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-        o4 = dx*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-    		s4 = dx*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-    		r4 = dx*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+                o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+    		s4 = DX_*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+    		r4 = DX_*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
 
     		p[i] = 0.;//p[i-1] + (k1 + 2.*k2 + 2.*k3 + k4)/6.;
     		dp[i] = 0.;//dp[i-1] + (q1 + 2.*q2 + 2.*q3 + q4)/6.;
     		psi[i] = psi[i-1] + (s1 + 2.*s2 + 2.*s3 + s4)/6.;
     		dpsi[i] = dpsi[i-1] + (r1 + 2.*r2 + 2.*r3 + r4)/6.;
     		omega[i] = omega[i-1] + (o1 + 2.*o2 + 2.*o3 + o4)/6.;
-    		radius_array[i-1] = x_;
-    		x_ += dx;
+    		x_ += DX_;
+                if (!adaptive){radius_array[i]=i*dx;}
   	}
-  	dx = DX;
-  	if (adaptive and x_ < 10e10)
+  
+  	if (adaptive and x_ < 8e7)
   	{
-  		  std::cout << "\33[30;41m" << " Asymptotic Radius Too Small" << "\x1B[0m" << std::endl;
-        std::cout << x_ << std::endl;
+  	        std::cout << "\33[30;41m" << " Asymptotic Radius Too Small" << "\x1B[0m" << std::endl;
+                std::cout << x_ << std::endl;
   	}
 }
   
@@ -431,8 +429,12 @@ double BosonStarSolution::P_RHS(const double x, const double P, const double DP,
 double BosonStarSolution::DP_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
 {
   	double DOM = OMEGA_RHS(x,P,DP,PSI,DPSI,OM,ww_), V = MM*P*P;
-  	double RHS = P*PSI*PSI*(DV(P) - ww_/(OM*OM)) - DP*(DOM/OM + DPSI/PSI + 2./(sqrt(x*x + 0.000000001)));
-  	return RHS;
+  	double RHS = P*PSI*PSI*(DV(P) - ww_/(OM*OM)) - DP*(DOM/OM + DPSI/PSI);
+        if (x>10e-9)
+        {
+                 RHS += -2.*DP/x;
+  	}
+        return RHS;
 }
 
 double BosonStarSolution::PSI_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
@@ -443,7 +445,11 @@ double BosonStarSolution::PSI_RHS(const double x, const double P, const double D
 
 double BosonStarSolution::DPSI_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
 {
-  	double RHS = DPSI*DPSI/(2.*PSI) - 2.*DPSI/sqrt(x*x + 0.000001) - 2*M_PI*G*(V(P)*pow(PSI,3) + DP*DP*PSI + ww_*PSI*pow(P*PSI/OM,2));
+  	double RHS = DPSI*DPSI/(2.*PSI) - 2*M_PI*G*(V(P)*pow(PSI,3) + DP*DP*PSI + ww_*PSI*pow(P*PSI/OM,2));
+        if (x>10e-9)
+        {
+                RHS += - 2.*DPSI/x;
+        }
   	return RHS;
 }
 
@@ -505,7 +511,7 @@ double BosonStarSolution::get_p_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -522,7 +528,7 @@ double BosonStarSolution::get_dp_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -539,7 +545,7 @@ double BosonStarSolution::get_lapse_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -556,7 +562,7 @@ double BosonStarSolution::get_psi_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -576,7 +582,7 @@ double BosonStarSolution::get_dpsi_interp(const double r) const
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
     return interpolated_value;
 }
 
@@ -588,15 +594,15 @@ double BosonStarSolution::get_dlapse_interp(const double r) const
     int iter = (int) floor(r/dx); // index of 2nd (out of 4) gridpoints used for interpolation
     double a = (r/dx)-floor(r/dx)-0.5; //fraction from midpoint of two values, a = +- 1/2 is the nearest gridpoints
     double interpolated_value = 0, f1, f2, f3, f4;
-    f1 = ((iter==0)?0.:0.); 
-    f2 = 0.;//OMEGA_RHS(iter*dx,p[iter],dp[iter],psi[iter],dpsi[iter],omega[iter],ww);
-    f3 = 0.;//OMEGA_RHS((iter+1)*dx,p[iter+1],dp[iter+1],psi[iter+1],dpsi[iter+1],omega[iter+1],ww);
-    f4 = 0.;//OMEGA_RHS((iter+2)*dx,p[iter+2],dp[iter+2],psi[iter+2],dpsi[iter+2],omega[iter+2],ww);
+    f1 = ((iter==0)?omega[1]:omega[iter-1]); 
+    f2 = omega[iter];
+    f3 = omega[iter+1];
+    f4 = omega[iter+2];
 
     if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
 
-    // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
-    interpolated_value = f2*(0.5-a)+f3*(0.5+a);//(1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
+    // do the cubic spline (for gradient now), from mathematica script written by Robin (rc634@cam.ac.uk)
+    interpolated_value = (1./(24.*dx))*( (f1-27.*f2+27.*f3-f4)  +  12.*a*(f1-f2-f3+f4)  -  12.*a*a*(f1-3.*f2+3.*f3-f4)  );
     return interpolated_value;
 }
 
@@ -630,7 +636,7 @@ void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_
     lambda = m_params_potential.phi4_coeff;
     solitonic = m_params_potential.solitonic;
     sigma = m_params_potential.sigma_soliton;
-    L = max_r;
+    L = max_r*1.05; //just to make sure the function domain is slightly larger than the required cube
     dx = L/(gridsize-1);
 }
 
