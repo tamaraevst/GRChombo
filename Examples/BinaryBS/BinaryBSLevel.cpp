@@ -121,7 +121,6 @@ void BinaryBSLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     auto compute_pack =
         make_compute_pack(my_ccz4_matter, set_analysis_vars_zero);
     BoxLoops::loop(compute_pack, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-
 }
 
 // Things to do at ODE update, after soln + rhs

@@ -17,8 +17,10 @@ struct BosonStar_params_t
     int eigen; // radial eigenstate of the boson star (0=ground)
     double BS_separation;
     bool BS_binary;
+    bool BS_BH_binary;
+    double BlackHoleMass;
     double BS_rapidity;
-    std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star    
+    std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
 };
 
 #endif /* BOSONSTARPARAMS_HPP_ */
