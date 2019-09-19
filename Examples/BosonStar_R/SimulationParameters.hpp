@@ -47,6 +47,8 @@ public:
         pp.load("solitonic", potential_params.solitonic, false);
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
         pp.load("BS_binary", bosonstar_params.BS_binary, false);
+        pp.load("BS_BH_binary", bosonstar_params.BS_BH_binary, false);
+        pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
 

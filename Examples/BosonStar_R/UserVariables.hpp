@@ -61,6 +61,9 @@ enum
     c_Mom2,
     c_Mom3,
 
+    c_Weyl4_Re,
+    c_Weyl4_Im,
+
     NUM_VARS
 };
 
@@ -93,7 +96,9 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "N",
 
-    "Ham",    "Mom1",   "Mom2",   "Mom3"};
-}
+    "Ham",    "Mom1",   "Mom2",   "Mom3",
+
+    "Weyl4_Re",  "Weyl4_Im"};
+    }
 
 #endif /* USERVARIABLES_HPP */

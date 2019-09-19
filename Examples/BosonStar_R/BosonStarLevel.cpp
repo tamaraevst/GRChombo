@@ -31,6 +31,10 @@
 #include "ADMMass.hpp"
 #include "MassExtraction.hpp"
 
+// For GW extraction
+#include "Weyl4.hpp"
+#include "WeylExtraction.hpp"
+
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
@@ -59,11 +63,9 @@ void BosonStarLevel::initialData()
     BosonStar boson_star(m_p.bosonstar_params, m_p.potential_params,
                          m_p.G_Newton, m_dx, m_verbosity);
 
-    // the max radius the code might need to calculate out to is 2*sqrt(3)*L
-    // 3.5 is an upper bound to 2*sqrt(3)
-    const double max_radius{m_p.L*3.5};
 
-    boson_star.compute_1d_solution(max_radius);
+    // the max radius the code might need to calculate out to is L*sqrt(3)
+    boson_star.compute_1d_solution(1.74*m_p.L);
 
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
@@ -138,9 +140,27 @@ void BosonStarLevel::doAnalysis()
     {
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
-        ADMMass adm_mass(m_p.L, m_dx);
-        BoxLoops::loop(make_compute_pack(adm_mass), m_state_new, m_state_new,
+        auto weyl4_adm_compute_pack =
+            make_compute_pack(Weyl4(m_p.extraction_params.extraction_center, m_dx),
+                              ADMMass(m_p.L, m_dx));
+        BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_new,
                         EXCLUDE_GHOST_CELLS);
+
+        // Do the extraction on the min extraction level
+        if (m_level == m_p.extraction_params.min_extraction_level)
+        {
+            if (m_verbosity)
+            {
+                pout() << "BinaryBSLevel::specificPostTimeStep:"
+                          " Extracting gravitational waves." << endl;
+            }
+
+            // Refresh the interpolator and do the interpolation
+            m_gr_amr.m_interpolator->refresh();
+            WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
+                                         m_restart_time, called_in_do_analysis);
+            gw_extraction.execute_query(m_gr_amr.m_interpolator);
+        }
 
         // Do the extraction on the min extraction level
         if (m_level == m_p.mass_extraction_params.min_extraction_level)
@@ -192,6 +212,7 @@ void BosonStarLevel::doAnalysis()
             noether_charge_file.write_time_data_line({noether_charge});
         }
 
+        // Compute the maximum of mod_phi and write it to a file
         double mod_phi_max = m_gr_amr.compute_max(
                                 Interval(c_mod_phi, c_mod_phi));
         SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
