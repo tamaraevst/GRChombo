@@ -622,7 +622,7 @@ double BosonStarSolution::get_w() const
 void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_BosonStar, Potential::params_t m_params_potential, const double max_r)
 {
     gridsize = m_params_BosonStar.gridpoints;
-    adaptive_buffer = gridsize/10; // numer of gridpoints to intergate more carefully
+    adaptive_buffer = 0.;//gridsize/10; // numer of gridpoints to intergate more carefully
     p.resize(gridsize); //scalar field modulus
     dp.resize(gridsize); //scalar field modulus gradient
     psi.resize(gridsize); //conformal factor
