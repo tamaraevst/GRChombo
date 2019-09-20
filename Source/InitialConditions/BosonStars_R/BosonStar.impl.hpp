@@ -100,7 +100,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     KLL[1][0] = 0.;
     KLL[2][2] = lapse_1*(z/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
     double thingy = omega_*psi_prime_*(2.*v_*v_*omega_*omega_-psi_*psi_) + omega_prime_*psi_*(v_*v_*omega_*omega_-2.*psi_*psi_);
-    K = pow(lapse_1/omega_,3)*pow(psi_,-5)*s_*c_*c_*(x/r)*(thingy);
+    K = pow(lapse_1/omega_,3)*pow(psi_,-5)*s_*c_*c_*(z/r)*(thingy);
 
     if (binary)
     {
@@ -146,6 +146,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         g_zz += BH_gii-1.;
     }
 
+    vars.shift[2] += beta_z;
     vars.chi += pow(g_xx*g_yy*g_zz,-1./3.);
     vars.lapse += BS_BH_binary?sqrt(vars.chi):sqrt(lapse_1*lapse_1 + lapse_2+lapse_2-1.);
     vars.h[0][0] += vars.chi*g_xx;
