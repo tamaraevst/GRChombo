@@ -1,0 +1,112 @@
+# Note that this is a realistic example but not production quality for 
+# generating BBH waveforms (one needs a larger wave zone)
+# It should run well on 160 MPI processes x 4 openMP threads = 640 cores
+# On CDS3 one achieves roughly 40 M/hr at t = 5M
+# (It should give circular orbits)
+
+verbosity = 0
+#chk_prefix = BinaryBH_
+chk_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBHCTC2_chk
+plot_prefix = BinaryBHPlot_
+#restart_file = BinaryBH_000360.3d.hdf5
+
+# Set up grid spacings and regrid params
+# NB - the N values need to be multiples of block_factor
+N1 = 64
+N2 = 64
+N3 = 64
+L = 512
+#center = 256 256 256
+
+# BH params
+track_punctures = 1
+massA = 0.4884789232012386
+centerA = 256 262.10679 256
+momentumA = -0.0841746 -0.000510846 0.0
+
+massB = 0.4884789232012297
+centerB = 256 249.89321 256
+momentumB =  0.0841746  0.000510846 0.0
+
+# regridding control
+regrid_threshold = 0.1
+max_level = 9
+regrid_interval = 0 0 0 0 128 8 4 2 1 0
+tag_buffer_size = 0
+fill_ratio = 0.75
+
+#Max and min box sizes
+max_grid_size = 16
+block_factor = 16
+
+#boundaries and periodicity of grid
+#Periodic directions - 0 = false, 1 = true
+isPeriodic = 0 0 0
+# if not periodic, then specify the boundary type
+# 0 = static, 1 = sommerfeld, 2 = reflective
+# (see BoundaryConditions.hpp for details)
+hi_boundary = 1 1 1
+lo_boundary = 1 1 1
+
+# if reflective boundaries selected, must set
+# parity of all vars (in order given by UserVariables.hpp)
+# 0 = even
+# 1,2,3 = odd x, y, z
+# 4,5,6 = odd xy, yz, xz
+vars_parity            = 0 0 4 6 0 5 0    #chi and hij
+                         0 0 4 6 0 5 0    #K and Aij
+                         0 1 2 3          #Theta and Gamma
+                         0 1 2 3 1 2 3    #lapse shift and B
+                         0 1 2 3          #Ham and Mom
+                         0 0              #Weyl
+
+# if sommerfeld boundaries selected, must select 
+# asymptotic values (in order given by UserVariables.hpp)
+vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
+                         0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
+                         0.0 0.0 0.0 0.0             #Theta and Gamma
+                         1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B
+                         0.0 0.0 0.0 0.0             #Ham and Mom
+                         0.0 0.0                     #Weyl
+
+# Set up time steps
+# dt will be dx*dt_multiplier on each grid level
+# HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
+checkpoint_interval = 50
+# set to zero to turn off plot files
+plot_interval = 0
+dt_multiplier = 0.20
+stop_time = 200.0
+
+#Lapse evolution
+lapse_advec_coeff = 0.0
+lapse_coeff = 1.0
+lapse_power = 1.0
+
+# Shift evolution
+shift_advec_coeff = 0.0
+shift_Gamma_coeff = 0.75
+eta = 1.0
+
+# CCZ4 parameters
+kappa1 = 0.1
+kappa2 = 0
+kappa3 = 1.0
+covariantZ4 = 1 # 0: default. 1: dampk1 -> dampk1/lapse
+
+#coefficient for KO numerical dissipation
+sigma = 0.5
+
+#extraction params
+#default center to grid center, uncomment to change
+#extraction_center = 64 64 64
+activate_extraction = 1
+num_extraction_radii = 3
+extraction_radii = 24.0 48.0 96.0
+extraction_levels = 3 2 1
+num_points_phi = 4
+num_points_theta = 8
+num_modes = 3
+modes = 2 0 # l m for spherical harmonics
+        2 1
+        2 2

@@ -8,7 +8,7 @@ L = 256
 r = 6
 
 fig = plt.figure()
-data = np.loadtxt("BBH2_chkExtraction2.txt")
+data = np.loadtxt("BBHCTC_chk_Punctures.txt")
 x1 = data[:,1]-L
 y1 = data[:,2]-L
 plt.plot(x1,y1)

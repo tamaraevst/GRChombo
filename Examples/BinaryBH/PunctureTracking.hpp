@@ -36,6 +36,55 @@ class PunctureTracker
     {
     }
 
+    //! Set punctures post restart
+    void read_in_punctures(GRAMR &a_gramr) const
+    {
+        std::vector<double> puncture_coords;
+        puncture_coords.resize(m_num_punctures*CH_SPACEDIM);
+
+        // read them in from the Punctures file
+        std::string punctures_filename =
+            m_checkpoint_prefix + "_Punctures.txt";
+
+        // find the m_time line and read in the puncture data
+        ifstream in_file;
+        in_file.open(punctures_filename);
+        if (!in_file.is_open()) 
+        {
+            pout() << "Unable to open punctures file for restart" << endl;
+            MayDay::Error("Puncture file not found.");
+        }
+
+        double tmp_value;
+        int count = 0;
+        bool found_punctures = false;
+        std::string header_line;
+        getline(in_file, header_line);
+	while (in_file >> tmp_value)
+        {
+            if ( (abs(tmp_value - m_time) < 1e-2) && (count % (2*CH_SPACEDIM+1) == 0))
+            {
+                found_punctures = true;
+                pout() << "Found punctures on restart at: " << endl;
+                for (int ipuncture = 0; ipuncture < CH_SPACEDIM*m_num_punctures; ipuncture++)
+                {
+                    in_file >> tmp_value;
+                    puncture_coords[ipuncture] = tmp_value;
+                    pout() << puncture_coords[ipuncture] << " ";
+                }
+                pout() << endl;
+                break;
+            }
+            count++;
+        }
+        if(!found_punctures) { MayDay::Error("Punctures not found in file."); }
+        CH_assert(puncture_coords.size() / CH_SPACEDIM == m_num_punctures);
+        in_file.close();
+
+        // set the coordinates
+        a_gramr.set_puncture_coords(puncture_coords);
+    }
+
     //! Execute the query
     void execute_tracking(GRAMR &a_gramr) const
     {

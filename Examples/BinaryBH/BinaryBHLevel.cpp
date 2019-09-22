@@ -40,12 +40,27 @@ void BinaryBHLevel::initialData()
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
 
     // setup initial puncture coords for tracking
-    m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+    // do puncture tracking, just set them once, so on level 0
+    if (m_p.track_punctures == 1 && m_level == 0)
+    {
+        m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+    }
 
     // First set everything to zero (to avoid undefinded values in constraints)
     // then calculate initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.), binary), m_state_new,
                    m_state_new, INCLUDE_GHOST_CELLS);
+}
+
+void BinaryBHLevel::postRestart()
+{
+    // do puncture tracking, just set them once, so on level 0
+    if (m_p.track_punctures == 1 && m_level == 0)
+    {
+        PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
+                                    m_p.checkpoint_prefix);
+        my_punctures.read_in_punctures(m_gr_amr);
+    }
 }
 
 void BinaryBHLevel::preCheckpointLevel()
@@ -109,12 +124,12 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-    // do puncture tracking on a coarser level
-    if (m_p.track_punctures == 1 && m_level == m_p.max_level - 2)
+    // do puncture tracking on finest but one level
+    if (m_p.track_punctures == 1 && m_level == m_p.max_level - 1)
     {
-        PunctureTracker mypunctures(m_time, m_restart_time, m_dt,
+        PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
                                     m_p.checkpoint_prefix);
-        mypunctures.execute_tracking(m_gr_amr);
+        my_punctures.execute_tracking(m_gr_amr);
     }
 }
 

@@ -79,19 +79,21 @@ template <class data_t> void compute(Cell<data_t> current_cell) const
         }
     }
 
-    // only check the puncture locations on the top level
-    if ((m_level > (m_max_level - 1)) && (m_track_punctures == 1))
+    // only check the puncture locations on the top level 
+    // which regrids (ie, max_level - 1)
+    if ((m_level > (m_max_level - 2)) && (m_track_punctures == 1))
     {
+        const double bh_mass = 0.5;
         const Coordinates<data_t> coords1(current_cell, m_dx,
                                           m_puncture_coords1);
         const Coordinates<data_t> coords2(current_cell, m_dx,
                                           m_puncture_coords2);
         const data_t r1 = coords1.get_radius();
         const data_t r2 = coords2.get_radius();
-        auto regrid = simd_compare_lt(r1, 0.75);
-        criterion = simd_conditional(regrid, 1.0e10, criterion);
-        regrid = simd_compare_lt(r2, 0.75);
-        criterion = simd_conditional(regrid, 1.0e10, criterion);
+        auto regrid = simd_compare_lt(r1, bh_mass);
+        criterion = simd_conditional(regrid, 100.0, criterion);
+        regrid = simd_compare_lt(r2, bh_mass);
+        criterion = simd_conditional(regrid, 100.0, criterion);
     }
 
     // Write back into the flattened Chombo box

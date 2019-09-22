@@ -1,14 +1,15 @@
 # Note that this is a realistic example but not production quality for 
 # generating BBH waveforms (one needs a larger wave zone)
-# It should run well on 64 MPI processes x 4 openMP threads = 256 cores
-# On CDS3 one achieves roughly 50 M/hr on average
+# It should run well on 96 MPI processes x 4 openMP threads = 384 cores
+# Or with max_box_size=8 on 512 proc x 4 openMP threads = 2048 cores
+# On CDS3 one achieves roughly 40 M/hr at t = 5M
 # (It should give circular orbits)
 
 verbosity = 0
 #chk_prefix = BinaryBH_
 chk_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBHCTC_chk
 plot_prefix = BinaryBHPlot_
-#restart_file = BinaryBH_000360.3d.hdf5
+#restart_file = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBHCTC_chk000350.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -29,15 +30,15 @@ centerB = 256 249.89321 256
 momentumB =  0.0841746  0.000510846 0.0
 
 # regridding control
-regrid_threshold = 0.08
+regrid_threshold = 0.1
 max_level = 9
-regrid_interval = 0 0 0 64 32 16 8 4 2 1
+regrid_interval = 0 0 0 0 128 8 4 2 1 0
 tag_buffer_size = 0
 fill_ratio = 0.75
 
 #Max and min box sizes
-max_grid_size = 16
-block_factor = 16
+max_grid_size = 8
+block_factor = 8
 
 #boundaries and periodicity of grid
 #Periodic directions - 0 = false, 1 = true

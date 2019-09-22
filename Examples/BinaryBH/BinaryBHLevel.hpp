@@ -22,6 +22,9 @@ class BinaryBHLevel : public GRAMRLevel
     /// Initial data calculation
     virtual void initialData() override;
 
+    /// Things to do after a restart
+    virtual void postRestart() override;
+
     /// Any actions that should happen just before checkpointing
     virtual void preCheckpointLevel() override;
 
