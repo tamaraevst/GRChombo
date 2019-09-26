@@ -108,7 +108,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         s_ = sinh(rapidity);
         v_ = tanh(rapidity);
         t = coords.z*s_ + 0.*s_; //set /tilde{t} to zero
-        x = coords.x-separation/2.;
+        x = coords.x+separation/2.;
         z = coords.z*c_;
         y = coords.y;
         r = sqrt(x*x+y*y+z*z);
