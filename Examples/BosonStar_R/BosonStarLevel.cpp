@@ -65,7 +65,7 @@ void BosonStarLevel::initialData()
 
 
     // the max radius the code might need to calculate out to is L*sqrt(3)
-    boson_star.compute_1d_solution(1.74*m_p.L);
+    boson_star.compute_1d_solution(2.*m_p.L);
 
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
