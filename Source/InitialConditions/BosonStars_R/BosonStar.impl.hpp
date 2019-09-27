@@ -89,7 +89,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double kLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double K1, K2;
+    double K1, K2=0.;
 
     kLL[0][0] = -lapse_1*s_*z*psi_prime_/(r*psi_);
     KLL[1][1] = KLL[0][0];
@@ -173,9 +173,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     double one_third = 1./3.;
     vars.K += K1 + K2;
-    vars.A[0][0] += chi_*(KLL[0][0]-one_third*K*g_xx);
-    vars.A[1][1] += chi_*(KLL[1][1]-one_third*K*g_yy);
-    vars.A[2][2] += chi_*(KLL[2][2]-one_third*K*g_zz);
+    vars.A[0][0] += chi_*(KLL[0][0]-one_third*(K1+K2)*g_xx);
+    vars.A[1][1] += chi_*(KLL[1][1]-one_third*(K1+K2)*g_yy);
+    vars.A[2][2] += chi_*(KLL[2][2]-one_third*(K1+K2)*g_zz);
     vars.A[0][1] += chi_*KLL[0][1];
     vars.A[0][2] += chi_*KLL[0][2];
     vars.A[1][2] += chi_*KLL[1][2];
