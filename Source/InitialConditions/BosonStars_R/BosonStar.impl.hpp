@@ -100,7 +100,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     KLL[0][1] = 0.;
     KLL[1][0] = 0.;
     KLL[2][2] = lapse_1*(z/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
-    double thing1 = omega_*psi_prime_*(2.*v_*v_*omega_*omega_-psi_*psi_) + omega_prime_*psi_*(v_*v_*omega_*omega_-2.*psi_*psi_);
+    double thingy1 = omega_*psi_prime_*(2.*v_*v_*omega_*omega_-psi_*psi_) + omega_prime_*psi_*(v_*v_*omega_*omega_-2.*psi_*psi_);
     K1 = pow(lapse_1/omega_,3)*pow(psi_,-5)*s_*c_*c_*(z/r)*(thingy1);
 
     if (binary)
