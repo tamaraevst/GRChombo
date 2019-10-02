@@ -39,6 +39,7 @@ class ChomboParameters
         boundary_params.is_periodic.fill(true);
         nonperiodic_boundaries_exist = false;
         symmetric_boundaries_exist = false;
+        FOR1(i) {bitant_symmetries[i] = 0.0;}
         FOR1(idir)
         {
             if (isPeriodic[idir] == false)
@@ -55,6 +56,7 @@ class ChomboParameters
                      BoundaryConditions::REFLECTIVE_BC))
                 {
                     symmetric_boundaries_exist = true;
+                    bitant_symmetries[idir] = 1;
                     pp.load("vars_parity", boundary_params.vars_parity);
                 }
                 if ((boundary_params.hi_boundary[idir] ==
@@ -157,6 +159,7 @@ class ChomboParameters
     BoundaryConditions::params_t boundary_params; // set boundaries in each dir
     bool nonperiodic_boundaries_exist;
     bool symmetric_boundaries_exist;
+    std::array<int, CH_SPACEDIM> bitant_symmetries;
 
     // For tagging
     double regrid_threshold;

@@ -24,6 +24,7 @@ struct extraction_params_t
     std::vector<int> extraction_levels;
     bool write_extraction;
     int min_extraction_level;
+    std::array<int, CH_SPACEDIM> bitant_symmetries;
 };
 
 class SimulationParametersBase : public ChomboParameters
@@ -126,6 +127,10 @@ class SimulationParametersBase : public ChomboParameters
             std::min_element(extraction_params.extraction_levels.begin(),
                              extraction_params.extraction_levels.end());
         extraction_params.min_extraction_level = *(min_extraction_level_it);
+
+        // set the bitant symmetries
+        FOR1(i) {extraction_params.bitant_symmetries[i] = bitant_symmetries[i];}
+
     }
 
   public:

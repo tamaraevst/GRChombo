@@ -138,6 +138,17 @@ WeylExtraction::integrate_surface(int es, int el, int em,
                         a_re_part[idx] * Y_lm.Real + a_im_part[idx] * Y_lm.Im;
                     double integrand_im =
                         a_im_part[idx] * Y_lm.Real - a_re_part[idx] * Y_lm.Im;
+                    if(m_params.bitant_symmetries[2] == 1)
+                    {
+                        // note sign flip for im part due to Weyl scalar parity
+                        // in z (axis of symmetry in the fields) - Re part is
+                        // even, Im part is odd
+                        Y_lm_t<double> Y_lm_sym = spin_Y_lm(x, y, -z, es, el, em);
+                        integrand_re +=
+                            a_re_part[idx] * Y_lm_sym.Real - a_im_part[idx] * Y_lm_sym.Im;
+                        integrand_im +=
+                            -a_im_part[idx] * Y_lm_sym.Real - a_re_part[idx] * Y_lm_sym.Im;
+                    }
                     // note the multiplication by radius here
                     double f_theta_phi_re = m_params.extraction_radii[iradius] *
                                             integrand_re * sin(theta);
