@@ -1,6 +1,6 @@
 # Note that this is a realistic example but not production quality for 
-# generating BBH waveforms (one needs a larger wave zone, but this should
-# give circular orbits)
+# generating BBH waveforms (one needs a larger wave zone, and better resolution)
+# This should give circular orbits though
 # With max_box_size = 16 :
 # It should run well on 128 proc x 8 openMP threads = 1024 cores
 # On CDS3 one achieves roughly 70 M/hr at t = 10M
@@ -76,7 +76,7 @@ checkpoint_interval = 50
 # set to zero to turn off plot files
 plot_interval = 0
 dt_multiplier = 0.20
-stop_time = 2400.0
+stop_time = 2000.0
 
 #Lapse evolution
 lapse_advec_coeff = 1.0
