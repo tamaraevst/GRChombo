@@ -137,7 +137,7 @@ class PunctureTracker
 
         // print them out
         std::string extraction_filename =
-            m_checkpoint_prefix + "_Punctures.txt";
+            m_checkpoint_prefix + "Punctures.txt";
         SmallDataIO extraction_file(extraction_filename, m_dt, m_time,
                                     m_restart_time, SmallDataIO::APPEND);
         extraction_file.remove_duplicate_time_data();

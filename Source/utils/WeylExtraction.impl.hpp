@@ -140,14 +140,18 @@ WeylExtraction::integrate_surface(int es, int el, int em,
                         a_im_part[idx] * Y_lm.Real - a_re_part[idx] * Y_lm.Im;
                     if(m_params.bitant_symmetries[2] == 1)
                     {
-                        // note sign flip for im part due to Weyl scalar parity
-                        // in z (axis of symmetry in the fields) - Re part is
-                        // even, Im part is odd
+                        // add the contributions from the corresponding
+                        // part of the spacetime at x, y, -z using symmetry
+                        // (note sign flips due to Weyl scalar parity in z)
+                        int parity_re_z = 1;
+                        int parity_im_z = -1;
                         Y_lm_t<double> Y_lm_sym = spin_Y_lm(x, y, -z, es, el, em);
                         integrand_re +=
-                            a_re_part[idx] * Y_lm_sym.Real - a_im_part[idx] * Y_lm_sym.Im;
+                            parity_re_z * a_re_part[idx] * Y_lm_sym.Real + 
+                            parity_im_z * a_im_part[idx] * Y_lm_sym.Im;
                         integrand_im +=
-                            -a_im_part[idx] * Y_lm_sym.Real - a_re_part[idx] * Y_lm_sym.Im;
+                            parity_im_z * a_im_part[idx] * Y_lm_sym.Real -
+                            parity_re_z * a_re_part[idx] * Y_lm_sym.Im;
                     }
                     // note the multiplication by radius here
                     double f_theta_phi_re = m_params.extraction_radii[iradius] *
