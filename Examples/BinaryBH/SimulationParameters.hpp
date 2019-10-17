@@ -31,8 +31,8 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("massB", bh2_params.mass);
         pp.load("centerB", bh2_params.center);
         pp.load("momentumB", bh2_params.momentum);
-        pp.load("activate_extraction", activate_extraction, 0);
-        pp.load("track_punctures", track_punctures, 0);
+        pp.load("activate_extraction", activate_extraction, false);
+        pp.load("track_punctures", track_punctures, false);
 
         puncture_coords.resize(2 * CH_SPACEDIM);
         FOR1(idir)
@@ -43,11 +43,8 @@ class SimulationParameters : public SimulationParametersBase
     }
 
     // Initial data
-    int activate_extraction, track_punctures;
+    bool activate_extraction, track_punctures;
     std::vector<double> puncture_coords;
-    Real massA, massB;
-    std::array<double, CH_SPACEDIM> centerA, centerB;
-    std::array<double, CH_SPACEDIM> momentumA, momentumB;
 
     // Collection of parameters necessary for initial conditions
     BoostedBH::params_t bh2_params;

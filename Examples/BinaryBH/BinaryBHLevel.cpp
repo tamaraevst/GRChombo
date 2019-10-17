@@ -18,6 +18,7 @@
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
 
+// Things to do during the advance step after RK4 steps
 void BinaryBHLevel::specificAdvance()
 {
     // Enforce the trace free A_ij condition and positive chi and alpha
@@ -30,6 +31,8 @@ void BinaryBHLevel::specificAdvance()
                        m_state_new, EXCLUDE_GHOST_CELLS, disable_simd());
 }
 
+// This initial data uses an approximation for the metric which
+// is valid for small boosts
 void BinaryBHLevel::initialData()
 {
     CH_TIME("BinaryBHLevel::initialData");
@@ -52,24 +55,39 @@ void BinaryBHLevel::initialData()
                    m_state_new, INCLUDE_GHOST_CELLS);
 }
 
+// Things to do after a restart
 void BinaryBHLevel::postRestart()
 {
     // do puncture tracking, just set them once, so on level 0
     if (m_p.track_punctures == 1 && m_level == 0)
     {
-        PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
-                                    m_p.checkpoint_prefix);
-        my_punctures.read_in_punctures(m_gr_amr);
+        // look for the current puncture location in the 
+        // puncture output file (it needs to exist!)
+        if (m_time > 0.0)
+        {
+            PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
+                                        m_p.checkpoint_prefix);
+            my_punctures.read_in_punctures(m_gr_amr);
+        }
+        // if it is the first timestep, use the param values
+        // rather than look for the output file
+        else if (m_time == 0.0)
+        {
+            m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+        }
     }
 }
 
+// Things to do before writing checkpoints
 void BinaryBHLevel::preCheckpointLevel()
 {
+    // Calculate and assing values of Ham and Mom constraints on grid
     fillAllGhosts();
     BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
 }
 
+// Calculate RHS during RK4 substeps
 void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                                     const double a_time)
 {
@@ -85,6 +103,7 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
         a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
 }
 
+// enforce trace removal during RK4 substeps
 void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
                                       const GRLevelData &a_rhs, Real a_dt)
 {
@@ -92,14 +111,16 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
     BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
 }
 
+// specify the cells to tag
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
+    double max_puncture_mass = max(m_p.bh1_params.mass, m_p.bh2_params.mass);
     std::vector<double> puncture_coords = m_gr_amr.get_puncture_coords();
     BoxLoops::loop(ChiExtractionTaggingCriterion(
                        m_dx, m_level, m_p.max_level, m_p.extraction_params,
                        puncture_coords, m_p.activate_extraction,
-                       m_p.track_punctures),
+                       m_p.track_punctures, max_puncture_mass),
                    current_state, tagging_criterion);
 }
 
