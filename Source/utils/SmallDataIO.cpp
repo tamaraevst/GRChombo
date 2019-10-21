@@ -5,6 +5,8 @@
 
 #include "SmallDataIO.hpp"
 
+// ------------ Writing Functions ------------
+
 void SmallDataIO::write_header_line(
     const std::vector<std::string> &a_header_strings,
     const std::string &a_pre_header_string)
@@ -119,4 +121,51 @@ void SmallDataIO::remove_duplicate_time_data()
         // reopen the file in append mode
         m_file.open(m_filename, std::ios::app);
     }
+}
+
+// ------------ Reading Functions ------------
+
+void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
+                                         const std::vector<double> a_coords)
+{
+    if (m_rank == 0)
+    {
+        // first set the current position to the beginning of the file
+        m_file.seekg(0);
+
+        // get a string of the coords as they are in the file
+        std::stringstream coords_ss;
+        coords_ss << std::fixed << std::setprecision(m_coords_precision);
+        for (double coord : a_coords)
+        {
+            coords_ss << std::setw(m_coords_width) << coord;
+        }
+        std::string coords_string = coords_ss.str();
+
+        // now search for lines that start with coords_string and put the data
+        // in a_out_data
+        std::string line;
+        while(std::getline(m_file, line))
+        {
+            if (!(line.find(coords_string) == std::string::npos))
+            {
+                for(int ichar = a_coords.size() * m_coords_width;
+                    ichar < line.size(); ichar += m_data_width)
+                {
+                    double data_value
+                        = std::stod(line.substr(ichar, m_data_width));
+                    a_out_data.push_back(data_value);
+                }
+                // only want the first occurrence so break the while loop
+                break;
+            }
+        }
+    }
+}
+
+void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
+                                         const double a_coord)
+{
+    std::vector<double> coords(1, a_coord);
+    get_specific_data_line(a_out_data, coords);
 }
