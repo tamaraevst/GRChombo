@@ -161,6 +161,12 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
             }
         }
     }
+    // now broadcast the vector to all ranks using Chombo broadcast function
+    // need to convert std::vector to Vector first
+    Vector<double> data_Vect(a_out_data);
+    int broadcast_rank = 0;
+    broadcast(data_Vect, broadcast_rank);
+    a_out_data = data_Vect.stdVector();
 }
 
 void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
