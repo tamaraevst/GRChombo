@@ -674,7 +674,6 @@ void BoundaryConditions::expand_grids_to_boundaries(
     {
         if (!m_params.is_periodic[idir])
         {
-            domain_with_boundaries.growHi(idir, m_num_ghosts);
             if (get_boundary_condition(Side::Lo, idir) == SOMMERFELD_BC)
             {
                 domain_with_boundaries.growLo(idir, m_num_ghosts);
