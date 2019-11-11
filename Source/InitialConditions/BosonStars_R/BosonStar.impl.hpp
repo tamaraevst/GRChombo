@@ -162,6 +162,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
 
     vars.chi = pow(g_xx*g_yy*g_zz,-1./3.);
+    chi_ = pow(g_xx*g_yy*g_zz,-1./3.);
 
     if (BS_BH_binary){vars.lapse += sqrt(vars.chi);}
     else if (binary){vars.lapse += sqrt(lapse_1*lapse_1 + lapse_2+lapse_2-1.);}
