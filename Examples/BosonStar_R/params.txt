@@ -126,7 +126,7 @@ eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>
 gridpoints 200000
 BS_binary = true # make false for one star
 BS_BH_binary = false
-BS_rapidity = 0.0 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
+BS_rapidity = 0.1 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
 BS_separation = 32.0 # should be set to 0 if binary is false otherwise the star wont be in the centre of the screen
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
