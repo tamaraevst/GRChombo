@@ -1,14 +1,16 @@
 # Note that this is a realistic example but not production quality for 
-# generating BBH waveforms (one needs a larger wave zone, and better resolution)
-# This should give circular orbits though
-# With max_box_size = 16 :
+# generating BBH waveforms (one probably needs a larger wave zone, 
+# and better resolution at the horizon)
+# It should give about eight circular orbits though before the plunge
+# With max_box_size = min_box_size = 16 :
 # It should run well on 128 proc x 8 openMP threads = 1024 cores
-# On CDS3 one achieves roughly 70 M/hr at t = 10M
+# On CDS3 one achieves roughly 50 M/hr at t = 10M
+# Using OPT=HIGH and AVX512 vectorisation
 
 verbosity = 0
-chk_prefix = BinaryBHChk_
-plot_prefix = BinaryBHPlot_
-#restart_file = BinaryBHChk_000400.3d.hdf5
+chk_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_
+plot_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHPlot_
+#restart_file = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_000400.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -20,20 +22,18 @@ center = 256 256 0
 
 # BH params
 track_punctures = 1
-massA = 0.4884789232012386
+massA = 0.48847892320123
 centerA = 256 262.10679 0
 momentumA = -0.0841746 -0.000510846 0.0
 
-massB = 0.4884789232012297
+massB = 0.48847892320123
 centerB = 256 249.89321 0
 momentumB =  0.0841746  0.000510846 0.0
 
 # regridding control
-regrid_threshold = 0.1
+regrid_threshold = 0.05
 max_level = 9
-regrid_interval = 0 0 0 32 32 32 32 32 32 0
-tag_buffer_size = 3
-fill_ratio = 0.75
+regrid_interval = 0 0 0 32 64 64 64 64 64 0
 
 #Max and min box sizes
 max_grid_size = 16
@@ -76,7 +76,7 @@ checkpoint_interval = 50
 # set to zero to turn off plot files
 plot_interval = 0
 dt_multiplier = 0.20
-stop_time = 2000.0
+stop_time = 1800.0
 
 #Lapse evolution
 lapse_advec_coeff = 1.0

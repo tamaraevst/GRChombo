@@ -44,7 +44,7 @@ class PunctureTracker
 
         // read them in from the Punctures file
         std::string punctures_filename =
-            m_checkpoint_prefix + "_Punctures.txt";
+            m_checkpoint_prefix + "Punctures.txt";
 
         // find the m_time line and read in the puncture data
         ifstream in_file;

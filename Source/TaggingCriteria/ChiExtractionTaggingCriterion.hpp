@@ -25,7 +25,7 @@ class ChiExtractionTaggingCriterion
     const int m_max_level;
     const bool m_activate_extraction;
     const bool m_track_punctures;
-    const int m_puncture_mass;
+    const double m_puncture_mass;
     const extraction_params_t m_params;
     const FourthOrderDerivatives m_deriv;
     std::array<double, CH_SPACEDIM> m_puncture_coords1;
@@ -46,12 +46,14 @@ class ChiExtractionTaggingCriterion
     };
 
     // The constructor
-    ChiExtractionTaggingCriterion(const double dx, const int a_level, const int a_max_level,
+    ChiExtractionTaggingCriterion(const double dx,
+                                  const int a_level,
+                                  const int a_max_level,
                                   const extraction_params_t a_params,
                                   const std::vector<double> a_puncture_coords,
                                   const bool activate_extraction = false,
                                   const bool track_punctures = false, 
-                                  const double a_puncture_mass = 0.0)
+                                  const double a_puncture_mass = 1.0)
         : m_dx(dx), m_deriv(dx), m_params(a_params), m_level(a_level),
           m_max_level(a_max_level), m_track_punctures(track_punctures),
           m_activate_extraction(activate_extraction),
@@ -100,16 +102,20 @@ class ChiExtractionTaggingCriterion
         // the top levels are well spaced)
         if ((m_level > (m_max_level - 3)) && (m_track_punctures == 1))
         {
+            // we want each level to be double the innermost one in size
             const double factor = pow(2.0, m_max_level - m_level - 1);
+            // where am i?
             const Coordinates<data_t> coords1(current_cell, m_dx,
                                               m_puncture_coords1);
             const Coordinates<data_t> coords2(current_cell, m_dx,
                                               m_puncture_coords2);
             const data_t r1 = coords1.get_radius();
             const data_t r2 = coords2.get_radius();
-            auto regrid = simd_compare_lt(r1, 1.25 * factor * m_puncture_mass);
+            // decide whether to tag based on distance to horizon
+            // plus a fudge factor of 1.5
+            auto regrid = simd_compare_lt(r1, 1.5 * factor * m_puncture_mass);
             criterion = simd_conditional(regrid, 100.0, criterion);
-            regrid = simd_compare_lt(r2, 1.25 * factor * m_puncture_mass);
+            regrid = simd_compare_lt(r2, 1.5 * factor * m_puncture_mass);
             criterion = simd_conditional(regrid, 100.0, criterion);
         }
     

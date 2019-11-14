@@ -115,7 +115,7 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
-    double max_puncture_mass = max(m_p.bh1_params.mass, m_p.bh2_params.mass);
+    const double max_puncture_mass = max(m_p.bh1_params.mass, m_p.bh2_params.mass);
     std::vector<double> puncture_coords = m_gr_amr.get_puncture_coords();
     BoxLoops::loop(ChiExtractionTaggingCriterion(
                        m_dx, m_level, m_p.max_level, m_p.extraction_params,
