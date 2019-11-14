@@ -130,6 +130,7 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
 {
     if (m_rank == 0)
     {
+        bool line_found = false;
         // first set the current position to the beginning of the file
         m_file.seekg(0);
 
@@ -156,9 +157,14 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
                         = std::stod(line.substr(ichar, m_data_width));
                     a_out_data.push_back(data_value);
                 }
+                line_found = true;
                 // only want the first occurrence so break the while loop
                 break;
             }
+        }
+        if(!line_found)
+        {
+            MayDay::Error("SmallDataIO : Data to be read in at coord not found in file");
         }
     }
     // now broadcast the vector to all ranks using Chombo broadcast function

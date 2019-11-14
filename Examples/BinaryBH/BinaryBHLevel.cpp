@@ -156,7 +156,7 @@ void BinaryBHLevel::specificPostTimeStep()
         bool write_punctures = false;
         const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
         const double remainder = fmod(m_time, coarsest_dt);
-        if (min(remainder, abs(remainder - m_dt)) < 1.0e-8)
+        if (min(abs(remainder), abs(remainder - m_dt)) < 1.0e-8)
         {
             write_punctures = true;
         }
