@@ -28,8 +28,8 @@ class ChiExtractionTaggingCriterion
     const double m_puncture_mass;
     const extraction_params_t m_params;
     const FourthOrderDerivatives m_deriv;
-    std::array<double, CH_SPACEDIM> m_puncture_coords1;
-    std::array<double, CH_SPACEDIM> m_puncture_coords2;
+    const std::array<double, CH_SPACEDIM> m_puncture_coords1;
+    const std::array<double, CH_SPACEDIM> m_puncture_coords2;
 
   public:
     template <class data_t> struct Vars
@@ -50,20 +50,18 @@ class ChiExtractionTaggingCriterion
                                   const int a_level,
                                   const int a_max_level,
                                   const extraction_params_t a_params,
-                                  const std::vector<double> a_puncture_coords,
+                                  const std::vector<std::array<double, CH_SPACEDIM>>
+                                        a_puncture_coords,
                                   const bool activate_extraction = false,
                                   const bool track_punctures = false, 
                                   const double a_puncture_mass = 1.0)
         : m_dx(dx), m_deriv(dx), m_params(a_params), m_level(a_level),
           m_max_level(a_max_level), m_track_punctures(track_punctures),
           m_activate_extraction(activate_extraction),
-          m_puncture_mass(a_puncture_mass)
+          m_puncture_mass(a_puncture_mass),
+          m_puncture_coords1(a_puncture_coords[0]),
+          m_puncture_coords2(a_puncture_coords[1])
     {
-        FOR1(i)
-        {
-            m_puncture_coords1[i] = a_puncture_coords[i];
-            m_puncture_coords2[i] = a_puncture_coords[CH_SPACEDIM + i];
-        }
     };
 
     template <class data_t> void compute(Cell<data_t> current_cell) const

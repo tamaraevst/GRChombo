@@ -49,18 +49,16 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("activate_extraction", activate_extraction, false);
         pp.load("track_punctures", track_punctures, false);
 
-        puncture_coords.resize(2 * CH_SPACEDIM);
-        FOR1(idir)
-        {
-            puncture_coords[0 + idir] = bh1_params.center[idir];
-            puncture_coords[CH_SPACEDIM + idir] = bh2_params.center[idir];
-        }
+        // hard code num punctures to 2 for now
+        int num_punctures = 2;
+        initial_puncture_coords.resize(num_punctures);
+        initial_puncture_coords[0] = bh1_params.center;
+        initial_puncture_coords[1] = bh2_params.center;
     }
 
     // Initial data
     bool activate_extraction, track_punctures;
-    std::vector<double> puncture_coords;
-
+    std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords;
     // Collection of parameters necessary for initial conditions
     BoostedBH::params_t bh2_params;
     BoostedBH::params_t bh1_params;

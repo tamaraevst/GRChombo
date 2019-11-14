@@ -46,7 +46,7 @@ void BinaryBHLevel::initialData()
     // do puncture tracking, just set them once, so on level 0
     if (m_p.track_punctures == 1 && m_level == 0)
     {
-        m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+        m_gr_amr.set_puncture_coords(m_p.initial_puncture_coords);
     }
 
     // First set everything to zero (to avoid undefinded values in constraints)
@@ -70,10 +70,11 @@ void BinaryBHLevel::postRestart()
             my_punctures.read_in_punctures(m_gr_amr);
         }
         // if it is the first timestep, use the param values
-        // rather than look for the output file
+        // rather than look for the output file, e.g. for when
+        // restart from IC solver
         else if (m_time == 0.0)
         {
-            m_gr_amr.set_puncture_coords(m_p.puncture_coords);
+            m_gr_amr.set_puncture_coords(m_p.initial_puncture_coords);
         }
     }
 }
@@ -116,7 +117,8 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
     const double max_puncture_mass = max(m_p.bh1_params.mass, m_p.bh2_params.mass);
-    std::vector<double> puncture_coords = m_gr_amr.get_puncture_coords();
+    std::vector<std::array<double, CH_SPACEDIM>> puncture_coords 
+                                            = m_gr_amr.get_puncture_coords();
     BoxLoops::loop(ChiExtractionTaggingCriterion(
                        m_dx, m_level, m_p.max_level, m_p.extraction_params,
                        puncture_coords, m_p.activate_extraction,
@@ -149,8 +151,16 @@ void BinaryBHLevel::specificPostTimeStep()
     if (m_p.track_punctures == 1 && m_level == m_p.max_level - 1)
     {
         PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
-                                    m_p.checkpoint_prefix);
-        my_punctures.execute_tracking(m_gr_amr);
+                                     m_p.checkpoint_prefix);
+        // only do the write out for every coarsest level timestep
+        bool write_punctures = false;
+        const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
+        const double remainder = fmod(m_time, coarsest_dt);
+        if (min(remainder, abs(remainder - m_dt)) < 1.0e-8)
+        {
+            write_punctures = true;
+        }
+        my_punctures.execute_tracking(m_gr_amr, write_punctures, coarsest_dt);
     }
 }
 
