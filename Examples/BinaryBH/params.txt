@@ -10,7 +10,7 @@
 verbosity = 0
 chk_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_
 plot_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHPlot_
-restart_file = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_000100.3d.hdf5
+#restart_file = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_000000.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -18,7 +18,7 @@ N1 = 64
 N2 = 64
 N3 = 32
 L = 512
-center = 256 256 0
+center = 256.0 256.0 0.0
 
 # BH params
 track_punctures = 1

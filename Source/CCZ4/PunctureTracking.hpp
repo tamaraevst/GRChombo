@@ -63,11 +63,14 @@ class PunctureTracker
         a_gramr.set_puncture_coords(puncture_coords);
 
         // print out values into pout files
-        pout() << "Punctures restarted at " << puncture_coords[0][0] << " "
-               << puncture_coords[0][1] << " " << puncture_coords[0][2] << endl;
-        pout() << "and                    " << puncture_coords[1][0] << " "
-               << puncture_coords[1][1] << " " << puncture_coords[1][2] << endl;
-        pout() << "at time = " << m_time << endl;
+        for(int ipuncture = 0 ; ipuncture < m_num_punctures ; ipuncture++)
+        {
+            pout() << "Puncture " << ipuncture << " restarted at : "
+                   << puncture_coords[ipuncture][0] << " "
+                   << puncture_coords[ipuncture][1] << " "
+                   << puncture_coords[ipuncture][2] << endl;
+            pout() << "at time = " << m_time << endl;
+        }
     }
 
     //! Execute the tracking and write out

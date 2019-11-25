@@ -47,7 +47,7 @@ class GRAMR : public AMR
     }
 
     // function to get punctures
-    std::vector<std::array<double, CH_SPACEDIM>> get_puncture_coords()
+    const std::vector<std::array<double, CH_SPACEDIM>> get_puncture_coords() const
     {
         return m_puncture_coords;
     }

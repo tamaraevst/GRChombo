@@ -8,6 +8,7 @@
 #include "BoxLoops.hpp"
 #include "CCZ4.hpp"
 #include "ChiExtractionTaggingCriterion.hpp"
+#include "ChiPunctureExtractionTaggingCriterion.hpp"
 #include "ComputePack.hpp"
 #include "Constraints.hpp"
 #include "NanCheck.hpp"
@@ -116,15 +117,25 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
-    const double max_puncture_mass =
-        max(m_p.bh1_params.mass, m_p.bh2_params.mass);
-    std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
-        m_gr_amr.get_puncture_coords();
-    BoxLoops::loop(ChiExtractionTaggingCriterion(
+    if(m_p.track_punctures == true)
+    {
+        const vector<double> puncture_masses =
+                 {m_p.bh1_params.mass, m_p.bh2_params.mass};
+        std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
+            m_gr_amr.get_puncture_coords();
+        BoxLoops::loop(ChiPunctureExtractionTaggingCriterion(
+                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
+                           puncture_coords, m_p.activate_extraction,
+                           m_p.track_punctures, puncture_masses),
+                       current_state, tagging_criterion);
+    }
+    else
+    {
+        BoxLoops::loop(ChiExtractionTaggingCriterion(
                        m_dx, m_level, m_p.max_level, m_p.extraction_params,
-                       puncture_coords, m_p.activate_extraction,
-                       m_p.track_punctures, max_puncture_mass),
+                       m_p.activate_extraction),
                    current_state, tagging_criterion);
+    }
 }
 
 void BinaryBHLevel::specificPostTimeStep()
