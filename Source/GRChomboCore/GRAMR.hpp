@@ -40,15 +40,15 @@ class GRAMR : public AMR
     }
 
     // function to set punctures
-    void set_puncture_coords(std::vector<std::array<double, CH_SPACEDIM>> 
-                                &a_puncture_coords)
+    void set_puncture_coords(
+        std::vector<std::array<double, CH_SPACEDIM>> &a_puncture_coords)
     {
         m_puncture_coords = a_puncture_coords;
     }
 
     // function to get punctures
     std::vector<std::array<double, CH_SPACEDIM>> get_puncture_coords()
-    { 
+    {
         return m_puncture_coords;
     }
 

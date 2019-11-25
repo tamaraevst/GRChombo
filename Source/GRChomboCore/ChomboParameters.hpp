@@ -39,7 +39,7 @@ class ChomboParameters
         boundary_params.is_periodic.fill(true);
         nonperiodic_boundaries_exist = false;
         symmetric_boundaries_exist = false;
-        FOR1(i) {bitant_symmetries[i] = 0;}
+        FOR1(i) { bitant_symmetries[i] = 0; }
         FOR1(idir)
         {
             if (isPeriodic[idir] == false)

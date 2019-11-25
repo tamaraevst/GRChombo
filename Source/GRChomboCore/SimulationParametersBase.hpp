@@ -129,8 +129,10 @@ class SimulationParametersBase : public ChomboParameters
         extraction_params.min_extraction_level = *(min_extraction_level_it);
 
         // set the bitant symmetries
-        FOR1(i) {extraction_params.bitant_symmetries[i] = bitant_symmetries[i];}
-
+        FOR1(i)
+        {
+            extraction_params.bitant_symmetries[i] = bitant_symmetries[i];
+        }
     }
 
   public:

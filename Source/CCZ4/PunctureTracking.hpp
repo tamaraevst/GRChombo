@@ -39,43 +39,41 @@ class PunctureTracker
     //! Set punctures post restart
     void read_in_punctures(GRAMR &a_gramr) const
     {
-        std::vector<std::array<double, CH_SPACEDIM> > puncture_coords;
+        std::vector<std::array<double, CH_SPACEDIM>> puncture_coords;
         puncture_coords.resize(m_num_punctures);
 
         // read them in from the Punctures file at current time m_time
         SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                                    m_restart_time, SmallDataIO::READ);
-        // NB need to give the get function an empty vector to fill 
+                                   m_restart_time, SmallDataIO::READ);
+        // NB need to give the get function an empty vector to fill
         std::vector<double> puncture_vector;
         punctures_file.get_specific_data_line(puncture_vector, m_time);
         CH_assert(puncture_vector.size() == m_num_punctures * CH_SPACEDIM);
 
         // convert vector to list of coords
-        for(int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
+        for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
         {
-            puncture_coords[ipuncture] = {puncture_vector[ipuncture*CH_SPACEDIM+0],
-                                          puncture_vector[ipuncture*CH_SPACEDIM+1],
-                                          puncture_vector[ipuncture*CH_SPACEDIM+2]};
+            puncture_coords[ipuncture] = {
+                puncture_vector[ipuncture * CH_SPACEDIM + 0],
+                puncture_vector[ipuncture * CH_SPACEDIM + 1],
+                puncture_vector[ipuncture * CH_SPACEDIM + 2]};
         }
 
         // set the coordinates
         a_gramr.set_puncture_coords(puncture_coords);
 
         // print out values into pout files
-        pout() << "Punctures restarted at " 
-               << puncture_coords[0][0] << " " << puncture_coords[0][1] 
-               << " " << puncture_coords[0][2] << endl;
-        pout() << "and                    "
-               << puncture_coords[1][0] << " " << puncture_coords[1][1]
-               << " " << puncture_coords[1][2] << endl;
+        pout() << "Punctures restarted at " << puncture_coords[0][0] << " "
+               << puncture_coords[0][1] << " " << puncture_coords[0][2] << endl;
+        pout() << "and                    " << puncture_coords[1][0] << " "
+               << puncture_coords[1][1] << " " << puncture_coords[1][2] << endl;
         pout() << "at time = " << m_time << endl;
     }
 
     //! Execute the tracking and write out
     //! If optional arguments unset will write on every timestep
     //! on which the tracking is performed
-    void execute_tracking(GRAMR &a_gramr, 
-                          const bool write_punctures = true,
+    void execute_tracking(GRAMR &a_gramr, const bool write_punctures = true,
                           const double a_coarse_dt = 0.0) const
     {
         // refresh interpolator
@@ -90,8 +88,8 @@ class PunctureTracker
         std::vector<double> interp_z(m_num_punctures);
 
         // assign coordinates
-        std::vector<std::array<double, CH_SPACEDIM> > new_puncture_coords 
-                                            = a_gramr.get_puncture_coords();
+        std::vector<std::array<double, CH_SPACEDIM>> new_puncture_coords =
+            a_gramr.get_puncture_coords();
         CH_assert(new_puncture_coords.size() == m_num_punctures);
 
         for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
@@ -129,12 +127,12 @@ class PunctureTracker
         if (write_punctures)
         {
             SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                                    m_restart_time, SmallDataIO::APPEND);
+                                       m_restart_time, SmallDataIO::APPEND);
             punctures_file.remove_duplicate_time_data();
             if (m_time == a_coarse_dt)
             {
                 std::vector<std::string> header1_strings(CH_SPACEDIM *
-                                                     m_num_punctures);
+                                                         m_num_punctures);
                 header1_strings[0] = "x1";
                 header1_strings[1] = "y1";
                 header1_strings[2] = "z1";
@@ -149,9 +147,12 @@ class PunctureTracker
             puncture_vector.resize(m_num_punctures * CH_SPACEDIM);
             for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
             {
-                puncture_vector[ipuncture*CH_SPACEDIM+0] = new_puncture_coords[ipuncture][0];
-                puncture_vector[ipuncture*CH_SPACEDIM+1] = new_puncture_coords[ipuncture][1];
-                puncture_vector[ipuncture*CH_SPACEDIM+2] = new_puncture_coords[ipuncture][2];
+                puncture_vector[ipuncture * CH_SPACEDIM + 0] =
+                    new_puncture_coords[ipuncture][0];
+                puncture_vector[ipuncture * CH_SPACEDIM + 1] =
+                    new_puncture_coords[ipuncture][1];
+                puncture_vector[ipuncture * CH_SPACEDIM + 2] =
+                    new_puncture_coords[ipuncture][2];
             }
             punctures_file.write_time_data_line(puncture_vector);
         }

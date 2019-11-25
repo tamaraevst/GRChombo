@@ -61,12 +61,12 @@ void BinaryBHLevel::postRestart()
     // do puncture tracking, just set them once, so on level 0
     if (m_p.track_punctures == 1 && m_level == 0)
     {
-        // look for the current puncture location in the 
+        // look for the current puncture location in the
         // puncture output file (it needs to exist!)
         if (m_time > 0.0)
         {
             PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
-                                        m_p.checkpoint_prefix);
+                                         m_p.checkpoint_prefix);
             my_punctures.read_in_punctures(m_gr_amr);
         }
         // if it is the first timestep, use the param values
@@ -116,9 +116,10 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
-    const double max_puncture_mass = max(m_p.bh1_params.mass, m_p.bh2_params.mass);
-    std::vector<std::array<double, CH_SPACEDIM>> puncture_coords 
-                                            = m_gr_amr.get_puncture_coords();
+    const double max_puncture_mass =
+        max(m_p.bh1_params.mass, m_p.bh2_params.mass);
+    std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
+        m_gr_amr.get_puncture_coords();
     BoxLoops::loop(ChiExtractionTaggingCriterion(
                        m_dx, m_level, m_p.max_level, m_p.extraction_params,
                        puncture_coords, m_p.activate_extraction,

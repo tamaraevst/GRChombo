@@ -146,15 +146,15 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
         // now search for lines that start with coords_string and put the data
         // in a_out_data
         std::string line;
-        while(std::getline(m_file, line))
+        while (std::getline(m_file, line))
         {
             if (!(line.find(coords_string) == std::string::npos))
             {
-                for(int ichar = a_coords.size() * m_coords_width;
-                    ichar < line.size(); ichar += m_data_width)
+                for (int ichar = a_coords.size() * m_coords_width;
+                     ichar < line.size(); ichar += m_data_width)
                 {
-                    double data_value
-                        = std::stod(line.substr(ichar, m_data_width));
+                    double data_value =
+                        std::stod(line.substr(ichar, m_data_width));
                     a_out_data.push_back(data_value);
                 }
                 line_found = true;
@@ -162,9 +162,10 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
                 break;
             }
         }
-        if(!line_found)
+        if (!line_found)
         {
-            MayDay::Error("SmallDataIO : Data to be read in at coord not found in file");
+            MayDay::Error(
+                "SmallDataIO : Data to be read in at coord not found in file");
         }
     }
     // now broadcast the vector to all ranks using Chombo broadcast function
