@@ -17,6 +17,7 @@ void PunctureTracker::set_initial_punctures(GRAMR &a_gramr,
 {
     // first set the puncture data, initial shift is always zero
     std::vector<std::array<double, CH_SPACEDIM>> initial_shift;
+    initial_shift.resize(m_num_punctures);
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
         FOR1(i)
@@ -26,17 +27,17 @@ void PunctureTracker::set_initial_punctures(GRAMR &a_gramr,
     }
     a_gramr.set_puncture_data(initial_puncture_coords, initial_shift);
 
-    // now the write out
+    // now the write out to a new file
+    bool first_step = true;
     SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                               m_restart_time, SmallDataIO::APPEND);
+                               m_restart_time, SmallDataIO::APPEND, first_step);
     std::vector<std::string> header1_strings(CH_SPACEDIM *
                                              m_num_punctures);
-    header1_strings[0] = "time";
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
-        header1_strings[CH_SPACEDIM*ipuncture+1] = "x";
-        header1_strings[CH_SPACEDIM*ipuncture+2] = "y";
-        header1_strings[CH_SPACEDIM*ipuncture+3] = "z";
+        header1_strings[CH_SPACEDIM*ipuncture+0] = "x";
+        header1_strings[CH_SPACEDIM*ipuncture+1] = "y";
+        header1_strings[CH_SPACEDIM*ipuncture+2] = "z";
     }
     punctures_file.write_header_line(header1_strings);
 
@@ -53,12 +54,18 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
     puncture_coords.resize(m_num_punctures);
 
     // read them in from the Punctures file at current time m_time
+    // NB opening in APPEND mode allows reading where m_restart_time
+    // is greater than zero and m_time < m_restart_time + m_dt
+    bool first_step = false;
     SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                               m_restart_time, SmallDataIO::READ);
+                               m_restart_time, SmallDataIO::APPEND,
+                               first_step);
     // NB need to give the get function an empty vector to fill
     std::vector<double> puncture_vector;
     punctures_file.get_specific_data_line(puncture_vector, m_time);
+    // check the data returned is the right size
     CH_assert(puncture_vector.size() == m_num_punctures * CH_SPACEDIM);
+    // remove any duplicate data from the file
     punctures_file.remove_duplicate_time_data();
 
     // convert vector to list of coords
@@ -88,7 +95,8 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
 }
 
 //! Execute the tracking and write out
-void PunctureTracker::execute_tracking(GRAMR &a_gramr, const bool write_punctures) const
+void PunctureTracker::execute_tracking(GRAMR &a_gramr,
+                                       const bool write_punctures) const
 {
     // get puncture coordinates and old shift value
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
@@ -116,8 +124,10 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr, const bool write_puncture
     // print them out
     if (write_punctures)
     {
+        bool first_step = false;
         SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                                   m_restart_time, SmallDataIO::APPEND);
+                                   m_restart_time, SmallDataIO::APPEND, 
+                                   first_step);
 
         // use a vector for the write out
         std::vector<double> puncture_vector = 
