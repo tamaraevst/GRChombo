@@ -50,7 +50,8 @@ void BinaryBHLevel::initialData()
         const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
         PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
                                      m_p.checkpoint_prefix);
-        my_punctures.set_initial_punctures(m_gr_amr, m_p.initial_puncture_coords);
+        my_punctures.set_initial_punctures(m_gr_amr,
+                                           m_p.initial_puncture_coords);
     }
 
     // First set everything to zero (to avoid undefinded values in constraints)
@@ -80,8 +81,9 @@ void BinaryBHLevel::postRestart()
         {
             const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
             PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
-                                     m_p.checkpoint_prefix);
-            my_punctures.set_initial_punctures(m_gr_amr, m_p.initial_puncture_coords);
+                                         m_p.checkpoint_prefix);
+            my_punctures.set_initial_punctures(m_gr_amr,
+                                               m_p.initial_puncture_coords);
         }
     }
 }
@@ -123,10 +125,10 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
-    if(m_p.track_punctures == true)
+    if (m_p.track_punctures == true)
     {
-        const vector<double> puncture_masses =
-                 {m_p.bh1_params.mass, m_p.bh2_params.mass};
+        const vector<double> puncture_masses = {m_p.bh1_params.mass,
+                                                m_p.bh2_params.mass};
         std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
             m_gr_amr.get_puncture_coords();
         BoxLoops::loop(ChiPunctureExtractionTaggingCriterion(
@@ -138,9 +140,9 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     else
     {
         BoxLoops::loop(ChiExtractionTaggingCriterion(
-                       m_dx, m_level, m_p.max_level, m_p.extraction_params,
-                       m_p.activate_extraction),
-                   current_state, tagging_criterion);
+                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
+                           m_p.activate_extraction),
+                       current_state, tagging_criterion);
     }
 }
 

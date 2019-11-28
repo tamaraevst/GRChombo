@@ -11,19 +11,16 @@
 #define PUNCTURETRACKER_IMPL_HPP_
 
 //! set and write initial puncture locations
-void PunctureTracker::set_initial_punctures(GRAMR &a_gramr,
-                    std::vector<std::array<double, CH_SPACEDIM>>
-                                  initial_puncture_coords) const
+void PunctureTracker::set_initial_punctures(
+    GRAMR &a_gramr,
+    std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords) const
 {
     // first set the puncture data, initial shift is always zero
     std::vector<std::array<double, CH_SPACEDIM>> initial_shift;
     initial_shift.resize(m_num_punctures);
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
-        FOR1(i)
-        {
-            initial_shift[ipuncture][i] = 0.0;
-        }
+        FOR1(i) { initial_shift[ipuncture][i] = 0.0; }
     }
     a_gramr.set_puncture_data(initial_puncture_coords, initial_shift);
 
@@ -42,8 +39,8 @@ void PunctureTracker::set_initial_punctures(GRAMR &a_gramr,
     punctures_file.write_header_line(header1_strings);
 
     // use a vector for the write out
-    std::vector<double> puncture_vector 
-                        = get_puncture_vector(initial_puncture_coords);
+    std::vector<double> puncture_vector =
+        get_puncture_vector(initial_puncture_coords);
     punctures_file.write_time_data_line(puncture_vector);
 }
 
@@ -84,10 +81,10 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
     a_gramr.set_puncture_data(puncture_coords, current_shift);
 
     // print out values into pout files
-    for(int ipuncture = 0 ; ipuncture < m_num_punctures ; ipuncture++)
+    for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
-        pout() << "Puncture " << ipuncture << " restarted at : "
-               << puncture_coords[ipuncture][0] << " "
+        pout() << "Puncture " << ipuncture
+               << " restarted at : " << puncture_coords[ipuncture][0] << " "
                << puncture_coords[ipuncture][1] << " "
                << puncture_coords[ipuncture][2] << endl;
         pout() << "at time = " << m_time << endl;
@@ -111,12 +108,13 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr,
     new_shift = get_interp_shift(a_gramr, puncture_coords);
 
     // update puncture locations using second order update
-    for (int ipuncture = 0 ; ipuncture < m_num_punctures ; ipuncture++)
+    for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
         FOR1(i)
         {
             puncture_coords[ipuncture][i] +=
-                -0.5 * m_dt * (new_shift[ipuncture][i] + old_shift[ipuncture][i]);
+                -0.5 * m_dt *
+                (new_shift[ipuncture][i] + old_shift[ipuncture][i]);
         }
     }
     a_gramr.set_puncture_data(puncture_coords, new_shift);
@@ -130,8 +128,8 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr,
                                    first_step);
 
         // use a vector for the write out
-        std::vector<double> puncture_vector = 
-                               get_puncture_vector(puncture_coords);
+        std::vector<double> puncture_vector =
+            get_puncture_vector(puncture_coords);
         punctures_file.write_time_data_line(puncture_vector);
     }
 }
