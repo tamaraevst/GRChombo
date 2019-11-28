@@ -50,7 +50,7 @@ class ChiPunctureExtractionTaggingCriterion
         const extraction_params_t a_params,
         const std::vector<std::array<double, CH_SPACEDIM>> a_puncture_coords,
         const bool activate_extraction = false,
-        const bool track_punctures = false, 
+        const bool track_punctures = false,
         const std::vector<double> a_puncture_masses = {1.0, 1.0})
         : m_dx(dx), m_deriv(dx), m_params(a_params), m_level(a_level),
           m_max_level(a_max_level), m_track_punctures(track_punctures),
@@ -112,12 +112,12 @@ class ChiPunctureExtractionTaggingCriterion
             {
                 // where am i?
                 const Coordinates<data_t> coords(current_cell, m_dx,
-                                              m_puncture_coords[ipuncture]);
+                                                 m_puncture_coords[ipuncture]);
                 const data_t r = coords.get_radius();
                 // decide whether to tag based on distance to horizon
                 // plus a fudge factor of 1.4
-                auto regrid = simd_compare_lt(r, 1.4 * factor 
-                                              * m_puncture_masses[ipuncture]);
+                auto regrid = simd_compare_lt(
+                    r, 1.4 * factor * m_puncture_masses[ipuncture]);
                 criterion = simd_conditional(regrid, 100.0, criterion);
             }
         }

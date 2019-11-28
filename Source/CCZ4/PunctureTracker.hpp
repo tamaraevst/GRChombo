@@ -39,23 +39,25 @@ class PunctureTracker
 
     //! set and write initial puncture locations
     void set_initial_punctures(GRAMR &a_gramr,
-                        std::vector<std::array<double, CH_SPACEDIM>>
-                                      initial_puncture_coords) const;
+                               std::vector<std::array<double, CH_SPACEDIM>>
+                                   initial_puncture_coords) const;
 
     //! Set punctures post restart
     void read_in_punctures(GRAMR &a_gramr) const;
 
     //! Execute the tracking and write out
-    void execute_tracking(GRAMR &a_gramr, const bool write_punctures = true) const;
+    void execute_tracking(GRAMR &a_gramr,
+                          const bool write_punctures = true) const;
 
     //! Use the interpolator to get the value of the shift at
     //! given coords
-    std::vector<std::array<double, CH_SPACEDIM>> get_interp_shift(GRAMR &a_gramr,
+    std::vector<std::array<double, CH_SPACEDIM>> get_interp_shift(
+        GRAMR &a_gramr,
         std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const;
 
     //! Get a vector of the puncture coords - used for write out
-    std::vector<double> get_puncture_vector(std::vector<std::array<double, CH_SPACEDIM>>
-                                      puncture_coords) const;
+    std::vector<double> get_puncture_vector(
+        std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const;
 };
 
 #include "PunctureTracker.impl.hpp"
