@@ -13,7 +13,7 @@
 #include "Constraints.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
-#include "PunctureTracking.hpp"
+#include "PunctureTracker.hpp"
 #include "SetValue.hpp"
 #include "TraceARemoval.hpp"
 #include "Weyl4.hpp"
@@ -47,7 +47,10 @@ void BinaryBHLevel::initialData()
     // do puncture tracking, just set them once, so on level 0
     if (m_p.track_punctures == 1 && m_level == 0)
     {
-        m_gr_amr.set_puncture_coords(m_p.initial_puncture_coords);
+        const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
+        PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
+                                     m_p.checkpoint_prefix);
+        my_punctures.set_initial_punctures(m_gr_amr, m_p.initial_puncture_coords);
     }
 
     // First set everything to zero (to avoid undefinded values in constraints)
@@ -75,7 +78,10 @@ void BinaryBHLevel::postRestart()
         // restart from IC solver
         else if (m_time == 0.0)
         {
-            m_gr_amr.set_puncture_coords(m_p.initial_puncture_coords);
+            const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
+            PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
+                                     m_p.checkpoint_prefix);
+            my_punctures.set_initial_punctures(m_gr_amr, m_p.initial_puncture_coords);
         }
     }
 }
@@ -159,8 +165,8 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-    // do puncture tracking on finest but one level
-    if (m_p.track_punctures == 1 && m_level == m_p.max_level - 1)
+    // do puncture tracking on finest level
+    if (m_p.track_punctures == 1 && m_level == m_p.max_level)
     {
         // only do the write out for every coarsest level timestep
         bool write_punctures = false;
@@ -172,7 +178,7 @@ void BinaryBHLevel::specificPostTimeStep()
         {
             write_punctures = true;
         }
-        my_punctures.execute_tracking(m_gr_amr, write_punctures, coarsest_dt);
+        my_punctures.execute_tracking(m_gr_amr, write_punctures);
     }
 }
 

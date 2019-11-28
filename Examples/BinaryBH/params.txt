@@ -8,9 +8,9 @@
 # Using OPT=HIGH and AVX512 vectorisation
 
 verbosity = 0
-chk_prefix = BinaryBHChk_
+chk_prefix = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_
 plot_prefix = BinaryBHPlot_
-#restart_file = BinaryBHChk_000200.3d.hdf5
+restart_file = /home/dc-cui1/rds/rds-dirac-dp131/dc-cui1/BBH/BinaryBHChk_000950.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -33,7 +33,7 @@ momentumB =  0.0841746  0.000510846 0.0
 # regridding control
 regrid_threshold = 0.05
 max_level = 9
-regrid_interval = 0 0 0 64 64 64 64 64 64 0
+regrid_interval = 0 0 0 64 64 64 64 32 16 0
 
 #Max and min box sizes
 max_grid_size = 16
@@ -76,7 +76,7 @@ checkpoint_interval = 50
 # set to zero to turn off plot files
 plot_interval = 0
 dt_multiplier = 0.20
-stop_time = 1800.0
+stop_time = 2500.0
 
 #Lapse evolution
 lapse_advec_coeff = 1.0
