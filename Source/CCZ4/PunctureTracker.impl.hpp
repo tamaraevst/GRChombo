@@ -31,12 +31,13 @@ void PunctureTracker::set_initial_punctures(GRAMR &a_gramr,
                                m_restart_time, SmallDataIO::APPEND);
     std::vector<std::string> header1_strings(CH_SPACEDIM *
                                              m_num_punctures);
-    header1_strings[0] = "x1";
-    header1_strings[1] = "y1";
-    header1_strings[2] = "z1";
-    header1_strings[3] = "x2";
-    header1_strings[4] = "y2";
-    header1_strings[5] = "z2";
+    header1_strings[0] = "time";
+    for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
+    {
+        header1_strings[CH_SPACEDIM*ipuncture+1] = "x";
+        header1_strings[CH_SPACEDIM*ipuncture+2] = "y";
+        header1_strings[CH_SPACEDIM*ipuncture+3] = "z";
+    }
     punctures_file.write_header_line(header1_strings);
 
     // use a vector for the write out
@@ -58,6 +59,7 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
     std::vector<double> puncture_vector;
     punctures_file.get_specific_data_line(puncture_vector, m_time);
     CH_assert(puncture_vector.size() == m_num_punctures * CH_SPACEDIM);
+    punctures_file.remove_duplicate_time_data();
 
     // convert vector to list of coords
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
@@ -116,7 +118,6 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr, const bool write_puncture
     {
         SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
                                    m_restart_time, SmallDataIO::APPEND);
-        punctures_file.remove_duplicate_time_data();
 
         // use a vector for the write out
         std::vector<double> puncture_vector = 

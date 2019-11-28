@@ -56,7 +56,7 @@ class GRAMR : public AMR
         return m_puncture_coords;
     }
 
-    // function to get punctures
+    // function to get shift at puncture on previous timestep
     const std::vector<std::array<double, CH_SPACEDIM>> get_puncture_shift() const
     {
         return m_puncture_shift;
