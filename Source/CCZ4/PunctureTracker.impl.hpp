@@ -76,8 +76,7 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
 
     // set the coordinates and get the current shift
     std::vector<std::array<double, CH_SPACEDIM>> current_shift;
-    current_shift.resize(m_num_punctures);
-    current_shift = get_interp_shift(a_gramr, puncture_coords);
+    get_interp_shift(current_shift, a_gramr, puncture_coords);
     a_gramr.set_puncture_data(puncture_coords, current_shift);
 
     // print out values into pout files
@@ -87,6 +86,9 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
                << " restarted at : " << puncture_coords[ipuncture][0] << " "
                << puncture_coords[ipuncture][1] << " "
                << puncture_coords[ipuncture][2] << endl;
+        pout() << " with shift vector : " << current_shift[ipuncture][0] << " "
+               << current_shift[ipuncture][1] << " "
+               << current_shift[ipuncture][2] << endl;
         pout() << "at time = " << m_time << endl;
     }
 }
@@ -104,8 +106,7 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr,
 
     // new shift value
     std::vector<std::array<double, CH_SPACEDIM>> new_shift;
-    new_shift.resize(m_num_punctures);
-    new_shift = get_interp_shift(a_gramr, puncture_coords);
+    get_interp_shift(new_shift, a_gramr, puncture_coords);
 
     // update puncture locations using second order update
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
@@ -136,12 +137,11 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr,
 
 //! Use the interpolator to get the value of the shift at
 //! given coords
-std::vector<std::array<double, CH_SPACEDIM>> PunctureTracker::get_interp_shift(
-    GRAMR &a_gramr,
+void PunctureTracker::get_interp_shift(
+    std::vector<std::array<double, CH_SPACEDIM>> &interp_shift, GRAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const
 {
-    // interpolated shift value
-    std::vector<std::array<double, CH_SPACEDIM>> interp_shift;
+    // resize the vector to the number of punctures
     interp_shift.resize(m_num_punctures);
 
     // refresh interpolator
@@ -174,14 +174,13 @@ std::vector<std::array<double, CH_SPACEDIM>> PunctureTracker::get_interp_shift(
     // engage!
     a_gramr.m_interpolator->interp(query);
 
-    // put the shift values into an array
+    // put the shift values into the output array
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
         interp_shift[ipuncture] = {interp_shift1[ipuncture],
                                    interp_shift2[ipuncture],
                                    interp_shift3[ipuncture]};
     }
-    return interp_shift;
 }
 
 //! get a vector of the puncture coords - used for write out

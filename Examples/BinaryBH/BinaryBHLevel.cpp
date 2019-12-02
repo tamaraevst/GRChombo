@@ -63,13 +63,17 @@ void BinaryBHLevel::initialData()
 // Things to do after a restart
 void BinaryBHLevel::postRestart()
 {
-    // do puncture tracking, just set them once, so on level 0
-    if (m_p.track_punctures == 1 && m_level == 0)
+    // do puncture tracking, just set them once, so on the top level
+    if (m_p.track_punctures == 1 && m_level == m_p.max_level)
     {
         // look for the current puncture location in the
         // puncture output file (it needs to exist!)
         if (m_time > 0.0)
         {
+            // set a temporary interpolator for finding the shift
+            AMRInterpolator<Lagrange<4>> interpolator(
+                m_gr_amr, m_p.origin, m_p.dx, m_p.verbosity);
+            m_gr_amr.set_interpolator(&interpolator);
             PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
                                          m_p.checkpoint_prefix);
             my_punctures.read_in_punctures(m_gr_amr);
@@ -167,14 +171,14 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-    // do puncture tracking on finest level
-    if (m_p.track_punctures == 1 && m_level == m_p.max_level)
+    // do puncture tracking on finest but one level
+    if (m_p.track_punctures == 1 && m_level == m_p.max_level - 1)
     {
         // only do the write out for every coarsest level timestep
         bool write_punctures = false;
         const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
         const double remainder = fmod(m_time, coarsest_dt);
-        PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
+        PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
                                      m_p.checkpoint_prefix);
         if (min(abs(remainder), abs(remainder - coarsest_dt)) < 1.0e-8)
         {

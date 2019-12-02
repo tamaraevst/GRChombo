@@ -51,8 +51,8 @@ class PunctureTracker
 
     //! Use the interpolator to get the value of the shift at
     //! given coords
-    std::vector<std::array<double, CH_SPACEDIM>> get_interp_shift(
-        GRAMR &a_gramr,
+    void get_interp_shift(
+        std::vector<std::array<double, CH_SPACEDIM>> &interp_shift, GRAMR &a_gramr,
         std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const;
 
     //! Get a vector of the puncture coords - used for write out
