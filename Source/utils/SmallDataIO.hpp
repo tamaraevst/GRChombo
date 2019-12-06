@@ -186,7 +186,7 @@ class SmallDataIO
 
     //! if restarting from an earlier checkpoint file, this function removes
     //! any time data that will be replaced.
-    void remove_duplicate_time_data();
+    void remove_duplicate_time_data(const bool keep_m_time_data = false);
 
     // ------------ Reading Functions ------------
 

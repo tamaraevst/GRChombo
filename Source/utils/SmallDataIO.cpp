@@ -88,16 +88,19 @@ void SmallDataIO::line_break()
     }
 }
 
-void SmallDataIO::remove_duplicate_time_data()
+void SmallDataIO::remove_duplicate_time_data(const bool keep_m_time_data)
 {
     constexpr double epsilon = 1.0e-8;
     if (m_rank == 0 && m_restart_time > 0. && m_mode == APPEND &&
         m_time < m_restart_time + m_dt + epsilon)
     {
         // copy lines with time < m_time into a temporary file
+        m_file.seekg(0);
         std::string line;
         std::string temp_filename = m_filename + ".temp";
         std::ofstream temp_file(temp_filename);
+        int sign = -1;
+        if(keep_m_time_data) {sign = 1;}
         while (std::getline(m_file, line))
         {
             if (!(line.find("#") == std::string::npos))
@@ -105,7 +108,7 @@ void SmallDataIO::remove_duplicate_time_data()
                 temp_file << line << "\n";
             }
             else if (std::stod(line.substr(0, m_coords_width)) <
-                     m_time - epsilon)
+                     m_time + sign * epsilon)
             {
                 temp_file << line << "\n";
             }

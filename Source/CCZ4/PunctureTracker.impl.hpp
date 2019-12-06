@@ -10,6 +10,25 @@
 #ifndef PUNCTURETRACKER_IMPL_HPP_
 #define PUNCTURETRACKER_IMPL_HPP_
 
+//! Set punctures post restart
+void PunctureTracker::restart_punctures(GRAMR &a_gramr,
+    std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords) const
+{
+    if (m_time == 0)
+    {
+        // if it is the first timestep, use the param values
+        // rather than look for the output file, e.g. for when
+        // restart from IC solver checkpoint
+        set_initial_punctures(a_gramr, initial_puncture_coords);
+    }
+    else
+    {
+        // look for the current puncture location in the
+        // puncture output file (it needs to exist!)
+        read_in_punctures(a_gramr);
+    }
+}
+
 //! set and write initial puncture locations
 void PunctureTracker::set_initial_punctures(
     GRAMR &a_gramr,
@@ -63,7 +82,8 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
     // check the data returned is the right size
     CH_assert(puncture_vector.size() == m_num_punctures * CH_SPACEDIM);
     // remove any duplicate data from the file
-    punctures_file.remove_duplicate_time_data();
+    const bool keep_m_time_data = true;
+    punctures_file.remove_duplicate_time_data(keep_m_time_data);
 
     // convert vector to list of coords
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)

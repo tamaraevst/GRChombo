@@ -3,14 +3,14 @@
 # and better resolution at the horizon)
 # It should give about eight circular orbits though before the plunge
 # With max_box_size = min_box_size = 16 :
-# It should run well on 192 proc x 4 openMP threads = 768 cores
+# It should run well on 224 proc x 4 openMP threads = 896 cores
 # On CDS3 one achieves roughly 50 M/hr at t = 10M
 # Using OPT=HIGH and AVX512 vectorisation
 
 verbosity = 0
 chk_prefix = BinaryBHChk_
 plot_prefix = BinaryBHPlot_
-#restart_file = BinaryBHChk_000001.3d.hdf5
+#restart_file = BinaryBHChk_000000.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor

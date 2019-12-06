@@ -66,29 +66,15 @@ void BinaryBHLevel::postRestart()
     // do puncture tracking, just set them once, so on the top level
     if (m_p.track_punctures == 1 && m_level == m_p.max_level)
     {
-        // look for the current puncture location in the
-        // puncture output file (it needs to exist!)
-        if (m_time > 0.0)
-        {
-            // set a temporary interpolator for finding the shift
-            AMRInterpolator<Lagrange<4>> interpolator(
+        // need to set a temporary interpolator for finding the shift
+        // as the happens in setupAMRObject() not amr.run()
+        AMRInterpolator<Lagrange<4>> interpolator(
                 m_gr_amr, m_p.origin, m_p.dx, m_p.verbosity);
-            m_gr_amr.set_interpolator(&interpolator);
-            PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
+        m_gr_amr.set_interpolator(&interpolator);
+        PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
                                          m_p.checkpoint_prefix);
-            my_punctures.read_in_punctures(m_gr_amr);
-        }
-        // if it is the first timestep, use the param values
-        // rather than look for the output file, e.g. for when
-        // restart from IC solver
-        else if (m_time == 0.0)
-        {
-            const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
-            PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
-                                         m_p.checkpoint_prefix);
-            my_punctures.set_initial_punctures(m_gr_amr,
-                                               m_p.initial_puncture_coords);
-        }
+        my_punctures.restart_punctures(m_gr_amr,
+                                       m_p.initial_puncture_coords);
     }
 }
 

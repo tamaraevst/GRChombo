@@ -37,12 +37,17 @@ class PunctureTracker
     {
     }
 
+    //! set puncture locations on restart
+    void restart_punctures(GRAMR &a_gramr,
+                           std::vector<std::array<double, CH_SPACEDIM>>
+                               initial_puncture_coords) const;
+
     //! set and write initial puncture locations
     void set_initial_punctures(GRAMR &a_gramr,
                                std::vector<std::array<double, CH_SPACEDIM>>
                                    initial_puncture_coords) const;
 
-    //! Set punctures post restart
+    //! Set punctures post restart if m_time > 0
     void read_in_punctures(GRAMR &a_gramr) const;
 
     //! Execute the tracking and write out

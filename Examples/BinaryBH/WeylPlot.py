@@ -35,8 +35,8 @@ plt.plot(timedata1, fluxdata1, '-', lw = 0.75, label="r1")
 # make the plot look nice
 plt.xlabel("time t / M")
 plt.ylabel("Re (Psi4) el, em = " + mode)
-plt.xlim(190, 2400)
-plt.ylim(-0.012, 0.012)
+plt.xlim(0, 2200)
+plt.ylim(-0.061, 0.061)
 
 # save as png image
 filename = "Weyl_" + mode + ".png"
