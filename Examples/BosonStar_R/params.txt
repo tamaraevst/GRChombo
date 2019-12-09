@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 1 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -121,7 +121,7 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 
 # BosonStar Initial data parameters
 central_amplitude_CSF = 0.02820947917 # 0.0733 # near kaup limit 
-phase = 0.0
+phase = 1.0
 eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>=20 ask Robin
 gridpoints 200000
 BS_binary = true # make false for one star
