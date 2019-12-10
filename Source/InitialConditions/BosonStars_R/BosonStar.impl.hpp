@@ -58,7 +58,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double v_ = tanh(rapidity);
     double t = coords.z*s_; //set /tilde{t} to zero
     double x = coords.x-separation/2.;
-    double z = coords.z*c_; //set /tilde{t} to zero
+    double z = (coords.z+0.*separation/2.)*c_; //set /tilde{t} to zero
     double y = coords.y;
     double r = sqrt(x*x+y*y+z*z);
 
@@ -74,7 +74,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double lapse_1 = omega_*psi_/(sqrt(pc_os));
     double lapse_2 = 1.;
     double w_ = m_1d_sol.get_w();
-    double phase_ = m_params_BosonStar.phase + w_*t;
+    double phase_ = w_*t;
     double beta_z = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
     vars.shift[2] += beta_z;
     double g_xx_1 = psi_*psi_;
@@ -118,7 +118,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         v_ = tanh(-rapidity);
         t = coords.z*s_; //set /tilde{t} to zero
         x = coords.x+separation/2.;
-        z = coords.z*c_;
+        z = (coords.z-0.*separation/2.)*c_;
         y = coords.y;
         r = sqrt(x*x+y*y+z*z);
 
@@ -143,7 +143,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_;
         lapse_2 = omega_*psi_/(sqrt(pc_os));
         w_ = m_1d_sol.get_w();
-        phase_ = m_params_BosonStar.phase + w_*t;
+        phase_ = m_params_BosonStar.phase*M_PI + w_*t;
         beta_z = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
         vars.shift[2] += beta_z;
         g_xx_2 = psi_*psi_;
