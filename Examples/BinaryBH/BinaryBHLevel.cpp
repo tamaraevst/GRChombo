@@ -50,7 +50,7 @@ void BinaryBHLevel::initialData()
         const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
         PunctureTracker my_punctures(m_time, m_restart_time, coarsest_dt,
                                      m_p.checkpoint_prefix);
-        my_punctures.set_initial_punctures(m_gr_amr,
+        my_punctures.set_initial_punctures(m_bh_amr,
                                            m_p.initial_puncture_coords);
     }
 
@@ -69,11 +69,11 @@ void BinaryBHLevel::postRestart()
         // need to set a temporary interpolator for finding the shift
         // as the happens in setupAMRObject() not amr.run()
         AMRInterpolator<Lagrange<4>> interpolator(
-                m_gr_amr, m_p.origin, m_p.dx, m_p.verbosity);
-        m_gr_amr.set_interpolator(&interpolator);
+                m_bh_amr, m_p.origin, m_p.dx, m_p.verbosity);
+        m_bh_amr.set_interpolator(&interpolator);
         PunctureTracker my_punctures(m_time, m_restart_time, m_dt,
                                          m_p.checkpoint_prefix);
-        my_punctures.restart_punctures(m_gr_amr,
+        my_punctures.restart_punctures(m_bh_amr,
                                        m_p.initial_puncture_coords);
     }
 }
@@ -120,7 +120,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
         const vector<double> puncture_masses = {m_p.bh1_params.mass,
                                                 m_p.bh2_params.mass};
         std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
-            m_gr_amr.get_puncture_coords();
+            m_bh_amr.get_puncture_coords();
         BoxLoops::loop(ChiPunctureExtractionTaggingCriterion(
                            m_dx, m_level, m_p.max_level, m_p.extraction_params,
                            puncture_coords, m_p.activate_extraction,
@@ -170,7 +170,7 @@ void BinaryBHLevel::specificPostTimeStep()
         {
             write_punctures = true;
         }
-        my_punctures.execute_tracking(m_gr_amr, write_punctures);
+        my_punctures.execute_tracking(m_bh_amr, write_punctures);
     }
 }
 
