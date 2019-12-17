@@ -43,15 +43,8 @@ class WeylExtraction
           m_first_step(a_first_step), m_restart_time(a_restart_time),
           m_num_points(m_params.num_points_phi * m_params.num_points_theta),
           m_dphi(2.0 * M_PI / m_params.num_points_phi),
-          m_dtheta(M_PI / m_params.num_points_theta /
-                   (m_params.bitant_symmetries[2] + 1.0))
+          m_dtheta(M_PI / m_params.num_points_theta)
     {
-        if ((m_params.bitant_symmetries[0] == 1) ||
-            (m_params.bitant_symmetries[1] == 1))
-        {
-            MayDay::Error("Bitant symmetries in x and y directions not "
-                          "supported in WeylExtraction class (only in z).");
-        }
     }
 
     //! The old constructor which assumes it is called in specificPostTimeStep

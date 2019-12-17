@@ -39,7 +39,6 @@ class ChomboParameters
         boundary_params.is_periodic.fill(true);
         nonperiodic_boundaries_exist = false;
         symmetric_boundaries_exist = false;
-        FOR1(i) { bitant_symmetries[i] = 0; }
         FOR1(idir)
         {
             if (isPeriodic[idir] == false)
@@ -56,7 +55,6 @@ class ChomboParameters
                      BoundaryConditions::REFLECTIVE_BC))
                 {
                     symmetric_boundaries_exist = true;
-                    bitant_symmetries[idir] = 1;
                     pp.load("vars_parity", boundary_params.vars_parity);
                 }
                 if ((boundary_params.hi_boundary[idir] ==
@@ -95,12 +93,14 @@ class ChomboParameters
         coarsest_dx = L / max_N;
 
         pp.load("max_level", max_level, 0);
-        // the reference ratio is hard coded to 2
+        // the reference ratio is hard coded to 2 on all levels
         // in principle it can be set to other values, but this is
         // not recommended since we do not test GRChombo with other
         // refinement ratios - use other values at your own risk
         ref_ratios.resize(max_level + 1);
         ref_ratios.assign(2);
+        // read in frequency of regrid on each levels, needs
+        // max_level + 1 entries (although never regrids on max_level+1)
         pp.getarr("regrid_interval", regrid_interval, 0, max_level + 1);
 
         // time stepping outputs and regrid data
@@ -158,7 +158,6 @@ class ChomboParameters
     BoundaryConditions::params_t boundary_params; // set boundaries in each dir
     bool nonperiodic_boundaries_exist;
     bool symmetric_boundaries_exist;
-    std::array<int, CH_SPACEDIM> bitant_symmetries;
 
     // For tagging
     double regrid_threshold;
