@@ -142,7 +142,7 @@ inline void SphericalExtraction::write_integral(
     CH_TIME("SphericalExtraction::write_integral");
     // open file for writing
     SmallDataIO integral_file(a_filename, m_dt, m_time, m_restart_time,
-                              SmallDataIO::APPEND, m_called_in_do_analysis);
+                              SmallDataIO::APPEND, m_first_step);
 
     // remove any duplicate data if this is a restart
     // note that this only does something if this is the first timestep after
@@ -150,8 +150,7 @@ inline void SphericalExtraction::write_integral(
     integral_file.remove_duplicate_time_data();
 
     // need to write headers if this is the first timestep
-    if ((m_time == m_dt && !m_called_in_do_analysis) ||
-        (m_time == 0 && m_called_in_do_analysis))
+    if (m_first_step)
     {
         // make header strings
         std::vector<std::string> header1_strings(m_params.num_extraction_radii);

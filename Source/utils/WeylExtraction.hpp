@@ -29,9 +29,8 @@ class WeylExtraction
     const int m_im_comp = c_Weyl4_Im;
     const double m_dt;
     const double m_time;
+    const bool m_first_step;
     const double m_restart_time;
-    const bool m_called_in_do_analysis; // if called in doAnalysis, extraction
-                                        // will happen at time = 0
     const int m_num_points; // number of points per extraction radius
     const double m_dphi;
     const double m_dtheta;
@@ -39,14 +38,21 @@ class WeylExtraction
   public:
     //! The constructor
     WeylExtraction(extraction_params_t a_params, double a_dt, double a_time,
-                   double a_restart_time = 0.0,
-                   bool a_called_in_do_analysis = false)
+                   bool a_first_step, double a_restart_time = 0.0)
         : m_params(a_params), m_dt(a_dt), m_time(a_time),
-          m_restart_time(a_restart_time),
-          m_called_in_do_analysis(a_called_in_do_analysis),
+          m_first_step(a_first_step), m_restart_time(a_restart_time),
           m_num_points(m_params.num_points_phi * m_params.num_points_theta),
           m_dphi(2.0 * M_PI / m_params.num_points_phi),
           m_dtheta(M_PI / m_params.num_points_theta)
+    {
+    }
+
+    //! The old constructor which assumes it is called in specificPostTimeStep
+    //! so the first time step is when m_time == m_dt
+    WeylExtraction(extraction_params_t a_params, double a_dt, double a_time,
+                   double a_restart_time = 0.0)
+        : WeylExtraction(a_params, a_dt, a_time, (a_dt == a_time),
+                         a_restart_time)
     {
     }
 

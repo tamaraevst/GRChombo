@@ -22,13 +22,12 @@ public:
                          const double a_dt, const double a_time,
                          const double a_restart_time,
                          const std::string a_filename,
-                         const bool a_called_in_do_analysis = false,
+                         const bool a_first_step,
                          const double a_norm_exponent = 2.)
         : m_Ham_comp(a_Ham_comp), m_Mom_comps(a_Mom_comps), m_gr_amr(a_gr_amr),
         m_dx_coarse(a_dx_coarse), m_dt(a_dt), m_time(a_time),
-        m_restart_time(a_restart_time), m_filename(a_filename), 
-        m_called_in_do_analysis(a_called_in_do_analysis),
-        m_norm_exponent(a_norm_exponent) {}
+        m_restart_time(a_restart_time), m_filename(a_filename),
+        m_first_step(a_first_step), m_norm_exponent(a_norm_exponent) {}
 
     // Calculates norms and writes to file
     void execute();
@@ -45,7 +44,7 @@ private:
     const double m_time;
     const double m_restart_time;
     const std::string m_filename;
-    const bool m_called_in_do_analysis;
+    const bool m_first_step;
     const double m_norm_exponent;
     double m_Ham_norm;
     double m_Mom_norm;
