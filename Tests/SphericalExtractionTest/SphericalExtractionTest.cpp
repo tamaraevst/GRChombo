@@ -33,13 +33,13 @@ using std::endl;
 #include "AMRInterpolator.hpp"
 #include "Lagrange.hpp"
 #include "SphericalExtraction.hpp"
-#include "SurfaceExtractionTestLevel.hpp"
+#include "SphericalExtractionTestLevel.hpp"
 
 #ifdef _OPENMP
 #include <omp.h>
 #endif
 
-int runSurfaceExtractionTest(int argc, char *argv[])
+int runSphericalExtractionTest(int argc, char *argv[])
 {
     // Load the parameter file and construct the SimulationParameter class
     // To add more parameters edit the SimulationParameters file.
@@ -50,7 +50,7 @@ int runSurfaceExtractionTest(int argc, char *argv[])
     SimulationParameters sim_params(pp);
 
     GRAMR gr_amr;
-    DefaultLevelFactory<SurfaceExtractionTestLevel>
+    DefaultLevelFactory<SphericalExtractionTestLevel>
         surface_extraction_test_level_fact(gr_amr, sim_params);
     setupAMRObject(gr_amr, surface_extraction_test_level_fact);
 
@@ -103,7 +103,7 @@ int runSurfaceExtractionTest(int argc, char *argv[])
         // want max 0.01% relative error in integral_chi
         // and 1.0e-10 absolute error in integral_dphi_dx
         // (since the latter is just a sum of zeros)
-        status |= (relative_error_chi > 1.0e-4 );
+        status |= (relative_error_chi > 1.0e-4);
         status |= (abs(result_dphi_dx) > 1.0e-10);
     }
 
@@ -114,12 +114,12 @@ int main(int argc, char *argv[])
 {
     mainSetup(argc, argv);
 
-    int status = runSurfaceExtractionTest(argc, argv);
+    int status = runSphericalExtractionTest(argc, argv);
 
     if (status == 0)
-        pout() << "SurfaceExtractionTest test passed." << endl;
+        pout() << "SphericalExtractionTest test passed." << endl;
     else
-        pout() << "SurfaceExtractionTest test failed with return code "
+        pout() << "SphericalExtractionTest test failed with return code "
                << status << endl;
 
     mainFinalize();
