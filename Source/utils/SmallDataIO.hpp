@@ -141,7 +141,7 @@ class SmallDataIO
                 int a_data_precision = 10,
                 int a_coords_precision = 7)
         : SmallDataIO(a_filename, 0.0, 0.0, 0.0, READ, false,
-                      (a_time == a_dt), a_file_extension, a_data_precision,
+                      a_file_extension, a_data_precision,
                       a_coords_precision)
     {
     }

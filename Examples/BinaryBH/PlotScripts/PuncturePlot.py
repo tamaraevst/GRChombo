@@ -14,7 +14,7 @@ L = 256
 # half the separation of punctures
 r = 6
 # output data from running merger
-data = np.loadtxt("BinaryBHChk_Punctures.txt")
+data = np.loadtxt("../BinaryBHChk_Punctures.dat")
 
 # make the plot
 fig = plt.figure()

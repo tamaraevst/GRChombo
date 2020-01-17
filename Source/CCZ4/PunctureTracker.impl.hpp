@@ -11,7 +11,7 @@
 #define PUNCTURETRACKER_IMPL_HPP_
 
 //! Set punctures post restart
-void PunctureTracker::restart_punctures(GRAMR &a_gramr,
+void PunctureTracker::restart_punctures(BHAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords) const
 {
     if (m_time == 0)
@@ -31,7 +31,7 @@ void PunctureTracker::restart_punctures(GRAMR &a_gramr,
 
 //! set and write initial puncture locations
 void PunctureTracker::set_initial_punctures(
-    GRAMR &a_gramr,
+    BHAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords) const
 {
     // first set the puncture data, initial shift is always zero
@@ -64,7 +64,7 @@ void PunctureTracker::set_initial_punctures(
 }
 
 //! Set punctures post restart
-void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
+void PunctureTracker::read_in_punctures(BHAMR &a_gramr) const
 {
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords;
     puncture_coords.resize(m_num_punctures);
@@ -114,7 +114,7 @@ void PunctureTracker::read_in_punctures(GRAMR &a_gramr) const
 }
 
 //! Execute the tracking and write out
-void PunctureTracker::execute_tracking(GRAMR &a_gramr,
+void PunctureTracker::execute_tracking(BHAMR &a_gramr,
                                        const bool write_punctures) const
 {
     // get puncture coordinates and old shift value
@@ -158,7 +158,7 @@ void PunctureTracker::execute_tracking(GRAMR &a_gramr,
 //! Use the interpolator to get the value of the shift at
 //! given coords
 void PunctureTracker::get_interp_shift(
-    std::vector<std::array<double, CH_SPACEDIM>> &interp_shift, GRAMR &a_gramr,
+    std::vector<std::array<double, CH_SPACEDIM>> &interp_shift, BHAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const
 {
     // resize the vector to the number of punctures

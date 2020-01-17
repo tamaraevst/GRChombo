@@ -15,7 +15,7 @@ M = 1.0
 # The mode, as text
 mode = "22"
 # output data from running merger
-data = np.loadtxt("Weyl_integral_" + mode)
+data = np.loadtxt("../Weyl_integral_" + mode + ".dat")
 
 # make the plot
 fig = plt.figure()
