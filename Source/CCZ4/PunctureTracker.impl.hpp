@@ -117,6 +117,7 @@ void PunctureTracker::read_in_punctures(BHAMR &a_gramr) const
 void PunctureTracker::execute_tracking(BHAMR &a_gramr,
                                        const bool write_punctures) const
 {
+    CH_TIME("PunctureTracker::execute_tracking");
     // get puncture coordinates and old shift value
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords =
         a_gramr.get_puncture_coords();
@@ -161,6 +162,7 @@ void PunctureTracker::get_interp_shift(
     std::vector<std::array<double, CH_SPACEDIM>> &interp_shift, BHAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> puncture_coords) const
 {
+    CH_TIME("PunctureTracker::get_interp_shift");
     // resize the vector to the number of punctures
     interp_shift.resize(m_num_punctures);
 

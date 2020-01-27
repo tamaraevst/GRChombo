@@ -32,7 +32,7 @@ class PunctureTracker
                     const double a_dt, const std::string a_checkpoint_prefix,
                     const int a_num_punctures = 2)
         : m_num_punctures(a_num_punctures), m_time(a_time),
-          m_punctures_filename(a_checkpoint_prefix + "Punctures.txt"),
+          m_punctures_filename(a_checkpoint_prefix + "Punctures"),
           m_restart_time(a_restart_time), m_dt(a_dt)
     {
     }

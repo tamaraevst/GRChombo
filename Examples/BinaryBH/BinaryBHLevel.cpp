@@ -149,6 +149,7 @@ void BinaryBHLevel::specificPostTimeStep()
         // Do the extraction on the min extraction level
         if (m_level == m_p.extraction_params.min_extraction_level)
         {
+            CH_TIME("WeylExtraction");
             // Now refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
@@ -160,6 +161,7 @@ void BinaryBHLevel::specificPostTimeStep()
     // do puncture tracking on finest but one level
     if (m_p.track_punctures == 1 && m_level == m_p.max_level - 1)
     {
+        CH_TIME("PunctureTracking");
         // only do the write out for every coarsest level timestep
         bool write_punctures = false;
         const double coarsest_dt = m_p.coarsest_dx * m_p.dt_multiplier;
