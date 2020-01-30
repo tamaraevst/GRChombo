@@ -1,14 +1,7 @@
-# Note that this is a realistic example but not production quality for 
-# generating BBH waveforms (one probably needs a larger wave zone, 
-# and better resolution at the horizon)
-# It should give about eight circular orbits though before the plunge
-# With max_box_size = min_box_size = 16 :
-# It should run well on 256 proc x 4 openMP threads = 1024 cores
-# On CSD3 one achieves roughly 30 M/hr at t = 10M
-# Using OPT=HIGH and AVX512 vectorisation
-
 # See the wiki page for an explanation of the params!
 # https://github.com/GRChombo/GRChombo/wiki/Guide-to-parameters
+# and a guide to this specific example at
+# https://github.com/GRChombo/GRChombo/wiki/Running-the-BBH-example
 
 # location / naming of output files (must give full path)
 verbosity = 0
