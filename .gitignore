@@ -4,7 +4,6 @@ pout.*
 *.pbs
 *.sh
 *.s
-jobscript*
 d
 o
 p
@@ -15,8 +14,10 @@ log*
 *.ex
 *.swp
 *.out
+*.dat
 *.hdf5
 *.dSYM
+<<<<<<< HEAD
 .gcc-flags.json
 *.o
 test
@@ -24,5 +25,13 @@ test
 Weyl_integral*
 *.dat
 ExtractionOut_*
+=======
+LB.txt
+Weyl_integral*
+*ExtractionOut_*
+time.table.*
+*.patch
+*.log
+>>>>>>> master
 
 Doxygen/html

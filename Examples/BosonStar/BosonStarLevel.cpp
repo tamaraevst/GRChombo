@@ -133,7 +133,7 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
-    bool called_in_do_analysis = true;
+    bool first_step = (m_time == m_dt);
     if (m_p.activate_mass_extraction == 1)
     {
         // First compute the ADM Mass integrand values on the grid
@@ -152,7 +152,7 @@ void BosonStarLevel::doAnalysis()
             m_gr_amr.m_interpolator->refresh();
             MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
                                         m_time, m_restart_time,
-                                        called_in_do_analysis);
+                                        first_step);
             mass_extraction.execute_query(m_gr_amr.m_interpolator);
         }
     }
@@ -172,7 +172,7 @@ void BosonStarLevel::doAnalysis()
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
                 m_time, m_restart_time, "ConstraintViolations.dat",
-                called_in_do_analysis);
+                first_step);
             constraint_violations.execute();
         }
 
@@ -183,7 +183,7 @@ void BosonStarLevel::doAnalysis()
             SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
                                             m_restart_time,
                                             SmallDataIO::APPEND,
-                                            called_in_do_analysis);
+                                            first_step);
             noether_charge_file.remove_duplicate_time_data();
             if (m_time == 0.)
             {
@@ -197,7 +197,7 @@ void BosonStarLevel::doAnalysis()
         SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
-                                     called_in_do_analysis);
+                                     first_step);
         mod_phi_max_file.remove_duplicate_time_data();
         if (m_time == 0.)
         {

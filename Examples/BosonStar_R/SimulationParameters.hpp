@@ -13,6 +13,7 @@
 // Problem specific includes:
 #include "ComplexPotential.hpp"
 #include "BosonStarParams.hpp"
+#include "GaussianFitTrackingParams.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
@@ -70,6 +71,19 @@ public:
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
+
+
+        // Star Tracking
+        pp.load("do_star_tracking", gaussfit_params.do_star_tracking, 0);
+        pp.load("num_points_gaussian_fit", gaussfit_params.num_points, 50);
+        // will be replaced
+        pp.load("centre_offset", gaussfit_params.offset, 0.);
+        pp.load("tracked_field_index", gaussfit_params.field_index, 30);
+        pp.load("search_width", gaussfit_params.search_width, 16.);
+
+
+
+
         // Work out the minimum extraction level
         auto min_extraction_level_it =
             std::min_element(mass_extraction_params.extraction_levels.begin(),
@@ -99,6 +113,7 @@ public:
     double G_Newton;
     BosonStar_params_t bosonstar_params;
     Potential::params_t potential_params;
+    GaussFit_params_t gaussfit_params;
 
     // Mass extraction
     int activate_mass_extraction;

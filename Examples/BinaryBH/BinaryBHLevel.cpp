@@ -92,7 +92,7 @@ void BinaryBHLevel::doAnalysis()
                    Weyl4(m_p.extraction_params.extraction_center, m_dx)),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
-    bool called_in_do_analysis = true;
+    bool first_step = (m_time == m_dt);
 
     // Do the extraction on the min extraction level
     if (m_level == m_p.extraction_params.min_extraction_level
@@ -102,7 +102,7 @@ void BinaryBHLevel::doAnalysis()
         // Now refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
         WeylExtraction my_extraction(m_p.extraction_params, m_dt, m_time,
-                                     m_restart_time, called_in_do_analysis);
+                                     first_step, m_restart_time);
         my_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
@@ -110,7 +110,7 @@ void BinaryBHLevel::doAnalysis()
     {
         ConstraintViolations constraint_violations(c_Ham,
             Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt, m_time,
-            m_restart_time, "ConstraintViolations.dat", called_in_do_analysis);
+            m_restart_time, "ConstraintViolations.dat", first_step);
         constraint_violations.execute();
         auto violations = constraint_violations.get_norms();
         pout() << "L2 norms of constraint violations:\n";

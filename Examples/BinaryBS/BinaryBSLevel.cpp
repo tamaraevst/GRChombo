@@ -148,7 +148,7 @@ void BinaryBSLevel::doAnalysis()
     BoxLoops::loop(analysis_compute_pack, m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
 
-    bool called_in_do_analysis = true;
+    bool first_step = (m_dt == m_time);
 
     // Do the extraction on the min extraction level
     if (m_p.activate_gw_extraction == 1 &&
@@ -163,7 +163,7 @@ void BinaryBSLevel::doAnalysis()
         // Refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
         WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
-                                     m_restart_time, called_in_do_analysis);
+                                     first_step, m_restart_time);
         gw_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
@@ -180,7 +180,7 @@ void BinaryBSLevel::doAnalysis()
         m_gr_amr.m_interpolator->refresh();
         MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
                                     m_time, m_restart_time,
-                                    called_in_do_analysis);
+                                    first_step);
         mass_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
@@ -192,7 +192,7 @@ void BinaryBSLevel::doAnalysis()
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
                 m_time, m_restart_time, "ConstraintViolations.dat",
-                called_in_do_analysis);
+                first_step);
             constraint_violations.execute();
         }
 
@@ -203,7 +203,7 @@ void BinaryBSLevel::doAnalysis()
             SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
                                             m_restart_time,
                                             SmallDataIO::APPEND,
-                                            called_in_do_analysis);
+                                            first_step);
             noether_charge_file.remove_duplicate_time_data();
             if (m_time == 0.)
             {
@@ -218,7 +218,7 @@ void BinaryBSLevel::doAnalysis()
         SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
-                                     called_in_do_analysis);
+                                     first_step);
         mod_phi_max_file.remove_duplicate_time_data();
         if (m_time == 0.)
         {
