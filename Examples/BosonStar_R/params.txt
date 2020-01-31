@@ -3,7 +3,7 @@
 verbosity = 1
 chk_prefix = chk_test/Sim_
 plot_prefix = plt_test/Sim_p_
-#restart_file = chk_test/BH_BS_000330.3d.hdf5 
+#restart_file = chk_test/BH_BS_000040.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 0 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -120,7 +120,7 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 # G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
-central_amplitude_CSF = 0.02820947917 # 0.0733 # near kaup limit 
+central_amplitude_CSF = 0.02820947917 # 0.0733 # near kaup limit
 phase = 1.0
 eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>=20 ask Robin
 gridpoints 200000
@@ -167,3 +167,9 @@ modes = 2 0
         5 0
         6 0
 
+# Star centre Tracking
+do_star_tracking = 1
+num_points_gaussian_fit = 60
+centre_offset = 16. #should be half of star separation
+tracked_field_index = 29 #modphi is 29
+search_width = 32.

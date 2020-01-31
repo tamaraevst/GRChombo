@@ -39,6 +39,9 @@
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
 
+// For Star Tracking
+#include "GaussianFitTracking.hpp"
+
 // Things to do at each advance step, after the RK4 is calculated
 void BosonStarLevel::specificAdvance()
 {
@@ -239,6 +242,15 @@ void BosonStarLevel::doAnalysis()
             }
             pout() << std::endl;
         }
+    }
+
+
+    if (m_p.gaussfit_params.do_star_tracking)
+    {
+        GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
+                                        m_time,m_restart_time,first_step,m_p.L);
+
+        gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
     }
 }
 
