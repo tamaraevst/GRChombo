@@ -27,11 +27,11 @@ L = 512
 # ensure horizons resolved
 track_punctures = 1
 massA = 0.48847892320123
-offsetA = 0.0 0.0 6.10679 
-momentumA = 0.0 -0.0841746 -0.000510846
+offsetA = 0.0 6.10679 0.0
+momentumA = -0.0841746 -0.000510846 0.0
 massB = 0.48847892320123
-offsetB = 0.0 0.0 -6.10679
-momentumB =  0.0 0.0841746  0.000510846
+offsetB = 0.0 -6.10679 0.0
+momentumB =  0.0841746  0.000510846 0.0
 
 # regridding control, specify frequency on each level
 # so need max_level + 1 entries for interval
@@ -73,7 +73,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 1 2 3          #Ham and Mom
                          0 0              #Weyl
 
-# if sommerfeld boundaries selected, must select 
+# if sommerfeld boundaries selected, must select
 # asymptotic values (in order given by UserVariables.hpp)
 vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
@@ -110,7 +110,12 @@ extraction_radii = 50.0 100.0
 extraction_levels = 2 1
 num_points_phi = 24
 num_points_theta = 36
-num_modes = 3
+num_modes = 8
 modes = 2 0 # l m for spherical harmonics
+        2 1
+        2 2
         4 0
-        6 0
+        4 1
+        4 2
+        4 3
+        4 4

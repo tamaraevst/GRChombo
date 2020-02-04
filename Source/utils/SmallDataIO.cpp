@@ -100,7 +100,10 @@ void SmallDataIO::remove_duplicate_time_data(const bool keep_m_time_data)
         std::string temp_filename = m_filename + ".temp";
         std::ofstream temp_file(temp_filename);
         int sign = -1;
-        if(keep_m_time_data) {sign = 1;}
+        if (keep_m_time_data)
+        {
+            sign = 1;
+        }
         while (std::getline(m_file, line))
         {
             if (!(line.find("#") == std::string::npos))

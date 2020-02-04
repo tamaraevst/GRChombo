@@ -8,8 +8,8 @@
 #include <chrono>
 #include <iostream>
 
-#include "DefaultLevelFactory.hpp"
 #include "BHAMR.hpp"
+#include "DefaultLevelFactory.hpp"
 #include "GRParmParse.hpp"
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"

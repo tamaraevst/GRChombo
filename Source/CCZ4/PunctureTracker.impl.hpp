@@ -11,7 +11,8 @@
 #define PUNCTURETRACKER_IMPL_HPP_
 
 //! Set punctures post restart
-void PunctureTracker::restart_punctures(BHAMR &a_gramr,
+void PunctureTracker::restart_punctures(
+    BHAMR &a_gramr,
     std::vector<std::array<double, CH_SPACEDIM>> initial_puncture_coords) const
 {
     if (m_time == 0)
@@ -47,13 +48,12 @@ void PunctureTracker::set_initial_punctures(
     bool first_step = true;
     SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
                                m_restart_time, SmallDataIO::APPEND, first_step);
-    std::vector<std::string> header1_strings(CH_SPACEDIM *
-                                             m_num_punctures);
+    std::vector<std::string> header1_strings(CH_SPACEDIM * m_num_punctures);
     for (int ipuncture = 0; ipuncture < m_num_punctures; ipuncture++)
     {
-        header1_strings[CH_SPACEDIM*ipuncture+0] = "x";
-        header1_strings[CH_SPACEDIM*ipuncture+1] = "y";
-        header1_strings[CH_SPACEDIM*ipuncture+2] = "z";
+        header1_strings[CH_SPACEDIM * ipuncture + 0] = "x";
+        header1_strings[CH_SPACEDIM * ipuncture + 1] = "y";
+        header1_strings[CH_SPACEDIM * ipuncture + 2] = "z";
     }
     punctures_file.write_header_line(header1_strings);
 
@@ -74,8 +74,7 @@ void PunctureTracker::read_in_punctures(BHAMR &a_gramr) const
     // is greater than zero and m_time < m_restart_time + m_dt
     bool first_step = false;
     SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                               m_restart_time, SmallDataIO::APPEND,
-                               first_step);
+                               m_restart_time, SmallDataIO::APPEND, first_step);
     // NB need to give the get function an empty vector to fill
     std::vector<double> puncture_vector;
     punctures_file.get_specific_data_line(puncture_vector, m_time);
@@ -146,7 +145,7 @@ void PunctureTracker::execute_tracking(BHAMR &a_gramr,
     {
         bool first_step = false;
         SmallDataIO punctures_file(m_punctures_filename, m_dt, m_time,
-                                   m_restart_time, SmallDataIO::APPEND, 
+                                   m_restart_time, SmallDataIO::APPEND,
                                    first_step);
 
         // use a vector for the write out

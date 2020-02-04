@@ -6,8 +6,8 @@
 #ifndef BHAMR_HPP_
 #define BHAMR_HPP_
 
-#include "GRAMR.hpp"
 #include "AMRInterpolator.hpp"
+#include "GRAMR.hpp"
 #include "Lagrange.hpp"
 #include <chrono>
 #include <ratio>
@@ -55,7 +55,6 @@ class BHAMR : public GRAMR
     {
         return m_puncture_shift;
     }
-
 };
 
 #endif /* BHAMR_HPP_ */

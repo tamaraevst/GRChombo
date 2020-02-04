@@ -130,19 +130,16 @@ class SmallDataIO
                 std::string a_file_extension = ".dat",
                 int a_data_precision = 10, int a_coords_precision = 7)
         : SmallDataIO(a_filename, a_dt, a_time, a_restart_time, a_mode,
-                      (a_time == a_dt), a_file_extension,
-                       a_data_precision, a_coords_precision)
+                      (a_time == a_dt), a_file_extension, a_data_precision,
+                      a_coords_precision)
     {
     }
 
     //! Constructor for reading when m_time, m_dt, m_restart_time are irrelevant
-    SmallDataIO(std::string a_filename,
-                std::string a_file_extension = ".dat",
-                int a_data_precision = 10,
-                int a_coords_precision = 7)
-        : SmallDataIO(a_filename, 0.0, 0.0, 0.0, READ, false,
-                      a_file_extension, a_data_precision,
-                      a_coords_precision)
+    SmallDataIO(std::string a_filename, std::string a_file_extension = ".dat",
+                int a_data_precision = 10, int a_coords_precision = 7)
+        : SmallDataIO(a_filename, 0.0, 0.0, 0.0, READ, false, a_file_extension,
+                      a_data_precision, a_coords_precision)
     {
     }
 
