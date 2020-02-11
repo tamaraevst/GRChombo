@@ -170,6 +170,9 @@ modes = 2 0
 # Star centre Tracking
 do_star_tracking = 1
 num_points_gaussian_fit = 60
-centre_offset = 16. #should be half of star separation
 tracked_field_index = 29 #modphi is 29
 search_width = 32.
+track_both_centres = true # false for one track
+track_min_separation = 2. # cancels tracking if stars get within this distance
+tracking_centre = 16 0 0 # with respect to centre of grid
+tracking_centres = 16 0 0 -16 0 0 # with respect to centre of grid

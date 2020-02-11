@@ -27,13 +27,15 @@ class GaussianFitTracking
     double* m_array_x;
     double* m_array_y;
     double* m_array_z;
-    double* m_centre = new double[3];
-    double* m_old_centre = new double[3];
-    double m_dt, m_time, m_restart_time;
+    double* m_centre;
+    double* m_old_centre;
+    double m_dt, m_time, m_restart_time, m_min_separation;
+    double m_N; //number of coords we are tracking
     bool m_first_step;
     string m_filename = "StarTracking";
     std::ofstream m_test_file;
     GaussFit_params_t m_params_GaussFit;
+    bool star_positions_are_good = true;
 
   public:
 
@@ -47,11 +49,31 @@ class GaussianFitTracking
         m_number = m_params_GaussFit.num_points;
         m_field_index = m_params_GaussFit.field_index;
         m_delta = m_params_GaussFit.search_width;
-        //m_test_file.open("TestDatFile.dat",std::ifstream::app);
-        m_vals = new double[3*m_number];
-        m_array_x = new double[3*m_number];
-        m_array_y = new double[3*m_number];
-        m_array_z = new double[3*m_number];
+        m_min_separation = m_params_GaussFit.track_min_separation;
+        m_test_file.open("TestDatFile.dat",std::ifstream::app);
+
+        if (m_params_GaussFit.track_both_centres)
+        {
+            m_N = 6;
+            m_vals = new double[6*m_number];
+            m_array_x = new double[6*m_number];
+            m_array_y = new double[6*m_number];
+            m_array_z = new double[6*m_number];
+            m_centre = new double[6];
+            m_old_centre = new double[6];
+        }
+        else
+        {
+            m_N = 3;
+            m_vals = new double[3*m_number];
+            m_array_x = new double[3*m_number];
+            m_array_y = new double[3*m_number];
+            m_array_z = new double[3*m_number];
+            m_centre = new double[3];
+            m_old_centre = new double[3];
+        }
+
+
     }
     ~GaussianFitTracking()
     {
@@ -63,9 +85,12 @@ class GaussianFitTracking
         delete[] m_array_z;
         m_test_file.close();
     }
+    bool calculate_star_position_bool();
     void get_data(AMRInterpolator<Lagrange<4>> *a_interpolator);
-    void find_centre();
+    void get_data_2(AMRInterpolator<Lagrange<4>> *a_interpolator);
+    void find_centres();
     void write_to_dat();
+    void write_to_dat_2();
     void do_star_tracking(AMRInterpolator<Lagrange<4>> *a_interpolator);
     void read_old_centre_from_dat();
 };
