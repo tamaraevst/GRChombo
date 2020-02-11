@@ -13,9 +13,12 @@ struct GaussFit_params_t
 {
     int num_points; // numer of gridpoints used to create boson star
     int do_star_tracking;
-    double offset;
     int field_index;
     double search_width;
+    bool track_both_centres;
+    double track_min_separation;
+    std::array<double, CH_SPACEDIM> track_centre; //!< coordinates of the centres of the stars
+    std::array<double, 2*CH_SPACEDIM> track_centres; //!< coordinates of the centres of the stars
 };
 
 #endif /* GAUSSFITPARAMS_HPP_ */
