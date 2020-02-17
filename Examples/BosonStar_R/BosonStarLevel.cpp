@@ -245,10 +245,10 @@ void BosonStarLevel::doAnalysis()
     }
 
 
-    if (m_p.gaussfit_params.do_star_tracking)
+    if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
     {
         GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
-                                        m_time,m_restart_time,first_step,m_p.L);
+                                        m_time,m_restart_time,first_step,m_p.L,m_level);
 
         gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
     }

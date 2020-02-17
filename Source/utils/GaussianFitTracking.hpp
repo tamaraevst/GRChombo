@@ -36,15 +36,16 @@ class GaussianFitTracking
     std::ofstream m_test_file;
     GaussFit_params_t m_params_GaussFit;
     bool star_positions_are_good = true;
+    int m_level;
 
   public:
 
 
     GaussianFitTracking(GaussFit_params_t a_params_GaussFit, double a_dt, double a_time,
-                                    double a_restart_time, bool a_first_step, double a_L)
+                                    double a_restart_time, bool a_first_step, double a_L, int a_level)
                                     :m_params_GaussFit(a_params_GaussFit),m_dt(a_dt),
                                     m_time(a_time),m_restart_time(a_restart_time),
-                                    m_first_step(a_first_step),m_L(a_L)
+                                    m_first_step(a_first_step),m_L(a_L),m_level(a_level)
     {
         m_number = m_params_GaussFit.num_points;
         m_field_index = m_params_GaussFit.field_index;

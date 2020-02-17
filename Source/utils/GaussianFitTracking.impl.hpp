@@ -13,9 +13,10 @@
 // effectively the main() function
 void GaussianFitTracking::do_star_tracking(AMRInterpolator<Lagrange<4>> *a_interpolator)
 {
+    m_test_file << "m_time " << m_time << ", m_restart_time " << m_restart_time << std::endl;
     read_old_centre_from_dat();
 
-    star_positions_are_good=calculate_star_position_bool();
+    star_positions_are_good=true;//calculate_star_position_bool();
 
     if (star_positions_are_good)
     {
@@ -38,7 +39,7 @@ void GaussianFitTracking::do_star_tracking(AMRInterpolator<Lagrange<4>> *a_inter
 for use in next tracking */
 bool GaussianFitTracking::calculate_star_position_bool()
 {
-    if (m_first_step)
+    if (m_time == 0)
     {
         return true;
     }
@@ -67,7 +68,7 @@ bool GaussianFitTracking::calculate_star_position_bool()
 // loads previously saved data from dat file into m_old_centre arrays
 void GaussianFitTracking::read_old_centre_from_dat()
 {
-    if (!m_first_step)
+    if (m_time > 0.)
     {
         int num = 1+m_N; //number of columns of dat file
         std::string messages[num];
@@ -102,6 +103,7 @@ void GaussianFitTracking::read_old_centre_from_dat()
             while (file.good())
             {
                 c = file.get();
+                //m_test_file << m_time << " " << c << std::endl;
                 message += c;
                 if (c!=' ' && c!= '\n' )
                 {
@@ -111,12 +113,16 @@ void GaussianFitTracking::read_old_centre_from_dat()
                 {
                     found_a_number = false;
                     messages[i] = message;
+                    //m_test_file << m_time << " " << message << std::endl;
+                    nums[i] = std::stod(message);
                     message = " ";
                     break;
                 }
                 if (c=='\n')
                 {
                     messages[i] = message;
+                    //m_test_file << m_time << " " << message << std::endl;
+                    nums[i] = std::stod(message);
                     break;
                 }
             }
@@ -125,11 +131,16 @@ void GaussianFitTracking::read_old_centre_from_dat()
         // load the strings read off into the (double) arrays for use
         for (int i=0; i<num; i++)
         {
-            nums[i] = std::stod(messages[i]);
+            //m_test_file << "i " << i << " : msgs " << messages[i] << std::endl;
+        }
+        for (int i=0; i<num; i++)
+        {
+            //nums[i] = std::stod(messages[i]);
             if (i!=0)
             {
                 m_old_centre[i-1] = nums[i];
-                m_test_file << "Time " << m_time << " : msg " << m_old_centre[i-1] << ", i=" << i << std::endl;
+                //m_test_file << "i " << i << " : m_level " << m_level << ", i=" << i << std::endl;
+
             }
         }
         file.close();
@@ -142,7 +153,7 @@ void GaussianFitTracking::read_old_centre_from_dat()
 void GaussianFitTracking::get_data(AMRInterpolator<Lagrange<4>> *a_interpolator)
 {
     //setup initial star centres from params file
-    if (m_first_step)
+    if (m_time == 0.)
     {
         for (int i=0; i<m_N; i++)
         {
@@ -164,6 +175,9 @@ void GaussianFitTracking::get_data(AMRInterpolator<Lagrange<4>> *a_interpolator)
         m_array_z[i + 2*m_number] += 0.5*m_delta*(2*i + 1 - m_number)/m_number;
     }
 
+
+    m_test_file << m_old_centre[0] << ", " << m_old_centre[1] << ", "
+                                           << m_old_centre[2] << std::endl;
     // setup the interpolator
     a_interpolator->refresh();
     InterpolationQuery query(3*m_number);
@@ -181,7 +195,7 @@ void GaussianFitTracking::get_data(AMRInterpolator<Lagrange<4>> *a_interpolator)
 void GaussianFitTracking::get_data_2(AMRInterpolator<Lagrange<4>> *a_interpolator)
 {
     //setup initial star centres from params file
-    if (m_first_step)
+    if (m_time == 0.)
     {
         for (int i=0; i<m_N; i++)
         {
@@ -213,6 +227,8 @@ void GaussianFitTracking::get_data_2(AMRInterpolator<Lagrange<4>> *a_interpolato
         m_array_z[i + 5*m_number] += 0.5*m_delta*(2*i + 1 - m_number)/m_number;
     }
 
+    m_test_file << m_old_centre[0] << ", " << m_old_centre[1] << ", "
+                                           << m_old_centre[2] << std::endl;
     // setup interpolator
     a_interpolator->refresh();
     InterpolationQuery query(m_N*m_number);
@@ -270,11 +286,12 @@ void GaussianFitTracking::find_centres()
 
 void GaussianFitTracking::write_to_dat()
 {
+    double eps = 10e-8;
     SmallDataIO star_centre_file(m_filename, m_dt, m_time,
                                   m_restart_time,
                                   SmallDataIO::APPEND,
                                   m_first_step);
-    star_centre_file.remove_duplicate_time_data();
+    if (m_time > m_restart_time + eps){star_centre_file.remove_duplicate_time_data();}
     if (m_time == 0.)
     {
         star_centre_file.write_header_line({"Star Centre x","Star Centre y","Star Centre z"});
@@ -284,11 +301,12 @@ void GaussianFitTracking::write_to_dat()
 
 void GaussianFitTracking::write_to_dat_2()
 {
+    double eps = 10e-8;
     SmallDataIO star_centre_file(m_filename, m_dt, m_time,
                                   m_restart_time,
                                   SmallDataIO::APPEND,
                                   m_first_step);
-    star_centre_file.remove_duplicate_time_data();
+    if (m_time > m_restart_time + eps){star_centre_file.remove_duplicate_time_data();}
     if (m_time == 0.)
     {
         star_centre_file.write_header_line({"Star 1 Centre x","Star 1 Centre y",
