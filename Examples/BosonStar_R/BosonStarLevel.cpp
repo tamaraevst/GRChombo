@@ -193,7 +193,7 @@ void BosonStarLevel::doAnalysis()
             // Write constraint violations to file
             ConstraintViolations constraint_violations(c_Ham,
                 Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
-                m_time, m_restart_time, "ConstraintViolations.dat",
+                m_time, m_restart_time, "ConstraintViolations",
                 first_step);
             constraint_violations.execute();
         }
@@ -202,7 +202,7 @@ void BosonStarLevel::doAnalysis()
         {
             // compute integrated volume weighted noether charge integral
             double noether_charge = m_gr_amr.compute_sum(c_N, m_dx);
-            SmallDataIO noether_charge_file("NoetherCharge.dat", m_dt, m_time,
+            SmallDataIO noether_charge_file("NoetherCharge", m_dt, m_time,
                                             m_restart_time,
                                             SmallDataIO::APPEND,
                                             first_step);
@@ -217,7 +217,7 @@ void BosonStarLevel::doAnalysis()
         // Compute the maximum of mod_phi and write it to a file
         double mod_phi_max = m_gr_amr.compute_max(
                                 Interval(c_mod_phi, c_mod_phi));
-        SmallDataIO mod_phi_max_file("mod_phi_max.dat", m_dt, m_time,
+        SmallDataIO mod_phi_max_file("mod_phi_max", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
                                      first_step);
@@ -245,10 +245,10 @@ void BosonStarLevel::doAnalysis()
     }
 
 
-    if (m_p.gaussfit_params.do_star_tracking)
+    if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
     {
         GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
-                                        m_time,m_restart_time,first_step,m_p.L);
+                                        m_time,m_restart_time,first_step,m_p.L,m_level);
 
         gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
     }

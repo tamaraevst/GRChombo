@@ -14,6 +14,7 @@ struct GaussFit_params_t
     int num_points; // numer of gridpoints used to create boson star
     int do_star_tracking;
     int field_index;
+    int AMR_level;
     double search_width;
     bool track_both_centres;
     double track_min_separation;
