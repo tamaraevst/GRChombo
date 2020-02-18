@@ -16,6 +16,7 @@
 //////
 #include <fstream>
 #include <string>
+#include <vector>
 //////
 class GaussianFitTracking
 {
@@ -39,7 +40,6 @@ class GaussianFitTracking
     int m_level;
 
   public:
-
 
     GaussianFitTracking(GaussFit_params_t a_params_GaussFit, double a_dt, double a_time,
                                     double a_restart_time, bool a_first_step, double a_L, int a_level)
@@ -73,9 +73,8 @@ class GaussianFitTracking
             m_centre = new double[3];
             m_old_centre = new double[3];
         }
-
-
     }
+
     ~GaussianFitTracking()
     {
         delete[] m_vals;
@@ -86,6 +85,7 @@ class GaussianFitTracking
         delete[] m_array_z;
         m_test_file.close();
     }
+
     bool calculate_star_position_bool();
     void get_data(AMRInterpolator<Lagrange<4>> *a_interpolator);
     void get_data_2(AMRInterpolator<Lagrange<4>> *a_interpolator);
@@ -94,6 +94,7 @@ class GaussianFitTracking
     void write_to_dat_2();
     void do_star_tracking(AMRInterpolator<Lagrange<4>> *a_interpolator);
     void read_old_centre_from_dat();
+    void read_old_centre_from_dat_manually(); //obsolete but kept incase needed
 };
 
 #include "GaussianFitTracking.impl.hpp"

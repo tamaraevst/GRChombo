@@ -3,7 +3,7 @@
 verbosity = 1
 chk_prefix = chk_test/Sim_
 plot_prefix = plt_test/Sim_p_
-restart_file = chk_test/Sim_000003.3d.hdf5
+restart_file = chk_test/Sim_000004.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -173,7 +173,7 @@ num_points_gaussian_fit = 60
 tracked_field_index = 32 #modphi is 29
 search_width = 20.
 tracking_AMR_level = 0 # level that tracking is performed on
-track_both_centres = false # false for one track
+track_both_centres = true # false for one track
 track_min_separation = 2. # cancels tracking if stars get within this distance
 tracking_centre = 16 0 0 # with respect to centre of grid
 tracking_centres = 16 0 0 -16 0 0 # with respect to centre of grid
