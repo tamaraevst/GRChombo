@@ -79,6 +79,7 @@ public:
         // will be replaced
         pp.load("tracked_field_index", gaussfit_params.field_index, 30);
         pp.load("search_width", gaussfit_params.search_width, 16.);
+        pp.load("tracking_BH_cutoff", gaussfit_params.BH_cutoff, 0.05);
         pp.load("tracking_AMR_level", gaussfit_params.AMR_level,0);
         pp.load("track_both_centres", gaussfit_params.track_both_centres, true);
         pp.load("track_min_separation", gaussfit_params.track_min_separation, 5.);
