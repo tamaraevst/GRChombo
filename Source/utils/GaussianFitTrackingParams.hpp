@@ -18,6 +18,7 @@ struct GaussFit_params_t
     double search_width;
     bool track_both_centres;
     double track_min_separation;
+    double BH_cutoff;
     std::array<double, CH_SPACEDIM> track_centre; //!< coordinates of the centres of the stars
     std::array<double, 2*CH_SPACEDIM> track_centres; //!< coordinates of the centres of the stars
 };

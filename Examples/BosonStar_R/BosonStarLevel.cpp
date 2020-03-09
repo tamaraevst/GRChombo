@@ -251,6 +251,8 @@ void BosonStarLevel::doAnalysis()
                                         m_time,m_restart_time,first_step,m_p.L,m_level);
 
         gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
+        std::vector<double> dummy;
+        gaussian_fit_tracking.get_BH_centres(dummy);
     }
 }
 
