@@ -57,8 +57,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
     double t = coords.z*s_; //set /tilde{t} to zero
-    double x = coords.x-separation/2.;
-    double z = (coords.z+0.*separation/2.)*c_; //set /tilde{t} to zero
+    double x = coords.x-0.*separation/2.;
+    double z = (coords.z+separation/2.)*c_; //set /tilde{t} to zero
     double y = coords.y;
     double r = sqrt(x*x+y*y+z*z);
 
@@ -117,8 +117,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         s_ = sinh(-rapidity);
         v_ = tanh(-rapidity);
         t = coords.z*s_; //set /tilde{t} to zero
-        x = coords.x+separation/2.;
-        z = (coords.z-0.*separation/2.)*c_;
+        x = coords.x+0.*separation/2.;
+        z = (coords.z-separation/2.)*c_;
         y = coords.y;
         r = sqrt(x*x+y*y+z*z);
 
