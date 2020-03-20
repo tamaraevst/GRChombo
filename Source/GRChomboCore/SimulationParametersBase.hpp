@@ -13,6 +13,9 @@
 #include "GRParmParse.hpp"
 #include "SphericalExtraction.hpp"
 
+// add this type alias here for backwards compatibility
+using extraction_params_t = SphericalExtraction::params_t;
+
 class SimulationParametersBase : public ChomboParameters
 {
   public:
@@ -85,8 +88,7 @@ class SimulationParametersBase : public ChomboParameters
             pout() << "Parameter: num_points_theta incompatible with Simpson's "
                    << "rule so increased by 1.\n";
         }
-        pp.load("extraction_center", extraction_params.center,
-                center); // default to center of the grid
+        pp.load("extraction_center", extraction_params.center, center);
         if (pp.contains("modes"))
         {
             pp.load("num_modes", extraction_params.num_modes);
