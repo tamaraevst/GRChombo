@@ -56,10 +56,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = coords.z*s_; //set /tilde{t} to zero
-    double x = coords.x-0.*separation/2.;
-    double z = (coords.z+separation/2.)*c_; //set /tilde{t} to zero
-    double y = coords.y;
+    double t = coords.x*s_; //set /tilde{t} to zero
+    double x = coords.x*c_;
+    double z = coords.z; //set /tilde{t} to zero
+    double y = coords.y+separation/2.;
     double r = sqrt(x*x+y*y+z*z);
 
     // first star physical variables
@@ -75,17 +75,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double lapse_2 = 1.;
     double w_ = m_1d_sol.get_w();
     double phase_ = w_*t;
-    double beta_z = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
-    vars.shift[2] += beta_z;
-    double g_xx_1 = psi_*psi_;
+    double beta_x = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
+    vars.shift[0] += beta_x;
+    double g_zz_1 = psi_*psi_;
     double g_yy_1 = psi_*psi_;
-    double g_zz_1 = pc_os;
+    double g_xx_1 = pc_os;
     double g_xx_2=1., g_yy_2=1., g_zz_2=1., g_xx, g_yy, g_zz;
 
     vars.phi_Re += p_*cos(phase_);
     vars.phi_Im += p_*sin(phase_);
-    vars.Pi_Re += -(1./lapse_1)*( (x/r)*(s_-beta_z*c_)*dp_*cos(phase_) - w_*(c_-beta_z*s_)*p_*sin(phase_) );
-    vars.Pi_Im += -(1./lapse_1)*( (x/r)*(s_-beta_z*c_)*dp_*sin(phase_) + w_*(c_-beta_z*s_)*p_*cos(phase_) );
+    vars.Pi_Re += -(1./lapse_1)*( (x/r)*(s_-beta_x*c_)*dp_*cos(phase_) - w_*(c_-beta_x*s_)*p_*sin(phase_) );
+    vars.Pi_Im += -(1./lapse_1)*( (x/r)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
 
     double KLL_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double KLL_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
@@ -94,32 +94,31 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double gammaUU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaUU_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaUU_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double K1, K2;
+    double K1=0., K2=0.;
     gammaUU_1[0][0] = 1./g_xx_1;
     gammaUU_1[1][1] = 1./g_yy_1;
     gammaUU_1[2][2] = 1./g_zz_1;
 
-    KLL_1[0][0] = -lapse_1*s_*z*psi_prime_/(r*psi_);
-    KLL_1[1][1] = KLL_1[0][0];
-    KLL_1[2][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-    KLL_1[2][0] = lapse_1*c_*s_*(x/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-    KLL_1[1][2] = KLL_1[2][1];
-    KLL_1[0][2] = KLL_1[2][0];
-    KLL_1[0][1] = 0.;
-    KLL_1[1][0] = 0.;
-    KLL_1[2][2] = lapse_1*(z/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
-    double thingy1 = omega_*psi_prime_*(2.*v_*v_*omega_*omega_-psi_*psi_) + omega_prime_*psi_*(v_*v_*omega_*omega_-2.*psi_*psi_);
-    K1 = pow(lapse_1/omega_,3)*pow(psi_,-5)*s_*c_*c_*(z/r)*(thingy1);
+    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*psi_);
+    KLL_1[1][1] = KLL_1[2][2];
+    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+    KLL_1[1][0] = KLL_1[0][1];
+    KLL_1[2][0] = KLL_1[0][2];
+    KLL_1[2][1] = 0.;
+    KLL_1[1][2] = 0.;
+    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
+    FOR2(i,j) K1 += gammaUU_1[i][j]*KLL_1[i][j];
 
     if (binary)
     {
         c_ = cosh(-rapidity);
         s_ = sinh(-rapidity);
         v_ = tanh(-rapidity);
-        t = coords.z*s_; //set /tilde{t} to zero
-        x = coords.x+0.*separation/2.;
-        z = (coords.z-separation/2.)*c_;
-        y = coords.y;
+        t = coords.x*s_; //set /tilde{t} to zero
+        x = coords.x*c_;
+        z = coords.z;
+        y = coords.y-separation/2.;
         r = sqrt(x*x+y*y+z*z);
 
           // first star physical variables
@@ -144,11 +143,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         lapse_2 = omega_*psi_/(sqrt(pc_os));
         w_ = m_1d_sol.get_w();
         phase_ = m_params_BosonStar.phase*M_PI + w_*t;
-        beta_z = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
-        vars.shift[2] += beta_z;
-        g_xx_2 = psi_*psi_;
+        beta_x = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
+        vars.shift[0] += beta_x;
+        g_zz_2 = psi_*psi_;
         g_yy_2 = psi_*psi_;
-        g_zz_2 = pc_os;
+        g_xx_2 = pc_os;
         gammaUU_2[0][0] = 1./g_xx_2;
         gammaUU_2[1][1] = 1./g_yy_2;
         gammaUU_2[2][2] = 1./g_zz_2;
@@ -162,23 +161,22 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         {
             vars.phi_Re += p_*cos(phase_);
             vars.phi_Im += p_*sin(phase_);
-            vars.Pi_Re += -(1./lapse_2)*( (x/r)*(s_-beta_z*c_)*dp_*cos(phase_) - w_*(c_-beta_z*s_)*p_*sin(phase_) );
-            vars.Pi_Im += -(1./lapse_2)*( (x/r)*(s_-beta_z*c_)*dp_*sin(phase_) + w_*(c_-beta_z*s_)*p_*cos(phase_) );
+            vars.Pi_Re += -(1./lapse_2)*( (x/r)*(s_-beta_x*c_)*dp_*cos(phase_) - w_*(c_-beta_x*s_)*p_*sin(phase_) );
+            vars.Pi_Im += -(1./lapse_2)*( (x/r)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
         }
 
 
 
-        KLL_2[0][0] = -lapse_2*s_*z*psi_prime_/(r*psi_);
-        KLL_2[1][1] = KLL_2[0][0];
-        KLL_2[2][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-        KLL_2[2][0] = lapse_2*c_*s_*(x/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-        KLL_2[1][2] = KLL_2[2][1];
-        KLL_2[0][2] = KLL_2[2][0];
-        KLL_2[0][1] = 0.;
-        KLL_2[1][0] = 0.;
-        KLL_2[2][2] = lapse_2*(z/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
-        double thingy2 = omega_*psi_prime_*(2.*v_*v_*omega_*omega_-psi_*psi_) + omega_prime_*psi_*(v_*v_*omega_*omega_-2.*psi_*psi_);
-        K2 = pow(lapse_2/omega_,3)*pow(psi_,-5)*s_*c_*c_*(z/r)*(thingy2);
+        KLL_2[2][2] = -lapse_2*s_*x*psi_prime_/(r*psi_);
+        KLL_2[1][1] = KLL_2[2][2];
+        KLL_2[0][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+        KLL_2[0][2] = lapse_2*c_*s_*(z/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+        KLL_2[1][0] = KLL_2[0][1];
+        KLL_2[2][0] = KLL_2[0][2];
+        KLL_2[2][1] = 0.;
+        KLL_2[1][2] = 0.;
+        KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
+        FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
     }
     g_xx = g_xx_1 + g_xx_2 - 1.;
