@@ -2,7 +2,6 @@ jobscript*
 pout.*
 .bashrc
 *.pbs
-*.sh
 *.s
 d
 o
@@ -12,26 +11,16 @@ f
 .DS_Store
 log*
 *.ex
-*.swp
+.*.sw[n-p]
 *.out
 *.dat
 *.hdf5
 *.dSYM
-<<<<<<< HEAD
-.gcc-flags.json
-*.o
-test
-*.dat
-Weyl_integral*
-*.dat
-ExtractionOut_*
-=======
 LB.txt
 Weyl_integral*
 *ExtractionOut_*
 time.table.*
 *.patch
 *.log
->>>>>>> master
-
+ipo_out.optrpt
 Doxygen/html

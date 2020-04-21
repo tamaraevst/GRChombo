@@ -88,7 +88,7 @@ void SmallDataIO::line_break()
     }
 }
 
-void SmallDataIO::remove_duplicate_time_data()
+void SmallDataIO::remove_duplicate_time_data(const bool keep_m_time_data)
 {
     constexpr double epsilon = 1.0e-8;
     if (m_rank == 0 && m_restart_time > 0. && m_mode == APPEND &&
@@ -99,6 +99,11 @@ void SmallDataIO::remove_duplicate_time_data()
         std::string line;
         std::string temp_filename = m_filename + ".temp";
         std::ofstream temp_file(temp_filename);
+        int sign = -1;
+        if (keep_m_time_data)
+        {
+            sign = 1;
+        }
         while (std::getline(m_file, line))
         {
             if (!(line.find("#") == std::string::npos))
@@ -106,7 +111,7 @@ void SmallDataIO::remove_duplicate_time_data()
                 temp_file << line << "\n";
             }
             else if (std::stod(line.substr(0, m_coords_width)) <
-                     m_time - epsilon)
+                     m_time + sign * epsilon)
             {
                 temp_file << line << "\n";
             }
@@ -131,6 +136,7 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
 {
     if (m_rank == 0)
     {
+        bool line_found = false;
         // first set the current position to the beginning of the file
         m_file.seekg(0);
 
@@ -146,20 +152,26 @@ void SmallDataIO::get_specific_data_line(std::vector<double> &a_out_data,
         // now search for lines that start with coords_string and put the data
         // in a_out_data
         std::string line;
-        while(std::getline(m_file, line))
+        while (std::getline(m_file, line))
         {
             if (!(line.find(coords_string) == std::string::npos))
             {
-                for(int ichar = a_coords.size() * m_coords_width;
-                    ichar < line.size(); ichar += m_data_width)
+                for (int ichar = a_coords.size() * m_coords_width;
+                     ichar < line.size(); ichar += m_data_width)
                 {
-                    double data_value
-                        = std::stod(line.substr(ichar, m_data_width));
+                    double data_value =
+                        std::stod(line.substr(ichar, m_data_width));
                     a_out_data.push_back(data_value);
                 }
+                line_found = true;
                 // only want the first occurrence so break the while loop
                 break;
             }
+        }
+        if (!line_found)
+        {
+            MayDay::Error(
+                "SmallDataIO : Data to be read in at coord not found in file");
         }
     }
     // now broadcast the vector to all ranks using Chombo broadcast function

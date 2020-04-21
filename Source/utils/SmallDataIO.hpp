@@ -15,9 +15,9 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 //! A class for reading and writing small data to a file in ASCII format.
 /*!
@@ -140,7 +140,8 @@ class SmallDataIO
                 int a_data_precision = 10, int a_coords_precision = 7)
         : SmallDataIO(a_filename, 0.0, 0.0, 0.0, READ, false, a_file_extension,
                       a_data_precision, a_coords_precision)
-    {}
+    {
+    }
 
     //! Destructor (closes file)
     ~SmallDataIO()
@@ -192,7 +193,7 @@ class SmallDataIO
 
     //! if restarting from an earlier checkpoint file, this function removes
     //! any time data that will be replaced.
-    void remove_duplicate_time_data();
+    void remove_duplicate_time_data(const bool keep_m_time_data = false);
 
     // ------------ Reading Functions ------------
 
@@ -205,7 +206,6 @@ class SmallDataIO
     //! file
     void get_specific_data_line(std::vector<double> &a_out_data,
                                 const double a_coord);
-
 };
 
 #endif /* SMALLDATAIO_HPP_ */
