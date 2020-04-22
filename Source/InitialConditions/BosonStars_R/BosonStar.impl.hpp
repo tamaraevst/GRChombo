@@ -51,15 +51,16 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     bool BS_BH_binary = m_params_BosonStar.BS_BH_binary;
     double M = m_params_BosonStar.BlackHoleMass;
     double separation = m_params_BosonStar.BS_separation;
+    double impact_parameter = m_params_BosonStar.BS_impact_parameter;
 
     // boosts and coordinate objects
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = coords.x*s_; //set /tilde{t} to zero
-    double x = coords.x*c_;
+    double t = (coords.x-separation/2.)*s_; //set /tilde{t} to zero
+    double x = (coords.x-separation/2.)*c_;
     double z = coords.z; //set /tilde{t} to zero
-    double y = coords.y+separation/2.;
+    double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
 
     // first star physical variables
@@ -115,10 +116,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity);
         s_ = sinh(-rapidity);
         v_ = tanh(-rapidity);
-        t = coords.x*s_; //set /tilde{t} to zero
-        x = coords.x*c_;
+        t = (coords.x+separation/2.)*s_; //set /tilde{t} to zero
+        x = (coords.x+separation/2.)*c_;
         z = coords.z;
-        y = coords.y-separation/2.;
+        y = coords.y-impact_parameter/2.;
         r = sqrt(x*x+y*y+z*z);
 
           // first star physical variables

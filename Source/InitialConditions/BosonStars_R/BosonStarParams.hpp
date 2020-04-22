@@ -16,6 +16,7 @@ struct BosonStar_params_t
     double phase;
     int eigen; // radial eigenstate of the boson star (0=ground)
     double BS_separation;
+    double BS_impact_parameter;
     bool BS_binary;
     bool BS_BH_binary;
     double BlackHoleMass;

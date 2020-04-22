@@ -1,9 +1,9 @@
 #Params for runtime inputs
 
 verbosity = 1
-chk_prefix = chk_test/Sim_
-plot_prefix = plt_test/Sim_p_
-restart_file = chk_test/Sim_000007.3d.hdf5
+chk_prefix = chk/Sim_
+plot_prefix = plt/Sim_p_
+restart_file = chk/Sim_000000.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -13,7 +13,7 @@ N3 = 32
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L = 256
+L = 64
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 1 # There are (max_level+1) grids, so min is zero
+max_level = 2 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -127,7 +127,8 @@ gridpoints 200000
 BS_binary = true # make false for one star
 BS_BH_binary = false
 BS_rapidity = 0.1 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_separation = 32.0 # should be set to 0 if binary is false otherwise the star wont be in the centre of the screen
+BS_impact_parameter = 10.0 #separation perpendicular to boost, y
+BS_separation = 32.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
@@ -144,7 +145,7 @@ sigma_soliton = 0.02 # try central density ~ 0.05, the soliton is very sensitive
 #mass_extraction_center = 64 64 64
 activate_mass_extraction = 1
 num_mass_extraction_radii = 3
-mass_extraction_radii = 40. 50. 60.
+mass_extraction_radii = 20. 25. 30.
 mass_extraction_levels = 0 0 0
 num_points_phi_mass = 16
 num_points_theta_mass = 24
@@ -154,7 +155,7 @@ num_points_theta_mass = 24
 #extraction_center = 64 64 64
 activate_gw_extraction = 1
 num_extraction_radii = 3
-extraction_radii = 30. 60. 90.
+extraction_radii = 20. 25. 30.
 extraction_levels = 0 0 0
 num_points_phi = 24
 num_points_theta = 60
@@ -168,7 +169,7 @@ modes = 2 0
         6 0
 
 # Star centre Tracking
-do_star_tracking = 1
+do_star_tracking = 0
 num_points_gaussian_fit = 60
 tracked_field_index = 32 #modphi is 29
 search_width = 20.

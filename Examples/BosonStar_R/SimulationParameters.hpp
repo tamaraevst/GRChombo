@@ -52,6 +52,7 @@ public:
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
+        pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
