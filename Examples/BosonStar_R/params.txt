@@ -3,7 +3,7 @@
 verbosity = 1
 chk_prefix = chk/Sim_
 plot_prefix = plt/Sim_p_
-restart_file = chk/Sim_000000.3d.hdf5
+#restart_file = chk/Sim_000000.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor

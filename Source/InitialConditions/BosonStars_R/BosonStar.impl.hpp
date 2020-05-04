@@ -111,6 +111,24 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
     FOR2(i,j) K1 += gammaUU_1[i][j]*KLL_1[i][j];
 
+    // helfer fix variables
+    double helferLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+    double t_p = (-separation)*s_; //set /tilde{t} to zero
+    double x_p = (-separation)*c_;
+    double z_p = 0.; //set /tilde{t} to zero
+    double y_p = impact_parameter;
+    double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
+    double p_p = m_1d_sol.get_p_interp(r_p);
+    double dp_p = m_1d_sol.get_dp_interp(r_p);
+    double omega_p = m_1d_sol.get_lapse_interp(r_p);
+    double omega_prime_p = m_1d_sol.get_dlapse_interp(r_p);
+    double psi_p = m_1d_sol.get_psi_interp(r_p);
+    double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
+    double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
+    helferLL[1][1] = psi_p*psi_p;
+    helferLL[2][2] = psi_p*psi_p;
+    helferLL[0][0] = pc_os_p;
+
     if (binary)
     {
         c_ = cosh(-rapidity);
@@ -180,9 +198,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
     }
-    g_xx = g_xx_1 + g_xx_2 - 1.;
-    g_yy = g_yy_1 + g_yy_2 - 1.;
-    g_zz = g_zz_1 + g_zz_2 - 1.;
+    g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
+    g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
+    g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
     gammaLL[0][0] = g_xx;
     gammaLL[1][1] = g_yy;
     gammaLL[2][2] = g_zz;
