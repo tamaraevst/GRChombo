@@ -42,7 +42,7 @@ template <class matter_t> class MatterWeyl4 : public Weyl4
     //! Add matter terms to electric and magnetic parts
     template <class data_t>
     void add_matter_EB(EBFields_t<data_t> &eb_fields,
-                       Tensor<3, data_t> &epsilon3_LUU,
+                       const Tensor<3, data_t> &epsilon3_LUU,
                        const Vars<data_t> &vars,
                        const Vars<Tensor<1, data_t>> &d1,
                        const Coordinates<data_t> &coords) const;

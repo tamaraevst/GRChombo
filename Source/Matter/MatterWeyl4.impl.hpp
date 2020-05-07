@@ -44,7 +44,7 @@ void MatterWeyl4<matter_t>::compute(Cell<data_t> current_cell) const
 template <class matter_t>
 template <class data_t>
 void MatterWeyl4<matter_t>::add_matter_EB(
-    EBFields_t<data_t> &ebfields, Tensor<3, data_t> epsilon3_LUU,
+    EBFields_t<data_t> &ebfields, const Tensor<3, data_t> &epsilon3_LUU,
     const Vars<data_t> &vars, const Vars<Tensor<1, data_t>> &d1,
     const Coordinates<data_t> &coords) const
 {
@@ -55,7 +55,7 @@ void MatterWeyl4<matter_t>::add_matter_EB(
     const auto emtensor = m_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
     Tensor<2, data_t> Sij_TF = emtensor.Sij;
-    make_trace_free(Sij_TF, vars.h, h_UU);
+    TensorAlgebra::make_trace_free(Sij_TF, vars.h, h_UU);
 
     // first add in formulation-independent terms
     FOR2(i, j) { ebfields.E[i][j] += -4.0 * M_PI * m_G_Newton * Sij_TF[i][j]; }
@@ -63,7 +63,7 @@ void MatterWeyl4<matter_t>::add_matter_EB(
     // Now add in BSSN specific terms. BSSN expressions rely on constraint
     // satisfaction for tracelessness rather than explicit trace-removal as in
     // the CCZ4 case.
-    if (m_formulation == USE_BSSN)
+    if (m_formulation == CCZ4::USE_BSSN)
     {
         FOR2(i, j)
         {
