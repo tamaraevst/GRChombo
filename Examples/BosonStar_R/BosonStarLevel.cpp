@@ -9,6 +9,7 @@
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "TraceARemoval.hpp"
+#include "GammaCalculator.hpp"
 
 // For RHS update
 #include "MatterCCZ4.hpp"
@@ -73,6 +74,10 @@ void BosonStarLevel::initialData()
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
     BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS,
+                   disable_simd());
+
+    BoxLoops::loop(GammaCalculator(m_dx),
                    m_state_new, m_state_new, INCLUDE_GHOST_CELLS,
                    disable_simd());
 }
