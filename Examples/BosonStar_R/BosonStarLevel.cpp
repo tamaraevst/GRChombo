@@ -78,7 +78,7 @@ void BosonStarLevel::initialData()
                    disable_simd());
 
     BoxLoops::loop(GammaCalculator(m_dx),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS,
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                    disable_simd());
 }
 
