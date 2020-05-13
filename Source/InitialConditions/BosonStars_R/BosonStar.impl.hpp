@@ -81,7 +81,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double g_zz_1 = psi_*psi_;
     double g_yy_1 = psi_*psi_;
     double g_xx_1 = pc_os;
-    double g_xx_2=1., g_yy_2=1., g_zz_2=1., g_xx, g_yy, g_zz;
+    double g_xx_2=0., g_yy_2=0., g_zz_2=0., g_xx, g_yy, g_zz;
 
     vars.phi_Re += p_*cos(phase_);
     vars.phi_Im += p_*sin(phase_);
@@ -125,9 +125,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_p = m_1d_sol.get_psi_interp(r_p);
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
-    helferLL[1][1] = psi_p*psi_p;
-    helferLL[2][2] = psi_p*psi_p;
-    helferLL[0][0] = pc_os_p;
+    if (binary)
+    {
+        helferLL[1][1] = psi_p*psi_p;
+        helferLL[2][2] = psi_p*psi_p;
+        helferLL[0][0] = pc_os_p;
+    }
 
     if (binary)
     {
