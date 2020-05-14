@@ -221,8 +221,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     double one_third = 1./3.;
     FOR2(i,j) vars.h[i][j] = vars.chi*gammaLL[i][j];
-    FOR2(i,j) vars.K += (KLL_1[i][j]+KLL_2[i][j])*gammaUU[i][j];
     FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l]*(gammaUU_1[l][k]*KLL_1[k][j] + gammaUU_2[l][k]*KLL_2[k][j]);
+    FOR2(i,j) vars.K += KLL[i][j]*gammaUU[i][j];
     FOR2(i,j) vars.A[i][j] = chi_*(KLL[i][j]-one_third*vars.K*gammaLL[i][j]);
 
     // Store the initial values of the variables
