@@ -154,7 +154,7 @@ void BinaryBHLevel::doAnalysis()
     {
 
         // Do the extraction on the min extraction level
-        if (m_level == m_p.extraction_params.min_extraction_level)
+        if (m_level == m_p.extraction_params.min_extraction_level())
         {
             CH_TIME("WeylExtraction");
             // Now refresh the interpolator and do the interpolation
@@ -189,13 +189,7 @@ void BinaryBHLevel::prePlotLevel()
     fillAllGhosts();
     if (m_p.activate_extraction == 1)
     {
-        BoxLoops::loop(Weyl4(m_p.extraction_params.extraction_center, m_dx),
-                       m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(Weyl4(m_p.extraction_params.center, m_dx), m_state_new,
+                       m_state_new, EXCLUDE_GHOST_CELLS);
     }
-}
-
-// Specify if you want any plot files to be written, with which vars
-void BinaryBHLevel::specificWritePlotHeader(std::vector<int> &plot_states) const
-{
-    plot_states = {c_chi, c_Weyl4_Re, c_Weyl4_Im};
 }

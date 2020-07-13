@@ -677,9 +677,10 @@ void GRAMRLevel::writePlotLevel(HDF5Handle &a_handle) const
     if (m_verbosity)
         pout() << "GRAMRLevel::writePlotLevel" << endl;
 
-    // number and index of states to print
-    std::vector<int> plot_states;
-    // to be specified in specific Level class
+    // number and index of states to print. first default to parameter
+    std::vector<int> plot_states = m_p.plot_vars;
+    // but call this which may defined in specific Level class for backwards
+    // compatibility
     specificWritePlotHeader(plot_states);
     int num_states = plot_states.size();
 
@@ -749,9 +750,10 @@ void GRAMRLevel::writePlotHeader(HDF5Handle &a_handle) const
     if (m_verbosity)
         pout() << "GRAMRLevel::writePlotHeader" << endl;
 
-    // number and index of states to print
-    std::vector<int> plot_states;
-    // to be specified in specific Level class
+    // number and index of states to print. first default to parameter
+    std::vector<int> plot_states = m_p.plot_vars;
+    // but call this which may defined in specific Level class for backwards
+    // compatibility
     specificWritePlotHeader(plot_states);
     int num_states = plot_states.size();
 

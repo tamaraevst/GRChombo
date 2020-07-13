@@ -36,10 +36,13 @@ tag_buffer_size = 3
 
 checkpoint_interval = 4
 # set to zero to turn off plot files
-plot_interval = 1
-dt_multiplier = 0.50
+
 stop_time = 1000.0
 max_steps = 2000
+plot_interval = 0
+num_plot_vars = 3
+plot_vars = chi Weyl4_Re Weyl4_Im
+dt_multiplier = 0.25
 
 nan_check = 1
 
