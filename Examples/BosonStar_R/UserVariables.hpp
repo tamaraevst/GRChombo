@@ -64,6 +64,11 @@ enum
     c_Weyl4_Re,
     c_Weyl4_Im,
 
+    c_rho,   // stress tensor components
+    c_s1,
+    c_s2,
+    c_s3,
+
     NUM_VARS
 };
 
@@ -98,7 +103,9 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "Ham",    "Mom1",   "Mom2",   "Mom3",
 
-    "Weyl4_Re",  "Weyl4_Im"};
+    "Weyl4_Re",  "Weyl4_Im",
+
+    "rho", "s1", "s2", "s3"};
     }
 
 #endif /* USERVARIABLES_HPP */

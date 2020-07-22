@@ -397,12 +397,12 @@ void GaussianFitTracking::get_BH_centres(std::vector<double> &a_out_data)
             }
         }
     }
-    m_test_file << m_time << ": ";
+    /*m_test_file << m_time << ": ";
     for (int i=0; i < m_N; i++)
     {
         m_test_file << a_out_data[i] << ", ";
     }
-    m_test_file << std::endl;
+    m_test_file << std::endl;*/
 }
 
 #endif /* GAUSSIANFITTRACKING_IMPL_HPP_ */

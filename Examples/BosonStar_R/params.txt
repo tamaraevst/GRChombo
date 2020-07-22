@@ -3,7 +3,7 @@
 verbosity = 1
 chk_prefix = chk/Sim_
 plot_prefix = plt/Sim_p_
-#restart_file = chk/Sim_000000.3d.hdf5
+#restart_file = chk/Sim_000004.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -23,11 +23,11 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 1 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 256 128 64 32 16 8 4 2 2 2 2 2 2 2 2 2 2 2 2
+regrid_interval = 2 1 1
 # Max and min box size - for load balancing
 max_box_size = 32
 min_box_size = 8
@@ -67,6 +67,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0                         #N(oether charge density)
                          0.0 0.0 0.0 0.0             #Ham and Mom
                          0.0 0.0                     #Wely4_Re and Weyl4_Im
+                         0.0 0.0 0.0 0.0             #Stress tensor components
 
 
 # Set up time steps
@@ -108,8 +109,8 @@ calculate_constraint_violations = 1
 calculate_noether_charge = 1
 
 # Vars to write to plot files
-num_plot_vars = 6
-plot_vars = 0 7 25 29 32 37 # chi, K, phi_Re, mod_phi, N, Weyl4_Re
+num_plot_vars = 10
+plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
 
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3

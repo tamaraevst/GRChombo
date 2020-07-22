@@ -35,7 +35,7 @@ class GaussianFitTracking
     int m_N; //number of coords we are tracking
     bool m_first_step;
     string m_filename = "StarTracking";
-    std::ofstream m_test_file;
+    //std::ofstream m_test_file;
     GaussFit_params_t m_params_GaussFit;
     bool star_positions_are_good = true;
     int m_level;
@@ -54,7 +54,7 @@ class GaussianFitTracking
         m_delta = m_params_GaussFit.search_width;
         m_min_separation = m_params_GaussFit.track_min_separation;
         m_BH_cutoff = m_params_GaussFit.BH_cutoff;
-        m_test_file.open("TestDatFile.dat",std::ifstream::app);
+        //m_test_file.open("TestDatFile.dat",std::ifstream::app);
 
         if (m_params_GaussFit.track_both_centres)
         {
@@ -83,7 +83,7 @@ class GaussianFitTracking
         delete[] m_array_x;
         delete[] m_array_y;
         delete[] m_array_z;
-        m_test_file.close();
+        //m_test_file.close();
     }
 
     void check_if_star_positions_are_good();

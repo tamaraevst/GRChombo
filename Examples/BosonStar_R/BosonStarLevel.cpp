@@ -30,7 +30,9 @@
 
 // For mass extraction
 #include "ADMMass.hpp"
-#include "MassExtraction.hpp"
+#include "Density.hpp"
+#include "EMTensor.hpp"
+//#include "MassExtraction.hpp"
 
 // For GW extraction
 #include "Weyl4.hpp"
@@ -85,26 +87,51 @@ void BosonStarLevel::initialData()
 // Things to do before outputting a checkpoint file
 void BosonStarLevel::preCheckpointLevel()
 {
-    fillAllGhosts();
+    //Thomas Version for EMTENSOR
+    /*fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
     BoxLoops::loop(make_compute_pack(
                     MatterConstraints<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
+                  Density<ComplexScalarFieldWithPotential>(
+                  complex_scalar_field, m_dx, m_p.G_Newton)),
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);*/
+
+     Potential potential(m_p.potential_params);
+     ComplexScalarFieldWithPotential complex_scalar_field(potential);
+     BoxLoops::loop(make_compute_pack(
+                     MatterConstraints<ComplexScalarFieldWithPotential>(
+                     complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
+                     EMTensor<ComplexScalarFieldWithPotential>(
+                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3))),
+                     m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
 }
 
 // Things to do before outputting a plot file
 void BosonStarLevel::prePlotLevel()
 {
-    fillAllGhosts();
+    //Thomas Version for EMTENSOR
+    /*fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
     BoxLoops::loop(make_compute_pack(
                     MatterConstraints<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
+                    Density<ComplexScalarFieldWithPotential>(
+                    complex_scalar_field, m_dx, m_p.G_Newton)),
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);*/
+
+     fillAllGhosts();
+     Potential potential(m_p.potential_params);
+     ComplexScalarFieldWithPotential complex_scalar_field(potential);
+     BoxLoops::loop(make_compute_pack(
+                     MatterConstraints<ComplexScalarFieldWithPotential>(
+                     complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
+                     EMTensor<ComplexScalarFieldWithPotential>(
+                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3))),
+                     m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
 }
 
@@ -155,8 +182,8 @@ void BosonStarLevel::doAnalysis()
                         EXCLUDE_GHOST_CELLS);
 
         // Do the extraction on the min extraction level
-        if (m_level == m_p.extraction_params.min_extraction_level)
         {
+          if (m_level == m_p.extraction_params.min_extraction_level())
             if (m_verbosity)
             {
                 pout() << "BinaryBSLevel::specificPostTimeStep:"
@@ -166,11 +193,11 @@ void BosonStarLevel::doAnalysis()
             // Refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
-                                         m_restart_time, first_step);
+                                         first_step, m_restart_time);
             gw_extraction.execute_query(m_gr_amr.m_interpolator);
         }
 
-        // Do the extraction on the min extraction level
+        /* // Do the extraction on the min extraction level
         if (m_level == m_p.mass_extraction_params.min_extraction_level)
         {
             if (m_verbosity)
@@ -181,7 +208,7 @@ void BosonStarLevel::doAnalysis()
             MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
                                         m_time, first_step, m_restart_time);
             mass_extraction.execute_query(m_gr_amr.m_interpolator);
-        }
+        } */
     }
 
     fillAllGhosts();
