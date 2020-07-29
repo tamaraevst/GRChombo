@@ -98,6 +98,7 @@ void BosonStarLevel::preCheckpointLevel()
                   complex_scalar_field, m_dx, m_p.G_Newton)),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);*/
 
+     fillAllGhosts();
      Potential potential(m_p.potential_params);
      ComplexScalarFieldWithPotential complex_scalar_field(potential);
      BoxLoops::loop(make_compute_pack(
