@@ -102,8 +102,8 @@ public:
         pp.load("calculate_noether_charge", calculate_noether_charge, false);
 
         // Variables for outputting to plot files
-        pp.load("num_plot_vars", num_plot_vars, 0);
-        pp.load("plot_vars", plot_vars, num_plot_vars, 0);
+        //pp.load("num_plot_vars", num_plot_vars, 0);
+        //pp.load("plot_vars", plot_vars, num_plot_vars, 0);
 
         // Variables for outputting inf-norm
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
@@ -130,8 +130,8 @@ public:
     bool calculate_noether_charge;
 
     // Vars for outputting in plot files
-    int num_plot_vars;
-    std::vector<int> plot_vars;
+    //int num_plot_vars;
+    //std::vector<int> plot_vars;
 
     // Vars for outputting inf-norms
     int num_vars_inf_norm;

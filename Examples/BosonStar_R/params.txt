@@ -109,8 +109,9 @@ calculate_constraint_violations = 1
 calculate_noether_charge = 1
 
 # Vars to write to plot files
-num_plot_vars = 10
-plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
+num_plot_vars = 8
+# plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
+plot_vars = chi K lapse phi_Re mod_phi N Weyl4_Re rho
 
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3
