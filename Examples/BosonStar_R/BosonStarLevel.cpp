@@ -87,6 +87,7 @@ void BosonStarLevel::initialData()
 // Things to do before outputting a checkpoint file
 void BosonStarLevel::preCheckpointLevel()
 {
+    CH_TIME("BosonStarLevel::preCheckpointLevel");
     //Thomas Version for EMTENSOR
     /*fillAllGhosts();
     Potential potential(m_p.potential_params);
@@ -113,6 +114,7 @@ void BosonStarLevel::preCheckpointLevel()
 // Things to do before outputting a plot file
 void BosonStarLevel::prePlotLevel()
 {
+    CH_TIME("BosonStarLevel::prePlotLevel");
     //Thomas Version for EMTENSOR
     /*fillAllGhosts();
     Potential potential(m_p.potential_params);
