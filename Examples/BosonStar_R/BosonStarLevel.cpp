@@ -183,7 +183,8 @@ void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
     bool first_step = (m_time == 0.0);
-    if (m_p.activate_mass_extraction == 1)
+    if (m_p.activate_mass_extraction == 1 and
+       at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
     {
         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
         // First compute the ADM Mass integrand values on the grid
@@ -195,8 +196,8 @@ void BosonStarLevel::doAnalysis()
                         EXCLUDE_GHOST_CELLS);
 
         // Do the extraction on the min extraction level
+        if (m_level == m_p.extraction_params.min_extraction_level())
         {
-          if (m_level == m_p.extraction_params.min_extraction_level())
             if (m_verbosity)
             {
                 pout() << "BinaryBSLevel::specificPostTimeStep:"

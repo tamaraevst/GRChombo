@@ -161,8 +161,15 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     double get_dx() const;
 
-    /// Fill all ghosts cells
-    virtual void fillAllGhosts();
+    /// Returns true if m_time is the same as the time at the end of the current
+    /// timestep on level a_level and false otherwise
+    /// Useful to check whether to calculate something in postTimeStep (which
+    /// might only be needed at the end of a_level's timestep)
+    bool at_level_timestep_multiple(int a_level) const;
+
+    /// Fill all [either] evolution or diagnostic ghost cells
+    virtual void
+    fillAllGhosts();
 
   protected:
     /// Fill ghosts cells from boxes on this level only. Do not interpolate
