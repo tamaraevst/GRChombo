@@ -82,6 +82,8 @@ void BosonStarLevel::initialData()
     BoxLoops::loop(GammaCalculator(m_dx),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                    disable_simd());
+
+    fillAllGhosts();
 }
 
 // Things to do before outputting a checkpoint file
@@ -106,7 +108,8 @@ void BosonStarLevel::preCheckpointLevel()
                      MatterConstraints<ComplexScalarFieldWithPotential>(
                      complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
                      EMTensor<ComplexScalarFieldWithPotential>(
-                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3))),
+                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
+                     Interval(c_s11,c_s33))),
                      m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
 }
@@ -133,7 +136,8 @@ void BosonStarLevel::prePlotLevel()
                      MatterConstraints<ComplexScalarFieldWithPotential>(
                      complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
                      EMTensor<ComplexScalarFieldWithPotential>(
-                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3))),
+                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
+                     Interval(c_s11,c_s33))),
                      m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
 }

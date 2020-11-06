@@ -130,6 +130,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL[1][1] = psi_p*psi_p;
         helferLL[2][2] = psi_p*psi_p;
         helferLL[0][0] = pc_os_p;
+        std::cout << "delta00 = " << helferLL[0][0] << ", delta11 = " << helferLL[1][1]
+                          << ", delta22 = " << helferLL[2][2] << ", chi inf = " <<
+                          pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
+                          (2.-helferLL[2][2]),-1./3.) << std::endl;
     }
 
     if (binary)
