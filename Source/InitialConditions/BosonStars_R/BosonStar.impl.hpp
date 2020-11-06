@@ -124,7 +124,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double omega_prime_p = m_1d_sol.get_dlapse_interp(r_p);
     double psi_p = m_1d_sol.get_psi_interp(r_p);
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
-    double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;#
+    double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
     if (binary)
     {
         helferLL[1][1] = psi_p*psi_p;
