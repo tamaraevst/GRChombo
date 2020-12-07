@@ -14,6 +14,7 @@
 #include "ComplexPotential.hpp"
 #include "BosonStarParams.hpp"
 #include "GaussianFitTrackingParams.hpp"
+#include "AngMomFluxParams.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
@@ -108,6 +109,20 @@ public:
         // Variables for outputting inf-norm
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
         pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
+
+
+
+        /*pp.load("flux_number_of_radii", angmomflux_params.number_radii,1);
+        pp.load("flux_do", angmomflux_params.do_flux_integration,false);
+        pp.load("flux_extraction_level", angmomflux_params.extraction_level,0);
+        pp.load("flux_num_theta", angmomflux_params.num_theta,10);
+        pp.load("flux_num_phi", angmomflux_params.num_phi,10);
+        pp.load("flux_extraction_centre", angmomflux_params.centre,
+                                                {0.5 * L, 0.5 * L, 0.5 * L});
+
+        angmomflux_params.radii.resize(angmomflux_params.number_radii);
+        pp.load("flux_extraction_radii", angmomflux_params.radii,
+                                                angmomflux_params.number_radii);*/
     }
 
     // Tagging thresholds
@@ -122,6 +137,7 @@ public:
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
+
 
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;

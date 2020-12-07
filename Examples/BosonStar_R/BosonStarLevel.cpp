@@ -32,6 +32,7 @@
 #include "ADMMass.hpp"
 #include "Density.hpp"
 #include "EMTensor.hpp"
+#include "MomFluxCalc.hpp"
 //#include "MassExtraction.hpp"
 
 // For GW extraction
@@ -44,6 +45,9 @@
 
 // For Star Tracking
 #include "GaussianFitTracking.hpp"
+
+// For Ang Mom Integrating
+#include "AngMomFlux.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void BosonStarLevel::specificAdvance()
@@ -292,6 +296,18 @@ void BosonStarLevel::doAnalysis()
         gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
         std::vector<double> dummy;
         gaussian_fit_tracking.get_BH_centres(dummy);
+    }
+
+    //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
+    if (m_p.do_flux_integration)
+    {
+      // update stress tensor and mom flux components
+      BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
+                      complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
+                      c_Fx_flux, c_Fy_flux, c_rho, Interval(c_s1,c_s3),
+                      Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+        AngMomFlux ang_mom_flux(m_p.angmomflux_params,m_time,m_dt,m_restart_time,first_step);
+        ang_mom_flux.run(m_gr_amr.m_interpolator);
     }
 }
 

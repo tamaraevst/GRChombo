@@ -1,6 +1,6 @@
 #Params for runtime inputs
 
-verbosity = 1
+verbosity = 0
 chk_prefix = chk/Sim_
 plot_prefix = plt/Sim_p_
 #restart_file = chk/Sim_000004.3d.hdf5
@@ -61,6 +61,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 0              #Weyl4 re im
                          0 0 0 0          #Stresstensor rho s1 s2 s3
                          0 0 0 0 0 0      #Stresstensor s11 s12 s13 s22 s23 s33
+                         0 0              #Fx Fy
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -76,6 +77,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0                     #Wely4_Re and Weyl4_Im
                          0.0 0.0 0.0 0.0             #Stress tensor rho s1 s2 s3
                          0.0 0.0 0.0 0.0 0.0 0.0     #Stress tensor s11 s12 s13 s22 s23 s33
+                         0.0 0.0                     #Fx Fy
 
 
 # Set up time steps
@@ -189,3 +191,13 @@ track_min_separation = 2. # cancels tracking if stars get within this distance
 tracking_centre = 16 0 0 # with respect to centre of grid
 tracking_centres = 16 0 0 -16 0 0 # with respect to centre of grid
 tracking_BH_cutoff = 0.05
+
+
+flux_number_of_radii = 3
+flux_do = true
+flux_write_extraction = true
+flux_num_theta = 20
+flux_num_phi = 20
+#flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
+flux_extraction_radii = 10. 20. 30.
+flux_extraction_levels = 1 0 0

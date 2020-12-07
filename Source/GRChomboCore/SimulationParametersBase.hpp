@@ -117,6 +117,20 @@ class SimulationParametersBase : public ChomboParameters
         }
 
         pp.load("write_extraction", extraction_params.write_extraction, false);
+
+
+        pp.load("flux_number_of_radii", angmomflux_params.num_extraction_radii,1);
+        pp.load("flux_write_extraction",angmomflux_params.write_extraction,false );
+        pp.load("flux_do", do_flux_integration,false);
+        pp.load("flux_extraction_levels", angmomflux_params.extraction_levels,angmomflux_params.num_extraction_radii);
+        pp.load("flux_num_theta", angmomflux_params.num_points_theta,10);
+        pp.load("flux_num_phi", angmomflux_params.num_points_phi,10);
+        pp.load("flux_extraction_centre", angmomflux_params.center,
+                                                {0.5 * L, 0.5 * L, 0.5 * L});
+
+        //angmomflux_params.radii.resize(angmomflux_params.number_radii);
+        pp.load("flux_extraction_radii", angmomflux_params.extraction_radii,
+                                                angmomflux_params.num_extraction_radii);
     }
 
   public:
@@ -134,6 +148,8 @@ class SimulationParametersBase : public ChomboParameters
     // Collection of parameters necessary for the CCZ4 RHS and extraction
     CCZ4::params_t ccz4_params;
     SphericalExtraction::params_t extraction_params;
+    SphericalExtraction::params_t angmomflux_params;
+    bool do_flux_integration;
 };
 
 #endif /* SIMULATIONPARAMETERSBASE_HPP_ */

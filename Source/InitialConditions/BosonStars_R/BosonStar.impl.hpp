@@ -133,9 +133,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
         (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
         h11_inf = (2.-helferLL[1][1])*chi_inf, h22_inf = (2.-helferLL[2][2])*chi_inf;
-        std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
+        /*std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
-                          chi_inf << std::endl;
+                          chi_inf << std::endl;*/
     }
 
     if (binary)

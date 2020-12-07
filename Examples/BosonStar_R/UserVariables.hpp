@@ -75,6 +75,9 @@ enum
     c_s23,
     c_s33,
 
+    c_Fx_flux,
+    c_Fy_flux,
+
     NUM_VARS
 };
 
@@ -111,7 +114,9 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "Weyl4_Re",  "Weyl4_Im",
 
-    "rho", "s1", "s2", "s3", "s11", "s12", "s13", "s22", "s23", "s33"};
+    "rho", "s1", "s2", "s3", "s11", "s12", "s13", "s22", "s23", "s33",
+
+    "Fx_flux", "Fy_flux"};
     }
 
 #endif /* USERVARIABLES_HPP */
