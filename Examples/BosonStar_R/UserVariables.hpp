@@ -78,6 +78,9 @@ enum
     c_Fx_flux,
     c_Fy_flux,
 
+    c_Sx_source,
+    c_Sy_source,
+
     NUM_VARS
 };
 
@@ -116,7 +119,7 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "rho", "s1", "s2", "s3", "s11", "s12", "s13", "s22", "s23", "s33",
 
-    "Fx_flux", "Fy_flux"};
+    "Fx_flux", "Fy_flux", "Sx_source", "Sy_source"};
     }
 
 #endif /* USERVARIABLES_HPP */

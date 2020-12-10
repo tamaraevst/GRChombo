@@ -22,11 +22,13 @@ template <class matter_t>
 EMTensor_and_mom_flux<matter_t>::EMTensor_and_mom_flux(const matter_t &a_matter,
                              const double dx, const double a_L,
                               std::array<double,CH_SPACEDIM> a_centre, const int a_c_Fx_flux,
-                             const int a_c_Fy_flux, const int a_c_rho,
+                             const int a_c_Fy_flux, const int a_c_Sx_source,
+                             const int a_c_Sy_source, const int a_c_rho,
                              const Interval a_c_Si, const Interval a_c_Sij)
     : m_matter(a_matter), m_deriv(dx),  m_dx(dx), m_L(a_L),
                                   m_centre(a_centre), m_c_Fx_flux(a_c_Fx_flux),
-                                   m_c_Fy_flux(a_c_Fy_flux),  m_c_rho(a_c_rho),
+                        m_c_Fy_flux(a_c_Fy_flux), m_c_Sx_source(a_c_Sx_source),
+                                m_c_Sy_source(a_c_Sy_source), m_c_rho(a_c_rho),
                                               m_c_Si(a_c_Si), m_c_Sij(a_c_Sij)
 {
     if (m_c_Si.size() != 0)
@@ -86,7 +88,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     //double N[3] = {coords.x,coords.y,coords.z};
     data_t N[3] = {coords.x,coords.y,coords.z};
     data_t normsqr = 0.;
-    data_t Fx=0., Fy=0.;
+    data_t Fx=0., Fy=0., Sx =0., Sy = 0.;
 
     FOR2(i,j) normsqr += N[i]*N[j]*vars.h[i][j]/vars.chi;
     FOR1(i) N[i] /= sqrt(normsqr);
@@ -95,9 +97,26 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR2(i,j) Fx -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[0]/vars.chi;
     FOR2(i,j) Fy -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[1]/vars.chi;
 
+    auto gamma_chris = chris.ULL;
+
+    std::function<data_t(int i, int j)> kroneka = [](int i, int j){ return ((i==j)?1.:0.);};
+
+    FOR3(i,j,k) gamma_chris[i][j][k] -= (kroneka(i,k)*d1.chi[j] + kroneka(i,j)*d1.chi[k])/(2.*vars.chi);
+    FOR4(i,j,k,l) gamma_chris[i][j][k] += (h_UU[i][l]*vars.h[j][k]*d1.chi[l])/(2.*vars.chi);
+
+    Sx = -emtensor.rho*d1.lapse[0];
+    Sy = -emtensor.rho*d1.lapse[1];
+
+    FOR1(i) Sx += emtensor.Si[i]*d1.shift[i][1];
+    FOR1(i) Sy += emtensor.Si[i]*d1.shift[i][2];
+    FOR3(i,j,k) Sx += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
+                                                        * gamma_chris[j][i][k];
+
 
     current_cell.store_vars(Fx,m_c_Fx_flux);
     current_cell.store_vars(Fy,m_c_Fy_flux);
+    current_cell.store_vars(Sx,m_c_Sx_source);
+    current_cell.store_vars(Sy,m_c_Sy_source);
 
 }
 

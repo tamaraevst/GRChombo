@@ -77,7 +77,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0                     #Wely4_Re and Weyl4_Im
                          0.0 0.0 0.0 0.0             #Stress tensor rho s1 s2 s3
                          0.0 0.0 0.0 0.0 0.0 0.0     #Stress tensor s11 s12 s13 s22 s23 s33
-                         0.0 0.0                     #Fx Fy
+                         0.0 0.0 0.0 0.0             #Fx Fy Sx Sy
 
 
 # Set up time steps

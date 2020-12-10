@@ -27,6 +27,8 @@ template <class matter_t> class EMTensor_and_mom_flux
              const int a_c_rho = -1,
              const int a_c_Fx_flux = -1,
              const int a_c_Fy_flux = -1,
+             const int a_c_Sx_source = -1,
+             const int a_c_Sy_source = -1,
              const Interval a_c_Si = Interval(),
              const Interval a_c_Sij = Interval());
 
@@ -40,6 +42,8 @@ template <class matter_t> class EMTensor_and_mom_flux
     const int m_c_rho;      // var enum for the energy density
     const int m_c_Fx_flux;    // mom flux x
     const int m_c_Fy_flux;    // mom flux y
+    const int m_c_Sx_source;    // source mom x
+    const int m_c_Sy_source;    // source mom y
     const Interval m_c_Si;  // Interval of var enums for the momentum density
     const Interval m_c_Sij; // Interval of var enums for the spatial
                             // stress-energy density
