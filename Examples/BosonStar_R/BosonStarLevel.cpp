@@ -306,7 +306,8 @@ void BosonStarLevel::doAnalysis()
                       complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
                       c_Fx_flux, c_Fy_flux, c_Sx_source, c_Sy_source, c_rho, Interval(c_s1,c_s3),
                       Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
-        fillAllGhosts();
+        // Refresh the interpolator and do the interpolation
+        m_gr_amr.m_interpolator->refresh();
         AngMomFlux ang_mom_flux(m_p.angmomflux_params,m_time,m_dt,m_restart_time,first_step);
         ang_mom_flux.run(m_gr_amr.m_interpolator);
     }

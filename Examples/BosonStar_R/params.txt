@@ -3,7 +3,7 @@
 verbosity = 0
 chk_prefix = chk/Sim_
 plot_prefix = plt/Sim_p_
-#restart_file = chk/Sim_000004.3d.hdf5
+restart_file = chk/Sim_000000.3d.hdf5
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
@@ -83,8 +83,8 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
-checkpoint_interval = 1
-plot_interval = 1
+checkpoint_interval = 100
+plot_interval = 10
 dt_multiplier = 0.25
 stop_time =1000.0
 

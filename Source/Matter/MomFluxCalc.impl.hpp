@@ -110,7 +110,9 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR1(i) Sx += emtensor.Si[i]*d1.shift[i][1];
     FOR1(i) Sy += emtensor.Si[i]*d1.shift[i][2];
     FOR3(i,j,k) Sx += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
-                                                        * gamma_chris[j][i][k];
+                                                        * gamma_chris[j][i][0];
+    FOR3(i,j,k) Sy += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
+                                                        * gamma_chris[j][i][1];
 
 
     current_cell.store_vars(Fx,m_c_Fx_flux);
