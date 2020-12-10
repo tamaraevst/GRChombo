@@ -47,6 +47,12 @@ template <class SurfaceGeometry> class SurfaceExtraction
             return *(std::min_element(extraction_levels.begin(),
                                       extraction_levels.end()));
         }
+
+        int max_extraction_level() // added by robin
+        {
+            return *(std::max_element(extraction_levels.begin(),
+                                      extraction_levels.end()));
+        }
     };
 
   protected:

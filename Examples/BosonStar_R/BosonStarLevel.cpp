@@ -299,7 +299,7 @@ void BosonStarLevel::doAnalysis()
     }
 
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
-    if (m_p.do_flux_integration)
+    if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.max_extraction_level())
     {
         // update stress tensor and mom flux components
         BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
