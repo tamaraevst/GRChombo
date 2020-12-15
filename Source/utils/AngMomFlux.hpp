@@ -42,6 +42,7 @@ class AngMomFlux : SphericalExtraction
       {
           add_var(c_Fx_flux);
           add_var(c_Fy_flux);
+          add_var(c_chi);
       }
 
     void run(AMRInterpolator<Lagrange<4>> *a_interpolator)
@@ -49,7 +50,8 @@ class AngMomFlux : SphericalExtraction
         std::vector<double> integrals;
         auto integrand = [](std::vector<double> mom_flux_vals, double r,
                                                      double theta, double phi){
-            return mom_flux_vals[1]*sin(theta) - mom_flux_vals[0]*cos(theta);
+            return r*sin(theta)*(mom_flux_vals[1]*cos(phi) -
+                                    mom_flux_vals[0]*sin(phi))/mom_flux_vals[2];
         };
 
         // extract the values of the Weyl scalars on the spheres
