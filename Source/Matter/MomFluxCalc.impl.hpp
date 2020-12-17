@@ -86,7 +86,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     Coordinates<data_t> coords(current_cell, m_dx,m_centre);
 
     //double N[3] = {coords.x,coords.y,coords.z};
-    data_t N[3] = {coords.x,coords.y,coords.z};
+    /*data_t N[3] = {coords.x,coords.y,coords.z};
     data_t normsqr = 0.;
     data_t Fx=0., Fy=0., Sx =0., Sy = 0.;
 
@@ -95,9 +95,30 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR1(i) Fx += vars.lapse*N[i]*emtensor.Sij[i][0];
     FOR1(i) Fy += vars.lapse*N[i]*emtensor.Sij[i][1];
     FOR2(i,j) Fx -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[0]/vars.chi;
-    FOR2(i,j) Fy -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[1]/vars.chi;
+    FOR2(i,j) Fy -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[1]/vars.chi;*/
 
-    auto gamma_chris = chris.ULL;
+
+
+    data_t azimuthal_radial_shear = 0.; // the T^r_phi component
+    data_t T_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // the spatial components of the 4-stress tensor
+    data_t g_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //spatial components of 4-metric inverse
+    data_t x = coords.x, y=coords.y, z=coords.z, r_xyz = sqrt(x*x + y*y + z*z),
+                               r_xy = sqrt(x*x + y*y), sintheta = r_xy/r_xyz,
+                                             sinphi = y/r_xy, cosphi = x/r_xy;
+
+    FOR2(i,j) g_UU[i][j] = h_UU[i][j]*vars.chi -
+                                vars.shift[i]*vars.shift[j]*pow(vars.lapse,-2);
+
+    FOR3(i,j,k) T_UL[i][j] += g_UU[i][k]*emtensor.Sij[k][j];
+
+    azimuthal_radial_shear = sintheta*(
+                           cosphi*(x*T_UL[0][1] + y*T_UL[1][1] +z*T_UL[2][1])
+                         - sinphi*(x*T_UL[0][0] + y*T_UL[1][0] +z*T_UL[2][0]) );
+
+
+
+
+    /*auto gamma_chris = chris.ULL;
 
     std::function<data_t(int i, int j)> kroneka = [](int i, int j){ return ((i==j)?1.:0.);};
 
@@ -112,13 +133,13 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR3(i,j,k) Sx += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
                                                         * gamma_chris[j][i][0];
     FOR3(i,j,k) Sy += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
-                                                        * gamma_chris[j][i][1];
+                                                        * gamma_chris[j][i][1];*/
 
 
-    current_cell.store_vars(Fx,m_c_Fx_flux);
-    current_cell.store_vars(Fy,m_c_Fy_flux);
-    current_cell.store_vars(Sx,m_c_Sx_source);
-    current_cell.store_vars(Sy,m_c_Sy_source);
+    current_cell.store_vars(vars.lapse*azimuthal_radial_shear,m_c_Fx_flux);
+    current_cell.store_vars(0.,m_c_Fy_flux);
+    current_cell.store_vars(0.,m_c_Sx_source);
+    current_cell.store_vars(0.,m_c_Sy_source);
 
 }
 
