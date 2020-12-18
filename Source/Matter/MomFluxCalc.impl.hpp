@@ -100,20 +100,20 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
 
     data_t azimuthal_radial_shear = 0.; // the T^r_phi component
-    data_t T_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // the spatial components of the 4-stress tensor
-    data_t g_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //spatial components of 4-metric inverse
+    data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
+    data_t gamma_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //
     data_t x = coords.x, y=coords.y, z=coords.z, r_xyz = sqrt(x*x + y*y + z*z),
                                r_xy = sqrt(x*x + y*y), sintheta = r_xy/r_xyz,
                                              sinphi = y/r_xy, cosphi = x/r_xy;
 
-    FOR2(i,j) g_UU[i][j] = h_UU[i][j]*vars.chi -
-                                vars.shift[i]*vars.shift[j]*pow(vars.lapse,-2);
+    FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]*vars.chi;
 
-    FOR3(i,j,k) T_UL[i][j] += g_UU[i][k]*emtensor.Sij[k][j];
+    FOR3(i,j,k) aT_UL[i][j] += vars.lapse*gamma_UU[i][k]*emtensor.Sij[k][j];
+    FOR2(i,j) aT_UL[i][j] += -vars.shift[i]*emtensor.Si[j];
 
     azimuthal_radial_shear = sintheta*(
-                           cosphi*(x*T_UL[0][1] + y*T_UL[1][1] +z*T_UL[2][1])
-                         - sinphi*(x*T_UL[0][0] + y*T_UL[1][0] +z*T_UL[2][0]) );
+                        cosphi*(x*aT_UL[0][1] + y*aT_UL[1][1] +z*aT_UL[2][1])
+                      - sinphi*(x*aT_UL[0][0] + y*aT_UL[1][0] +z*aT_UL[2][0]));
 
 
 
@@ -136,7 +136,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
                                                         * gamma_chris[j][i][1];*/
 
 
-    current_cell.store_vars(vars.lapse*azimuthal_radial_shear,m_c_Fx_flux);
+    current_cell.store_vars(azimuthal_radial_shear,m_c_Fx_flux);
     current_cell.store_vars(0.,m_c_Fy_flux);
     current_cell.store_vars(0.,m_c_Sx_source);
     current_cell.store_vars(0.,m_c_Sy_source);
