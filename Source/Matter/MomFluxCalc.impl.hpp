@@ -97,14 +97,15 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR2(i,j) Fx -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[0]/vars.chi;
     FOR2(i,j) Fy -=  vars.h[i][j]*vars.shift[i]*N[j]*emtensor.Si[1]/vars.chi;*/
 
-
+    // start on flux term
 
     data_t azimuthal_radial_shear = 0.; // the T^r_phi component
     data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
     data_t gamma_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //
     data_t x = coords.x, y=coords.y, z=coords.z, r_xyz = sqrt(x*x + y*y + z*z),
                                r_xy = sqrt(x*x + y*y), sintheta = r_xy/r_xyz,
-                                             sinphi = y/r_xy, cosphi = x/r_xy;
+                                             sinphi = y/r_xy, cosphi = x/r_xy,
+                                             costheta = z/r_xyz;
 
     FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]*vars.chi;
 
@@ -117,28 +118,62 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
 
 
+    // start source term
 
-    /*auto gamma_chris = chris.ULL;
+    data_t J_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};// (d x^a)/(d tildex^b)
+    data_t dJ_UL[3][3][3];// tildepartial_c (d x^a)/(d tildex^b)
+    data_t d_tilde_gamma_LL[3][3][3];// 3-metric 1st dervis in polars partial_c gamma_ab
+    data_t tilde_gamma_LL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+    data_t S_phi=0.;
 
-    std::function<data_t(int i, int j)> kroneka = [](int i, int j){ return ((i==j)?1.:0.);};
+    FOR3(i,j,k) dJ_UL[i][j][k] = 0.;
+    FOR3(i,j,k) d_tilde_gamma_LL[i][j][k] = 0.;
 
-    FOR3(i,j,k) gamma_chris[i][j][k] -= (kroneka(i,k)*d1.chi[j] + kroneka(i,j)*d1.chi[k])/(2.*vars.chi);
-    FOR4(i,j,k,l) gamma_chris[i][j][k] += (h_UU[i][l]*vars.h[j][k]*d1.chi[l])/(2.*vars.chi);
+    J_UL[0][0] = cosphi*sintheta;
+    J_UL[1][0] = sinphi*sintheta;
+    J_UL[2][0] = costheta;
+    J_UL[0][1] = r_xyz*cosphi*costheta;
+    J_UL[1][1] = r_xyz*sinphi*costheta;
+    J_UL[2][1] = -r_xyz*sintheta;
+    J_UL[0][2] = -r_xyz*sinphi*sintheta;
+    J_UL[1][2] = r_xyz*cosphi*sintheta;
 
-    Sx = -emtensor.rho*d1.lapse[0];
-    Sy = -emtensor.rho*d1.lapse[1];
+    // radial derivs
+    dJ_UL[0][1][0] = cosphi*costheta;
+    dJ_UL[1][1][0] = sinphi*costheta;
+    dJ_UL[2][1][0] = -sintheta;
+    dJ_UL[0][2][0] = -sinphi*sintheta;
+    dJ_UL[1][2][0] = cosphi*sintheta;
 
-    FOR1(i) Sx += emtensor.Si[i]*d1.shift[i][1];
-    FOR1(i) Sy += emtensor.Si[i]*d1.shift[i][2];
-    FOR3(i,j,k) Sx += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
-                                                        * gamma_chris[j][i][0];
-    FOR3(i,j,k) Sy += vars.lapse * vars.chi * h_UU[i][k] * emtensor.Sij[k][j]
-                                                        * gamma_chris[j][i][1];*/
+    //theta derivs
+    dJ_UL[0][0][1] = cosphi*costheta;
+    dJ_UL[1][0][1] = sinphi*costheta;
+    dJ_UL[2][0][1] = -sintheta;
+    dJ_UL[0][1][1] = -r_xyz*cosphi*sintheta;
+    dJ_UL[1][1][1] = -r_xyz*sinphi*sintheta;
+    dJ_UL[2][1][1] = -r_xyz*costheta;
+    dJ_UL[0][2][1] = -r_xyz*sinphi*costheta;
+    dJ_UL[1][2][1] = r_xyz*cosphi*costheta;
+
+    //phi derivs
+    dJ_UL[0][0][2] = -sinphi*sintheta;
+    dJ_UL[1][0][2] = cosphi*sintheta;
+    dJ_UL[0][1][2] = -r_xyz*sinphi*costheta;
+    dJ_UL[1][1][2] = r_xyz*cosphi*costheta;
+    dJ_UL[0][2][2] = -r_xyz*cosphi*sintheta;
+    dJ_UL[1][2][2] = -r_xyz*sinphi*sintheta;
+
+    FOR4(i,j,k,l) tilde_gamma_LL[i][j] += vars.h[k][l]*
+                                               (J_UL[k][i]*J_UL[l][j])/vars.chi;
+
+    auto tilde_gamma_UU = compute_inverse_sym(tilde_gamma_LL);
+
+
 
 
     current_cell.store_vars(azimuthal_radial_shear,m_c_Fx_flux);
     current_cell.store_vars(0.,m_c_Fy_flux);
-    current_cell.store_vars(0.,m_c_Sx_source);
+    current_cell.store_vars(S_phi,m_c_Sx_source);
     current_cell.store_vars(0.,m_c_Sy_source);
 
 }
