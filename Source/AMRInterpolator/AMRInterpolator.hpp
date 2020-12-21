@@ -44,14 +44,14 @@ template <typename InterpAlgo> class AMRInterpolator
                     const BoundaryConditions::params_t &a_bc_params,
                     int verbosity = 0);
 
-    void refresh(const bool fill_ghosts = true);
+    void refresh(const bool a_fill_ghosts = true);
 
     // if not filling ghosts in refresh, call this explicitly for required vars
     void fill_ghosts(
-        const VariableType var_type,
+        const VariableType a_var_type,
         const Interval &a_comps = Interval(0, std::numeric_limits<int>::max()),
-        const int min_level = 0,
-        const int max_level = std::numeric_limits<int>::max());
+        const int a_min_level = 0,
+        const int a_max_level = std::numeric_limits<int>::max());
 
     void limit_num_levels(unsigned int num_levels);
     void interp(InterpolationQuery &query);

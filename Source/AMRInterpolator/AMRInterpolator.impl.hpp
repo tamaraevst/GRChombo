@@ -37,7 +37,7 @@ AMRInterpolator<InterpAlgo>::AMRInterpolator(
 }
 
 template <typename InterpAlgo>
-void AMRInterpolator<InterpAlgo>::refresh(const bool fill_ghosts)
+void AMRInterpolator<InterpAlgo>::refresh(const bool a_fill_ghosts)
 {
     CH_TIME("AMRInterpolator::refresh");
 
@@ -47,21 +47,16 @@ void AMRInterpolator<InterpAlgo>::refresh(const bool fill_ghosts)
     m_mem_level.clear();
     m_mem_box.clear();
 
-    if (fill_ghosts)
+    if (a_fill_ghosts)
     {
-        for (int level_idx = 0; level_idx < m_num_levels; ++level_idx)
-        {
-            AMRLevel &level = *levels[level_idx];
-            InterpSource &interp_source = dynamic_cast<InterpSource &>(level);
-            interp_source.fillAllGhosts(VariableType::evolution);
-            if (NUM_DIAGNOSTIC_VARS > 0)
-                interp_source.fillAllGhosts(VariableType::diagnostic);
-        }
+        fill_ghosts(VariableType::evolution);
+        if (NUM_DIAGNOSTIC_VARS > 0)
+            fill_ghosts(VariableType::diagnostic);
     }
 }
 
 template <typename InterpAlgo>
-void AMRInterpolator<InterpAlgo>::fill_ghosts(const VariableType var_type,
+void AMRInterpolator<InterpAlgo>::fill_ghosts(const VariableType a_var_type,
                                               const Interval &a_comps,
                                               const int a_min_level,
                                               const int a_max_level)
@@ -73,7 +68,7 @@ void AMRInterpolator<InterpAlgo>::fill_ghosts(const VariableType var_type,
     {
         AMRLevel &level = *levels[level_idx];
         InterpSource &interp_source = dynamic_cast<InterpSource &>(level);
-        interp_source.fillAllGhosts(var_type, a_comps);
+        interp_source.fillAllGhosts(a_var_type, a_comps);
     }
 }
 
