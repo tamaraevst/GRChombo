@@ -7,11 +7,13 @@
 #define BOUNDARYCONDITIONS_HPP_
 
 #include "BoxIterator.H"
+#include "Coordinates.hpp"
 #include "Copier.H"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderInterpStencil.H"
 #include "GRLevelData.hpp"
 #include "GRParmParse.hpp"
+#include "Interval.H"
 #include "RealVect.H"
 #include "UserVariables.hpp"
 #include "VariableType.hpp"
@@ -33,7 +35,9 @@ class BoundaryConditions
     {
         STATIC_BC,
         SOMMERFELD_BC,
-        REFLECTIVE_BC
+        REFLECTIVE_BC,
+        EXTRAPOLATING_BC,
+        MIXED_BC
     };
 
     /// enum for possible parity states
@@ -61,12 +65,15 @@ class BoundaryConditions
         bool boundary_rhs_enforced;
         bool reflective_boundaries_exist;
         bool sommerfeld_boundaries_exist;
+        bool extrapolating_boundaries_exist;
+        bool mixed_boundaries_exist;
 
         std::array<int, NUM_VARS> vars_parity;
         std::array<int, NUM_DIAGNOSTIC_VARS>
             vars_parity_diagnostic; /* needed only in AMRInterpolator */
         std::array<double, NUM_VARS> vars_asymptotic_values;
-
+        std::map<int, int> mixed_bc_vars_map;
+        int extrapolation_order;
         params_t(); // sets the defaults
         void
         set_is_periodic(const std::array<bool, CH_SPACEDIM> &a_is_periodic);
@@ -77,15 +84,12 @@ class BoundaryConditions
 
   protected:
     // Member values
-    double m_dx;              // The grid spacing
-    int m_num_ghosts;         // the number of ghosts (usually 3)
-    params_t m_params;        // the boundary params
-    RealVect m_center;        // the position of the center of the grid
-    ProblemDomain m_domain;   // the problem domain (excludes boundary cells)
-    Box m_domain_box;         // The box representing the domain
-    std::vector<int> m_comps; // a vector of c_nums for all the evolution vars
-    std::vector<int>
-        m_diagnostic_comps; // a vector of c_nums for all the diagnostic vars
+    double m_dx;            // The grid spacing
+    int m_num_ghosts;       // the number of ghosts (usually 3)
+    params_t m_params;      // the boundary params
+    RealVect m_center;      // the position of the center of the grid
+    ProblemDomain m_domain; // the problem domain (excludes boundary cells)
+    Box m_domain_box;       // The box representing the domain
     bool is_defined; // whether the BoundaryConditions class members are defined
 
   public:
@@ -123,19 +127,23 @@ class BoundaryConditions
                              const GRLevelData &a_soln, GRLevelData &a_rhs);
 
     /// enforce solution boundary conditions, e.g. after interpolation
-    void fill_solution_boundaries(const Side::LoHiSide a_side,
-                                  GRLevelData &a_state);
+    void fill_solution_boundaries(
+        const Side::LoHiSide a_side, GRLevelData &a_state,
+        const Interval &a_comps = Interval(0, NUM_VARS - 1));
 
     /// fill diagnostic boundaries - used in AMRInterpolator
-    void fill_diagnostic_boundaries(const Side::LoHiSide a_side,
-                                    GRLevelData &a_state);
+    void fill_diagnostic_boundaries(
+        const Side::LoHiSide a_side, GRLevelData &a_state,
+        const Interval &a_comps = Interval(0, NUM_DIAGNOSTIC_VARS - 1));
 
     /// Fill the boundary values appropriately based on the params set
     /// in the direction dir
-    void fill_boundary_cells_dir(
-        const Side::LoHiSide a_side, const GRLevelData &a_soln,
-        GRLevelData &a_out, const int dir, const int boundary_condition,
-        const VariableType var_type = VariableType::evolution);
+    void fill_boundary_cells_dir(const Side::LoHiSide a_side,
+                                 const GRLevelData &a_soln, GRLevelData &a_out,
+                                 const int dir, const int boundary_condition,
+                                 const Interval &a_comps,
+                                 const VariableType var_type,
+                                 const bool filling_rhs);
 
     /// Copy the boundary values from src to dest
     /// NB assumes same box layout of input and output data
@@ -173,11 +181,20 @@ class BoundaryConditions
     /// write out sommerfeld conditions
     static void write_sommerfeld_conditions(int idir, const params_t &a_params);
 
+    /// write out mixed conditions
+    static void write_mixed_conditions(int idir, const params_t &a_params);
+
     void fill_sommerfeld_cell(FArrayBox &rhs_box, const FArrayBox &soln_box,
                               const IntVect iv,
                               const std::vector<int> &sommerfeld_comps) const;
+
+    void fill_extrapolating_cell(FArrayBox &out_box, const IntVect iv,
+                                 const Side::LoHiSide a_side, const int dir,
+                                 const std::vector<int> &extrapolating_comps,
+                                 const int order = 1) const;
+
     void fill_reflective_cell(
-        FArrayBox &rhs_box, const IntVect iv, const Side::LoHiSide a_side,
+        FArrayBox &out_box, const IntVect iv, const Side::LoHiSide a_side,
         const int dir, const std::vector<int> &reflective_comps,
         const VariableType var_type = VariableType::evolution) const;
 };
