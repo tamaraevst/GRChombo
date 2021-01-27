@@ -25,10 +25,8 @@ template <class matter_t> class EMTensor_and_mom_flux
     EMTensor_and_mom_flux(const matter_t &a_matter, const double dx, const double a_L,
              const std::array<double,CH_SPACEDIM> a_centre,
              const int a_c_rho = -1,
-             const int a_c_Fx_flux = -1,
-             const int a_c_Fy_flux = -1,
-             const int a_c_Sx_source = -1,
-             const int a_c_Sy_source = -1,
+             const int a_c_Fphi_flux = -1,
+             const int a_c_Sphi_source = -1,
              const Interval a_c_Si = Interval(),
              const Interval a_c_Sij = Interval());
 
@@ -40,10 +38,8 @@ template <class matter_t> class EMTensor_and_mom_flux
     const matter_t &m_matter;
     FourthOrderDerivatives m_deriv;
     const int m_c_rho;      // var enum for the energy density
-    const int m_c_Fx_flux;    // mom flux x
-    const int m_c_Fy_flux;    // mom flux y
-    const int m_c_Sx_source;    // source mom x
-    const int m_c_Sy_source;    // source mom y
+    const int m_c_Fphi_flux;    // ang mom flux 
+    const int m_c_Sphi_source;    // ang source mom
     const Interval m_c_Si;  // Interval of var enums for the momentum density
     const Interval m_c_Sij; // Interval of var enums for the spatial
                             // stress-energy density

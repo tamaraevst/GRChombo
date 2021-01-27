@@ -40,7 +40,7 @@ class AngMomFlux : SphericalExtraction
                             m_time(a_time), m_dt(a_dt), m_restart_time(m_restart_time),
                             m_first_step(a_first_step)
       {
-          add_var(c_Fx_flux);
+          add_var(c_Fphi_flux);
       }
 
     void run(AMRInterpolator<Lagrange<4>> *a_interpolator)

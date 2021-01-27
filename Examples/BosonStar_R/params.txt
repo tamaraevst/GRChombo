@@ -83,7 +83,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
 # Set up time steps
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
-checkpoint_interval = 100
+checkpoint_interval = 1
 plot_interval = 10
 dt_multiplier = 0.25
 stop_time =1000.0
@@ -132,7 +132,7 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 # G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
-central_amplitude_CSF = 0.02820947917 # 0.0733 # near kaup limit
+central_amplitude_CSF = 0.0733 # 0.02820947917 # 0.0733 # near kaup limit
 phase = 1.0
 eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>=20 ask Robin
 gridpoints 200000
@@ -199,5 +199,5 @@ flux_write_extraction = true
 flux_num_theta = 20
 flux_num_phi = 20
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
-flux_extraction_radii = 10. 20. 30.
+flux_extraction_radii = 5. 10. 15.
 flux_extraction_levels = 1 0 0
