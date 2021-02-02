@@ -302,8 +302,9 @@ void BosonStarLevel::doAnalysis()
     double S_phi_integral; // integral of angmomsource
     std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
-    if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.max_extraction_level())
+    if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.min_extraction_level())
     {
+        //std::cout << "Level : " << m_level << std::endl;
         // update stress tensor and mom flux components
         BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
@@ -319,41 +320,40 @@ void BosonStarLevel::doAnalysis()
                           m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
             S_phi_integral = m_gr_amr.compute_sum(c_Sphi_source, m_dx);
             S_phi_integrals[i] = S_phi_integral;
-            std::cout << "t : " << m_time << ", i : " << i <<
-                      ", S_phi_integral : " << S_phi_integral << std::endl;
+            //std::cout << "t : " << m_time << ", i : " << i <<
+            //          ", S_phi_integral : " << S_phi_integral << std::endl;
 
 
-            {
 
-
-                std::vector<string> title_line(m_p.angmomflux_params.num_extraction_radii);
-                string dummy_string;
-                for (int i=0; i<m_p.angmomflux_params.num_extraction_radii; i++)
-                {
-                    dummy_string = "r = " + to_string(m_p.angmomflux_params.extraction_radii[i]);
-                    title_line[i] = dummy_string;
-                }
-
-                SmallDataIO flux_file("AngMomSource", m_dt, m_time,
-                                              m_restart_time,
-                                              SmallDataIO::APPEND,
-                                              first_step);
-
-                if (m_time > 0) flux_file.remove_duplicate_time_data();
-
-                if (m_time == 0.)
-                {
-                    flux_file.write_header_line(title_line);
-                }
-
-                flux_file.write_time_data_line(S_phi_integrals);
-
-            }
         }
+
+        // save the Source integral to dat file
+        std::vector<string> title_line(m_p.angmomflux_params.num_extraction_radii);
+        string dummy_string;
+        for (int j=0; j<m_p.angmomflux_params.num_extraction_radii; j++)
+        {
+            dummy_string = "r = " + to_string(m_p.angmomflux_params.extraction_radii[j]);
+            title_line[j] = dummy_string;
+        }
+
+        SmallDataIO flux_file("AngMomSource", m_dt, m_time,
+                                      m_restart_time,
+                                      SmallDataIO::APPEND,
+                                      first_step);
+
+        if (m_time > 0) flux_file.remove_duplicate_time_data();
+
+        if (m_time == 0.)
+        {
+            flux_file.write_header_line(title_line);
+        }
+
+        flux_file.write_time_data_line(S_phi_integrals);
 
 
         // Refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
+        // setup and do angmomflux integral
         AngMomFlux ang_mom_flux(m_p.angmomflux_params,m_time,m_dt,m_restart_time,first_step);
         ang_mom_flux.run(m_gr_amr.m_interpolator);
     }
