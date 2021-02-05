@@ -185,6 +185,7 @@ void BosonStarLevel::doAnalysis()
     bool first_step = (m_time == 0.0);
     if (m_p.activate_mass_extraction == 1)
     {
+        CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
         auto weyl4_adm_compute_pack =
@@ -223,6 +224,7 @@ void BosonStarLevel::doAnalysis()
         } */
     }
 
+
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
@@ -230,8 +232,12 @@ void BosonStarLevel::doAnalysis()
                     MatterConstraints<ComplexScalarFieldWithPotential>(
                     complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+
+
+
     if (m_level == 0)
     {
+        CH_TIME("BosonStarLevel::doAnalysis::Ham/N/InfNorm");
         if (m_p.calculate_constraint_violations)
         {
             // Write constraint violations to file
@@ -291,6 +297,7 @@ void BosonStarLevel::doAnalysis()
 
     if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
     {
+        CH_TIME("BosonStarLevel::doAnalysis::gaussfit");
         GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
                                         m_time,m_restart_time,first_step,m_p.L,m_level);
 
@@ -299,11 +306,14 @@ void BosonStarLevel::doAnalysis()
         gaussian_fit_tracking.get_BH_centres(dummy);
     }
 
-    double S_phi_integral; // integral of angmomsource
-    std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
+
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
     if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.min_extraction_level())
     {
+        CH_TIME("BosonStarLevel::doAnalysis::FphiSphi");
+
+        double S_phi_integral; // integral of angmomsource
+        std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
         //std::cout << "Level : " << m_level << std::endl;
         // update stress tensor and mom flux components
         BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
