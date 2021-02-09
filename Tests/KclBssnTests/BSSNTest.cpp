@@ -14,8 +14,8 @@
 #endif
 
 #include "BoxLoops.hpp"
-#include "MatterCCZ4.hpp"
-#include "MatterConstraints.hpp"
+#include "MatterCCZ4RHS.hpp"
+#include "NewMatterConstraints.hpp"
 #include "Potential.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
@@ -216,7 +216,7 @@ int main()
         }
     }
 
-    CCZ4::params_t params;
+    CCZ4_params_t<MovingPunctureGauge::params_t> params;
     params.kappa1 = 0.0;
     params.kappa2 = 0.0;
     params.kappa3 = 0.0;
@@ -241,14 +241,17 @@ int main()
     typedef ScalarField<Potential> ScalarFieldWithPotential;
     Potential my_potential(potential_params);
     ScalarFieldWithPotential my_scalar_field(my_potential);
-    BoxLoops::loop(MatterCCZ4<ScalarFieldWithPotential>(my_scalar_field, params,
-                                                        dx, sigma, formulation,
-                                                        G_Newton),
+    BoxLoops::loop(MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
+                                 FourthOrderDerivatives>(my_scalar_field,
+                                                         params, dx, sigma,
+                                                         formulation, G_Newton),
                    in_fab, out_fab);
-    BoxLoops::loop(MatterConstraints<ScalarFieldWithPotential>(my_scalar_field,
-                                                               dx, G_Newton),
-                   in_fab, out_fab);
-    BoxLoops::loop(Constraints(dx), in_fab, out_fab_ccz4constraints);
+    BoxLoops::loop(
+        MatterConstraints<ScalarFieldWithPotential>(
+            my_scalar_field, dx, G_Newton, c_Ham, Interval(c_Mom1, c_Mom3)),
+        in_fab, out_fab);
+    BoxLoops::loop(Constraints(dx, c_Ham, Interval(c_Mom1, c_Mom3)), in_fab,
+                   out_fab_ccz4constraints);
     out_fab -= out_fab_ccz4constraints; // so as to test only matter additions
 
     gettimeofday(&end, NULL);

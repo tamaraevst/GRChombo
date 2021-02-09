@@ -17,7 +17,7 @@
 
 // Our includes
 #include "BoxLoops.hpp"
-#include "CCZ4.hpp"
+#include "CCZ4RHS.hpp"
 #include "GRBSSNChomboF_F.H"
 
 // Chombo namespace
@@ -199,7 +199,7 @@ int main()
         }
     }
 
-    CCZ4::params_t params;
+    CCZ4_params_t<MovingPunctureGauge::params_t> params;
     params.kappa1 = 0.1;
     params.kappa2 = 0;
     params.kappa3 = 1;
@@ -213,7 +213,9 @@ int main()
     struct timeval begin, end;
     gettimeofday(&begin, NULL);
 
-    BoxLoops::loop(CCZ4(params, dx, sigma), in_fab, out_fab);
+    BoxLoops::loop(
+        CCZ4RHS<MovingPunctureGauge, FourthOrderDerivatives>(params, dx, sigma),
+        in_fab, out_fab);
 
     gettimeofday(&end, NULL);
 

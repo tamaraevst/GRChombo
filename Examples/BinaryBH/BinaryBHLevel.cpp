@@ -7,12 +7,12 @@
 #include "AMRReductions.hpp"
 #include "BinaryBH.hpp"
 #include "BoxLoops.hpp"
-#include "CCZ4.hpp"
+#include "CCZ4RHS.hpp"
 #include "ChiExtractionTaggingCriterion.hpp"
 #include "ChiPunctureExtractionTaggingCriterion.hpp"
 #include "ComputePack.hpp"
-#include "Constraints.hpp"
 #include "NanCheck.hpp"
+#include "NewConstraints.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "PunctureTracker.hpp"
 #include "SetValue.hpp"
@@ -60,7 +60,8 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                    a_soln, a_soln, INCLUDE_GHOST_CELLS);
 
     // Calculate CCZ4 right hand side
-    BoxLoops::loop(CCZ4(m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
+    BoxLoops::loop(CCZ4RHS<MovingPunctureGauge, FourthOrderDerivatives>(
+                       m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
                    a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
 }
 
@@ -146,8 +147,8 @@ void BinaryBHLevel::specificPostTimeStep()
     if (m_p.calculate_constraint_norms)
     {
         fillAllGhosts();
-        BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_diagnostics,
-                       EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)),
+                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
         if (m_level == 0)
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
@@ -177,15 +178,17 @@ void BinaryBHLevel::specificPostTimeStep()
     }
 }
 
+#ifdef CH_USE_HDF5
 // Things to do before a plot level - need to calculate the Weyl scalars
 void BinaryBHLevel::prePlotLevel()
 {
     fillAllGhosts();
     if (m_p.activate_extraction == 1)
     {
-        BoxLoops::loop(
-            make_compute_pack(Weyl4(m_p.extraction_params.center, m_dx),
-                              Constraints(m_dx)),
-            m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(make_compute_pack(
+                           Weyl4(m_p.extraction_params.center, m_dx),
+                           Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
+                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
     }
 }
+#endif /* CH_USE_HDF5 */
