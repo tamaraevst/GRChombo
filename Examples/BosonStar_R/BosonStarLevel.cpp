@@ -279,6 +279,22 @@ void BosonStarLevel::doAnalysis()
         }
         mod_phi_max_file.write_time_data_line({mod_phi_max});
 
+
+        // Compute the min of chi and write it to a file
+        double min_chi = m_gr_amr.compute_min(
+                                Interval(c_chi, c_chi));
+        SmallDataIO min_chi_file("min_chi", m_dt, m_time,
+                                     m_restart_time,
+                                     SmallDataIO::APPEND,
+                                     first_step);
+        min_chi_file.remove_duplicate_time_data();
+        if (m_time == 0.)
+        {
+            min_chi_file.write_header_line({"min chi"});
+        }
+        min_chi_file.write_time_data_line({min_chi});
+
+
         // Calculate the infinity-norm of all variables specified in params file
         // and output them
         if (m_p.num_vars_inf_norm > 0)

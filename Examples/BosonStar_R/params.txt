@@ -13,7 +13,7 @@ N3 = 32
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L = 64
+L = 256
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
@@ -23,11 +23,11 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 1 # There are (max_level+1) grids, so min is zero
+max_level = 0 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 2 1 1
+regrid_interval = 2 0 0
 # Max and min box size - for load balancing
 max_box_size = 32
 min_box_size = 8
@@ -119,9 +119,9 @@ calculate_constraint_violations = 1
 calculate_noether_charge = 1
 
 # Vars to write to plot files
-num_plot_vars = 8
-# plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
-plot_vars = chi K lapse phi_Re mod_phi N Weyl4_Re rho
+num_plot_vars = 11
+plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
+#plot_vars = chi K lapse phi_Re mod_phi N Weyl4_Re rho
 
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3
@@ -132,15 +132,15 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 # G_Newton = 0.07957747154594767 # 1/(4pi)
 
 # BosonStar Initial data parameters
-central_amplitude_CSF = 0.0733 # 0.02820947917 # 0.0733 # near kaup limit
+central_amplitude_CSF = 0.02820947917 #0.0733 # 0.02820947917 # 0.0733 # near kaup limit
 phase = 1.0
 eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>=20 ask Robin
 gridpoints 200000
 BS_binary = true # make false for one star
 BS_BH_binary = false
-BS_rapidity = 0.1 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 10.0 #separation perpendicular to boost, y
-BS_separation = 32.0 #separation parallel to boost, x
+BS_rapidity = 0.3096 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
+BS_impact_parameter = 3.0 #separation perpendicular to boost, y
+BS_separation = 160.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
@@ -193,11 +193,11 @@ tracking_centres = 16 0 0 -16 0 0 # with respect to centre of grid
 tracking_BH_cutoff = 0.05
 
 
-flux_number_of_radii = 3
+flux_number_of_radii = 4
 flux_do = true
 flux_write_extraction = true
 flux_num_theta = 20
 flux_num_phi = 20
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
-flux_extraction_radii = 5. 10. 15.
-flux_extraction_levels = 1 0 0
+flux_extraction_radii = 5. 10. 15. 20.
+flux_extraction_levels = 2 1 1 0
