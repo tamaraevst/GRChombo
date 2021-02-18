@@ -5,14 +5,15 @@
 
 #include "KerrBHLevel.hpp"
 #include "BoxLoops.hpp"
-#include "CCZ4.hpp"
+#include "CCZ4RHS.hpp"
 #include "ChiTaggingCriterion.hpp"
 #include "ComputePack.hpp"
-#include "Constraints.hpp"
 #include "KerrBHLevel.hpp"
 #include "NanCheck.hpp"
+#include "NewConstraints.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "SetValue.hpp"
+#include "SixthOrderDerivatives.hpp"
 #include "TraceARemoval.hpp"
 
 // Initial data
@@ -37,10 +38,9 @@ void KerrBHLevel::initialData()
     if (m_verbosity)
         pout() << "KerrBHLevel::initialData " << m_level << endl;
 
-    // First set everything to zero (to avoid undefinded values on constraints)
-    // then calculate initial data  Get the Kerr solution in the variables, then
-    // calculate the \tilde\Gamma^i numerically as these  are non zero and not
-    // calculated in the Kerr ICs
+    // First set everything to zero then calculate initial data  Get the Kerr
+    // solution in the variables, then calculate the \tilde\Gamma^i numerically
+    // as these are non zero and not calculated in the Kerr ICs
     BoxLoops::loop(
         make_compute_pack(SetValue(0.), KerrBH(m_p.kerr_params, m_dx)),
         m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
@@ -50,12 +50,14 @@ void KerrBHLevel::initialData()
                    EXCLUDE_GHOST_CELLS);
 }
 
-void KerrBHLevel::preCheckpointLevel()
+#ifdef CH_USE_HDF5
+void KerrBHLevel::prePlotLevel()
 {
     fillAllGhosts();
-    BoxLoops::loop(Constraints(m_dx), m_state_new, m_state_new,
-                   EXCLUDE_GHOST_CELLS);
+    BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)),
+                   m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
+#endif /* CH_USE_HDF5 */
 
 void KerrBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                                   const double a_time)
@@ -64,11 +66,19 @@ void KerrBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
                    a_soln, a_soln, INCLUDE_GHOST_CELLS);
 
-    // Calculate CCZ4 right hand side and set constraints to zero to avoid
-    // undefined values
-    BoxLoops::loop(make_compute_pack(CCZ4(m_p.ccz4_params, m_dx, m_p.sigma),
-                                     SetValue(0, Interval(c_Ham, c_Mom3))),
-                   a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+    // Calculate CCZ4 right hand side
+    if (m_p.max_spatial_derivative_order == 4)
+    {
+        BoxLoops::loop(CCZ4RHS<MovingPunctureGauge, FourthOrderDerivatives>(
+                           m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
+                       a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+    }
+    else if (m_p.max_spatial_derivative_order == 6)
+    {
+        BoxLoops::loop(CCZ4RHS<MovingPunctureGauge, SixthOrderDerivatives>(
+                           m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
+                       a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+    }
 }
 
 void KerrBHLevel::specificUpdateODE(GRLevelData &a_soln,
@@ -78,11 +88,10 @@ void KerrBHLevel::specificUpdateODE(GRLevelData &a_soln,
     BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
 }
 
-// Specify which variables to write at plot intervals
-void KerrBHLevel::specificWritePlotHeader(std::vector<int> &plot_states) const
+void KerrBHLevel::preTagCells()
 {
-    // Specify the variables we want to output as plot
-    plot_states = {c_chi, c_K, c_lapse, c_shift1};
+    // We only use chi in the tagging criterion so only fill the ghosts for chi
+    fillAllGhosts(VariableType::evolution, Interval(c_chi, c_chi));
 }
 
 void KerrBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,

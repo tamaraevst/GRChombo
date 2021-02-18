@@ -6,10 +6,18 @@
 #ifndef GRPARMPARSE_HPP_
 #define GRPARMPARSE_HPP_
 
+// Chombo includes
 #include "ParmParse.H"
 #include "parstream.H" //Gives us pout()
+
+// Other includes
+#include "ArrayTools.hpp"
 #include <algorithm>
 #include <memory>
+#include <type_traits>
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 /// Helper structs to translate a dataype into a Chombo ParmParse data type
 template <class T> struct ParmParseTranslator;
@@ -57,8 +65,8 @@ class GRParmParse : public ParmParse
 
     /// Loads a value from the parameter file
     template <class data_t>
-    typename std::enable_if<
-        !std::is_enum<data_t>::value>::type // Can't use for enum types
+    typename std::enable_if_t<
+        !std::is_enum<data_t>::value> // Can't use for enum types
     load(const char *name, data_t &parameter) const
     {
         get(name, parameter);
@@ -66,8 +74,8 @@ class GRParmParse : public ParmParse
 
     /// Loads an enum value from the parameter file
     template <typename enum_type>
-    typename std::enable_if<
-        std::is_enum<enum_type>::value>::type // Only enabled for enum types
+    typename std::enable_if_t<
+        std::is_enum<enum_type>::value> // Only enabled for enum types
     load(const char *name, enum_type &parameter) const
     {
         int iparam;
@@ -88,8 +96,24 @@ class GRParmParse : public ParmParse
         else
         {
             parameter = default_value;
-            pout() << "Parameter: " << name << " not found in parameter file. "
-                   << "It has been set to its default value." << std::endl;
+            default_message(name, default_value);
+        }
+    }
+
+    /// Loads a vector with num_comp components from the parameter file, if the
+    /// vector isn't defined, it is set to the supplied default
+    template <class data_t>
+    void load(const char *name, std::vector<data_t> &vector, const int num_comp,
+              const std::vector<data_t> &default_vector) const
+    {
+        if (contains(name))
+        {
+            load(name, vector, num_comp);
+        }
+        else
+        {
+            vector = default_vector;
+            default_message(name, default_vector);
         }
     }
 
@@ -99,17 +123,36 @@ class GRParmParse : public ParmParse
     void load(const char *name, std::vector<data_t> &vector, const int num_comp,
               const data_t default_value) const
     {
-        if (contains(name))
+        load(name, vector, num_comp,
+             std::vector<data_t>(num_comp, default_value));
+    }
+
+  protected:
+    template <typename data_t,
+              std::enable_if_t<
+                  !ArrayTools::is_std_array_or_vector<data_t>::value,
+                  bool> = true> // this won't work for std::arrays and vectors
+    void default_message(const char *name, const data_t &default_value) const
+    {
+        pout() << "Parameter: " << name << " not found in parameter file. "
+               << "It has been set to its default value = " << default_value
+               << "." << std::endl;
+    }
+
+    template <typename data_t,
+              std::enable_if_t<
+                  ArrayTools::is_std_array_or_vector<data_t>::value,
+                  bool> = true> // use this code for std::arrays and vectors
+    void default_message(const char *name, const data_t &default_value) const
+    {
+        pout() << "Parameter: " << name << " not found in parameter file. "
+               << "It has been set to its default "
+                  "value =";
+        for (auto elem : default_value)
         {
-            load(name, vector, num_comp);
+            pout() << " " << elem;
         }
-        else
-        {
-            vector.resize(num_comp);
-            vector.assign(num_comp, default_value);
-            pout() << "Parameter: " << name << " not found in parameter file. "
-                   << "It has been set to its default value." << std::endl;
-        }
+        pout() << "." << std::endl;
     }
 };
 

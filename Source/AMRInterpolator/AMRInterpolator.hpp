@@ -6,34 +6,58 @@
 #ifndef AMRINTERPOLATOR_HPP_
 #define AMRINTERPOLATOR_HPP_
 
-// Chombo includes
+// system includes
 
-#include "AMR.H"
+#include <limits>
+
+// Chombo includes
 #include "AMRLevel.H"
 
-#include "UsingNamespace.H"
-
 // Our includes
-
+#include "BoundaryConditions.hpp"
+#include "GRAMR.hpp"
 #include "InterpSource.hpp"
 #include "InterpolationAlgorithm.hpp"
 #include "InterpolationLayout.hpp"
 #include "InterpolationQuery.hpp"
 
 #include "MPIContext.hpp"
+#include "UserVariables.hpp"
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 // End include
 
 template <typename InterpAlgo> class AMRInterpolator
 {
   public:
-    AMRInterpolator(const AMR &amr,
+    // constructor for backward compatibility
+    // (adds an artificial BC with only periodic BC)
+    AMRInterpolator(const GRAMR &amr,
                     const std::array<double, CH_SPACEDIM> &coarsest_origin,
                     const std::array<double, CH_SPACEDIM> &coarsest_dx,
                     int verbosity = 0);
-    void refresh();
+    AMRInterpolator(const GRAMR &amr,
+                    const std::array<double, CH_SPACEDIM> &coarsest_origin,
+                    const std::array<double, CH_SPACEDIM> &coarsest_dx,
+                    const BoundaryConditions::params_t &a_bc_params,
+                    int verbosity = 0);
+
+    void refresh(const bool a_fill_ghosts = true);
+
+    // if not filling ghosts in refresh, call this explicitly for required vars
+    void fill_multilevel_ghosts(
+        const VariableType a_var_type,
+        const Interval &a_comps = Interval(0, std::numeric_limits<int>::max()),
+        const int a_min_level = 0,
+        const int a_max_level = std::numeric_limits<int>::max());
+
     void limit_num_levels(unsigned int num_levels);
     void interp(InterpolationQuery &query);
+    const AMR &getAMR() const;
+    const std::array<double, CH_SPACEDIM> &get_coarsest_dx();
+    const std::array<double, CH_SPACEDIM> &get_coarsest_origin();
 
   private:
     void computeLevelLayouts();
@@ -45,7 +69,17 @@ template <typename InterpAlgo> class AMRInterpolator
     void calculateAnswers(InterpolationQuery &query);
     void exchangeMPIAnswer();
 
-    const AMR &m_amr;
+    /// set values of member 'm_lo_boundary_reflective' and
+    /// 'm_hi_boundary_reflective'
+    void set_reflective_BC();
+    int get_var_parity(int comp, const VariableType type, int point_idx,
+                       const InterpolationQuery &query,
+                       const Derivative &deriv) const;
+    /// reflect coordinates if BC set to reflective in that direction
+    double apply_reflective_BC_on_coord(const InterpolationQuery &query,
+                                        double dir, int point_idx) const;
+
+    const GRAMR &m_gr_amr;
 
     // Coordinates of the point represented by IntVect::Zero in coarsest grid
     const std::array<double, CH_SPACEDIM> m_coarsest_origin;
@@ -79,6 +113,17 @@ template <typename InterpAlgo> class AMRInterpolator
     // A bit of Android-ism here, but it's really useful!
     // Identifies the printout as originating from this class.
     const static string TAG;
+
+    // Variables for reflective BC
+    // m_bc_params can't be a 'const' reference as we need a
+    // constructor with backward compatibility that builds an artificial
+    // 'BoundaryConditions::params_t'
+    BoundaryConditions::params_t m_bc_params;
+    /// simplified bools saying whether or not boundary has
+    /// a reflective condition in a given direction
+    std::array<bool, CH_SPACEDIM> m_lo_boundary_reflective,
+        m_hi_boundary_reflective;
+    std::array<double, CH_SPACEDIM> m_upper_corner;
 };
 
 #include "AMRInterpolator.impl.hpp"

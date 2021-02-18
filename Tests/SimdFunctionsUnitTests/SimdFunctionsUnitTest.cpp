@@ -3,11 +3,18 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
+// Chombo includes
+#include "REAL.H"
+
+// Other includes
 #include "simd.hpp"
 #include <cmath>
 #include <iomanip>
 #include <iostream>
 #include <limits>
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 //#define DEBUG 1
 
@@ -114,15 +121,11 @@ bool rv_test(const char *name, op_t op, rev_op_t rev_op)
         }                                                                      \
     } while (0);
 
-#define SV_TEST(op)                                                            \
-    SV_TEST_T(double, op);                                                     \
-    SV_TEST_T(float, op);
+#define SV_TEST(op) SV_TEST_T(Real, op);
 
 #define RV_TEST(op, rev_op)                                                    \
-    RV_TEST_T(double, op, rev_op);                                             \
-    RV_TEST_T(float, op, rev_op);                                              \
-    RV_TEST_T(double, rev_op, op);                                             \
-    RV_TEST_T(float, rev_op, op);
+    RV_TEST_T(Real, op, rev_op);                                               \
+    RV_TEST_T(Real, rev_op, op);
 
 int main()
 {
@@ -142,10 +145,8 @@ int main()
     SV_TEST(cosh(x));
     SV_TEST(tanh(x));
 
-    SV_TEST_T(double, simd_min(x, 0.5));
-    SV_TEST_T(float, simd_min(x, 0.5f));
-    SV_TEST_T(double, simd_max(x, 0.5));
-    SV_TEST_T(float, simd_max(x, 0.5f));
+    SV_TEST_T(Real, simd_min(x, (Real)0.5));
+    SV_TEST_T(Real, simd_max(x, (Real)0.5));
 
     RV_TEST(exp(x), log(x));
     // RV_TEST(pow(x,(decltype(x))2),sqrt(x));

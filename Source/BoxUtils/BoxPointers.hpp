@@ -6,10 +6,16 @@
 #ifndef BOXPOINTERS_HPP_
 #define BOXPOINTERS_HPP_
 
-#include "CellIndex.hpp"
+// Chombo includes
 #include "FArrayBox.H"
+
+// Other includes
+#include "CellIndex.hpp"
 #include "UserVariables.hpp"
 #include <array>
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 /// This class provides information about where a Chombo box lies in memory and
 /// how it is laid out.
@@ -23,29 +29,34 @@ class BoxPointers
     const int *m_out_hi;
 
   public:
-    std::array<const double *, NUM_VARS> m_in_ptr;
+    std::vector<const double *> m_in_ptr;
     std::array<int, CH_SPACEDIM> m_in_stride; //!< Distance in memory between
                                               //! two values corresponding to
                                               //! adjacent coordinates in all
                                               //! directions.
+    const int m_in_num_comps;
 
-    std::array<double *, NUM_VARS> m_out_ptr;
+    std::vector<double *> m_out_ptr;
     std::array<int, CH_SPACEDIM> m_out_stride; //!< Distance in memory between
                                                //! two values corresponding to
                                                //! adjacent coordinates in all
                                                //! directions.
+    const int m_out_num_comps;
 
     BoxPointers(const FArrayBox &in, FArrayBox &out)
         : m_in_lo(in.loVect()), m_in_hi(in.hiVect()), m_out_lo(out.loVect()),
-          m_out_hi(out.hiVect())
+          m_out_hi(out.hiVect()), m_in_num_comps(in.nComp()),
+          m_out_num_comps(out.nComp())
     {
+        m_in_ptr.resize(m_in_num_comps);
+        m_out_ptr.resize(m_out_num_comps);
         // dataPtr in Chombo does CH_assert bound check
         // which we don't want to do in a loop
-        for (int i = 0; i < NUM_VARS; ++i)
+        for (int i = 0; i < m_in_num_comps; ++i)
             m_in_ptr[i] = in.dataPtr(i);
         // If the output FArrayBox doesn't have all components, just don't set
         // the pointers
-        for (int i = 0; i < out.nComp(); ++i)
+        for (int i = 0; i < m_out_num_comps; ++i)
             m_out_ptr[i] = out.dataPtr(i);
 
         m_in_stride[0] = 1;

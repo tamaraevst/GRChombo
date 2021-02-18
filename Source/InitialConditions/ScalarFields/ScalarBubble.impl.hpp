@@ -19,7 +19,7 @@ inline ScalarBubble::ScalarBubble(params_t a_params, double a_dx)
 template <class data_t>
 void ScalarBubble::compute(Cell<data_t> current_cell) const
 {
-    MatterCCZ4<ScalarField<>>::Vars<data_t> vars;
+    MatterCCZ4RHS<ScalarField<>>::Vars<data_t> vars;
     VarsTools::assign(vars, 0.); // Set only the non-zero components below
     Coordinates<data_t> coords(current_cell, m_dx, m_params.centerSF);
 
@@ -45,7 +45,7 @@ data_t ScalarBubble::compute_phi(Coordinates<data_t> coords) const
     data_t rr = coords.get_radius();
     data_t rr2 = rr * rr;
     data_t out_phi = m_params.amplitudeSF * rr2 *
-                     exp(-pow(rr - m_params.r_zero / m_params.widthSF, 2.0));
+                     exp(-pow((rr - m_params.r_zero) / m_params.widthSF, 2.0));
 
     return out_phi;
 }
