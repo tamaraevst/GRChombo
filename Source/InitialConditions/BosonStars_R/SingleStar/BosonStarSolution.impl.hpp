@@ -16,34 +16,41 @@ BosonStarSolution::BosonStarSolution()
 
 void BosonStarSolution::main()
 {
-    //std::cout << "\33[30;41m" << " Central Density: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-  	//std::cout << PC << std::endl;
-    //std::cout << "\33[30;41m" << " Max Radius: " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-  	//std::cout << L << std::endl;
+  	// finds the eigenvalue corresponding to intitial metric central values.
+    // WW is big then it descends to the correct w+ and w- then uses interval
+    // bisection to find best ww to machine precision
 
-  	// finds the eigenvalue. WW is big then it descends to the correct w+ and w- then uses interval bisection to find best ww to machine precision
+    // finds an eigenvalue with a lot of nodes, (20 + eigenstate) by defualt
   	WW = find_WW();
+    // calculates the lower limit for eigenvalue to be used in interval bisection
   	lower_ww = ww_min(WW);
+    // calculates the upper value for eigenvalue to be used in interval bisection
   	upper_ww = ww_max(WW,lower_ww);
+    // does interval bisection
   	middle_ww = ww_IB(lower_ww,upper_ww);
-  	mid_int = find_midint();
   	ww = middle_ww;
+    // finds the integer index at which the scalar field needs to be truncated
+  	mid_int = find_midint();
 
     // force the scalar field to zero after the turning point and reintegrate the lapse and shift
     force_flat(mid_int);
-    rk4_asymp(mid_int-1,false,ww);
-    initialise();
-    rk4_asymp(mid_int, true, ww); // (true) uses large radius adaptive stepsize to get asymptotics (integrates vacuum metric out to huge radius ~ 10^10 to measure asymptotics).
+    // (true) uses large radius adaptive stepsize to get asymptotics
+    // (integrates vacuum metric out to huge radius ~ 10^10 to measure asymptotics).
+    rk4_asymp(mid_int, true, ww);
+    // now we have integrated to huge radius we know the asymptotics to high precision
     PSI_INF = psi[gridsize-1];
     OM_INF = omega[gridsize-1];
 
 
+    // iterate process of rescaling radius 0 field values by the asymptotics
+    // miraculously converges in about 2 iterations normally
     for (int q=0; q<5; q++)
     {
         PSC/=PSI_INF;
         OMC/=OM_INF;
         ww/=OM_INF*OM_INF;
         initialise();
+        // the normal rk4 integration method (hidden inside all eigenvalue functions)
         rk4(ww);
         mid_int = find_midint();
         rk4_asymp(mid_int,true,ww);
@@ -57,43 +64,19 @@ void BosonStarSolution::main()
     initialise();
     rk4(ww);
     mid_int = find_midint();
-    rk4_asymp(mid_int,false,ww);//(mid_int-gridsize/200,false,ww);
+    // (false) now do vacuum integration without adaptive stepsize for the
+    // solution to be interpolated to grid
+    rk4_asymp(mid_int,false,ww);
 
-
-    /*dx/=PSI_INF; // change dx to make the rescaled physics scale correct
-
-    // just rescaled dx by the asymptotic value of the conformal factor and now re-integrate
-    rk4(ww);
-    mid_int = find_midint();
-    // force_flat(mid_int); // activate this for a hard star cutoff rather than smooth pseudo star integration
-    initialise();
-    rk4_asymp(mid_int-gridsize/200, false, ww); // (false) no large radius adaptive stepsize this time as we already know the asymptotics
-
-    //std::cout << "\33[30;41m" << " Origial Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-    //std::cout << "w: " << sqrt(ww)  << ", PSI_INF: " << PSI_INF << ", OM_INF: " << OM_INF << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
-
-    // Now we rescale all appropriate variables by the large radius vlaues of conformal factor and lapse
-    for (int i = 0; i < gridsize; ++i)
-    {
-        radius_array[i] = double(i)*dx*PSI_INF;
-        psi[i] *= 1./PSI_INF;
-        dpsi[i] *= pow(PSI_INF,-2);
-        omega[i] *= 1./OM_INF;
-    }*/
-
-    //calculate the ADM mass and aspect mass at the edge of physical domain. Aspect is more accurate but ADM should be relativiely similar.
+    // calculate the ADM mass and aspect mass at the edge of physical domain.
+    // Aspect is more accurate but ADM should be similar.
     adm_mass = -psi[gridsize-1]*dpsi[gridsize-1]*radius_array[gridsize-1]*radius_array[gridsize-1];
     aspect_mass = 2.*radius_array[gridsize-1]*(sqrt(psi[gridsize-1])-1.);
 
-    //ww *= 1./(OM_INF*OM_INF); // rescale the original eigenvalue by the lapse at large radius
-
-
-
-    std::cout << "Finished producing Bosonstar with ADM mass : " << adm_mass << " aspect mass : "  << aspect_mass
-    << " and eigenvalue w : " << sqrt(ww) << std::endl;    
-
-    //std::cout << "\33[30;41m" << " Renormalised Quantities: -> " << "\x1B[0m" << std::endl; // this mess of symbols just makes a nice red print statement, might be compiler dependant, can replace with normal std::cout stuff
-    //std::cout << "w: " << sqrt(ww) << ", ADM M: " << adm_mass << ", Aspect M: " << aspect_mass << ", Outer radius: " << radius_array[gridsize-1] << std::endl;
+    // optional print statement outputting star mass and eigenvalue
+    std::cout << "Finished producing Bosonstar with ADM mass : " << adm_mass <<
+    " aspect mass : "  << aspect_mass << " and eigenvalue w : " << sqrt(ww) <<
+    std::endl;
 
 }
 
@@ -112,6 +95,7 @@ void BosonStarSolution::initialise()
 // if the scalar field diverges it rounds down to a value wiht the same sign. This is to not affect axis crossings function (crossings) and let it accurately deal with inf/nan
 void BosonStarSolution::fix()
 {
+    // borked loosely means broken
   	bool borked = false; // turns true if function gets over twice as large as central (r=0) value
   	double truncation;
   	for (int i = 0; i < gridsize; ++i)
@@ -184,7 +168,7 @@ int BosonStarSolution::find_midint()
 }
 
 
-// finds an eigenvalue with a lot of nodes, (20 + desired eigenstate) by defualt
+// finds an eigenvalue with a lot of nodes, (20 + eigenstate) by defualt
 double BosonStarSolution::find_WW()
 {
   	int eigenstate;
@@ -242,7 +226,7 @@ double BosonStarSolution::ww_max(const double WW_, const double lower_ww_)
   	}
   	return 0.;
 }
-
+// calculates the upper value for eigenvalue to be used in interval bisection
 
 // takes in an upper and lower eigenvalue and uses interval bisection to find the solution inbetween
 double BosonStarSolution::ww_IB(double lower_ww_, double upper_ww_)
@@ -250,7 +234,9 @@ double BosonStarSolution::ww_IB(double lower_ww_, double upper_ww_)
   	int iter = 0, itermax, eigenstate, decimal_places_of_omega = 25.;
   	double middle_ww_;
 
-  	itermax = (int)((log(upper_ww_)+decimal_places_of_omega*log(10.))/log(2.)); //calculate number of bisections needed (simple pen and paper calculation)
+
+    //calculate number of bisections needed (simple pen and paper calculation)
+  	itermax = (int)((log(upper_ww_)+decimal_places_of_omega*log(10.))/log(2.));
   	while (true)
   	{
     		iter++;
@@ -307,19 +293,19 @@ void BosonStarSolution::rk4(const double ww_)
 
       			k2 = DX_*P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
       			q2 = DX_*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-      	                o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+      	    o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
       			s2 = DX_*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
       			r2 = DX_*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
 
       			k3 = DX_*P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
       			q3 = DX_*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-      	                o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+            o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
       			s3 = DX_*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
       			r3 = DX_*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
 
       			k4 = DX_*P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
       			q4 = DX_*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-      	                o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+      	    o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
       			s4 = DX_*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
       			r4 = DX_*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
 
@@ -378,19 +364,19 @@ void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const dou
 
     		//k2 = dx*small_P_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		//q2 = dx*DP_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
-                o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
+        o2 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		s2 = DX_*PSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
     		r2 = DX_*DPSI_RHS(x_ + h,p[i-1] + k1/2.,dp[i-1] + q1/2.,psi[i-1] + s1/2.,dpsi[i-1] + r1/2.,omega[i-1] + o1/2.,ww_);
 
     		//k3 = dx*small_P_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		//q3 = dx*DP_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
-                o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
+        o3 = DX_*OMEGA_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		s3 = DX_*PSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
     		r3 = DX_*DPSI_RHS(x_ + h,p[i-1] + k2/2.,dp[i-1] + q2/2.,psi[i-1] + s2/2.,dpsi[i-1] + r2/2.,omega[i-1] + o2/2.,ww_);
 
     		//k4 = dx*small_P_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		//q4 = dx*DP_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
-                o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
+        o4 = DX_*OMEGA_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		s4 = DX_*PSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
     		r4 = DX_*DPSI_RHS(x_ + 2.*h,p[i-1] + k3,dp[i-1] + q3,psi[i-1] + s3,dpsi[i-1] + r3,omega[i-1] + o3,ww_);
 
@@ -413,8 +399,10 @@ void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const dou
 
 
 // these functions return the right hand side of the ode's
-// small_P_RHS is valid for large redius when the scalar field is small.
 
+// small_P_RHS is ONLY valid for large redius when the scalar field is small.
+
+// can use this instead of vacuum at large radius for exponentially decaying scalar field. doesnt make much difference
 double BosonStarSolution::small_P_RHS(const double x, const double P, const double DP, const double PSI, const double DPSI, const double OM, const double ww_)
 {
   	double RHS = -P*PSI*sqrt(DV(P)-ww_/(OM*OM));
@@ -460,7 +448,7 @@ double BosonStarSolution::OMEGA_RHS(const double x, const double P, const double
 }
 
 
-// V is klein gordon potential and DV is its gradient. Depends on #define star_type at top
+// V is klein gordon potential and DV is its gradient. Depends on star type in BosonStarParams.hpp
 double BosonStarSolution::V(const double P)
 {
   	if (!solitonic)
@@ -509,7 +497,7 @@ double BosonStarSolution::get_p_interp(const double r) const
     f3 = p[iter+1];
     f4 = p[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
@@ -526,7 +514,7 @@ double BosonStarSolution::get_dp_interp(const double r) const
     f3 = dp[iter+1];
     f4 = dp[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
@@ -543,7 +531,7 @@ double BosonStarSolution::get_lapse_interp(const double r) const
     f3 = omega[iter+1];
     f4 = omega[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
@@ -560,7 +548,7 @@ double BosonStarSolution::get_psi_interp(const double r) const
     f3 = psi[iter+1];
     f4 = psi[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
@@ -580,7 +568,7 @@ double BosonStarSolution::get_dpsi_interp(const double r) const
     f3 = dpsi[iter+1];
     f4 = dpsi[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline, from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./48.)*(f1 *(-3.+2.*a+12.*a*a-8.*a*a*a) +(3.+2.*a)*(-(1.+2.*a)*(-9.*f3+f4+6.*f3*a-2*f4*a)+3.*f2*(3.-8.*a+4.*a*a)));
@@ -600,7 +588,7 @@ double BosonStarSolution::get_dlapse_interp(const double r) const
     f3 = omega[iter+1];
     f4 = omega[iter+2];
 
-    if (iter>gridsize-3){std::cout << "FArrayBox domain exceeding star radius!" << std::endl;}
+    if (iter>gridsize-3){std::cout << "Requested Value outside BS initial data domain!" << std::endl;}
 
     // do the cubic spline (for gradient now), from mathematica script written by Robin (rc634@cam.ac.uk)
     interpolated_value = (1./(24.*dx))*( (f1-27.*f2+27.*f3-f4)  +  12.*a*(f1-f2-f3+f4)  -  12.*a*a*(f1-3.*f2+3.*f3-f4)  );
@@ -608,12 +596,14 @@ double BosonStarSolution::get_dlapse_interp(const double r) const
 }
 
 
-
+// returns the aspect mass, i.e. comparing the large radius metric to Schwarzschild
+// and using a differential realtion to return M (NOT an ADM mass calc)
 double BosonStarSolution::get_mass() const
 {
     return aspect_mass;
 }
 
+// returns the eigenvalue
 double BosonStarSolution::get_w() const
 {
     return sqrt(ww);
