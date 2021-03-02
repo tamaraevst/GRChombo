@@ -282,7 +282,7 @@ void BosonStarSolution::rk4(const double ww_)
     		{
       			DX_ = DX/( (double)(1+jmax) );
       			h = DX_/2.;
-                        x_ = (i-1)*dx+j*DX_;
+            x_ = (i-1)*dx+j*DX_;
 
 
       			k1 = DX_*P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
@@ -621,6 +621,7 @@ void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_
     omega.resize(gridsize); // lapse
     radius_array.resize(gridsize); //radius
 
+    G = m_params_BosonStar.Newtons_constant;
     PC = m_params_BosonStar.central_amplitude_CSF;
     EIGEN = m_params_BosonStar.eigen;
     MM = m_params_potential.scalar_mass*m_params_potential.scalar_mass;
