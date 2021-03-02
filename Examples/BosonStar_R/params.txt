@@ -13,7 +13,7 @@ N3 = 64
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L = 128
+L = 64
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
@@ -200,4 +200,4 @@ flux_num_theta = 20
 flux_num_phi = 20
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20.
-flux_extraction_levels = 2 1 1 0
+flux_extraction_levels = 0 0 0 0

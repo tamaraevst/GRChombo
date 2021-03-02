@@ -284,7 +284,6 @@ void BosonStarSolution::rk4(const double ww_)
       			h = DX_/2.;
             x_ = (i-1)*dx+j*DX_;
 
-
       			k1 = DX_*P_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
       			q1 = DX_*DP_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
       			o1 = DX_*OMEGA_RHS(x_,p[i-1],dp[i-1],psi[i-1],dpsi[i-1],omega[i-1],ww_);
