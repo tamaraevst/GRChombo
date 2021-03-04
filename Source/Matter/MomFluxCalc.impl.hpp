@@ -204,9 +204,6 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
                               tilde_gamma_LL[1][2]*tilde_gamma_LL[2][1] ); //det of 2 metric of surface of constant radius
     data_t sqrt_sigma_weighted = sqrt_sigma/(r_xyz*r_xy) ; // r_xyz*r_xy is r^2 sin theta
 
-
-    //current_cell.store_vars(F_phi*sqrt_sigma_weighted,m_c_Fphi_flux);
-    //current_cell.store_vars(S_phi*sqrt_tilde_gamma,m_c_Sphi_source); // storing S_phi * sqrt(gamma)
     current_cell.store_vars(F_phi*sqrt_sigma_weighted,m_c_Fphi_flux);
     current_cell.store_vars(S_phi*pow(vars.chi,-1.5),m_c_Sphi_source); // storing S_phi * sqrt(gamma)
 

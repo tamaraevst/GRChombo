@@ -95,16 +95,6 @@ void BosonStarLevel::initialData()
 void BosonStarLevel::preCheckpointLevel()
 {
     CH_TIME("BosonStarLevel::preCheckpointLevel");
-    //Thomas Version for EMTENSOR
-    /*fillAllGhosts();
-    Potential potential(m_p.potential_params);
-    ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(make_compute_pack(
-                    MatterConstraints<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
-                  Density<ComplexScalarFieldWithPotential>(
-                  complex_scalar_field, m_dx, m_p.G_Newton)),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);*/
 
      fillAllGhosts();
      Potential potential(m_p.potential_params);
@@ -123,16 +113,6 @@ void BosonStarLevel::preCheckpointLevel()
 void BosonStarLevel::prePlotLevel()
 {
     CH_TIME("BosonStarLevel::prePlotLevel");
-    //Thomas Version for EMTENSOR
-    /*fillAllGhosts();
-    Potential potential(m_p.potential_params);
-    ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(make_compute_pack(
-                    MatterConstraints<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
-                    Density<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton)),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);*/
 
      fillAllGhosts();
      Potential potential(m_p.potential_params);
@@ -324,9 +304,13 @@ void BosonStarLevel::doAnalysis()
     }
 
 
+    int min_angmomextraction_level = *(std::min_element(
+                                m_p.angmomflux_params.extraction_levels.begin(),
+                                m_p.angmomflux_params.extraction_levels.end()));
+
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
     if (m_p.do_flux_integration &&
-       at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
+       at_level_timestep_multiple(min_angmomextraction_level))
     {
         CH_TIME("BosonStarLevel::doAnalysis::FphiSphi");
 
@@ -338,26 +322,37 @@ void BosonStarLevel::doAnalysis()
                       c_Fphi_flux, c_Sphi_source, c_rho, Interval(c_s1,c_s3),
                       Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
-
-        double S_phi_integral; // integral of angmomsource
-        std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
-
-        for (int i=m_p.angmomflux_params.num_extraction_radii-1; i>=0; i--)
+        if (m_level==min_angmomextraction_level)
         {
-            // set angmomsource to zero outside of extraction radii
-            BoxLoops::loop(SourceIntPreconditioner<ComplexScalarFieldWithPotential>(
-                          complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
-                          c_Sphi_source, m_p.angmomflux_params.extraction_radii[i]),
-                          m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
-            if (m_level==m_p.extraction_params.min_extraction_level())
+            double S_phi_integral; // integral of angmomsource
+            std::vector<AMRLevel *> all_level_ptrs = getAMRLevelHierarchy().stdVector();
+            std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
+
+            for (int i=m_p.angmomflux_params.num_extraction_radii-1; i>=0; i--)
             {
-                S_phi_integral = m_gr_amr.compute_sum(c_Sphi_source, m_dx);
-                S_phi_integrals[i] = S_phi_integral;
-            }
-        }
 
-        if (m_level==m_p.extraction_params.min_extraction_level())
-        {
+                for (auto level_ptr : all_level_ptrs)
+                {
+                    BosonStarLevel *bs_level_ptr =
+                        dynamic_cast<BosonStarLevel *>(level_ptr);
+                    if (bs_level_ptr == nullptr)
+                    {
+                        break;
+                    }
+
+                  // set angmomsource to zero outside of extraction radii
+                  BoxLoops::loop(SourceIntPreconditioner<ComplexScalarFieldWithPotential>
+                        (complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center, c_Sphi_source,
+                                       m_p.angmomflux_params.extraction_radii[i]),
+                             bs_level_ptr->m_state_new, bs_level_ptr->m_state_new,
+                                                             INCLUDE_GHOST_CELLS);
+
+                  S_phi_integral = m_gr_amr.compute_sum(c_Sphi_source, m_dx);
+                  S_phi_integrals[i] = S_phi_integral;
+                }
+            }
+
+
             // save the Source integral to dat file
             std::vector<string> title_line(m_p.angmomflux_params.num_extraction_radii);
             string dummy_string;

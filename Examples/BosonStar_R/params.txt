@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 0 # There are (max_level+1) grids, so min is zero
+max_level = 1 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -158,7 +158,7 @@ sigma_soliton = 0.02 # try central density ~ 0.05, the soliton is very sensitive
 activate_mass_extraction = 1
 num_mass_extraction_radii = 3
 mass_extraction_radii = 20. 25. 30.
-mass_extraction_levels = 0 0 0
+mass_extraction_levels = 1 0 0
 num_points_phi_mass = 16
 num_points_theta_mass = 24
 
@@ -168,7 +168,7 @@ num_points_theta_mass = 24
 activate_gw_extraction = 1
 num_extraction_radii = 3
 extraction_radii = 20. 25. 30.
-extraction_levels = 0 0 0
+extraction_levels = 1 0 0
 num_points_phi = 24
 num_points_theta = 60
 num_modes = 7
@@ -200,4 +200,4 @@ flux_num_theta = 20
 flux_num_phi = 20
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20.
-flux_extraction_levels = 0 0 0 0
+flux_extraction_levels = 2 1 1 0
