@@ -22,12 +22,13 @@ template <class matter_t>
 EMTensor_and_mom_flux<matter_t>::EMTensor_and_mom_flux(const matter_t &a_matter,
                              const double dx, const double a_L,
                               std::array<double,CH_SPACEDIM> a_centre,
-                            const int a_c_Fphi_flux, const int a_c_Sphi_source,
-                             const int a_c_rho, const Interval a_c_Si,
-                             const Interval a_c_Sij)
+                             const int a_c_Fphi_flux, const int a_c_Sphi_source,
+                                  const int a_c_Qphi_density, const int a_c_rho,
+                                  const Interval a_c_Si, const Interval a_c_Sij)
     : m_matter(a_matter), m_deriv(dx),  m_dx(dx), m_L(a_L),
                               m_centre(a_centre), m_c_Fphi_flux(a_c_Fphi_flux),
-                            m_c_Sphi_source(a_c_Sphi_source), m_c_rho(a_c_rho),
+                                              m_c_Sphi_source(a_c_Sphi_source),
+                          m_c_Qphi_density(a_c_Qphi_density), m_c_rho(a_c_rho),
                                                m_c_Si(a_c_Si), m_c_Sij(a_c_Sij)
 {
     if (m_c_Si.size() != 0)
@@ -84,15 +85,28 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
     Coordinates<data_t> coords(current_cell, m_dx,m_centre);
 
-    // start on flux term
+    ////////////////////////////
+    // density
+    ////////////////////////////
 
-    data_t F_phi = 0.; // angular momentum flux
-    data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
-    //data_t gamma_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //
     data_t x = coords.x, y=coords.y, z=coords.z, r_xyz = sqrt(x*x + y*y + z*z),
                                r_xy = sqrt(x*x + y*y), sintheta = r_xy/r_xyz,
                                              sinphi = y/r_xy, cosphi = x/r_xy,
                                              costheta = z/r_xyz;
+    data_t Q_phi = x*emtensor.Si[1]-y*emtensor.Si[0];
+
+
+
+
+
+    //////////////////////////
+    // flux term
+    //////////////////////////
+
+    data_t F_phi = 0.; // angular momentum flux
+    data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
+    //data_t gamma_UU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //
+
     Tensor<2, data_t, 3> gamma_UU;
     FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]*vars.chi;
 
@@ -105,8 +119,9 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
                        /sqrt(gamma_UU[0][0]);
 
 
-
+    /////////////////////////////////////
     // start source term
+    /////////////////////////////////////
 
     Tensor<2, data_t, 3> J_UL;// (d x^a)/(d tildex^b)
     data_t dJ_UL[3][3][3];// tildepartial_c (d x^a)/(d tildex^b)
@@ -204,6 +219,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
                               tilde_gamma_LL[1][2]*tilde_gamma_LL[2][1] ); //det of 2 metric of surface of constant radius
     data_t sqrt_sigma_weighted = sqrt_sigma/(r_xyz*r_xy) ; // r_xyz*r_xy is r^2 sin theta
 
+    current_cell.store_vars(Q_phi*pow(vars.chi,-1.5),m_c_Qphi_density);
     current_cell.store_vars(F_phi*sqrt_sigma_weighted,m_c_Fphi_flux);
     current_cell.store_vars(S_phi*pow(vars.chi,-1.5),m_c_Sphi_source); // storing S_phi * sqrt(gamma)
 

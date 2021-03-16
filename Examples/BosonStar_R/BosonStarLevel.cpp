@@ -318,15 +318,17 @@ void BosonStarLevel::doAnalysis()
         //std::cout << "Level : " << m_level << std::endl;
         // update stress tensor and mom flux components
         BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
-                      complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
-                      c_Fphi_flux, c_Sphi_source, c_rho, Interval(c_s1,c_s3),
-                      Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+                complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
+         c_Fphi_flux, c_Sphi_source, c_Qphi_density, c_rho, Interval(c_s1,c_s3),
+        Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
         if (m_level==min_angmomextraction_level)
         {
             double S_phi_integral; // integral of angmomsource
+            double Q_phi_integral; // integral of angmomsource
             std::vector<AMRLevel *> all_level_ptrs = getAMRLevelHierarchy().stdVector();
             std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
+            std::vector<double> Q_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
 
             for (int i=m_p.angmomflux_params.num_extraction_radii-1; i>=0; i--)
             {
@@ -342,13 +344,16 @@ void BosonStarLevel::doAnalysis()
 
                   // set angmomsource to zero outside of extraction radii
                   BoxLoops::loop(SourceIntPreconditioner<ComplexScalarFieldWithPotential>
-                        (complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center, c_Sphi_source,
-                                       m_p.angmomflux_params.extraction_radii[i]),
-                             bs_level_ptr->m_state_new, bs_level_ptr->m_state_new,
-                                                             INCLUDE_GHOST_CELLS);
+              (complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
+                                                 c_Sphi_source, c_Qphi_density,
+                                    m_p.angmomflux_params.extraction_radii[i]),
+                          bs_level_ptr->m_state_new, bs_level_ptr->m_state_new,
+                                                          INCLUDE_GHOST_CELLS);
 
                   S_phi_integral = m_gr_amr.compute_sum(c_Sphi_source, m_dx);
                   S_phi_integrals[i] = S_phi_integral;
+                  Q_phi_integral = m_gr_amr.compute_sum(c_Qphi_density, m_dx);
+                  Q_phi_integrals[i] = Q_phi_integral;
                 }
             }
 
@@ -375,6 +380,31 @@ void BosonStarLevel::doAnalysis()
             }
 
             flux_file.write_time_data_line(S_phi_integrals);
+
+
+            // save the Density integral to dat file
+            std::vector<string> title_line2(m_p.angmomflux_params.num_extraction_radii);
+            string dummy_string2;
+            for (int j=0; j<m_p.angmomflux_params.num_extraction_radii; j++)
+            {
+                dummy_string2 = "r = " + to_string(m_p.angmomflux_params.extraction_radii[j]);
+                title_line2[j] = dummy_string2;
+            }
+
+            SmallDataIO density_file("AngMomDensity", m_dt, m_time,
+                                          m_restart_time,
+                                          SmallDataIO::APPEND,
+                                          first_step);
+
+            if (m_time > 0) density_file.remove_duplicate_time_data();
+
+            if (m_time == 0.)
+            {
+                density_file.write_header_line(title_line2);
+            }
+
+            density_file.write_time_data_line(Q_phi_integrals);
+
 
 
             // Refresh the interpolator and do the interpolation

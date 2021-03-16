@@ -75,6 +75,8 @@ enum
     c_s23,
     c_s33,
 
+    c_Qphi_density,
+
     c_Fphi_flux,
 
     c_Sphi_source,
@@ -117,7 +119,7 @@ static constexpr char const *variable_names[NUM_VARS] = {
 
     "rho", "s1", "s2", "s3", "s11", "s12", "s13", "s22", "s23", "s33",
 
-    "Fphi_flux", "Sphi_source" };
+    "Qphi_density", "Fphi_flux", "Sphi_source" };
     }
 
 #endif /* USERVARIABLES_HPP */
