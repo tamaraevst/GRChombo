@@ -112,7 +112,7 @@ public:
         pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
 
 
-
+        pp.load("flux_extraction_level", flux_extraction_level, 0);
         /*pp.load("flux_number_of_radii", angmomflux_params.number_radii,1);
         pp.load("flux_do", angmomflux_params.do_flux_integration,false);
         pp.load("flux_extraction_level", angmomflux_params.extraction_level,0);
@@ -153,6 +153,8 @@ public:
     // Vars for outputting inf-norms
     int num_vars_inf_norm;
     std::vector<int> vars_inf_norm;
+
+    int flux_extraction_level; // specifies times (level) to do angmom flux extraction
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

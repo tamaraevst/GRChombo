@@ -23,11 +23,11 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 0 # There are (max_level+1) grids, so min is zero
+max_level = 1 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
-regrid_interval = 2 0 0
+regrid_interval = 1 0 0
 # Max and min box size - for load balancing
 max_box_size = 32
 min_box_size = 8
@@ -61,7 +61,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 0              #Weyl4 re im
                          0 0 0 0          #Stresstensor rho s1 s2 s3
                          0 0 0 0 0 0      #Stresstensor s11 s12 s13 s22 s23 s33
-                         0 0              #Fx Fy
+                         0 0 0            #Qphi Fphi Sphi
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -77,7 +77,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0                     #Wely4_Re and Weyl4_Im
                          0.0 0.0 0.0 0.0             #Stress tensor rho s1 s2 s3
                          0.0 0.0 0.0 0.0 0.0 0.0     #Stress tensor s11 s12 s13 s22 s23 s33
-                         0.0 0.0 0.0 0.0             #Fx Fy Sx Sy
+                         0.0 0.0 0.0                 #Qphi Fphi Sphi
 
 
 # Set up time steps
@@ -138,9 +138,9 @@ eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>
 gridpoints 200000
 BS_binary = true # make false for one star
 BS_BH_binary = false
-BS_rapidity = 0.1 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 24.0 #separation perpendicular to boost, y
-BS_separation = 6.0 #separation parallel to boost, x
+BS_rapidity = 0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
+BS_impact_parameter = 30.0 #separation perpendicular to boost, y
+BS_separation = 0.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
@@ -195,9 +195,10 @@ tracking_BH_cutoff = 0.05
 
 flux_number_of_radii = 6
 flux_do = true
+flux_extraction_level = 1
 flux_write_extraction = true
-flux_num_theta = 20
-flux_num_phi = 20
+flux_num_theta = 40
+flux_num_phi = 30
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20. 25. 30.
 flux_extraction_levels = 2 1 1 0 0 0

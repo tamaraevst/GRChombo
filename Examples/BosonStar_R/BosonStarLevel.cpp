@@ -303,14 +303,9 @@ void BosonStarLevel::doAnalysis()
         gaussian_fit_tracking.get_BH_centres(dummy);
     }
 
-
-    int min_angmomextraction_level = *(std::min_element(
-                                m_p.angmomflux_params.extraction_levels.begin(),
-                                m_p.angmomflux_params.extraction_levels.end()));
-
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
     if (m_p.do_flux_integration &&
-       at_level_timestep_multiple(min_angmomextraction_level))
+       at_level_timestep_multiple(m_p.flux_extraction_level))
     {
         CH_TIME("BosonStarLevel::doAnalysis::FphiSphi");
 
@@ -322,7 +317,7 @@ void BosonStarLevel::doAnalysis()
          c_Fphi_flux, c_Sphi_source, c_Qphi_density, c_rho, Interval(c_s1,c_s3),
         Interval(c_s11,c_s33)),  m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
-        if (m_level==min_angmomextraction_level)
+        if (m_level==m_p.flux_extraction_level)
         {
             double S_phi_integral; // integral of angmomsource
             double Q_phi_integral; // integral of angmomsource
@@ -342,7 +337,7 @@ void BosonStarLevel::doAnalysis()
                         break;
                     }
 
-                  // set angmomsource to zero outside of extraction radii
+                  // set angmomsource and density to zero outside of extraction radii
                   BoxLoops::loop(SourceIntPreconditioner<ComplexScalarFieldWithPotential>
               (complex_scalar_field, m_dx, m_p.L, m_p.angmomflux_params.center,
                                                  c_Sphi_source, c_Qphi_density,
