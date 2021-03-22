@@ -30,7 +30,7 @@
 
 // For mass extraction
 #include "ADMMass.hpp"
-#include "Density.hpp"
+//#include "Density.hpp"
 #include "EMTensor.hpp"
 #include "MomFluxCalc.hpp"
 #include "SourceIntPreconditioner.hpp"
