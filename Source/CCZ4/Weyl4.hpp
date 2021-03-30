@@ -6,7 +6,7 @@
 #ifndef WEYL4_HPP_
 #define WEYL4_HPP_
 
-#include "CCZ4.hpp"
+#include "CCZ4RHS.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "FourthOrderDerivatives.hpp"
@@ -60,7 +60,7 @@ class Weyl4
         the formulation.
     */
     Weyl4(const std::array<double, CH_SPACEDIM> a_center, const double a_dx,
-          const int a_formulation = CCZ4::USE_CCZ4)
+          const int a_formulation = CCZ4RHS<>::USE_CCZ4)
         : m_center(a_center), m_dx(a_dx), m_deriv(a_dx),
           m_formulation(a_formulation)
     {

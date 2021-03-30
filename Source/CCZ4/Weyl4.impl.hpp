@@ -106,7 +106,7 @@ EBFields_t<data_t> Weyl4::compute_EB_fields(
     const auto chris = compute_christoffel(d1.h, h_UU);
     const auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
     auto ricci_Z = ricci; // BSSN case will keep it like this
-    if (m_formulation == CCZ4::USE_CCZ4)
+    if (m_formulation == CCZ4RHS<>::USE_CCZ4)
     {
         Tensor<1, data_t> Z_over_chi;
         FOR1(i) Z_over_chi[i] = 0.5 * (vars.Gamma[i] - chris.contracted[i]);
@@ -171,7 +171,7 @@ EBFields_t<data_t> Weyl4::compute_EB_fields(
         out.E[i][j] += -K_tensor[i][k] * K_tensor[l][j] * h_UU[k][l] * vars.chi;
     }
 
-    if (m_formulation == CCZ4::USE_CCZ4)
+    if (m_formulation == CCZ4RHS<>::USE_CCZ4)
     {
         // In CCZ4 case do explicit symmetrization; BSSN case relies on momentum
         // constraint satisfaction instead
