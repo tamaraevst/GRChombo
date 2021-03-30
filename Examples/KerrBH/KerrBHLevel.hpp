@@ -22,8 +22,10 @@ class KerrBHLevel : public GRAMRLevel
     /// Initial data calculation
     virtual void initialData() override;
 
-    /// Any actions that should happen just before checkpointing
-    virtual void preCheckpointLevel() override;
+#ifdef CH_USE_HDF5
+    /// Things to do before writing a plot file
+    virtual void prePlotLevel() override;
+#endif /* CH_USE_HDF5 */
 
     /// Calculation of the right hand side for the time stepping
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
@@ -33,6 +35,9 @@ class KerrBHLevel : public GRAMRLevel
     virtual void specificUpdateODE(GRLevelData &a_soln,
                                    const GRLevelData &a_rhs,
                                    Real a_dt) override;
+
+    /// Things to do before tagging cells (i.e. filling ghosts)
+    virtual void preTagCells() override;
 
     virtual void
     computeTaggingCriterion(FArrayBox &tagging_criterion,

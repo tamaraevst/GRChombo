@@ -6,18 +6,27 @@
 #ifndef GRAMRLEVEL_HPP_
 #define GRAMRLEVEL_HPP_
 
+// Chombo includes
 #include "AMRLevel.H"
-#include "BoundaryConditions.hpp"
 #include "CoarseAverage.H"
 #include "FourthOrderFillPatch.H"
+#include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
+#include "LevelRK4.H"
+#include "LoadBalance.H"
+
+// Other includes
+#include "BoundaryConditions.hpp"
 #include "GRAMR.hpp"
 #include "GRLevelData.hpp"
 #include "InterpSource.hpp"
-#include "LevelFluxRegister.H" //We don't actually use flux conservation but Chombo assumes we do
-#include "LevelRK4.H"
 #include "SimulationParameters.hpp"
 #include "UserVariables.hpp" // need NUM_VARS
+#include <fstream>
+#include <limits>
 #include <sys/time.h>
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 class GRAMRLevel : public AMRLevel, public InterpSource
 {
@@ -31,7 +40,8 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     static const GRAMRLevel *gr_cast(const AMRLevel *const amr_level_ptr);
     static GRAMRLevel *gr_cast(AMRLevel *const amr_level_ptr);
 
-    const GRLevelData &getLevelData() const;
+    const GRLevelData &
+    getLevelData(const VariableType var_type = VariableType::evolution) const;
 
     bool contains(const std::array<double, CH_SPACEDIM> &point) const;
 
@@ -51,6 +61,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     /// things to do after a timestep
     virtual void postTimeStep();
+
+    /// things to do before tagging cells (e.g. filling ghosts)
+    virtual void preTagCells();
 
     /// tag cells that need to be refined
     virtual void tagCells(IntVectSet &a_tags);
@@ -140,9 +153,6 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// Things to do immediately before writing plot files
     virtual void prePlotLevel() {}
 
-    /// Specify which variables to write at plot intervals
-    virtual void specificWritePlotHeader(std::vector<int> &plot_states) const {}
-
     /// Things to do immediately after restart from checkpoint
     virtual void postRestart() {}
 #endif
@@ -157,17 +167,36 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     double get_dx() const;
 
-    /// Fill all ghosts cells
-    virtual void fillAllGhosts();
+    /// Returns true if m_time is the same as the time at the end of the current
+    /// timestep on level a_level and false otherwise
+    /// Useful to check whether to calculate something in postTimeStep (which
+    /// might only be needed at the end of a_level's timestep)
+    bool at_level_timestep_multiple(int a_level) const;
+
+    /// Fill all [either] evolution or diagnostic ghost cells
+    virtual void fillAllGhosts(
+        const VariableType var_type = VariableType::evolution,
+        const Interval &a_comps = Interval(0, std::numeric_limits<int>::max()));
 
   protected:
+    /// Fill all evolution ghosts cells (i.e. those in m_state_new)
+    virtual void
+    fillAllEvolutionGhosts(const Interval &a_comps = Interval(0, NUM_VARS - 1));
+
+    /// Fill all diagnostics ghost cells (i.e. those in m_state_diagnostics)
+    virtual void fillAllDiagnosticsGhosts(
+        const Interval &a_comps = Interval(0, NUM_DIAGNOSTIC_VARS - 1));
+
     /// Fill ghosts cells from boxes on this level only. Do not interpolate
     /// between levels.
-    virtual void fillIntralevelGhosts();
+    virtual void
+    fillIntralevelGhosts(const Interval &a_comps = Interval(0, NUM_VARS - 1));
 
     /// This function is used to fill ghost cells outside the domain
     /// (for non-periodic boundary conditions, where values depend on state)
-    virtual void fillBdyGhosts(GRLevelData &a_state);
+    virtual void fillBdyGhosts(GRLevelData &a_state,
+                               const Interval &a_comps = Interval(0, NUM_VARS -
+                                                                         1));
 
     /// This function is used to copy ghost cells outside the domain
     /// (for non-periodic boundary conditions, where boundaries evolve via rhs)
@@ -177,11 +206,14 @@ class GRAMRLevel : public AMRLevel, public InterpSource
     /// copying ghost cells between boxes
     virtual void defineExchangeCopier(const DisjointBoxLayout &a_level_domain);
 
+    void printProgress(const std::string &from) const;
+
     BoundaryConditions m_boundaries; // the class for implementing BCs
 
     GRLevelData m_state_old; //!< the solution at the old time
     GRLevelData m_state_new; //!< the solution at the new time
-    Real m_dx;               //!< grid spacing
+    GRLevelData m_state_diagnostics;
+    Real m_dx; //!< grid spacing
     double m_restart_time;
 
     GRAMR &m_gr_amr; //!< The GRAMR object containing this GRAMRLevel
@@ -196,6 +228,9 @@ class GRAMRLevel : public AMRLevel, public InterpSource
 
     FourthOrderFillPatch m_patcher; //!< Organises interpolation from coarse to
                                     //!< fine levels of ghosts
+    FourthOrderFillPatch
+        m_patcher_diagnostics; //!< Organises interpolation from coarse to
+                               //!< fine levels of ghosts for diagnostics
     FourthOrderFineInterp m_fine_interp; //!< executes the interpolation from
                                          //!< coarse to fine when regridding
 

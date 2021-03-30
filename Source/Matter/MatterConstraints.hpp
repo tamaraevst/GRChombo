@@ -15,7 +15,7 @@
 #include "simd.hpp"
 #include <array>
 
-//!  Calculates the Hamiltonain and Momentum constraints with matter fields
+//!  Calculates the Hamiltonian and Momentum constraints with matter fields
 /*!
      The class calculates the Hamiltonian and Momentum constraints at each point
    in a box. It inherits from the Constraints class which calculates the
@@ -24,7 +24,10 @@
    For an example of a matter_t class see ScalarField. \sa Constraints(),
    ScalarField()
 */
-template <class matter_t> class MatterConstraints : public Constraints
+template <class matter_t>
+class [[deprecated("Use new MatterConstraints class in "
+                   "NewMatterConstraints.hpp")]] MatterConstraints
+    : public Constraints
 {
   public:
     template <class data_t>
