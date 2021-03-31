@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 1 # There are (max_level+1) grids, so min is zero
+max_level = 2 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -139,7 +139,7 @@ gridpoints 200000
 BS_binary = true # make false for one star
 BS_BH_binary = false
 BS_rapidity = 0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 30.0 #separation perpendicular to boost, y
+BS_impact_parameter = 20.0 #separation perpendicular to boost, y
 BS_separation = 0.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
@@ -201,4 +201,4 @@ flux_num_theta = 40
 flux_num_phi = 30
 #flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20. 25. 30.
-flux_extraction_levels = 2 1 1 0 0 0
+flux_extraction_levels = 0 0 0 0 0 0 
