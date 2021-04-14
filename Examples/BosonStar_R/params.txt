@@ -7,9 +7,9 @@ plot_prefix = plt/Sim_p_
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
-N1 = 64
-N2 = 64
-N3 = 64
+N1 = 128
+N2 = 128
+N3 = 128
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
@@ -23,7 +23,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 2 # There are (max_level+1) grids, so min is zero
+max_level = 0 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -140,7 +140,7 @@ BS_binary = true # make false for one star
 BS_BH_binary = false
 BS_rapidity = 0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
 BS_impact_parameter = 20.0 #separation perpendicular to boost, y
-BS_separation = 0.0 #separation parallel to boost, x
+BS_separation = 10.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
@@ -180,7 +180,7 @@ modes = 2 0
         5 0
         6 0
 
-# Star centre Tracking
+_R# Star centre Tracking
 do_star_tracking = 0
 num_points_gaussian_fit = 60
 tracked_field_index = 32 #modphi is 29
@@ -195,7 +195,7 @@ tracking_BH_cutoff = 0.05
 
 flux_number_of_radii = 6
 flux_do = true
-flux_extraction_level = 1
+flux_extraction_level = 0
 flux_write_extraction = true
 flux_num_theta = 40
 flux_num_phi = 30
