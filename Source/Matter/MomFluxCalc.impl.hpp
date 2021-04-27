@@ -107,7 +107,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
 
     Tensor<2, data_t, 3> gamma_UU;
-    FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]/vars.chi;
+    FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]*vars.chi;
     auto gamma_LL = compute_inverse(gamma_UU);
 
     FOR3(i,j,k) aT_UL[i][j] += vars.lapse*gamma_UU[i][k]*emtensor.Sij[k][j];
@@ -168,6 +168,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
     /*FOR1(i) S_phi += - emtensor.rho*xi[i]*d1.lapse[i];
     FOR2(i,j) S_phi += emtensor.Si[i]*xi[j]*d1.shift[i][j];
+    FOR3(i,j,k) S_phi += vars.lapse*emtensor.Sij[i][j]*gamma_UU[j][k]*d_xi[k][i];
     FOR4(i,j,k,l) S_phi += vars.lapse*emtensor.Sij[j][k]*gamma_UU[k][i]*chris.ULL[j][i][l]*xi[l];*/
 
 
