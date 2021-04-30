@@ -139,8 +139,8 @@ gridpoints = 256001
 BS_binary = true # make false for one star
 BS_BH_binary = false
 BS_rapidity = 0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 5.0 #separation perpendicular to boost, y
-BS_separation = 20.0 #separation parallel to boost, x
+BS_impact_parameter = 8.0 #separation perpendicular to boost, y
+BS_separation = 40.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
