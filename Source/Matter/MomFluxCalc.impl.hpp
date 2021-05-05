@@ -86,7 +86,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     Coordinates<data_t> coords(current_cell, m_dx,m_centre);
 
     ////////////////////////////
-    // density
+    // coordinates and killing vector
     ////////////////////////////
 
     data_t x = coords.x, y=coords.y, z=coords.z,
@@ -108,26 +108,21 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     d_xi[1][0] = -1.;
     d_xi[0][1] = 1.;
 
-    data_t Q_phi = y*emtensor.Si[0] - x*emtensor.Si[1]; // ( minus phi component of S_i)
 
 
-    //////////////////////////
-    // flux term
-    //////////////////////////
 
-    data_t F_phi = 0., gamma_rr_inv = 0.; // angular momentum flux
-    //data_t aT_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // lapse times the spatial components of the 4-stress tensor
-    data_t S_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // S^i_j
+
+
+
+    ////////////////////////////
+    // metrics, volumes
+    ////////////////////////////
 
     Tensor<2, data_t, 3> gamma_UU;
     FOR2(i,j) gamma_UU[i][j] = h_UU[i][j]*vars.chi;
     auto gamma_LL = compute_inverse_sym(gamma_UU);
 
-    //FOR3(i,j,k) aT_UL[i][j] += vars.lapse*gamma_UU[i][k]*emtensor.Sij[k][j];
-    FOR3(i,j,k) S_UL[i][j] += gamma_UU[i][k]*emtensor.Sij[k][j]; // S^i_j
-    //FOR2(i,j) aT_UL[i][j] += -vars.shift[i]*emtensor.Si[j];
-
-    Tensor<2, data_t, 3> J_UL;// (d x^a)/(d tildex^b)
+    Tensor<2, data_t, 3> J_UL;// (d x^a)/(d tildex^b) jacobean
     // checked these with mathematica
     J_UL[0][0] = cosphi*sintheta;
     J_UL[1][0] = sinphi*sintheta;
@@ -138,75 +133,20 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     J_UL[0][2] = -r_xyz*sinphi*sintheta;
     J_UL[1][2] = r_xyz*cosphi*sintheta;
     J_UL[2][2] = 0.;
-
     // inverse jacobean
     auto J_inv_UL = compute_inverse(J_UL); //the function outputs the transverse of inverse
-
-    //FOR2(i,j) gamma_rr_inv += gamma_UU[i][j]*J_inv_UL2[i][0]*J_inv_UL2[j][0]; same as explicit version, checked
-
-    gamma_rr_inv = (x*x*gamma_UU[0][0] + y*y*gamma_UU[1][1] + z*z*gamma_UU[2][2]
-               + 2.*(x*y*gamma_UU[0][1] + y*z*gamma_UU[1][2] + x*z*gamma_UU[0][2])
-             )/(r_xyz*r_xyz); // same as version above, checked. This is gamma^{rr}
-
-    /*F_phi = sintheta*(
-                        cosphi*(x*aT_UL[0][1] + y*aT_UL[1][1] +z*aT_UL[2][1])
-                      - sinphi*(x*aT_UL[0][0] + y*aT_UL[1][0] +z*aT_UL[2][0])
-                    )/sqrt(gamma_rr_inv);*/ //just a different way of expressing it
-
-    /*F_phi = (   x*(x*aT_UL[0][1] + y*aT_UL[1][1] +z*aT_UL[2][1])
-              - y*(x*aT_UL[0][0] + y*aT_UL[1][0] +z*aT_UL[2][0])
-            )/(sqrt(gamma_rr_inv)*r_xyz);*/
-
-
-    F_phi = (  x*( x*S_UL[0][1] + y*S_UL[1][1] + z*S_UL[2][1] )
-              - y*( x*S_UL[0][0] + y*S_UL[1][0] + z*S_UL[2][0] )
-                                        )*vars.lapse/(sqrt(gamma_rr_inv)*r_xyz);
-    F_phi -= ( x*vars.shift[0] + y*vars.shift[1] + z*vars.shift[2] )
-                *(x*emtensor.Si[1]-y*emtensor.Si[0])/(sqrt(gamma_rr_inv)*r_xyz);
 
     /*data_t kroneka[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     FOR3(i,j,k) kroneka[i][k] += J_UL2[i][j]*J_inv_UL2[k][j];*/ // checked inverse metric works
 
+    data_t gamma_polar_LL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // downstairs indeces
+    Tensor<2, data_t, 3> dummy; //placeholder equal to polar metric
+    FOR4(i,j,k,l) gamma_polar_LL[i][j] += gamma_LL[k][l]*J_UL[k][i]*J_UL[l][j]; // make spatial polar 3-metric
+    FOR2(i,j) dummy[i][j] = gamma_polar_LL[i][j];
+    auto gamma_polar_UU = compute_inverse_sym(dummy);
 
-
-    //////////////////////////
-    // flux term again
-    //////////////////////////
-
-    data_t F2_phi = 0., N_normsqr = 0.; // angular momentum flux
-    Tensor<2, data_t, 3> g_UU; //4-metric but spatial parts only (not this is not a proper metric)
-    FOR2(i,j) g_UU  = gamma_UU[i][j] - vars.shift[i]*vars.shift[j]/(vars.lapse*vars.lapse);
-    FOR2(i,j) N_normsqr += g_UU[i][j]*cart_coords[i]*cart_coords[j];
-    Tensor<1, data_t, 3> N_cart; // downstaits componnet of radial unit vector
-    N_cart[0] = x/sqrt(N_normsqr);
-    N_cart[1] = y/sqrt(N_normsqr);
-    N_cart[2] = z/sqrt(N_normsqr);
-    FOR2(i,j) F2_phi += -xi[i]*emtensor.Si[i]*N_cart[j]*vars.shift[j]/vars.lapse;
-    FOR3(i,j,k) F2_phi += g_UU[i][j]*N_cart[j]*emtensor.Sij[i][k]*xi[k]; // the g_UU term looks weird but is correct
-
-
-
-    /////////////////////////////////////
-    // start source term again in cartesian
-    /////////////////////////////////////
-
-    data_t S_phi = 0.;
-
-    FOR1(i) S_phi += - emtensor.rho*xi[i]*d1.lapse[i];
-    FOR2(i,j) S_phi += emtensor.Si[i]*(xi[j]*d1.shift[i][j] - vars.shift[j]*d_xi[j][i]);  // assumed d1.shift[i][j] = partial_j beta^i
-    FOR3(i,j,k) S_phi += vars.lapse*emtensor.Sij[i][j]*gamma_UU[j][k]*d_xi[k][i];
-    FOR4(i,j,k,l) S_phi += vars.lapse*emtensor.Sij[j][k]*gamma_UU[k][i]*chris.ULL[j][i][l]*xi[l];
-
-
-
-    /////////////////////////////////////
-    // volumes/areas
-    /////////////////////////////////////
-    data_t polar_metric[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    FOR4(i,j,k,l) polar_metric[i][j] += gamma_LL[k][l]*J_UL[k][i]*J_UL[l][j]; // make spatial polar 3-metric
-
-    data_t sqrt_sigma = sqrt( polar_metric[1][1]*polar_metric[2][2] -
-                              polar_metric[1][2]*polar_metric[2][1] ); //det of 2 metric of surface of constant radius and time
+    data_t sqrt_sigma = sqrt( gamma_polar_LL[1][1]*gamma_polar_LL[2][2] -
+                              gamma_polar_LL[1][2]*gamma_polar_LL[2][1] ); //det of 2 metric of surface of constant radius and time
 
     data_t sqrt_sigma_modified = sqrt_sigma/(r_xyz*r_xy); // r_xyz*r_xy is r^2 sin theta that is automatically in flux int
 
@@ -220,10 +160,10 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     FOR2(i,j) beta_L_polar[i] += J_UL[j][i]*beta_L[j];
     hamma_LL[0][0] = -vars.lapse*vars.lapse;
     FOR2(i,j) hamma_LL[0][0] += vars.shift[i]*vars.shift[j]*gamma_LL[i][j];
-    hamma_LL[1][1] = polar_metric[1][1];
-    hamma_LL[1][2] = polar_metric[1][2];
-    hamma_LL[2][1] = polar_metric[2][1];
-    hamma_LL[2][2] = polar_metric[2][2];
+    hamma_LL[1][1] = gamma_polar_LL[1][1];
+    hamma_LL[1][2] = gamma_polar_LL[1][2];
+    hamma_LL[2][1] = gamma_polar_LL[2][1];
+    hamma_LL[2][2] = gamma_polar_LL[2][2];
     hamma_LL[1][0] = beta_L_polar[1];
     hamma_LL[2][0] = beta_L_polar[2];
     hamma_LL[0][1] = beta_L_polar[1];
@@ -233,27 +173,130 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     data_t root_minus_h_modified = root_minus_h/(r_xyz*r_xy); // modified by 1/(r^2 sintheta) which is in the flux integrator already
     //data_t hopefully_zero = 1. - sqrt_sigma/(root_minus_h*sqrt(-hamma_UU[0][0])); // it is :)
 
-    data_t beta_r = ( x*vars.shift[0]+ y*vars.shift[1]+ z*vars.shift[2]  )/r_xyz;
-    data_t g_rr_inv = gamma_rr_inv - beta_r*beta_r/(vars.lapse*vars.lapse);
+    data_t beta_r = ( x*vars.shift[0]+ y*vars.shift[1]+ z*vars.shift[2]  )/r_xyz; //upstars component
+    data_t g_rr_inv = gamma_polar_UU[0][0] - beta_r*beta_r/(vars.lapse*vars.lapse);
     //data_t hopefully_zero = vars.lapse/sqrt(gamma_rr_inv) - 1./sqrt(-hamma_UU[0][0]*g_rr_inv); // it is :)
     //data_t hopefully_zero = 1. + gamma_rr_inv/(hamma_UU[0][0]*g_rr_inv*vars.lapse*vars.lapse); // it is :)
 
 
     data_t sqrt_gamma_polar = sqrt(
-      polar_metric[0][0]*( polar_metric[1][1]*polar_metric[2][2] - polar_metric[1][2]*polar_metric[2][1] ) +
-      polar_metric[0][1]*( polar_metric[1][2]*polar_metric[2][0] - polar_metric[2][2]*polar_metric[1][0] ) +
-      polar_metric[0][2]*( polar_metric[1][0]*polar_metric[2][1] - polar_metric[1][1]*polar_metric[2][0] )
+      gamma_polar_LL[0][0]*( gamma_polar_LL[1][1]*gamma_polar_LL[2][2] - gamma_polar_LL[1][2]*gamma_polar_LL[2][1] ) +
+      gamma_polar_LL[0][1]*( gamma_polar_LL[1][2]*gamma_polar_LL[2][0] - gamma_polar_LL[2][2]*gamma_polar_LL[1][0] ) +
+      gamma_polar_LL[0][2]*( gamma_polar_LL[1][0]*gamma_polar_LL[2][1] - gamma_polar_LL[1][1]*gamma_polar_LL[2][0] )
     ); //det of polar 3-metric
+    //data_t alternative_sqrt_sigma = sqrt(gamma_rr_inv*sqrt_gamma_polar*sqrt_gamma_polar); // dont need this, but checked its equal to sqrt_sigma
 
-    data_t alternative_sqrt_sigma = sqrt(gamma_rr_inv*sqrt_gamma_polar*sqrt_gamma_polar); // dont need this, but checked its equal to sqrt_sigma
-
-    //data_t sqrt(compute_determinant_sym(gamma_LL)); // same as lien below
+    //data_t sqrt(compute_determinant_sym(gamma_LL)); // same as line below
     data_t sqrt_gamma = pow(vars.chi,-1.5); //det of cartesian 3-metric
 
+
+
+
+
+
+
+
+    ////////////////////////////
+    // density
+    ////////////////////////////
+
+    data_t Q_phi = 0.; //phi component of em tensors Si
+    FOR1(i) Q_phi += -xi[i]*emtensor.Si[i];
+    //data_t Q_phi = y*emtensor.Si[0] - x*emtensor.Si[1]; // ( minus phi component of S_i)
+
+
+
+
+
+
+    //////////////////////////
+    // flux term
+    //////////////////////////
+
+    // the polar version with sqrt(sigma) as det
+    // this version needs int F_phi sqrt(sigma) dx^2
+    // dont forget to divide sqrt(sigma) by r_xy*r_xyz = r^2 sintheta as the surface integrator has r^2 sin theta already
+
+    data_t F_phi = 0.;
+    data_t S_UL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // S^i_j
+    FOR3(i,j,k) S_UL[i][j] += gamma_UU[i][k]*emtensor.Sij[k][j]; // S^i_j
+    data_t S_mixed[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; // S_ij with i polar j cart
+    FOR3(i,j,k) S_mixed[i][j] += emtensor.Sij[k][j]*J_UL[k][j];
+
+    //FOR2(i,j) F_phi += vars.lapse*(cart_coords[i]/r_xyz)*S_UL[i][j]*xi[j];
+    FOR2(i,j) F_phi += vars.lapse*gamma_polar_UU[0][i]*S_mixed[i][j]*xi[j];
+    FOR1(i)   F_phi += - beta_r*emtensor.Si[i]*xi[i];
+    F_phi = F_phi/sqrt(gamma_polar_UU[0][0]);
+
+
+
+
+
+
+
+
+
+    //////////////////////////
+    // flux term again
+    //////////////////////////
+
+    // the cartesian version with sqrt(-h) as det
+    // this version requires int F sqrt(-h) dx^2
+    // dont forget to divide sqrt(-h) by r_xy*r_xyz = r^2 sintheta as this term is automatically in the surface integrator
+
+    data_t F2_phi = 0., N_normsqr = 0.; // angular momentum flux
+    Tensor<2, data_t, 3> g_UU; //4-metric but spatial parts only (not this is not a proper metric)
+    FOR2(i,j) g_UU  = gamma_UU[i][j] - vars.shift[i]*vars.shift[j]/(vars.lapse*vars.lapse);
+    FOR2(i,j) N_normsqr += g_UU[i][j]*cart_coords[i]*cart_coords[j];
+    Tensor<1, data_t, 3> N_cart; // downstaits componnet of radial unit vector
+    Tensor<1, data_t, 3> N_proj; // upstairs componetnets projected to Sigma
+    N_cart[0] = x/sqrt(N_normsqr);
+    N_cart[1] = y/sqrt(N_normsqr);
+    N_cart[2] = z/sqrt(N_normsqr);
+    N_proj[0] = 0.;
+    N_proj[1] = 0.;
+    N_proj[2] = 0.;
+    FOR2(i,j) N_proj[i] += gamma_UU[i][j]*N_cart[j];
+
+    FOR2(i,j) F2_phi += -N_cart[i]*vars.shift[i]*xi[j]*emtensor.Si[j]/vars.lapse;
+    FOR2(i,j) F2_phi += N_proj[i]*xi[j]*emtensor.Sij[i][j];
+
+
+
+
+
+
+
+    /////////////////////////////////////
+    // start source in cartesian
+    /////////////////////////////////////
+
+    data_t S_phi = 0.;
+
+    FOR1(i) S_phi += - emtensor.rho*xi[i]*d1.lapse[i];
+    FOR2(i,j) S_phi += emtensor.Si[i]*(xi[j]*d1.shift[i][j] - vars.shift[j]*d_xi[j][i]);  // assumed d1.shift[i][j] = partial_j beta^i
+    FOR3(i,j,k) S_phi += vars.lapse*emtensor.Sij[i][j]*gamma_UU[j][k]*d_xi[k][i];
+    FOR4(i,j,k,l) S_phi += vars.lapse*emtensor.Sij[j][k]*gamma_UU[k][i]*chris.ULL[j][i][l]*xi[l];
+
+
+
+    /////////////////////////////////////
+    // store values
+    /////////////////////////////////////
+
+
+    //data_t hopefully_zero = root_minus_h - vars.lapse*sqrt(g_rr_inv/gamma_polar_UU[0][0])*sqrt_sigma; // it is
+    //data_t hopefully_zero = root_minus_h - sqrt_sigma/sqrt(-hamma_UU[0][0]); // it is
+
     current_cell.store_vars(Q_phi*sqrt_gamma,m_c_Qphi_density);
-    current_cell.store_vars(F2_phi*root_minus_h_modified-F_phi*sqrt_sigma_modified,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
+    //current_cell.store_vars(F2_phi*root_minus_h_modified - F_phi*sqrt_sigma_modified,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
+    current_cell.store_vars(F2_phi*root_minus_h_modified,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
     //current_cell.store_vars(hopefully_zero,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
     current_cell.store_vars(S_phi*sqrt_gamma,m_c_Sphi_source); // storing S_phi * sqrt(gamma)
+
+
+
+
 
 
 }

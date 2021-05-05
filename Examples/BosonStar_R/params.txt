@@ -7,9 +7,9 @@ plot_prefix = plt/Sim_p_
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
-N1 = 64
-N2 = 64
-N3 = 64
+N1 = 128
+N2 = 128
+N3 = 128
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
