@@ -7,9 +7,9 @@ plot_prefix = plt/Sim_p_
 
 # Set up grid spacings and regrid params
 # NB - the N values need to be multiples of block_factor
-N1 = 128
-N2 = 128
-N3 = 128
+N1 = 64
+N2 = 64
+N3 = 64
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
@@ -138,9 +138,9 @@ eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>
 gridpoints = 256001
 BS_binary = true # make false for one star
 BS_BH_binary = false
-BS_rapidity = 0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 8.0 #separation perpendicular to boost, y
-BS_separation = 40.0 #separation parallel to boost, x
+BS_rapidity = 0.2 ; //0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
+BS_impact_parameter = 4.0 #separation perpendicular to boost, y
+BS_separation = 15.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
