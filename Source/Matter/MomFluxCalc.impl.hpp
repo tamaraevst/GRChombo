@@ -59,6 +59,9 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
     const auto emtensor = m_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
+    const auto phys_chris = compute_phys_chris(d1.chi, vars.chi, vars.h,
+                                                          h_UU, chris.ULL);
+
     if (m_c_rho >= 0)
     {
         current_cell.store_vars(emtensor.rho, m_c_rho);
@@ -270,6 +273,11 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     //////////////////////////
 
     data_t F3_phi=0.;
+
+
+
+
+
     data_t Sij_polar[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     data_t Si_polar[3] = {0.,0.,0.};
     FOR2(i,j) Si_polar[i] += emtensor.Si[j]*J_UL[j][i];
@@ -295,6 +303,26 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
 
 
     /////////////////////////////////////
+    // Source term again
+    /////////////////////////////////////
+    data_t S2_phi=0.;
+    data_t XI[3] = {-y,x,0.};
+    data_t DXI[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+    data_t CHRIS3[3][3][3];
+    DXI[0][1] = 1.;
+    DXI[1][0] = -1.;
+    FOR1(i) S2_phi += -emtensor.rho*XI[i]*d1.lapse[i];
+    FOR2(i,j) S2_phi += emtensor.Si[i]*XI[j]*d1.shift[i][j] - emtensor.Si[j]*vars.shift[i]*DXI[i][j];
+    FOR3(i,j,k) S2_phi += vars.lapse*gamma_UU[i][j]*emtensor.Sij[j][k]*DXI[i][k];
+    FOR4(i,j,k,l) S2_phi += vars.lapse*gamma_UU[i][j]*emtensor.Sij[j][k]*phys_chris[k][i][l]*XI[l];
+
+
+
+
+
+
+
+    /////////////////////////////////////
     // store values
     /////////////////////////////////////
 
@@ -302,7 +330,7 @@ void EMTensor_and_mom_flux<matter_t>::compute(Cell<data_t> current_cell) const
     //current_cell.store_vars(F2_phi*root_minus_h_modified - F_phi*sqrt_sigma_modified,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
     current_cell.store_vars(F3_phi*sqrt_sigma_modified,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
     //current_cell.store_vars(is_this_zero,m_c_Fphi_flux); // rememebr, the spherical integrator that uses this already includes r^2*sin theta
-    current_cell.store_vars(S_phi*sqrt_gamma,m_c_Sphi_source); // storing S_phi * sqrt(gamma)
+    current_cell.store_vars(S2_phi*sqrt_gamma,m_c_Sphi_source); // storing S_phi * sqrt(gamma)
 
 
 
