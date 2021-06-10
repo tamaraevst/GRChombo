@@ -63,7 +63,7 @@ Tensor<3, data_t> Weyl4::compute_epsilon3_LUU(const Vars<data_t> &vars) const
         for (int l = 0; l < 4; ++l)
         {
             epsilon3_LLL[i][j][k] += n_U[l] * epsilon4[i][j][k][l] *
-                                     vars.lapse * pow(vars.chi, -1.5);
+                                     vars.lapse / (vars.chi * sqrt(vars.chi));
         }
     }
     // rasing indices
@@ -255,7 +255,7 @@ Weyl4::compute_null_tetrad(const Vars<data_t> &vars,
 
     FOR4(i, j, k, m)
     {
-        out.w[i] += pow(chi, -0.5) * h_UU[i][j] * epsilon[j][k][m] * out.v[k] *
+        out.w[i] += 1. / sqrt(chi) * h_UU[i][j] * epsilon[j][k][m] * out.v[k] *
                     out.u[m];
     }
 
