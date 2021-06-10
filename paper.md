@@ -77,7 +77,7 @@ authors:
   affiliation: 5
 - name: Zainab Nazari
   orcid: 0000-0002-2955-7262
-  affiliation: 10
+  affiliation: 10, 11
 - name: Miren Radia
   orcid: 0000-0001-8861-2025
   affiliation: 5
@@ -89,7 +89,7 @@ authors:
   affiliation: 5
 - name: Ulrich Sperhake
   orcid: 0000-0002-3134-7088
-  affiliation: 5
+  affiliation: 5, 12
 - name: Dina Traykova
   orcid: 0000-0002-3451-0987
   affiliation: 4
@@ -124,8 +124,12 @@ affiliations:
   index: 8
 - name: Cosmology, Universe and Relativity at Louvain (CURL), Institut de Recherche en Mathematique et Physique, University of Louvain, 2 Chemin du Cyclotron, 1348 Louvain-la-Neuve, Belgium
   index: 9
-- name: Department of Physics, Bogazici University, 34342 Bebek, 80820 Istanbul, Turkey and HECAP Section, Abdus Salam International Centre for Theoretical Physics, 34151, Trieste, Italy
+- name: Department of Physics, Bogazici University, 34342 Bebek, 80820 Istanbul, Turkey
   index: 10
+- name: HECAP Section, Abdus Salam International Centre for Theoretical Physics (ICTP), 34151, Trieste, Italy
+  index: 11
+- name: California Institute of Technology, Pasadena, California 91125, USA
+  index: 12
 date: 1 June 2021
 bibliography: paper.bib
 
@@ -133,14 +137,15 @@ bibliography: paper.bib
 
 # Summary
 
-The 2015 detection of gravitational waves (GWs) from a binary black hole merger [@Abbott:2016blz] was a breakthrough moment for science. More detections have since been made by the Advanced LIGO/Virgo network [@TheVirgo:2014hva;@TheLIGOScientific:2014jea;@Aasi:2013wya] and future ground and space based detectors [@Somiya:2011np;@Saleem:2021iwi;@Audley:2017drz;@Luo:2015ght;@Hu:2017mde] will further expand our reach. 
+The 2015 detection of gravitational waves (GWs) from a binary black hole merger [@Abbott:2016blz] was a breakthrough moment for science. More detections have since been made by the Advanced LIGO/Virgo network [@Abbott:2020niy;@TheVirgo:2014hva;@TheLIGOScientific:2014jea;@Aasi:2013wya] and future ground and space based detectors [@Somiya:2011np;@Saleem:2021iwi;@Audley:2017drz;@Luo:2015ght;@Hu:2017mde] will further expand our reach. 
 
-Strong gravity regimes are described by the *Einstein Field Equation* (EFE) of General Relativity [@Einstein:1916vd]. 
+Strong gravity regimes are described by the *Einstein Field Equation* (EFE) of General Relativity [@Einstein:1916vd]
 \begin{equation}
-   R_{\mu \nu} - \frac{1}{2} R g_{\mu \nu} = 8 \pi G T_{\mu\nu} ~.
+   R_{\mu \nu} - \frac{1}{2} R g_{\mu \nu} = 8 \pi G T_{\mu\nu} ~,
 \end{equation}
+where $g_{\mu\nu}$ is the gravitational metric describing spacetime distances, $R$ and $R_{\mu\nu}$ are related to its second derivatives in space and time, and $T_{\mu\nu}$ is the stress-energy tensor of matter present.
 Analytic solutions to the EFE only exist where there is a high degree of symmetry; in general the equations must be solved numerically. The need for observational predictions has thus led to the development of *numerical relativity* (NR), methods for numerically solving the above expression, typically utilising high performance computing (HPC) resources.
-Expanding out the tensorial notation, the EFE is a set of second order partial differential equations for the metric tensor field $g_{\mu\nu}$, which describes the curvature of spacetime in the presence of matter with stress-energy $T_{\mu\nu}$, i.e.,
+Expanding out the tensorial notation above, the EFE is a set of coupled, non linear second order partial differential equations for $g_{\mu\nu}$, which describes the curvature of spacetime in the presence of matter with stress-energy $T_{\mu\nu}$, i.e.,
 \begin{equation}
    \partial_t \partial_t g_{\mu\nu} \sim \partial_x \partial_x g_{\mu\nu} + \partial_y \partial_y g_{\mu\nu} + \partial_z \partial_z g_{\mu\nu} + {\rm non ~ linear ~ cross ~ terms} 
           + 8 \pi G T_{\mu\nu}
@@ -157,7 +162,7 @@ Since its initial announcement in 2015 [@Clough:2015sqa], the GRChombo code has 
 
 The key features of GRChombo are as follows:
 
-- BSSN/CCZ4 formalism with moving punctures: GRChombo evolves the Einstein equation in the BSSN [@Nakamura:1987zz;@Shibata:1995we;@Baumgarte:1998te] or CCZ4 [@Gundlach:2005eh;@Alic:2011gg] formalism with conformal factor $\chi = det(\gamma_{ij})^{-1/3}$. Singularities of black holes are managed using the moving puncture gauge conditions [@Campanelli:2005dd;@Baker:2005vv], and Kreiss-Oliger dissipation is used to control errors, both from truncation and the interpolation associated with regridding.
+- BSSN/CCZ4 formalism with moving punctures: GRChombo evolves the Einstein equation in the BSSN [@Nakamura:1987zz;@Shibata:1995we;@Baumgarte:1998te] or CCZ4 [@Gundlach:2005eh;@Alic:2011gg] formalism with conformal factor $\chi = det(\gamma_{ij})^{-1/3}$. Singularities of black holes are managed using the moving puncture gauge conditions [@Campanelli:2005dd;@Baker:2005vv], and Kreiss-Oliger dissipation is used to control high-frequency noise, both from truncation and the interpolation associated with regridding.
 
 - Boundary Conditions: The code implements periodic, Sommerfeld (radiative), extrapolating and reflective boundary conditions.
 
@@ -167,7 +172,7 @@ The key features of GRChombo are as follows:
 
 - C++ class structure: GRChombo is written in the C++ language, and makes heavy use of object oriented programming (OOP) and templating.
 
-- Parallelism: GRChombo uses hybrid OpenMP/MPI  parallelism with explicit vectorisation of the evolution equations via intrinsics, and is AVX-512 compliant. Our code strong scales efficiently to several thousand CPU-cores for a typical BH binary problem, and further for larger problem sizes. 
+- Parallelism: GRChombo uses hybrid OpenMP/MPI  parallelism with explicit vectorisation of the evolution equations via intrinsics, and is AVX-512 compliant. Our code demonstrates efficient strong scaling up to several thousand CPU-cores for a typical BH binary problem, and further for larger problem sizes. 
 
 - Adaptive Mesh Refinement: The underlying Chombo code provides Berger-Oliger style [@Berger:1984zza] AMR with block-structured  Berger-Rigoutsos grid generation [@BergerRigoutsos]. The tagging of refinement regions is fully flexible and can be based on truncation error or other user-defined measures.
 
@@ -248,7 +253,7 @@ GRChombo users have benefited from the provision of HPC resources from:
     
   * the Argonne Leadership Computing Facility, including the Joint Laboratory for System Evaluation (JLSE), which is a U.S. Department of Energy (DOE) Office of Science User Facility supported under Contract DE-AC02-06CH11357.
 
-  * the Texas Advanced Computing Center (TACC) at The University of Texas at Austin HPC and visualisation resources URL: http://www.tacc.utexas.edu under project number PHY20043.
+  * the Texas Advanced Computing Center (TACC) at the University of Austin HPC and visualization resources URL: http://www.taxx.utexas.edu, and the San Diego Supercomputing Center (SDSC) URL: https://www.sdsc.edu, under project PHY-20043 and XSEDE Grant No. NSF-PHY-090003
 
   * Consortium des Équipements de Calcul Intensif (CÉCI), funded by the Fonds de la Recherche Scientifique de Belgique (F.R.S.-FNRS), Belgium
 
