@@ -253,7 +253,7 @@ GRChombo users have benefited from the provision of HPC resources from:
     
   * the Argonne Leadership Computing Facility, including the Joint Laboratory for System Evaluation (JLSE), which is a U.S. Department of Energy (DOE) Office of Science User Facility supported under Contract DE-AC02-06CH11357.
 
-  * the Texas Advanced Computing Center (TACC) at the University of Austin HPC and visualization resources URL: http://www.taxx.utexas.edu, and the San Diego Supercomputing Center (SDSC) URL: https://www.sdsc.edu, under project PHY-20043 and XSEDE Grant No. NSF-PHY-090003
+  * the Texas Advanced Computing Center (TACC) at the University of Austin HPC and visualization resources URL: http://www.tacc.utexas.edu, and the San Diego Supercomputing Center (SDSC) URL: https://www.sdsc.edu, under project PHY-20043 and XSEDE Grant No. NSF-PHY-090003
 
   * Consortium des Équipements de Calcul Intensif (CÉCI), funded by the Fonds de la Recherche Scientifique de Belgique (F.R.S.-FNRS), Belgium
 
