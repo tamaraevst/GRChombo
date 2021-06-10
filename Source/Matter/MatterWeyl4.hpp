@@ -24,7 +24,8 @@ template <class matter_t> class MatterWeyl4 : public Weyl4
     //! Constructor
     MatterWeyl4(matter_t a_matter,
                 const std::array<double, CH_SPACEDIM> a_center,
-                const double a_dx, const int a_formulation = CCZ4::USE_CCZ4,
+                const double a_dx,
+                const int a_formulation = CCZ4RHS<>::USE_CCZ4,
                 double a_G_Newton = 1.0)
         : Weyl4(a_center, a_dx, a_formulation), m_matter(a_matter),
           m_G_Newton(a_G_Newton)
@@ -41,11 +42,11 @@ template <class matter_t> class MatterWeyl4 : public Weyl4
 
     //! Add matter terms to electric and magnetic parts
     template <class data_t>
-    void add_matter_EB(EBFields_t<data_t> &eb_fields,
-                       const Tensor<3, data_t> &epsilon3_LUU,
-                       const Vars<data_t> &vars,
+    void add_matter_EB(EBFields_t<data_t> &eb_fields, const Vars<data_t> &vars,
                        const Vars<Tensor<1, data_t>> &d1,
-                       const Coordinates<data_t> &coords) const;
+                       const Tensor<3, data_t> &epsilon3_LUU,
+                       const Tensor<2, data_t> &h_UU,
+                       const chris_t<data_t> &chris) const;
 };
 
 #include "MatterWeyl4.impl.hpp"

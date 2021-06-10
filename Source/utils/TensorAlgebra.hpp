@@ -174,15 +174,17 @@ ALWAYS_INLINE void make_trace_free(Tensor<2, data_t> &tensor_LL,
 }
 
 /// Makes a 2-Tensor symmetric
-template <class data_t>
-ALWAYS_INLINE void make_symmetric(Tensor<2, data_t> &tensor_LL)
+template <class data_t, int size>
+ALWAYS_INLINE void make_symmetric(Tensor<2, data_t, size> &tensor_LL)
 {
-    Tensor<2, data_t> tensor_LL_symmetrized;
-    FOR2(i, j)
+    for (int i = 0; i < size; ++i)
     {
-        tensor_LL_symmetrized[i][j] = 0.5 * (tensor_LL[i][j] + tensor_LL[j][i]);
+        for (int j = 0; j < i; ++j)
+        {
+            tensor_LL[i][j] = 0.5 * (tensor_LL[i][j] + tensor_LL[j][i]);
+            tensor_LL[j][i] = tensor_LL[i][j];
+        }
     }
-    tensor_LL = tensor_LL_symmetrized;
 }
 
 /// Raises the index of a covector

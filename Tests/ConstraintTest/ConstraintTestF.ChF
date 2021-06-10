@@ -393,7 +393,7 @@ c     note that this has not been extended to work for DIM > 3
           do d2 = 0, 2
             ri_1(d0,d1) = ri_1(d0,d1) + hh(d2,d0) * d1_cfc(d2,d1) / 2
      &                                + hh(d2,d1) * d1_cfc(d2,d0) / 2
-     &                                + cfc(d2) * (cf1(d0,d1,d2) + cf1(d1,d0,d2)) / 2
+     &                                + cfc(d2) * d1_hh(d0,d1,d2) / 2
             do d3 = 0, 2
               ri_2(d0,d1) = ri_2(d0,d1) - hu(d2,d3) * d2_hh(d0,d1,d2,d3) / 2
               do d4 = 0, 2

@@ -6,7 +6,7 @@
 #ifndef WEYL4_HPP_
 #define WEYL4_HPP_
 
-#include "CCZ4RHS.hpp"
+#include "CCZ4.hpp"
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "FourthOrderDerivatives.hpp"
@@ -78,7 +78,8 @@ class Weyl4
 
     //! Compute spatial volume element
     template <class data_t>
-    Tensor<3, data_t> compute_epsilon3_LUU(const Vars<data_t> &vars) const;
+    Tensor<3, data_t> compute_epsilon3_LUU(const Vars<data_t> &vars,
+                                           const Tensor<2, data_t> &h_UU) const;
 
     //! Calculation of Weyl_4 scalar
     template <class data_t>
@@ -86,23 +87,24 @@ class Weyl4
                                      const Vars<data_t> &vars,
                                      const Vars<Tensor<1, data_t>> &d1,
                                      const Diff2Vars<Tensor<2, data_t>> &d2,
+                                     const Tensor<2, data_t> &h_UU,
                                      const Coordinates<data_t> &coords) const;
 
     //! Calculation of the tetrads
     template <class data_t>
     Tetrad_t<data_t>
-    compute_null_tetrad(const Vars<data_t> &vars,
+    compute_null_tetrad(const Vars<data_t> &vars, const Tensor<2, data_t> &h_UU,
                         const Coordinates<data_t> &coords) const;
 
     //! Calulation of the decomposition of the Weyl tensor in Electric and
     //! Magnetic fields
     template <class data_t>
-    EBFields_t<data_t>
-    compute_EB_fields(const Tensor<3, data_t> &epsilon3_LUU,
-                      const Vars<data_t> &vars,
-                      const Vars<Tensor<1, data_t>> &d1,
-                      const Diff2Vars<Tensor<2, data_t>> &d2,
-                      const Coordinates<data_t> &coords) const;
+    EBFields_t<data_t> compute_EB_fields(const Vars<data_t> &vars,
+                                         const Vars<Tensor<1, data_t>> &d1,
+                                         const Diff2Vars<Tensor<2, data_t>> &d2,
+                                         const Tensor<3, data_t> &epsilon3_LUU,
+                                         const Tensor<2, data_t> &h_UU,
+                                         const chris_t<data_t> &chris) const;
 };
 
 #include "Weyl4.impl.hpp"

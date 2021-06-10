@@ -914,11 +914,13 @@ c        R here is tilde{R_ij}, ie, the conformal R_ij
            enddo
            do d2 = 0,2
              R(d0,d1) = R(d0,d1)
-c            change back to calculated Gamma due to changes in Ricci calculation
-     &       + half*Gamma1d(d2)*chris1st(d0,d1,d2)
-     &       + half*Gamma1d(d2)*chris1st(d1,d0,d2)
+c            old code used calculated Gamma, not evolved Gamma
+c     &       + half*Gamma1d(d2)*chris1st(d0,d1,d2)
+c     &       + half*Gamma1d(d2)*chris1st(d1,d0,d2)
 c     &       + half*Gamma1(CHF_AUTOIX[i],d2)*chris1st(d0,d1,d2)
 c     &       + half*Gamma1(CHF_AUTOIX[i],d2)*chris1st(d1,d0,d2)
+c            switch to dgammadx instead of symmetrizing chris1st
+     &       + half*Gamma1(CHF_AUTOIX[i],d2)*dgammadx(d0,d1,d2)
              do d3 = 0,2; do d4 = 0,2
                R(d0,d1) = R(d0,d1)
      &         + gu(d3,d4)*chris(d2,d3,d0)*chris1st(d1,d2,d4)

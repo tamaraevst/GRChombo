@@ -21,15 +21,21 @@ template <class data_t> void Weyl4::compute(Cell<data_t> current_cell) const
     // Get the coordinates
     const Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
+    // Compute the inverse metric and Christoffel symbols
+    using namespace TensorAlgebra;
+    const auto h_UU = compute_inverse_sym(vars.h);
+    const auto chris = compute_christoffel(d1.h, h_UU);
+
     // Compute the spatial volume element
-    const auto epsilon3_LUU = compute_epsilon3_LUU(vars);
+    const auto epsilon3_LUU = compute_epsilon3_LUU(vars, h_UU);
 
     // Compute the E and B fields
     EBFields_t<data_t> ebfields =
-        compute_EB_fields(epsilon3_LUU, vars, d1, d2, coords);
+        compute_EB_fields(vars, d1, d2, epsilon3_LUU, h_UU, chris);
 
     // work out the Newman Penrose scalar
-    NPScalar_t<data_t> out = compute_Weyl4(ebfields, vars, d1, d2, coords);
+    NPScalar_t<data_t> out =
+        compute_Weyl4(ebfields, vars, d1, d2, h_UU, coords);
 
     // Write the rhs into the output FArrayBox
     current_cell.store_vars(out.Real, c_Weyl4_Re);
@@ -37,7 +43,9 @@ template <class data_t> void Weyl4::compute(Cell<data_t> current_cell) const
 }
 
 template <class data_t>
-Tensor<3, data_t> Weyl4::compute_epsilon3_LUU(const Vars<data_t> &vars) const
+Tensor<3, data_t>
+Weyl4::compute_epsilon3_LUU(const Vars<data_t> &vars,
+                            const Tensor<2, data_t> &h_UU) const
 {
     // raised normal vector, NB index 3 is time
     data_t n_U[4];
@@ -67,7 +75,6 @@ Tensor<3, data_t> Weyl4::compute_epsilon3_LUU(const Vars<data_t> &vars) const
         }
     }
     // rasing indices
-    const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
     FOR3(i, j, k)
     {
         FOR2(m, n)
@@ -86,9 +93,10 @@ Tensor<3, data_t> Weyl4::compute_epsilon3_LUU(const Vars<data_t> &vars) const
 // https://www.overleaf.com/read/tvqjbyhvqqtp
 template <class data_t>
 EBFields_t<data_t> Weyl4::compute_EB_fields(
-    const Tensor<3, data_t> &epsilon3_LUU, const Vars<data_t> &vars,
-    const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2,
-    const Coordinates<data_t> &coords) const
+    const Vars<data_t> &vars, const Vars<Tensor<1, data_t>> &d1,
+    const Diff2Vars<Tensor<2, data_t>> &d2,
+    const Tensor<3, data_t> &epsilon3_LUU, const Tensor<2, data_t> &h_UU,
+    const chris_t<data_t> &chris) const
 {
     EBFields_t<data_t> out;
 
@@ -99,28 +107,13 @@ EBFields_t<data_t> Weyl4::compute_EB_fields(
 
     // Compute inverse, Christoffel symbols, Ricci tensor and Z terms
     // Note that unlike in CCZ4 equations we want R_ij + 0.5(D_iZ_j + D_jZ_i)
-    // rather than R_ij + D_iZ_j + D_jZ_i so take the mean of R_ij and
-    // R_ij + D_iZ_j + D_jZ_i
-    using namespace TensorAlgebra;
-    const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
-    const auto chris = compute_christoffel(d1.h, h_UU);
-    const auto ricci = CCZ4Geometry::compute_ricci(vars, d1, d2, h_UU, chris);
-    auto ricci_Z = ricci; // BSSN case will keep it like this
-    if (m_formulation == CCZ4RHS<>::USE_CCZ4)
-    {
-        Tensor<1, data_t> Z_over_chi;
-        FOR1(i) Z_over_chi[i] = 0.5 * (vars.Gamma[i] - chris.contracted[i]);
-        ricci_Z = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris,
-                                                Z_over_chi);
-    }
-    ricci_t<data_t> ricci_and_Z_terms;
-    FOR2(i, j)
-    {
-        ricci_and_Z_terms.LL[i][j] = 0.5 * (ricci.LL[i][j] + ricci_Z.LL[i][j]);
-    }
-    // don't need ricci scalar so don't bother calculating it
+    // rather than R_ij + D_iZ_j + D_jZ_i hence use compute_ricci_Z_general
+    double dZ_coeff = (m_formulation == CCZ4RHS<>::USE_CCZ4) ? 1. : 0.;
+    auto ricci_and_Z_terms = CCZ4Geometry::compute_ricci_Z_general(
+        vars, d1, d2, h_UU, chris, dZ_coeff);
 
     // Compute full spatial Christoffel symbols
+    using namespace TensorAlgebra;
     const Tensor<3, data_t> chris_phys =
         compute_phys_chris(d1.chi, vars.chi, vars.h, h_UU, chris.ULL);
 
@@ -139,14 +132,23 @@ EBFields_t<data_t> Weyl4::compute_EB_fields(
         }
     }
     // covariant derivative of K
-    FOR3(i, j, k) { covariant_deriv_K_tensor[i][j][k] = d1_K_tensor[i][j][k]; }
-
-    FOR4(i, j, k, l)
+    FOR3(i, j, k)
     {
-        covariant_deriv_K_tensor[i][j][k] +=
-            -chris_phys[l][k][i] * K_tensor[l][j] -
-            chris_phys[l][k][j] * K_tensor[i][l];
+        covariant_deriv_K_tensor[i][j][k] = d1_K_tensor[i][j][k];
+
+        FOR1(l)
+        {
+            covariant_deriv_K_tensor[i][j][k] +=
+                -chris_phys[l][k][i] * K_tensor[l][j] -
+                chris_phys[l][k][j] * K_tensor[i][l];
+        }
     }
+
+    // Use 'K-Theta' in CCZ4. Just 'K' in BSSN. Not a mistake, this is not to
+    // confuse with the typical 'K-2*Theta' that appears in the CCZ4 equations
+    data_t K_minus_theta = vars.K;
+    if (m_formulation == CCZ4RHS<>::USE_CCZ4)
+        K_minus_theta -= vars.Theta;
 
     // Calculate electric and magnetic fields
     FOR2(i, j)
@@ -155,35 +157,34 @@ EBFields_t<data_t> Weyl4::compute_EB_fields(
         out.B[i][j] = 0.0;
     }
 
-    FOR4(i, j, k, l)
-    {
-        out.B[i][j] +=
-            epsilon3_LUU[i][k][l] * covariant_deriv_K_tensor[l][j][k];
-    }
-
     FOR2(i, j)
     {
-        out.E[i][j] += ricci_and_Z_terms.LL[i][j] + vars.K * K_tensor[i][j];
+        out.E[i][j] +=
+            ricci_and_Z_terms.LL[i][j] + K_minus_theta * K_tensor[i][j];
+
+        FOR2(k, l)
+        {
+            out.E[i][j] +=
+                -K_tensor[i][k] * K_tensor[l][j] * h_UU[k][l] * vars.chi;
+
+            out.B[i][j] +=
+                epsilon3_LUU[i][k][l] * covariant_deriv_K_tensor[l][j][k];
+        }
     }
 
-    FOR4(i, j, k, l)
-    {
-        out.E[i][j] += -K_tensor[i][k] * K_tensor[l][j] * h_UU[k][l] * vars.chi;
-    }
+    // For CCZ4, explicit symmetrization appears naturally;
+    // For BSSN, only extra matter terms appear in the original expression, but
+    // assuming the Momentum constraints are satisfied, we can make the
+    // expression explicitly symmetric, which we enforce below
+    // (see Alcubierre chapter 8.3, from eq. 8.3.15 onwards)
+    TensorAlgebra::make_symmetric(out.B);
 
-    if (m_formulation == CCZ4RHS<>::USE_CCZ4)
-    {
-        // In CCZ4 case do explicit symmetrization; BSSN case relies on momentum
-        // constraint satisfaction instead
-        TensorAlgebra::make_symmetric(out.B);
-
-        FOR2(i, j) { out.E[i][j] += -vars.Theta * K_tensor[i][j]; }
-
-        // The expression in CCZ4 is explicitly trace-free but in BSSN it's only
-        // trace-free if the Hamiltonian constraint is satisfied...
-        // Let's keep this CCZ4 only to avoid breaking the test
-        TensorAlgebra::make_trace_free(out.E, vars.h, h_UU);
-    }
+    // For CCZ4, Eij is explicitly trace-free;
+    // For BSSN, only extra matter terms appear in the original expression, but
+    // assuming the Hamiltonian constraint is satisfied, we can make the
+    // expression explicitly trace free, which we enforce below
+    // (see Alcubierre chapter 8.3, from eq. 8.3.15 onwards)
+    TensorAlgebra::make_trace_free(out.E, vars.h, h_UU);
 
     return out;
 }
@@ -194,12 +195,13 @@ NPScalar_t<data_t> Weyl4::compute_Weyl4(const EBFields_t<data_t> &ebfields,
                                         const Vars<data_t> &vars,
                                         const Vars<Tensor<1, data_t>> &d1,
                                         const Diff2Vars<Tensor<2, data_t>> &d2,
+                                        const Tensor<2, data_t> &h_UU,
                                         const Coordinates<data_t> &coords) const
 {
     NPScalar_t<data_t> out;
 
     // Calculate the tetrads
-    const Tetrad_t<data_t> tetrad = compute_null_tetrad(vars, coords);
+    const Tetrad_t<data_t> tetrad = compute_null_tetrad(vars, h_UU, coords);
 
     // Projection of Electric and magnetic field components using tetrads
     out.Real = 0.0;
@@ -224,6 +226,7 @@ NPScalar_t<data_t> Weyl4::compute_Weyl4(const EBFields_t<data_t> &ebfields,
 template <class data_t>
 Tetrad_t<data_t>
 Weyl4::compute_null_tetrad(const Vars<data_t> &vars,
+                           const Tensor<2, data_t> &h_UU,
                            const Coordinates<data_t> &coords) const
 {
     Tetrad_t<data_t> out;
@@ -233,8 +236,7 @@ Weyl4::compute_null_tetrad(const Vars<data_t> &vars,
     const double y = coords.y;
     const double z = coords.z;
 
-    // the inverse metric and alternating levi civita symbol
-    const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
+    // the alternating levi civita symbol
     const Tensor<3, double> epsilon = TensorAlgebra::epsilon();
 
     // calculate the tetrad
