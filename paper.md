@@ -269,5 +269,7 @@ GRChombo users have benefited from the provision of HPC resources from:
   
   * The Athena cluster at HPC Midlands Plus, UK
 
+  * The Cosmo cluster at CURL, University of Louvain, Belgium 
+
 # References
 
