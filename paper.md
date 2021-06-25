@@ -208,7 +208,7 @@ The wide range of fundamental physics problems for which the code has been used 
 ![Glocal axion strings \label{fig:cosmicstring1}](figures/string1.png){ width=45% }
 ![GW signal from cosmic string loop collapse \label{fig:cosmicstring2}](figures/string2.png){ width=45% }
 
-- the study of light bosonic dark matter and neutrino-like particles in black holes environments [@Bamber:2020bpu;@Clough:2019jpm;@Alexandre:2018crg;@Traykova2021].
+- the study of light bosonic dark matter and neutrino-like particles in black holes environments [@Bamber:2020bpu;@Clough:2019jpm;@Alexandre:2018crg;@Traykova2021dua].
 
 ![Scalar field around spinning black hole \label{fig:dm1}](figures/enviro1.png){ width=45% }
 ![Relativistic scaling of dynamical friction in scalar dark matter \label{fig:dm2}](figures/enviro2.png){ width=45% }
