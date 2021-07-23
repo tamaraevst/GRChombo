@@ -35,7 +35,7 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     double y = coords.y;
     double z = coords.z;
 
-    using namespace InitialDataTools;
+    using namespace CoordinateTransformations;
     // Convert spherical components to cartesian components using coordinate
     // transforms
     vars.h = spherical_to_cartesian_LL(spherical_g, x, y, z);
@@ -54,7 +54,7 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     make_trace_free(vars.A, vars.h, h_UU);
 
     // Make conformal
-    FOR2(i, j)
+    FOR(i, j)
     {
         vars.h[i][j] *= vars.chi;
         vars.A[i][j] *= vars.chi;
@@ -119,13 +119,13 @@ void KerrBH::compute_kerr(Tensor<2, data_t> &spherical_g,
 
     // Metric in semi isotropic Kerr-Schild coordinates, r, theta (t or th), phi
     // (p)
-    FOR2(i, j) { spherical_g[i][j] = 0.0; }
+    FOR(i, j) { spherical_g[i][j] = 0.0; }
     spherical_g[0][0] = gamma_rr;                // gamma_rr
     spherical_g[1][1] = Sigma;                   // gamma_tt
     spherical_g[2][2] = AA / Sigma * sin_theta2; // gamma_pp
 
     // Extrinsic curvature
-    FOR2(i, j) { spherical_K[i][j] = 0.0; }
+    FOR(i, j) { spherical_K[i][j] = 0.0; }
 
     // set non zero elements of Krtp - K_rp, K_tp
     spherical_K[0][2] =

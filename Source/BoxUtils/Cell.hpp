@@ -6,12 +6,18 @@
 #ifndef CELL_HPP_
 #define CELL_HPP_
 
+// Chombo includes
+#include "IntVect.H"
+
+// Our includes
 #include "AlwaysInline.hpp"
 #include "BoxPointers.hpp"
 #include "CellIndex.hpp"
 #include "GRInterval.hpp"
-#include "IntVect.H"
 #include "Tensor.hpp"
+
+// Chombo namespace
+#include "UsingNamespace.H"
 
 /// Encapsulates information about the position of a cell
 /** It contains the position of the cell on the Chombo grid and the index of the
@@ -92,6 +98,14 @@ template <class data_t> class Cell
     ALWAYS_INLINE
     const BoxPointers &get_box_pointers() const { return m_box_pointers; }
 
+    /// Return the number of variables in the input FAB
+    ALWAYS_INLINE
+    int get_num_in_vars() const { return m_box_pointers.m_in_num_comps; }
+
+    /// Returns the number of variables in the output FAB
+    ALWAYS_INLINE
+    int get_num_out_vars() const { return m_box_pointers.m_out_num_comps; }
+
     /// Loads the variable of a given variable from the Chombo grid
     ALWAYS_INLINE
     data_t load_vars(int ivar) const;
@@ -101,7 +115,7 @@ template <class data_t> class Cell
     void load_vars(data_t &out, int ivar) const;
 
     /// Loads all variables into an array
-    void load_vars(data_t (&out)[NUM_VARS]) const;
+    template <int num_vars> void load_vars(data_t (&out)[num_vars]) const;
 
     /// Loads all variables defined in a vars class
     template <template <typename> class vars_t>
@@ -120,7 +134,8 @@ template <class data_t> class Cell
         const GRInterval<start_var, end_var> interval) const;
 
     /// Stores an array of all variables to the chombo grid
-    void store_vars(const std::array<data_t, NUM_VARS> &values) const;
+    template <int num_vars>
+    void store_vars(const std::array<data_t, num_vars> &values) const;
 
     /// Stores all variables defined in the vars object to the chombo grid
     template <template <typename> class vars_t>

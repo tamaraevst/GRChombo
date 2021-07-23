@@ -15,8 +15,8 @@
 #include "MatterCCZ4.hpp"
 
 // For constraints calculation
-#include "MatterConstraints.hpp"
-#include "ConstraintViolations.hpp"
+#include "NewMatterConstraints.hpp"
+#include "NewConstraints.hpp"
 
 // For tag cells
 #include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
@@ -37,18 +37,18 @@
 //#include "MassExtraction.hpp"
 
 // For GW extraction
-#include "Weyl4.hpp"
+#include "MatterWeyl4.hpp"
 #include "WeylExtraction.hpp"
 
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
 
-// For Star Tracking
-#include "GaussianFitTracking.hpp"
-
 // For Ang Mom Integrating
 #include "AngMomFlux.hpp"
+
+// for chombo grid Functions
+#include "AMRReductions.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void BosonStarLevel::specificAdvance()
@@ -101,11 +101,12 @@ void BosonStarLevel::preCheckpointLevel()
      ComplexScalarFieldWithPotential complex_scalar_field(potential);
      BoxLoops::loop(make_compute_pack(
                      MatterConstraints<ComplexScalarFieldWithPotential>(
-                     complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
+                     complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
+                     Interval(c_Mom1, c_Mom3)), NoetherCharge(),
                      EMTensor<ComplexScalarFieldWithPotential>(
                      complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
                      Interval(c_s11,c_s33))),
-                     m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
 }
 
@@ -114,16 +115,17 @@ void BosonStarLevel::prePlotLevel()
 {
     CH_TIME("BosonStarLevel::prePlotLevel");
 
-     fillAllGhosts();
-     Potential potential(m_p.potential_params);
-     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-     BoxLoops::loop(make_compute_pack(
-                     MatterConstraints<ComplexScalarFieldWithPotential>(
-                     complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge(),
-                     EMTensor<ComplexScalarFieldWithPotential>(
-                     complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
-                     Interval(c_s11,c_s33))),
-                     m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+      fillAllGhosts();
+      Potential potential(m_p.potential_params);
+      ComplexScalarFieldWithPotential complex_scalar_field(potential);
+      BoxLoops::loop(make_compute_pack(
+                      MatterConstraints<ComplexScalarFieldWithPotential>(
+                      complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
+                      Interval(c_Mom1, c_Mom3)), NoetherCharge(),
+                      EMTensor<ComplexScalarFieldWithPotential>(
+                      complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
+                      Interval(c_s11,c_s33))),
+                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
 }
 
@@ -141,7 +143,7 @@ void BosonStarLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     // zero these
     Potential potential(m_p.potential_params);
     ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    MatterCCZ4<ComplexScalarFieldWithPotential> my_ccz4_matter(
+    MatterCCZ4RHS<ComplexScalarFieldWithPotential> my_ccz4_matter(
         complex_scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
         m_p.G_Newton);
     SetValue set_analysis_vars_zero(0.0, Interval(c_Pi_Im + 1, NUM_VARS - 1));
@@ -161,20 +163,27 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 // Things to do for analysis after each timestep and at the start
 void BosonStarLevel::doAnalysis()
 {
+    std::cout << "time : " << m_time << std::endl;
+    std::cout << "level : " << m_level << std::endl;
+    std::cout << "checkpoint 1" << std::endl;
     CH_TIME("BosonStarLevel::specificPostTimeStep");
     bool first_step = (m_time == 0.0);
-    if (m_p.activate_mass_extraction == 1 &&
+    if (m_p.activate_weyl_extraction == 1 &&
        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
     {
+        std::cout << "checkpoint 1.1" << std::endl;
         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
         // First compute the ADM Mass integrand values on the grid
         fillAllGhosts();
+        Potential potential(m_p.potential_params);
+        ComplexScalarFieldWithPotential complex_scalar_field(potential);
         auto weyl4_adm_compute_pack =
-            make_compute_pack(Weyl4(m_p.extraction_params.extraction_center, m_dx),
-                              ADMMass(m_p.L, m_dx));
-        BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_new,
+               make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
+               complex_scalar_field,m_p.extraction_params.extraction_center,
+               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
+        BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
                         EXCLUDE_GHOST_CELLS);
-
+        std::cout << "checkpoint 1.2" << std::endl;
         // Do the extraction on the min extraction level
         if (m_level == m_p.extraction_params.min_extraction_level())
         {
@@ -184,55 +193,33 @@ void BosonStarLevel::doAnalysis()
                           " Extracting gravitational waves." << endl;
             }
 
+
             // Refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
             WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
                                          first_step, m_restart_time);
+            std::cout << "checkpoint 1.3" << std::endl;
             gw_extraction.execute_query(m_gr_amr.m_interpolator);
         }
-
-        /* // Do the extraction on the min extraction level
-        if (m_level == m_p.mass_extraction_params.min_extraction_level)
-        {
-            if (m_verbosity)
-                pout() << "Extracting Mass." << endl;
-
-            // Now refresh the interpolator and do the interpolation
-            m_gr_amr.m_interpolator->refresh();
-            MassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
-                                        m_time, first_step, m_restart_time);
-            mass_extraction.execute_query(m_gr_amr.m_interpolator);
-        } */
     }
 
-
-    fillAllGhosts();
-    Potential potential(m_p.potential_params);
-    ComplexScalarFieldWithPotential complex_scalar_field(potential);
-    BoxLoops::loop(make_compute_pack(
-                    MatterConstraints<ComplexScalarFieldWithPotential>(
-                    complex_scalar_field, m_dx, m_p.G_Newton), NoetherCharge()),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
-
-
-
+    std::cout << "checkpoint 2" << std::endl;
+    // noether charge, max mod phi, min chi, constraint violations
     if (m_level == 0)
     {
-        CH_TIME("BosonStarLevel::doAnalysis::Ham/N/InfNorm");
-        if (m_p.calculate_constraint_violations)
-        {
-            // Write constraint violations to file
-            ConstraintViolations constraint_violations(c_Ham,
-                Interval(c_Mom1, c_Mom3), &m_gr_amr, m_p.coarsest_dx, m_dt,
-                m_time, m_restart_time, "ConstraintViolations",
-                first_step);
-            constraint_violations.execute();
-        }
-
+        BoxLoops::loop(NoetherCharge(), m_state_new, m_state_diagnostics,
+                      EXCLUDE_GHOST_CELLS);
+        fillAllGhosts();
+        std::cout << "checkpoint 2.1" << std::endl;
+        AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
         if (m_p.calculate_noether_charge)
         {
+            //noether charge should be calculated pre-check and pre plot
+            //so automatically here
+
             // compute integrated volume weighted noether charge integral
-            double noether_charge = m_gr_amr.compute_sum(c_N, m_dx);
+
+            double noether_charge = amr_reductions.sum(c_N);
             SmallDataIO noether_charge_file("NoetherCharge", m_dt, m_time,
                                             m_restart_time,
                                             SmallDataIO::APPEND,
@@ -246,8 +233,7 @@ void BosonStarLevel::doAnalysis()
         }
 
         // Compute the maximum of mod_phi and write it to a file
-        double mod_phi_max = m_gr_amr.compute_max(
-                                Interval(c_mod_phi, c_mod_phi));
+        double mod_phi_max = amr_reductions.max(c_mod_phi);
         SmallDataIO mod_phi_max_file("mod_phi_max", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
@@ -261,8 +247,7 @@ void BosonStarLevel::doAnalysis()
 
 
         // Compute the min of chi and write it to a file
-        double min_chi = m_gr_amr.compute_min(
-                                Interval(c_chi, c_chi));
+        double min_chi = amr_reductions.min(c_chi);
         SmallDataIO min_chi_file("min_chi", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
@@ -275,41 +260,30 @@ void BosonStarLevel::doAnalysis()
         min_chi_file.write_time_data_line({min_chi});
 
 
-        // Calculate the infinity-norm of all variables specified in params file
-        // and output them
-        if (m_p.num_vars_inf_norm > 0)
+        // constraeints calculated pre check and pre plot so done here already
+
+        double L2_Ham = amr_reductions.norm(c_Ham);
+        double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3));
+        SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
+                                     m_restart_time, SmallDataIO::APPEND,
+                                     first_step);
+        constraints_file.remove_duplicate_time_data();
+        if (first_step)
         {
-            pout() << "Variable infinity norms:\n";
-            for (int icomp : m_p.vars_inf_norm)
-            {
-                std::string var_name = UserVariables::variable_names[icomp];
-                double var_norm = m_gr_amr.compute_norm(Interval(icomp, icomp),
-                                    0., m_p.coarsest_dx);
-                pout() << var_name << ": " << var_norm << "\t";
-            }
-            pout() << std::endl;
+            constraints_file.write_header_line({"L^2_Ham", "L^2_Mom"});
         }
+        constraints_file.write_time_data_line({L2_Ham, L2_Mom});
     }
 
-
-    if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
-    {
-        CH_TIME("BosonStarLevel::doAnalysis::gaussfit");
-        GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
-                                        m_time,m_restart_time,first_step,m_p.L,m_level);
-
-        gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
-        std::vector<double> dummy;
-        gaussian_fit_tracking.get_BH_centres(dummy);
-    }
-
-
+    std::cout << "checkpoint 3" << std::endl;
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
     double temp_dx;
-    if (m_p.do_flux_integration &&
-       at_level_timestep_multiple(m_p.flux_extraction_level))
+    if (m_p.do_flux_integration && at_level_timestep_multiple(m_p.flux_extraction_level))
     {
+        std::cout << "checkpoint 3.1" << std::endl;
         CH_TIME("BosonStarLevel::doAnalysis::FphiSphi");
+        Potential potential(m_p.potential_params);
+        ComplexScalarFieldWithPotential complex_scalar_field(potential);
 
         // execute only on the finest level
         if (m_level==m_p.flux_extraction_level)
@@ -338,7 +312,7 @@ void BosonStarLevel::doAnalysis()
                                      c_Fphi_flux, c_Sphi_source, c_Qphi_density,
                                                      c_rho, Interval(c_s1,c_s3),
                              Interval(c_s11,c_s33)),  bs_level_ptr->m_state_new,
-                                bs_level_ptr->m_state_new, EXCLUDE_GHOST_CELLS);
+                                bs_level_ptr->m_state_diagnostics, EXCLUDE_GHOST_CELLS);
             }
             // loop through levels and fill ghosts
             for (auto level_ptr : all_level_ptrs)
@@ -351,15 +325,6 @@ void BosonStarLevel::doAnalysis()
                 }
                 bs_level_ptr->fillAllGhosts();
             }
-            /*double testvar1 = m_gr_amr.compute_max(
-                                    Interval(c_Qphi_density, c_Qphi_density));
-            double testvar2 = m_gr_amr.compute_max(
-                                    Interval(c_Fphi_flux, c_Fphi_flux));
-            double testvar3 = m_gr_amr.compute_max(
-                                    Interval(c_Sphi_source, c_Sphi_source));
-            std::cout << "max value 1 : " << testvar1 << std::endl;
-            std::cout << "max value 2 : " << testvar2 << std::endl;
-            std::cout << "max value 3 : " << testvar3 << std::endl;*/
 
             for (int i=m_p.angmomflux_params.num_extraction_radii-1; i>=0; i--)
             {
@@ -379,13 +344,14 @@ void BosonStarLevel::doAnalysis()
               (complex_scalar_field, temp_dx, m_p.L, m_p.angmomflux_params.center,
                                                  c_Sphi_source, c_Qphi_density,
                                     m_p.angmomflux_params.extraction_radii[i]),
-                          bs_level_ptr->m_state_new, bs_level_ptr->m_state_new,
+                          bs_level_ptr->m_state_new, bs_level_ptr->m_state_diagnostics,
                                                           INCLUDE_GHOST_CELLS);
                 }
-
-                S_phi_integral = m_gr_amr.compute_sum(c_Sphi_source, m_p.coarsest_dx);
+                // old code passed this coarse dx, maybe this doesnt work now?
+                AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
+                S_phi_integral = amr_reductions.sum(c_Sphi_source);
                 S_phi_integrals[i] = S_phi_integral;
-                Q_phi_integral = m_gr_amr.compute_sum(c_Qphi_density, m_p.coarsest_dx);
+                Q_phi_integral = amr_reductions.sum(c_Qphi_density);
                 Q_phi_integrals[i] = Q_phi_integral;
             }
 
@@ -399,19 +365,19 @@ void BosonStarLevel::doAnalysis()
                 title_line[j] = dummy_string;
             }
 
-            SmallDataIO flux_file("AngMomSource", m_dt, m_time,
+            SmallDataIO angmomsource_file("AngMomSource", m_dt, m_time,
                                           m_restart_time,
                                           SmallDataIO::APPEND,
                                           first_step);
 
-            if (m_time > 0) flux_file.remove_duplicate_time_data();
+            if (m_time > 0) angmomsource_file.remove_duplicate_time_data();
 
             if (m_time == 0.)
             {
-                flux_file.write_header_line(title_line);
+                angmomsource_file.write_header_line(title_line);
             }
 
-            flux_file.write_time_data_line(S_phi_integrals);
+            angmomsource_file.write_time_data_line(S_phi_integrals);
 
 
             // save the Density integral to dat file
@@ -446,13 +412,6 @@ void BosonStarLevel::doAnalysis()
             ang_mom_flux.run(m_gr_amr.m_interpolator);
         }
     }
-}
-
-// Specify if you want any plot files to be written, with which vars
-void BosonStarLevel::specificWritePlotHeader(
-    std::vector<int> &plot_states) const
-{
-    plot_states = m_p.plot_vars;
 }
 
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,

@@ -10,10 +10,13 @@ plot_prefix = plt/Sim_p_
 N1 = 64
 N2 = 64
 N3 = 64
+#N_full = 128
+
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
 L = 64
+#L_full = 64
 
 # Regridding
 # Thresholds on the change across a cell which prompts regrid
@@ -23,7 +26,7 @@ regrid_threshold_chi = 1
 
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 0 # There are (max_level+1) grids, so min is zero
+max_level = 1 # There are (max_level+1) grids, so min is zero
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items
 # Generally you do not need to regrid frequently on every level
@@ -53,7 +56,10 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 1 2 3          #Theta and Gamma
                          0 1 2 3 1 2 3    #lapse shift and B
                          0 0 0 0          #phi and Pi
-                         0 1 2 3          #Ham and Mom
+                         
+
+
+vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
                          0                #modphi
                          0 0              #ADM mass and J
                          0                #N
@@ -65,7 +71,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
-vars_asymptotic_values = 1.04045 0.999468 0.0 0.0 1.00027 0.0 1.00027 #chi and hij
+vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
                          0.0 0.0 0.0 0.0             #Theta and Gamma
                          1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B
@@ -119,9 +125,9 @@ calculate_constraint_violations = 1
 calculate_noether_charge = 1
 
 # Vars to write to plot files
-num_plot_vars = 8
-//plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
-plot_vars = chi K lapse phi_Re mod_phi N Weyl4_Re rho
+num_plot_vars = 4
+#plot_vars = 0 7 18 25 29 32 37 39 40 41 42 # chi, K, lapse, phi_Re, mod_phi, N, Weyl4_Re, Stress-energy
+plot_vars = mod_phi N Weyl4_Re rho
 
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3
@@ -139,13 +145,13 @@ gridpoints = 256001
 BS_binary = true # make false for one star
 BS_BH_binary = false
 BS_rapidity = 0.2 ; //0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
-BS_impact_parameter = 4.0 #separation perpendicular to boost, y
-BS_separation = 15.0 #separation parallel to boost, x
+BS_impact_parameter = 0.0 #separation perpendicular to boost, y
+BS_separation = 48.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
 # centre of the star - only uncomment if you want star off centre
-#star_centre = 64 64 64
+#star_centre = 0 0 0
 
 # Potential params
 scalar_mass = 1.0
@@ -154,7 +160,7 @@ solitonic = false # if false, next line is irrelevant. Make true for solitonic p
 sigma_soliton = 0.2 # try central density ~ 0.05, the soliton is very sensitive
 
 # Mass extraction params
-#mass_extraction_center = 64 64 64
+#mass_extraction_center = 0 0 0
 activate_mass_extraction = 1
 num_mass_extraction_radii = 3
 mass_extraction_radii = 20. 25. 30.
@@ -164,7 +170,8 @@ num_points_theta_mass = 24
 
 # GW extraction params
 #default center to grid center, uncomment to change
-#extraction_center = 64 64 64
+#extraction_center = 0 0 0 
+activate_extraction = 1
 activate_gw_extraction = 1
 num_extraction_radii = 3
 extraction_radii = 20. 25. 30.
@@ -180,18 +187,6 @@ modes = 2 0
         5 0
         6 0
 
-_R# Star centre Tracking
-do_star_tracking = 0
-num_points_gaussian_fit = 60
-tracked_field_index = 32 #modphi is 29
-search_width = 20.
-tracking_AMR_level = 0 # level that tracking is performed on
-track_both_centres = true # false for one track
-track_min_separation = 2. # cancels tracking if stars get within this distance
-tracking_centre = 16 0 0 # with respect to centre of grid
-tracking_centres = 16 0 0 -16 0 0 # with respect to centre of grid
-tracking_BH_cutoff = 0.05
-
 
 flux_number_of_radii = 6
 flux_do = true
@@ -199,6 +194,6 @@ flux_extraction_level = 0
 flux_write_extraction = true
 flux_num_theta = 40
 flux_num_phi = 30
-#flux_extraction_centre = # can specify, but defaults to L/2,L/2,L/2.
+#flux_extraction_centre = 0 0 0 # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20. 25. 30.
-flux_extraction_levels = 2 2 2 2 2 2
+flux_extraction_levels = 1 1 1 1 1 1

@@ -7,6 +7,7 @@
 #define WEYLEXTRACTION_HPP_
 
 #include "SphericalExtraction.hpp"
+
 //!  The class allows extraction of the values of the Weyl scalar components on
 //!  spherical shells at specified radii, and integration over those shells
 /*!
@@ -24,8 +25,8 @@ class WeylExtraction : public SphericalExtraction
         : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
                               a_restart_time)
     {
-        add_var(c_Weyl4_Re);
-        add_var(c_Weyl4_Im);
+        add_var(c_Weyl4_Re, VariableType::diagnostic);
+        add_var(c_Weyl4_Im, VariableType::diagnostic);
     }
 
     //! The old constructor which assumes it is called in specificPostTimeStep
@@ -44,9 +45,7 @@ class WeylExtraction : public SphericalExtraction
         extract(a_interpolator);
 
         if (m_params.write_extraction)
-        {
-            write_extraction("Weyl4ExtractionOut_");
-        }
+            write_extraction(m_params.extraction_file_prefix);
 
         // now calculate and write the requested spherical harmonic modes
         std::vector<std::pair<std::vector<double>, std::vector<double>>>
@@ -78,7 +77,7 @@ class WeylExtraction : public SphericalExtraction
         for (int imode = 0; imode < m_num_modes; ++imode)
         {
             const auto &mode = m_modes[imode];
-            std::string integrals_filename = "Weyl_integral_" +
+            std::string integrals_filename = m_params.integral_file_prefix +
                                              std::to_string(mode.first) +
                                              std::to_string(mode.second);
             std::vector<std::vector<double>> integrals_for_writing = {

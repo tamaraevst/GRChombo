@@ -9,7 +9,7 @@
 #include "CCZ4Geometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "MatterCCZ4.hpp"
+#include "MatterCCZ4RHS.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
@@ -37,10 +37,11 @@ template <class matter_t> class ChiRelaxation
 
     // Use the variable definitions in MatterCCZ4
     template <class data_t>
-    using Vars = typename MatterCCZ4<matter_t>::template Vars<data_t>;
+    using Vars = typename MatterCCZ4RHS<matter_t>::template Vars<data_t>;
 
     template <class data_t>
-    using Diff2Vars = typename MatterCCZ4<matter_t>::template Diff2Vars<data_t>;
+    using Diff2Vars =
+        typename MatterCCZ4RHS<matter_t>::template Diff2Vars<data_t>;
 
   public:
     //! Constructor of class ChiRelaxation
@@ -75,7 +76,7 @@ template <class matter_t> class ChiRelaxation
             &d2, //!< the value of the second derivatives of the variables.
         const Vars<data_t>
             &advec //!< advec the value of the advection terms beta^i d_i(var)
-        ) const;
+    ) const;
 };
 
 #include "ChiRelaxation.impl.hpp"

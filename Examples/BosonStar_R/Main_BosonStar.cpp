@@ -35,7 +35,8 @@ int runGRChombo(int argc, char *argv[])
 
     // Instantiate AMR interpolator for mass/GW extraction
     AMRInterpolator<Lagrange<4>> interpolator(
-        gr_amr, sim_params.origin, sim_params.dx, sim_params.verbosity);
+                                       gr_amr, sim_params.origin, sim_params.dx, 
+                              sim_params.boundary_params, sim_params.verbosity);
     gr_amr.set_interpolator(&interpolator);
 
     // Add a scheduler to GRAMR which just calls doAnalysis on every AMRLevel
