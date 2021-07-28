@@ -15,7 +15,7 @@ N3 = 64
 
 # Length of longest box side, dx_coarsest = L/N(max)
 # NB if non cubic, this determines dx for all sides
-L = 64
+L = 100
 #L_full = 64
 
 # Regridding
@@ -44,7 +44,7 @@ isPeriodic = 0 0 0
 # 0 = static, 1 = sommerfeld, 2 = reflective
 # (see BoundaryConditions.hpp for details)
 hi_boundary = 1 1 1
-lo_boundary = 1 1 1
+lo_boundary = 2 2 2
 
 # if sommerfeld boundaries selected, must select
 # asymptotic values (in order given by UserVariables.hpp)
@@ -63,10 +63,10 @@ vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
                          0                #modphi
                          0 0              #ADM mass and J
                          0                #N
-                         0 0 0 0          #H,mom constraints
-                         0 0              #Weyl4 re im
-                         0 0 0 0          #Stresstensor rho s1 s2 s3
-                         0 0 0 0 0 0      #Stresstensor s11 s12 s13 s22 s23 s33
+                         0 1 2 3          #H,mom constraints
+                         0 7              #Weyl4 re im
+                         0 1 2 3          #Stresstensor rho s1 s2 s3
+                         0 4 6 0 5 0      #Stresstensor s11 s12 s13 s22 s23 s33
                          0 0 0            #Qphi Fphi Sphi
 
 # if reflective boundaries selected, must set
@@ -90,7 +90,7 @@ vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
 # dt will be dx*dt_multiplier on each grid level
 # HDF5files are written every dt = L/N*dt_multiplier*checkpoint_interval
 checkpoint_interval = 1
-plot_interval = 10
+plot_interval = 1
 dt_multiplier = 0.25
 stop_time =1000.0
 
@@ -144,14 +144,14 @@ eigen = 0 # accepts ints < 20, radial excitation mode. If you really need eigen>
 gridpoints = 256001
 BS_binary = true # make false for one star
 BS_BH_binary = false
-BS_rapidity = 0.2 ; //0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
+BS_rapidity = 0.1003353 ; //0.1003353 # 1.32 # 0.05004 is v = 1/20, 0.1003353 is v = 1/10
 BS_impact_parameter = 0.0 #separation perpendicular to boost, y
-BS_separation = 48.0 #separation parallel to boost, x
+BS_separation = 80.0 #separation parallel to boost, x
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 
 # centre of the star - only uncomment if you want star off centre
-#star_centre = 0 0 0
+star_centre = 0 0 0
 
 # Potential params
 scalar_mass = 1.0
@@ -160,7 +160,7 @@ solitonic = false # if false, next line is irrelevant. Make true for solitonic p
 sigma_soliton = 0.2 # try central density ~ 0.05, the soliton is very sensitive
 
 # Mass extraction params
-#mass_extraction_center = 0 0 0
+mass_extraction_center = 0 0 0
 activate_mass_extraction = 1
 num_mass_extraction_radii = 3
 mass_extraction_radii = 20. 25. 30.
@@ -170,7 +170,7 @@ num_points_theta_mass = 24
 
 # GW extraction params
 #default center to grid center, uncomment to change
-#extraction_center = 0 0 0 
+extraction_center = 0 0 0 
 activate_extraction = 1
 activate_gw_extraction = 1
 num_extraction_radii = 3
@@ -194,6 +194,6 @@ flux_extraction_level = 0
 flux_write_extraction = true
 flux_num_theta = 40
 flux_num_phi = 30
-#flux_extraction_centre = 0 0 0 # can specify, but defaults to L/2,L/2,L/2.
+flux_extraction_centre = 0 0 0 # can specify, but defaults to L/2,L/2,L/2.
 flux_extraction_radii = 5. 10. 15. 20. 25. 30.
 flux_extraction_levels = 1 1 1 1 1 1
