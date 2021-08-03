@@ -3,18 +3,138 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#if !defined(SCALARFIELDMODIFIEDGR_HPP_)
-#error "This file should only be included through ScalarFieldModifiedGR.hpp"
+#if !defined(SCALARFIELD_HPP_)
+#error "This file should only be included through ScalarField.hpp"
 #endif
 
-#ifndef SCALARFIELDMODIFIEDGR_IMPL_HPP_
-#define SCALARFIELDMODIFIEDGR_IMPL_HPP_
+#ifndef SCALARFIELD_IMPL_HPP_
+#define SCALARFIELD_IMPL_HPP_
 
-// the RHS excluding the potential terms
+
+// Calculate the stress energy tensor elements
+template <class potential_t>
+template <class data_t, template <typename> class vars_t>
+emtensor_t<data_t> ScalarField<potential_t>::compute_emtensor(
+    const vars_t<data_t> &vars, const vars_t<Tensor<1, data_t>> &d1,
+    const Tensor<2, data_t> &h_UU, const Tensor<3, data_t> &chris_ULL) const
+{
+    emtensor_t<data_t> out;
+
+    // call the function which computes the em tensor excluding the potential
+    emtensor_excl_potential(out, vars, d1, h_UU, chris_ULL);
+
+    // set the potential values
+    data_t V_of_phi = 0.0;
+    data_t dVdphi = 0.0;
+
+    // compute potential and add constributions to EM Tensor
+    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+
+    out.rho += V_of_phi;
+    out.S += -3.0 * V_of_phi;
+    FOR2(i, j) { out.Sij[i][j] += -vars.h[i][j] * V_of_phi / vars.chi; }
+
+    return out;
+}
+
+// Calculate the stress energy tensor elements
+template <class potential_t>
+template <class data_t, template <typename> class vars_t>
+void ScalarField<potential_t>::emtensor_excl_potential(
+    emtensor_t<data_t> &out, const vars_t<data_t> &vars,
+    const vars_t<Tensor<1, data_t>> &d1, const Tensor<2, data_t> &h_UU,
+    const Tensor<3, data_t> &chris_ULL)
+{
+    // Useful quantity Vt
+    data_t Vt = -vars.Pi * vars.Pi;
+    FOR2(i, j) { Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j]; }
+
+    // Calculate components of EM Tensor
+    // S_ij = T_ij
+    FOR2(i, j)
+    {
+        out.Sij[i][j] =
+            -0.5 * vars.h[i][j] * Vt / vars.chi + d1.phi[i] * d1.phi[j];
+    }
+
+    // S = Tr_S_ij
+    out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij, h_UU);
+
+    // S_i (note lower index) = - n^a T_ai
+    FOR1(i) { out.Si[i] = -d1.phi[i] * vars.Pi; }
+
+    // rho = n^a n^b T_ab
+    out.rho = vars.Pi * vars.Pi + 0.5 * Vt;
+}
+
+// template <class data_t, template <typename> class vars_t, 
+// template <typename> class diff2_vars_t>
+// modifiedscalar_t<data_t> ScalarModifiedGR::compute_chern_simons(const vars_t<data_t> &vars,
+//         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
+//         const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+//     {
+//         using namespace TensorAlgebra;
+
+//         modifiedscalar_t<data_t> out;
+
+//         const auto E_ij = CCZ4GeometryModifiedGR::compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
+//         const auto B_ij = CCZ4GeometryModifiedGR::compute_magnetic_term(vars, d1, d2, h_UU, chris);
+
+//         //Finally compute *RR
+//         FOR4(i, j, k, l)
+//         {
+//             out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
+//         }
+//         return out;
+//     }
+
+// Adds in the RHS for the matter vars
+template <class potential_t>
 template <class data_t, template <typename> class vars_t,
           template <typename> class diff2_vars_t,
           template <typename> class rhs_vars_t>
-void matter_rhs_modified_gr(
+void ScalarField<potential_t>::add_matter_rhs(
+    rhs_vars_t<data_t> &total_rhs, const vars_t<data_t> &vars,
+    const vars_t<Tensor<1, data_t>> &d1,
+    const diff2_vars_t<Tensor<2, data_t>> &d2,
+    const vars_t<data_t> &advec) const
+{
+    using namespace TensorAlgebra;
+
+    const auto h_UU = compute_inverse_sym(vars.h);
+    const auto chris = compute_christoffel(d1.h, h_UU);
+    // first get the non potential part of the rhs
+    // this may seem a bit long winded, but it makes the function
+    // work for more multiple fields
+
+    // call the function for the rhs excluding the potential
+    matter_rhs_excl_potential(total_rhs, vars, d1, d2, advec);
+
+    // include modified GR scalars if their switches are on
+    ModifiedScalars::params_t mod_params;
+    int chern_simons_switch = mod_params.csswitch;
+
+    if (chern_simons_switch == 1) 
+    {   
+        auto modified_terms = CCZ4GeometryModifiedGR::compute_chern_simons(vars, d1, d2, h_UU, chris);
+        total_rhs.phi += -modified_terms.starR_R;
+    }
+
+    // set the potential values
+    data_t V_of_phi = 0.0;
+    data_t dVdphi = 0.0;
+    my_potential.compute_potential(V_of_phi, dVdphi, vars);
+
+    // adjust RHS for the potential term
+    total_rhs.Pi += -vars.lapse * dVdphi;
+}
+
+// the RHS excluding the potential tserms
+template <class potential_t>
+template <class data_t, template <typename> class vars_t,
+          template <typename> class diff2_vars_t,
+          template <typename> class rhs_vars_t>
+void ScalarField<potential_t>::matter_rhs_excl_potential(
     rhs_vars_t<data_t> &rhs, const vars_t<data_t> &vars,
     const vars_t<Tensor<1, data_t>> &d1,
     const diff2_vars_t<Tensor<2, data_t>> &d2, const vars_t<data_t> &advec)
@@ -24,10 +144,9 @@ void matter_rhs_modified_gr(
     const auto h_UU = compute_inverse_sym(vars.h);
     const auto chris = compute_christoffel(d1.h, h_UU);
 
-    auto starR_R = CCZ4GeometryModifieddGR::compute_chern_simons(vars, d1, d2, h_UU, chris);
-
     // evolution equations for scalar field and (minus) its conjugate momentum
-    rhs.phi = vars.lapse * vars.Pi + advec.phi - starR_R;
+
+    rhs.phi = vars.lapse * vars.Pi + advec.phi;
     rhs.Pi = vars.lapse * vars.K * vars.Pi + advec.Pi;
 
     FOR2(i, j)
