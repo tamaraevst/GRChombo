@@ -26,6 +26,7 @@
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
 #include "Potential.hpp"
+#include "ModifiedScalars.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 
@@ -69,6 +70,7 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
+    ModifiedScalars params(m_p.mod_params);
     ScalarFieldWithPotential scalar_field(potential);
     BoxLoops::loop(
         MatterConstraints<ScalarFieldWithPotential>(
@@ -89,6 +91,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
+    ModifiedScalars params(m_p.mod_params);
     ScalarFieldWithPotential scalar_field(potential);
     if (m_p.max_spatial_derivative_order == 4)
     {
