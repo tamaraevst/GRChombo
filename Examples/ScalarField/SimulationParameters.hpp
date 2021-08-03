@@ -14,6 +14,7 @@
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
 #include "Potential.hpp"
+#include "ScalarField.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
@@ -40,6 +41,10 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("kerr_mass", kerr_params.mass, 1.0);
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
+
+          // Switches for CS and GB terms
+        pp.load("chern_simons_term_switch", mod_params.csswitch, 0);
+        pp.load("gauss_bonnet_term_switch", mod_params.gbswitch, 0);
     }
 
     void check_params()
@@ -58,7 +63,7 @@ class SimulationParameters : public SimulationParametersBase
                         std::abs(kerr_params.spin) <= kerr_params.mass,
                         "must satisfy |a| <= M = " +
                             std::to_string(kerr_params.mass));
-        FOR(idir)
+        FOR1(idir)
         {
             std::string name = "kerr_center[" + std::to_string(idir) + "]";
             warn_parameter(
@@ -74,6 +79,8 @@ class SimulationParameters : public SimulationParametersBase
     InitialScalarData::params_t initial_params;
     Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
+    ModifiedScalars::params_t mod_params;
+    // ScalarField<DefaultPotential>::params_t mod_params;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */
