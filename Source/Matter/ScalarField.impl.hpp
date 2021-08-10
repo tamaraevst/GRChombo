@@ -86,17 +86,24 @@ void ScalarField<potential_t>::add_matter_rhs(
     // this may seem a bit long winded, but it makes the function
     // work for more multiple fields
 
-    // call the function for the rhs excluding the potential
+    // call the function for the rhs excluding the potentials
     matter_rhs_excl_potential(total_rhs, vars, d1, d2, advec);
 
-    // include modified GR scalars if their switches are on
+    // // include modified GR scalars if their switches are on
     ModifiedScalars::params_t mod_params;
     int chern_simons_switch = mod_params.csswitch;
+    int gauss_bonnet_switch = mod_params.gbswitch;
+
+    auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
 
     if (chern_simons_switch == 1) 
     {   
-        auto modified_terms = CCZ4GeometryModifiedGR::compute_chern_simons(vars, d1, d2, h_UU, chris);
         total_rhs.phi += -modified_terms.starR_R;
+    }
+
+    if (gauss_bonnet_switch == 1) 
+    {   
+        total_rhs.phi += -modified_terms.RGB;
     }
 
     // set the potential values
