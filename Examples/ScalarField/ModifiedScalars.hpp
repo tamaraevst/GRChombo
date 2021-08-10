@@ -8,6 +8,8 @@
 
 #include "simd.hpp"
 
+//This is for switches of any of the non-GR scalars we wish to introduce.
+
 class ModifiedScalars
 {
   public:
