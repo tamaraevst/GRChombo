@@ -15,8 +15,8 @@ class ModifiedScalars
   public:
     struct params_t
     {
-         int csswitch;
-         int gbswitch;
+         bool csswitch;
+         bool gbswitch;
     };
 
   protected:

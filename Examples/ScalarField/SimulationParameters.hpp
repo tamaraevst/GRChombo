@@ -43,9 +43,10 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
 
-          // Switches for CS and GB terms
-        pp.load("chern_simons_term_switch", mod_params.csswitch, 0);
-        pp.load("gauss_bonnet_term_switch", mod_params.gbswitch, 0);
+        // Switches for CS and GB terms
+        pp.load("activate_chern_simons", activate_chern_simons, false);
+        pp.load("activate_gauss_bonnet", activate_gauss_bonnet, false);
+        // pp.load("gauss_bonnet_term_switch", mod_params.gbswitch, false);
     }
 
     void check_params()
@@ -80,7 +81,10 @@ class SimulationParameters : public SimulationParametersBase
     InitialScalarData::params_t initial_params;
     Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
-    ModifiedScalars::params_t mod_params;
+    bool activate_chern_simons;
+    bool activate_gauss_bonnet;
+    // ModifiedScalars::params_t mod_params;
+    // ScalarField<DefaultPotential>::params_t mod_params;
     // ScalarField<DefaultPotential>::params_t mod_params;
 };
 

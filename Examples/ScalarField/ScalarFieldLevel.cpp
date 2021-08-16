@@ -29,6 +29,7 @@
 #include "ModifiedScalars.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
+#include "ChernSimonsExtraction.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -70,8 +71,8 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
-    ModifiedScalars params(m_p.mod_params);
-    ScalarFieldWithPotential scalar_field(potential);
+    // ModifiedScalars params(m_p.mod_params);
+    ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
     BoxLoops::loop(
         MatterConstraints<ScalarFieldWithPotential>(
             scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
@@ -91,8 +92,8 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
-    ModifiedScalars params(m_p.mod_params);
-    ScalarFieldWithPotential scalar_field(potential);
+    // ModifiedScalars params(m_p.mod_params);
+    ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
     if (m_p.max_spatial_derivative_order == 4)
     {
         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
@@ -131,4 +132,26 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     BoxLoops::loop(
         FixedGridsTaggingCriterion(m_dx, m_level, 2.0 * m_p.L, m_p.center),
         current_state, tagging_criterion);
+}
+
+void ScalarFieldLevel::specificPostTimeStep()
+{
+    if (m_p.activate_extraction)
+    {
+        fillAllGhosts();
+        Potential potential(m_p.potential_params);
+        ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+
+        // ignore extraction level param for now since tagging criterion does
+        // not enforce it
+        if (m_level == 0)
+        {
+            bool first_step = (m_dt == m_time);
+            ChernSimonsExtraction chern_simons_extraction(
+                m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
+                c_phi);
+            m_gr_amr.m_interpolator->refresh();
+            chern_simons_extraction.execute_query(m_gr_amr.m_interpolator);
+        }
+    }
 }
