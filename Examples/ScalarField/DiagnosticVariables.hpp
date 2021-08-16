@@ -13,6 +13,8 @@ enum
 
     c_Mom,
 
+    c_mod_scalar,
+
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -21,7 +23,9 @@ namespace DiagnosticVariables
 static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     "Ham",
 
-    "Mom"};
+    "Mom",
+    
+    "ModifiedScalars"};
 }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */

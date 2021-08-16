@@ -29,6 +29,7 @@
 #include "ModifiedScalars.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
+#include "ComputeModifiedScalars.hpp"
 #include "ChernSimonsExtraction.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
@@ -74,9 +75,15 @@ void ScalarFieldLevel::prePlotLevel()
     // ModifiedScalars params(m_p.mod_params);
     ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
     BoxLoops::loop(
-        MatterConstraints<ScalarFieldWithPotential>(
-            scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
+        make_compute_pack(MatterConstraints<ScalarFieldWithPotential>(
+                              scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
+                          ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar)),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    
+    // BoxLoops::loop(make_compute_pack(
+    //     MatterConstraints<ScalarFieldWithPotential>(
+    //         scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)), ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar))),
+    //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif
 
@@ -142,6 +149,10 @@ void ScalarFieldLevel::specificPostTimeStep()
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
 
+        BoxLoops::loop(ComputeModifiedScalars(m_p.extraction_params.center, m_dx,
+                              c_mod_scalar),
+                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+
         // ignore extraction level param for now since tagging criterion does
         // not enforce it
         if (m_level == 0)
@@ -149,7 +160,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             bool first_step = (m_dt == m_time);
             ChernSimonsExtraction chern_simons_extraction(
                 m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
-                c_phi);
+                c_mod_scalar);
             m_gr_amr.m_interpolator->refresh();
             chern_simons_extraction.execute_query(m_gr_amr.m_interpolator);
         }

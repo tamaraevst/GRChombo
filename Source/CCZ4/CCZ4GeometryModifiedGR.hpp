@@ -7,6 +7,9 @@
 #ifndef CCZ4GEOMETRYMODIFIEDGR_HPP_
 #define CCZ4GEOMETRYMODIFIEDGR_HPP_
 
+#include "Cell.hpp"
+#include "CoordinateTransformations.hpp"
+#include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
@@ -84,7 +87,6 @@ class CCZ4GeometryModifiedGR
     template <class data_t>
     Tensor<3, data_t> compute_epsilon3_LUU(const Vars<data_t> &vars,
                                            const Tensor<2, data_t> &h_UU) const;
-
 };
 
 #include "CCZ4GeometryModifiedGR.impl.hpp"

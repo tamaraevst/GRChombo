@@ -379,5 +379,5 @@ modifiedscalar_t<data_t> CCZ4GeometryModifiedGR::compute_modified_scalars(const 
 
         return out;
     }
-    
+
 #endif /* CCZ4GEOMETRYMODIFIEDGR_HPP_ */

@@ -10,7 +10,25 @@
 #ifndef SCALARFIELD_IMPL_HPP_
 #define SCALARFIELD_IMPL_HPP_
 
+template <class potential_t>
+inline ScalarField<potential_t>::ScalarField(const potential_t a_potential, 
+                bool activate_chern_simons, 
+                bool activate_gauss_bonnet) 
+                : my_potential(a_potential), 
+                  m_activate_chern_simons(activate_chern_simons), 
+                  m_activate_gauss_bonnet(activate_gauss_bonnet)
+{
+    if (m_activate_chern_simons)
+    {
+        cout << "Activating Chern-Simons" << endl;
+    }
 
+    if (m_activate_gauss_bonnet)
+    {
+        cout << "Activating Gauss-Bonnet" << endl;
+    }
+
+}
 // Calculate the stress energy tensor elements
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
@@ -95,6 +113,10 @@ void ScalarField<potential_t>::add_matter_rhs(
     // const bool gauss_bonnet_switch = mod_params.gbswitch;
 
     auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
+
+    using namespace std;
+    cout << "CS switch is " << m_activate_chern_simons << endl;
+    cout << "CS switch is " << m_activate_gauss_bonnet << endl;
 
     if (m_activate_chern_simons) 
     {   
