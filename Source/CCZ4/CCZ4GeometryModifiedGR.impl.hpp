@@ -89,7 +89,7 @@ covd2lapse_t<data_t> CCZ4GeometryModifiedGR::compute_covd2lapse_quantities(const
         {
             out.tr_free_covd2lapse = out.covd2lapse[i][j] - (1.0 / ((double)GR_SPACEDIM)) * vars.h[i][j] * TensorAlgebra::compute_trace(out.covd2lapse, h_UU);
         }
-        
+        return out;
     }
 
 /* There are some evolution terms in Gauss-Bonnet and Chern-Simons scalars, i.e. \partial_t A_ij, \partial_t K and \partial_t K
@@ -121,7 +121,6 @@ evolution_t<data_t> CCZ4GeometryModifiedGR::rhs_evolution_quantities(
     auto lapse_derivatives = compute_covd2lapse_quantities(vars, d1, d2, h_UU, chris); 
 
     data_t divshift = compute_trace(d1.shift);
-    data_t dlapse_dot_dchi = compute_dot_product(d1.lapse, d1.chi, h_UU);
 
     Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
 
@@ -160,6 +159,8 @@ evolution_t<data_t> CCZ4GeometryModifiedGR::rhs_evolution_quantities(
     //Finally, term K.
     rhs.K = vars.lapse * (tr_A2 + vars.K * vars.K /  GR_SPACEDIM) -
                 lapse_derivatives.tr_covd2lapse;
+
+    return rhs;
 }
 
 //This function compoutes electric term, E_ij, present in the Chern Simons scalar
@@ -181,16 +182,12 @@ CCZ4GeometryModifiedGR::compute_chern_simons_electric_term(const vars_t<data_t> 
         Tensor<1, data_t> Z0 = 0.0;
         auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
 
-        data_t divshift = compute_trace(d1.shift);
-        data_t dlapse_dot_dchi = compute_dot_product(d1.lapse, d1.chi, h_UU);
-
         Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
         data_t tr_A2 = compute_trace(vars.A, A_UU);
 
         //Finally, compute the electric part of the Chern-Simons term E_{ij}.
         FOR2(i, j)
         {
-            const double delta = (i == j) ? 1 : 0;
             Eij[i][j] = (1.0 / (2.0 * vars.chi * vars.chi)) * (rhs.chi * vars.A[i][j] - vars.chi * rhs.A[i][j]) - 
                 (1.0 /2.0) * (covd2lapse.tr_covd2lapse * (1.0 / vars.lapse) + ricci.LL[i][j] - 1.0 / ((double)GR_SPACEDIM) * vars.h[i][j] * ricci.scalar) +
                 (1.0 / (3.0 * vars.chi)) * vars.h[i][j] * tr_A2 + (1.0 / (6 * vars.chi)) * vars.K * vars.A[i][j];

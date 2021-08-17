@@ -26,7 +26,6 @@
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
 #include "Potential.hpp"
-#include "ModifiedScalars.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
@@ -72,7 +71,6 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
-    // ModifiedScalars params(m_p.mod_params);
     ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
     BoxLoops::loop(
         make_compute_pack(MatterConstraints<ScalarFieldWithPotential>(

@@ -9,7 +9,6 @@
 #include "CCZ4Geometry.hpp"
 #include "CCZ4GeometryModifiedGR.hpp"
 #include "DefaultPotential.hpp"
-#include "ModifiedScalars.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Tensor.hpp"

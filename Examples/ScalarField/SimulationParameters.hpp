@@ -15,7 +15,6 @@
 #include "KerrBH.hpp"
 #include "Potential.hpp"
 #include "ScalarField.hpp"
-#include "ModifiedScalars.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
