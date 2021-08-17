@@ -105,4 +105,20 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::add_emtensor_rhs(
     }
 }
 
+template <class matter_t, class gauge_t, class deriv_t>
+template <class data_t>
+void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::add_modified_scalars_rhs(
+    Vars<data_t> &matter_rhs, const Vars<data_t> &matter_vars,
+    const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2) const
+{
+    using namespace TensorAlgebra;
+
+    const auto h_UU = compute_inverse_sym(matter_vars.h);
+    const auto chris = compute_christoffel(d1.h, h_UU);
+
+    auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(matter_vars, d1, d2, h_UU, chris);
+
+    matter_rhs.phi += - modified_terms.starR_R - modified_terms.RGB;
+}
+
 #endif /* MATTERCCZ4RHS_IMPL_HPP_ */

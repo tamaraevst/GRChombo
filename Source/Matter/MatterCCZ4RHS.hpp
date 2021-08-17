@@ -8,6 +8,7 @@
 
 #include "CCZ4Geometry.hpp"
 #include "CCZ4RHS.hpp"
+#include "CCZ4GeometryModifiedGR.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "MovingPunctureGauge.hpp"
@@ -106,6 +107,10 @@ class MatterCCZ4RHS : public CCZ4RHS<gauge_t, deriv_t>
         const Vars<Tensor<1, data_t>>
             &d1 //!< the value of the first derivatives of the variables.
     ) const;
+
+    template <class data_t>
+    void add_modified_scalars_rhs(Vars<data_t> &matter_rhs, const Vars<data_t> &matter_vars,
+    const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2) const;
 
     // Class members
     matter_t my_matter;      //!< The matter object, e.g. a scalar field.

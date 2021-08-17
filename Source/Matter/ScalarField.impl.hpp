@@ -112,7 +112,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     // const bool chern_simons_switch = mod_params.csswitch;
     // const bool gauss_bonnet_switch = mod_params.gbswitch;
 
-    auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
+    // auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
 
     // if (m_activate_chern_simons) 
     // {   
@@ -130,7 +130,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     my_potential.compute_potential(V_of_phi, dVdphi, vars);
 
     // adjust RHS for the potential term
-    total_rhs.Pi += -vars.lapse * dVdphi - modified_terms.starR_R - modified_terms.RGB;
+    total_rhs.Pi += -vars.lapse * dVdphi;
 }
 
 // the RHS excluding the potential tserms
