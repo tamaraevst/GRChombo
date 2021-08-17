@@ -46,9 +46,6 @@ class InitialScalarData
         // calculate the field value
         data_t phi = m_params.amplitude *
                      (1.0 + 0.01 * rr2 * exp(-pow(rr / m_params.width, 2.0)));
-        
-        // switch to zero initial scalar field here
-        // data_t phi = 0.0
 
         // store the vars
         current_cell.store_vars(phi, c_phi);
