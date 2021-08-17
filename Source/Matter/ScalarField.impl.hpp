@@ -114,19 +114,15 @@ void ScalarField<potential_t>::add_matter_rhs(
 
     auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
 
-    using namespace std;
-    cout << "CS switch is " << m_activate_chern_simons << endl;
-    cout << "CS switch is " << m_activate_gauss_bonnet << endl;
+    // if (m_activate_chern_simons) 
+    // {   
+    //     total_rhs.phi += -modified_terms.starR_R;
+    // }
 
-    if (m_activate_chern_simons) 
-    {   
-        total_rhs.phi += -modified_terms.starR_R;
-    }
-
-    if (m_activate_gauss_bonnet) 
-    {   
-        total_rhs.phi += -modified_terms.RGB;
-    }
+    // if (m_activate_gauss_bonnet) 
+    // {   
+    //     total_rhs.phi += -modified_terms.RGB;
+    // }
 
     // set the potential values
     data_t V_of_phi = 0.0;
@@ -134,7 +130,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     my_potential.compute_potential(V_of_phi, dVdphi, vars);
 
     // adjust RHS for the potential term
-    total_rhs.Pi += -vars.lapse * dVdphi;
+    total_rhs.Pi += -vars.lapse * dVdphi - modified_terms.starR_R - modified_terms.RGB;
 }
 
 // the RHS excluding the potential tserms

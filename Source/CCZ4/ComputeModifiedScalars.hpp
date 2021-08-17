@@ -11,6 +11,7 @@
 #include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
+#include "BSSNVars.hpp"
 #include "CCZ4GeometryModifiedGR.hpp"
 #include "simd.hpp"
 
@@ -18,6 +19,8 @@ class ComputeModifiedScalars
 {
   public:
 
+    template <class data_t>
+    using Vars = BSSNVars::VarsWithGauge<data_t>;
     //! Constructor
     ComputeModifiedScalars(const std::array<double, CH_SPACEDIM> &a_center,
                      const double a_dx, const int a_var_enum);

@@ -10,8 +10,9 @@
 #ifndef CCZ4GEOMETRYMODIFIEDGR_IMPL_HPP_
 #define CCZ4GEOMETRYMODIFIEDGR_IMPL_HPP_
 
-#include "FourthOrderDerivatives.hpp"
-#include "MovingPunctureGauge.hpp"
+#include "DimensionDefinitions.hpp"
+#include "GRInterval.hpp"
+#include "VarsTools.hpp"
 
 /* This fuction computes D_k A_ij in conformal variables. Note that the corresponding quantity for it is covd_Aij[i][j][k].
 Note the order of brackets for the indices [i][j][k] corrresponding to the prder of _k _ij in the actual tensor!
@@ -202,9 +203,9 @@ CCZ4GeometryModifiedGR::compute_chern_simons_electric_term(const vars_t<data_t> 
     }
 
 //This is copied from Weyl4 code; the function is protected there for calculating \epsilon_i^jk
-template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>;
-template <class data_t>
-Tensor<3, data_t> CCZ4GeometryModifiedGR::compute_epsilon3_LUU(const Vars<data_t> &vars,
+// template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>;
+template <class data_t, template <typename> class vars_t>
+Tensor<3, data_t> CCZ4GeometryModifiedGR::compute_epsilon3_LUU(const vars_t<data_t> &vars,
                                            const Tensor<2, data_t> &h_UU) const
     {
         // raised normal vector, NB index 3 is time

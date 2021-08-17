@@ -7,14 +7,17 @@
 #ifndef CCZ4GEOMETRYMODIFIEDGR_HPP_
 #define CCZ4GEOMETRYMODIFIEDGR_HPP_
 
-#include "Cell.hpp"
-#include "CoordinateTransformations.hpp"
-#include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "TensorAlgebra.hpp"
 #include "CCZ4Geometry.hpp"
-#include "CCZ4RHS.hpp"
-#include "UserVariables.hpp"
+#include "BSSNVars.hpp"
+#include "Tensor.hpp"
+#include "simd.hpp"
+// #include "CCZ4.hpp"
+
+#include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
+
+#include <array>
 
 template <class data_t> struct modifiedscalar_t
 {
@@ -39,6 +42,13 @@ template <class data_t> struct evolution_t
 class CCZ4GeometryModifiedGR 
 {  
     public:
+
+    template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
+
+    template <class data_t>
+    using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
+
+    // template <class data_t> void compute(Cell<data_t> current_cell) const;
     
     template <class data_t, template <typename> class vars_t>
     static Tensor<3, data_t>
@@ -83,9 +93,9 @@ class CCZ4GeometryModifiedGR
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
         const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris);
 
-    template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>;
-    template <class data_t>
-    Tensor<3, data_t> compute_epsilon3_LUU(const Vars<data_t> &vars,
+    // template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>;
+    template <class data_t, template <typename> class vars_t>
+    Tensor<3, data_t> compute_epsilon3_LUU(const vars_t<data_t> &vars,
                                            const Tensor<2, data_t> &h_UU) const;
 };
 
