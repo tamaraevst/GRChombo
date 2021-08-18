@@ -72,16 +72,21 @@ void ScalarFieldLevel::prePlotLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
-    BoxLoops::loop(
-        make_compute_pack(MatterConstraints<ScalarFieldWithPotential>(
-                              scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
-                          ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar)),
-        m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    // BoxLoops::loop(
+    //     make_compute_pack(MatterConstraints<ScalarFieldWithPotential>(
+    //                           scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
+    //                       ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar)),
+    //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
     
     // BoxLoops::loop(make_compute_pack(
     //     MatterConstraints<ScalarFieldWithPotential>(
     //         scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)), ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar))),
     //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+
+    BoxLoops::loop(make_compute_pack(
+        MatterConstraints<ScalarFieldWithPotential>(
+            scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom))),
+        m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif
 
@@ -147,9 +152,9 @@ void ScalarFieldLevel::specificPostTimeStep()
         Potential potential(m_p.potential_params);
         ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
 
-        BoxLoops::loop(ComputeModifiedScalars(m_p.extraction_params.center, m_dx,
-                              c_mod_scalar),
-                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        // BoxLoops::loop(ComputeModifiedScalars(m_p.extraction_params.center, m_dx,
+        //                       c_mod_scalar),
+        //                m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         // ignore extraction level param for now since tagging criterion does
         // not enforce it

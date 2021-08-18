@@ -17,6 +17,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
+#include "DebuggingTools.hpp"
 
 //!  Calculates RHS using CCZ4 including matter terms, and matter variable
 //!  evolution

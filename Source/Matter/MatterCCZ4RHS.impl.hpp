@@ -10,6 +10,7 @@
 #ifndef MATTERCCZ4RHS_IMPL_HPP_
 #define MATTERCCZ4RHS_IMPL_HPP_
 #include "DimensionDefinitions.hpp"
+#include "CCZ4GeometryModifiedGR.hpp"
 
 template <class matter_t, class gauge_t, class deriv_t>
 MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::MatterCCZ4RHS(
@@ -39,7 +40,11 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::compute(
 
     // add RHS matter terms from EM Tensor
     add_emtensor_rhs(matter_rhs, matter_vars, d1);
+    DEBUG_SHOW(matter_rhs.phi);
 
+    add_modified_scalars_rhs(matter_rhs, matter_vars, d1, d2);
+
+    DEBUG_SHOW(matter_rhs.phi);
     // add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
 
@@ -116,7 +121,8 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::add_modified_scalars_rhs(
     const auto h_UU = compute_inverse_sym(matter_vars.h);
     const auto chris = compute_christoffel(d1.h, h_UU);
 
-    auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(matter_vars, d1, d2, h_UU, chris);
+    CCZ4GeometryModifiedGR ccz4mod;
+    const auto modified_terms = ccz4mod.compute_modified_scalars(matter_vars, d1, d2, h_UU, chris);
 
     matter_rhs.phi += - modified_terms.starR_R - modified_terms.RGB;
 }

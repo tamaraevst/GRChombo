@@ -42,6 +42,9 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
 
+        // whether to do extraction
+        pp.load("activate_extraction", activate_extraction, false);
+
         // Switches for CS and GB terms
         pp.load("activate_chern_simons", activate_chern_simons, false);
         pp.load("activate_gauss_bonnet", activate_gauss_bonnet, false);
@@ -80,6 +83,7 @@ class SimulationParameters : public SimulationParametersBase
     InitialScalarData::params_t initial_params;
     Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
+    bool activate_extraction;
     bool activate_chern_simons;
     bool activate_gauss_bonnet;
     // ModifiedScalars::params_t mod_params;
