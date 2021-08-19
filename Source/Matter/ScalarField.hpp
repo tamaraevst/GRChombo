@@ -16,6 +16,7 @@
 #include "UserVariables.hpp" 
 #include "simd.hpp"
 #include <iostream> 
+#include "DebuggingTools.hpp"
 //This files needs NUM_VARS, total num of components
 
 //!  Calculates the matter type specific elements such as the EMTensor and
@@ -46,14 +47,18 @@ template <class potential_t = DefaultPotential> class ScalarField
     //! The local copy of the potential
     potential_t my_potential;
     // const params_t m_params;
-    const bool m_activate_chern_simons;
-    const bool m_activate_gauss_bonnet;
+    bool m_activate_chern_simons;
+    bool m_activate_gauss_bonnet;
 
     public:
     //!  Constructor of class ScalarField, inputs are the matter parameters.
-    ScalarField(const potential_t a_potential, 
-                bool activate_chern_simons = false, 
-                bool activate_gauss_bonnet = false);
+    // ScalarField(const potential_t a_potential, 
+    //             bool activate_chern_simons, 
+    //             bool activate_gauss_bonnet);
+
+    ScalarField(const potential_t a_potential, bool activate_chern_simons, bool activate_gauss_bonnet) : my_potential(a_potential),
+    m_activate_chern_simons(activate_chern_simons), m_activate_gauss_bonnet(activate_gauss_bonnet){}
+
     // ScalarField(const potential_t a_potential, 
     //             const bool activate_chern_simons = false, 
     //             const bool activate_gauss_bonnet = false) 

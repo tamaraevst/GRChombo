@@ -10,25 +10,24 @@
 #ifndef SCALARFIELD_IMPL_HPP_
 #define SCALARFIELD_IMPL_HPP_
 
-template <class potential_t>
-inline ScalarField<potential_t>::ScalarField(const potential_t a_potential, 
-                bool activate_chern_simons, 
-                bool activate_gauss_bonnet) 
-                : my_potential(a_potential), 
-                  m_activate_chern_simons(activate_chern_simons), 
-                  m_activate_gauss_bonnet(activate_gauss_bonnet)
-{
-    if (m_activate_chern_simons)
-    {
-        cout << "Activating Chern-Simons" << endl;
-    }
+// template <class potential_t>
+// inline ScalarField<potential_t>::ScalarField(const potential_t m_potential, 
+//                 bool m_activate_chern_simons, 
+//                 bool m_activate_gauss_bonnet) 
+//                 : my_potential(m_potential), 
+//                   CCZ4GeometryModifiedGR(m_activate_chern_simons, m_activate_gauss_bonnet)
+// {
+//     if (m_activate_chern_simons)
+//     {
+//         cout << "Activating Chern-Simons" << endl;
+//     }
 
-    if (m_activate_gauss_bonnet)
-    {
-        cout << "Activating Gauss-Bonnet" << endl;
-    }
+//     if (m_activate_gauss_bonnet)
+//     {
+//         cout << "Activating Gauss-Bonnet" << endl;
+//     }
 
-}
+// }
 // Calculate the stress energy tensor elements
 template <class potential_t>
 template <class data_t, template <typename> class vars_t>
@@ -107,23 +106,36 @@ void ScalarField<potential_t>::add_matter_rhs(
     // call the function for the rhs excluding the potentials
     matter_rhs_excl_potential(total_rhs, vars, d1, d2, advec);
 
+    DEBUG_SHOW(total_rhs.phi);
+    DEBUG_OUT(total_rhs.phi); 
+
     // // include modified GR scalars if their switches are on
     // ModifiedScalars::params_t mod_params;
     // const bool chern_simons_switch = mod_params.csswitch;
     // const bool gauss_bonnet_switch = mod_params.gbswitch;
 
     // auto modified_terms = CCZ4GeometryModifiedGR::compute_modified_scalars(vars, d1, d2, h_UU, chris);
+    CCZ4GeometryModifiedGR ccz4mod(m_activate_chern_simons, m_activate_gauss_bonnet);
+ 
+    const auto modified_terms = ccz4mod.add_modified_scalars(vars, d1, d2, h_UU, chris);
 
-    // if (m_activate_chern_simons) 
-    // {   
-    //     total_rhs.phi += -modified_terms.starR_R;
-    // }
+    if (m_activate_chern_simons) 
+    {   
+        pout() << "Activating Chern-Simons" << endl;
+        total_rhs.phi += -modified_terms.starR_R;
+    }
 
-    // if (m_activate_gauss_bonnet) 
-    // {   
-    //     total_rhs.phi += -modified_terms.RGB;
-    // }
+    if (m_activate_gauss_bonnet) 
+    {   
+        pout() << "Activating Gauss-Bonnet" << endl;
+        total_rhs.phi += -modified_terms.RGB;
+    }
 
+    DEBUG_SHOW(total_rhs.phi);
+    DEBUG_OUT(total_rhs.phi); 
+
+    
+    total_rhs.phi +=  -modified_terms.starR_R - -modified_terms.RGB;
     // set the potential values
     data_t V_of_phi = 0.0;
     data_t dVdphi = 0.0;

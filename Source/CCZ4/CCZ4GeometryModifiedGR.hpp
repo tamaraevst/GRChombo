@@ -11,30 +11,92 @@
 #include "TensorAlgebra.hpp"
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
+#include "MatterCCZ4RHS.hpp"
+#include "FourthOrderDerivatives.hpp"
+#include "Cell.hpp"
+#include "DebuggingTools.hpp"
 
-template <class data_t> struct covd2lapse_t
-{   
-    Tensor<2, data_t> covd2lapse;
-    data_t tr_covd2lapse;      
-    Tensor<2, data_t> tr_free_covd2lapse;             
-};
-
-template <class data_t> struct evolution_t
-{
-    Tensor<2, data_t> A;
-    data_t K;
-    data_t chi;
-};
-
-template <class data_t> struct modfied_scalar_t
-{
-    data_t starR_R;
-    data_t RGB;
-};
 
 class CCZ4GeometryModifiedGR
 {   
+    public:
+
+    // Use the variable definitions in MatterCCZ4
+    template <class data_t> struct covd2lapse_t
+    {   
+        Tensor<2, data_t> covd2lapse;
+        data_t tr_covd2lapse;      
+        Tensor<2, data_t> tr_free_covd2lapse;             
+    };
+
+    template <class data_t> struct evolution_t
+    {
+        Tensor<2, data_t> A;
+        data_t K;
+        data_t chi;
+    };
+
+    template <class data_t> struct modfied_scalar_t
+    {
+        data_t starR_R;
+        data_t RGB;
+    };  
+    
+    public:
+
+    CCZ4GeometryModifiedGR(bool activate_chern_simons, bool activate_gauss_bonnet) :
+                 m_activate_chern_simons(activate_chern_simons), 
+                  m_activate_gauss_bonnet(activate_gauss_bonnet){};
+
+        //Function for computing Gauss Bonnet and Chern Simons scalars!
+    template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
+    modfied_scalar_t<data_t> add_modified_scalars(const vars_t<data_t> &vars,
+        const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
+        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+    {
+        using namespace TensorAlgebra;
+        modfied_scalar_t<data_t> out;
+
+        const auto E_ij = compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
+        const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU, chris);
+
+        //Finally compute *RR
+        FOR4(i, j, k, l)
+        {
+            out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
+        }
+
+        out.RGB = GB_scalar(vars, d1, d2, h_UU, chris);
+
+        DEBUG_OUT(out.RGB); 
+
+        // total_rhs.phi += -out.RGB - out.starR_R;
+    }
+
+
+        // template <class data_t>
+        // void compute(Cell<data_t> current_cell) const
+        // {
+        // const auto vars = current_cell.template load_vars<Vars>();
+        // const auto d1 = m_deriv.template diff1<Vars>(current_cell);
+        // const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
+
+        // const auto h_UU = TensorAlgebra::compute_inverse_sym(vars.h);
+        // const auto chris = TensorAlgebra::compute_christoffel(d1.h, h_UU);
+
+        // Vars<data_t> rhs;
+
+        // modfied_scalar_t<data_t> out;
+        // out = compute_modified_scalars(vars, d1, d2, h_UU, chris);
+
+        // store_vars(out, current_cell);
+        // }
+
     protected:
+    // const FourthOrderDerivatives m_deriv;
+    const bool m_activate_chern_simons;
+    const bool m_activate_gauss_bonnet;
+
     /* This fuction computes D_k A_ij in conformal variables. Note that the corresponding quantity for it is covd_Aij[i][j][k].
     Note the order of brackets for the indices [i][j][k] corrresponding to the prder of _k _ij in the actual tensor!
     */
@@ -182,7 +244,6 @@ class CCZ4GeometryModifiedGR
     return rhs;
 }
 
-public:
     //This function compoutes electric term, E_ij, present in the Chern Simons scalar
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     Tensor<2, data_t>
@@ -290,8 +351,7 @@ public:
         Tensor<3, data_t> covd_A = compute_covd_Aij(vars, d1, h_UU, chris);
 
         //First, define B
-        CCZ4GeometryModifiedGR ccz4mod;
-        const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU, chris);
+        const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU, chris);
         
         //Raise index for B^ij and convert to conformal variables
         Tensor<2, data_t> B_UU;
@@ -369,29 +429,6 @@ compute_epsilon3_LUU(const vars_t<data_t> &vars,
         }
 
     return epsilon3_LUU;
-    }
-
-//Function for computing Gauss Bonnet and Chern Simons scalars!
-template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
-modfied_scalar_t<data_t> compute_modified_scalars(const vars_t<data_t> &vars,
-        const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
-    {
-        using namespace TensorAlgebra;
-        modfied_scalar_t<data_t> out;
-
-        const auto E_ij = compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
-        const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU, chris);
-
-        //Finally compute *RR
-        FOR4(i, j, k, l)
-        {
-            out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
-        }
-
-        out.RGB = GB_scalar(vars, d1, d2, h_UU, chris);
-
-        return out;
     }
 
 };
