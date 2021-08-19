@@ -28,7 +28,6 @@
 #include "Potential.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
-#include "ComputeModifiedScalars.hpp"
 #include "ChernSimonsExtraction.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
