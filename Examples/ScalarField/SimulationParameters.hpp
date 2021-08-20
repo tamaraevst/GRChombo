@@ -45,6 +45,8 @@ class SimulationParameters : public SimulationParametersBase
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
+        pp.load("scalars_file_prefix", scalars_file_prefix, std::string("Modified_Scalars_"));
+
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
@@ -87,6 +89,7 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
+    std::string scalars_file_prefix;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

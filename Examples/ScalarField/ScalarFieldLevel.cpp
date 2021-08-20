@@ -146,8 +146,7 @@ void ScalarFieldLevel::specificPostTimeStep()
     CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
-    bool first_step =
-        (m_time == 0.);
+    bool first_step = (m_time == 0.);
 
     if (m_p.calculate_scalar_norm)
     {
