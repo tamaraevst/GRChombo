@@ -45,14 +45,11 @@ class SimulationParameters : public SimulationParametersBase
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
-        // Switches for CS and GB terms
-        pp.load("activate_chern_simons", activate_chern_simons, false);
-        pp.load("activate_gauss_bonnet", activate_gauss_bonnet, false);
-
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
-        they are \gamma'(0) and \beta'(0) for the scalars respectively */
-        pp.load("gamma_amplitude", gamma_amplitude, 1.0);
-        pp.load("beta_amplitude", beta_amplitude, 1.0);
+        they are \gamma'(0) and \beta'(0) for the scalars respectively.
+        Set them to zero if you do not want the corresponding scalar included. */
+        pp.load("gamma_amplitude", gamma_amplitude, 1.0); // for Chern Simons
+        pp.load("beta_amplitude", beta_amplitude, 1.0); // for Gauss Bonnet
     }
 
     void check_params()
@@ -90,8 +87,6 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
-    bool activate_chern_simons;
-    bool activate_gauss_bonnet;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

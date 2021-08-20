@@ -74,7 +74,7 @@ void ScalarFieldLevel::prePlotLevel()
     fillAllGhosts();
     Potential potential(m_p.potential_params);
     CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude);
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
         MatterConstraints<ScalarFieldWithPotential>(
@@ -96,7 +96,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
     CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {
         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
@@ -143,7 +143,7 @@ void ScalarFieldLevel::specificPostTimeStep()
     CH_TIME("ScalarField::specificPostTimeStep");
     Potential potential(m_p.potential_params);
     CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     bool first_step =
         (m_time == 0.);

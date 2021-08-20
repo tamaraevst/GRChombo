@@ -39,22 +39,16 @@ template <class potential_t = DefaultPotential> class ScalarField
     /* The local copy of the potential, switches for Chern Simons and 
     Gauss Bonnet scalars and their amplitudes*/
     potential_t my_potential;
-    bool m_activate_chern_simons;
-    bool m_activate_gauss_bonnet;
     double m_gamma_amplitude;
     double m_beta_amplitude;
 
     public:
     ScalarField(const potential_t a_potential,
                 double a_gamma_amplitude,
-                double a_beta_amplitude,
-                bool activate_chern_simons, 
-                bool activate_gauss_bonnet) : 
+                double a_beta_amplitude) : 
                 my_potential(a_potential),
                 m_gamma_amplitude(a_gamma_amplitude),
-                m_beta_amplitude(a_beta_amplitude),
-                m_activate_chern_simons(activate_chern_simons),
-                m_activate_gauss_bonnet(activate_gauss_bonnet){}
+                m_beta_amplitude(a_beta_amplitude){}
 
     //! Structure containing the rhs variables for the matter fields
     template <class data_t> struct Vars

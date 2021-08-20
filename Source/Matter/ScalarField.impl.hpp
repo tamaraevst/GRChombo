@@ -95,22 +95,10 @@ void ScalarField<potential_t>::add_matter_rhs(
  
     const auto modified_terms = ccz4mod.add_modified_scalars(vars, d1, d2, h_UU, chris);
 
-    if (m_activate_chern_simons) 
-    {   
-        pout() << "Activating Chern-Simons" << endl; //for sanity check
-        total_rhs.phi += - modified_terms.starR_R;
-    }
-
-    if (m_activate_gauss_bonnet) 
-    {   
-        pout() << "Activating Gauss-Bonnet" << endl; //for sanity check
-        total_rhs.phi += - modified_terms.RGB;
-    }
+    // add them to the RHS equation of phi
+    total_rhs.phi += - modified_terms.starR_R - modified_terms.RGB;
 
     DEBUG_OUT(total_rhs.phi); 
-    
-    // add then to the RHS equation of phi
-    total_rhs.phi +=  -modified_terms.starR_R - modified_terms.RGB;
 
     // set the potential values
     data_t V_of_phi = 0.0;
