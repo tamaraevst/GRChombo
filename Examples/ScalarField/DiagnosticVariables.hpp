@@ -13,7 +13,9 @@ enum
 
     c_Mom,
 
-    c_mod_scalar,
+    c_chernsimons,
+
+    c_gaussbonnet,
 
     NUM_DIAGNOSTIC_VARS
 };

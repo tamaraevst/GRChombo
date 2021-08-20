@@ -28,7 +28,10 @@
 #include "Potential.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
-#include "ChernSimonsExtraction.hpp"
+#include "ComputeModifiedScalars.hpp"
+
+#include "AMRReductions.hpp"
+
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -70,18 +73,8 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
-    CCZ4GeometryModifiedGR ccz4mod(m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
-    ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
-    // BoxLoops::loop(
-    //     make_compute_pack(MatterConstraints<ScalarFieldWithPotential>(
-    //                           scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)),
-    //                       ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar)),
-    //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-    
-    // BoxLoops::loop(make_compute_pack(
-    //     MatterConstraints<ScalarFieldWithPotential>(
-    //         scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom)), ComputeModifiedScalars(m_p.extraction_params.center, m_dx, c_mod_scalar))),
-    //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude);
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
 
     BoxLoops::loop(make_compute_pack(
         MatterConstraints<ScalarFieldWithPotential>(
@@ -102,9 +95,8 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
-    CCZ4GeometryModifiedGR ccz4mod(m_p.activate_chern_simons, m_p.activate_gauss_bonnet); 
-    // ModifiedScalars params(m_p.mod_params);
-    ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
     if (m_p.max_spatial_derivative_order == 4)
     {
         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
@@ -145,28 +137,38 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
         current_state, tagging_criterion);
 }
 
+//Output norms of Gauss-Bonnet and Chern-Simons into output file 
 void ScalarFieldLevel::specificPostTimeStep()
 {
-    if (m_p.activate_extraction)
+    CH_TIME("ScalarField::specificPostTimeStep");
+    Potential potential(m_p.potential_params);
+    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
+    
+    bool first_step =
+        (m_time == 0.);
+
+    if (m_p.calculate_scalar_norm)
     {
         fillAllGhosts();
-        Potential potential(m_p.potential_params);
-        ScalarFieldWithPotential scalar_field(potential, m_p.activate_chern_simons, m_p.activate_gauss_bonnet);
-
-        // BoxLoops::loop(ComputeModifiedScalars(m_p.extraction_params.center, m_dx,
-        //                       c_mod_scalar),
-        //                m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-
-        // ignore extraction level param for now since tagging criterion does
-        // not enforce it
+        BoxLoops::loop(ComputeModifiedScalars<ScalarFieldWithPotential>(scalar_field, m_dx,
+                     m_p.gamma_amplitude, 
+                     m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
         if (m_level == 0)
         {
-            bool first_step = (m_dt == m_time);
-            ChernSimonsExtraction chern_simons_extraction(
-                m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
-                c_mod_scalar);
-            m_gr_amr.m_interpolator->refresh();
-            chern_simons_extraction.execute_query(m_gr_amr.m_interpolator);
+            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
+            double L2_ChernSimons = amr_reductions.norm(c_chernsimons);
+            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet);
+            SmallDataIO constraints_file(m_p.data_path + "constraint_norms",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            constraints_file.remove_duplicate_time_data();
+            if (first_step)
+            {
+                constraints_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
+            }
+            constraints_file.write_time_data_line({L2_ChernSimons, L2_GaussBonnet});
         }
     }
 }

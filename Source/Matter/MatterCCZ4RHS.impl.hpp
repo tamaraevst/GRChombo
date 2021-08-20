@@ -10,7 +10,6 @@
 #ifndef MATTERCCZ4RHS_IMPL_HPP_
 #define MATTERCCZ4RHS_IMPL_HPP_
 #include "DimensionDefinitions.hpp"
-#include "CCZ4GeometryModifiedGR.hpp"
 
 template <class matter_t, class gauge_t, class deriv_t>
 MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::MatterCCZ4RHS(
@@ -40,10 +39,6 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::compute(
 
     // add RHS matter terms from EM Tensor
     add_emtensor_rhs(matter_rhs, matter_vars, d1);
-    DEBUG_SHOW(matter_rhs.phi);
-
-    // add_modified_scalars_rhs(matter_rhs, matter_vars, d1, d2);
-    // DEBUG_SHOW(matter_rhs.phi);
 
     // add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
@@ -109,22 +104,5 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::add_emtensor_rhs(
         matter_rhs.B[i] += matter_term_Gamma;
     }
 }
-
-// template <class matter_t, class gauge_t, class deriv_t>
-// template <class data_t>
-// void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::add_modified_scalars_rhs(
-//     Vars<data_t> &matter_rhs, const Vars<data_t> &matter_vars,
-//     const Vars<Tensor<1, data_t>> &d1, const Diff2Vars<Tensor<2, data_t>> &d2) const
-// {
-//     using namespace TensorAlgebra;
-
-//     const auto h_UU = compute_inverse_sym(matter_vars.h);
-//     const auto chris = compute_christoffel(d1.h, h_UU);
-
-//     CCZ4GeometryModifiedGR(activate_chern_simons, activate_gauss_bonnet) ccz4mod;
-//     const auto modified_terms = ccz4mod.compute_modified_scalars(matter_vars, d1, d2, h_UU, chris);
-
-//     matter_rhs.phi += - modified_terms.starR_R - modified_terms.RGB;
-// }
 
 #endif /* MATTERCCZ4RHS_IMPL_HPP_ */

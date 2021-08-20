@@ -13,11 +13,10 @@
 #include "FourthOrderDerivatives.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
-#include "UserVariables.hpp" 
+#include "UserVariables.hpp" //This files needs NUM_VARS, total num of components
 #include "simd.hpp"
 #include <iostream> 
 #include "DebuggingTools.hpp"
-//This files needs NUM_VARS, total num of components
 
 //!  Calculates the matter type specific elements such as the EMTensor and
 //   matter evolution
@@ -36,35 +35,26 @@
 
 template <class potential_t = DefaultPotential> class ScalarField
 {
-    // public:
-    // struct params_t
-    // {
-    //      bool csswitch;
-    //      bool gbswitch;
-    // };
-    
     protected:
-    //! The local copy of the potential
+    /* The local copy of the potential, switches for Chern Simons and 
+    Gauss Bonnet scalars and their amplitudes*/
     potential_t my_potential;
-    // const params_t m_params;
     bool m_activate_chern_simons;
     bool m_activate_gauss_bonnet;
+    double m_gamma_amplitude;
+    double m_beta_amplitude;
 
     public:
-    //!  Constructor of class ScalarField, inputs are the matter parameters.
-    // ScalarField(const potential_t a_potential, 
-    //             bool activate_chern_simons, 
-    //             bool activate_gauss_bonnet);
-
-    ScalarField(const potential_t a_potential, bool activate_chern_simons, bool activate_gauss_bonnet) : my_potential(a_potential),
-    m_activate_chern_simons(activate_chern_simons), m_activate_gauss_bonnet(activate_gauss_bonnet){}
-
-    // ScalarField(const potential_t a_potential, 
-    //             const bool activate_chern_simons = false, 
-    //             const bool activate_gauss_bonnet = false) 
-    //             : my_potential(a_potential), 
-    //               m_activate_chern_simons(activate_chern_simons), 
-    //               m_activate_gauss_bonnet(activate_gauss_bonnet){}
+    ScalarField(const potential_t a_potential,
+                double a_gamma_amplitude,
+                double a_beta_amplitude,
+                bool activate_chern_simons, 
+                bool activate_gauss_bonnet) : 
+                my_potential(a_potential),
+                m_gamma_amplitude(a_gamma_amplitude),
+                m_beta_amplitude(a_beta_amplitude),
+                m_activate_chern_simons(activate_chern_simons),
+                m_activate_gauss_bonnet(activate_gauss_bonnet){}
 
     //! Structure containing the rhs variables for the matter fields
     template <class data_t> struct Vars
