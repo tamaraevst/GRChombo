@@ -160,9 +160,9 @@ void ScalarFieldLevel::specificPostTimeStep()
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double L2_ChernSimons = amr_reductions.norm(c_chernsimons);
             double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet);
-            SmallDataIO scalars_file(m_p.data_path + "scalars_norms",
+            SmallDataIO scalars_file(m_p.data_path,
                                          m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
+                                         SmallDataIO::NEW, "Modified_Scalars_", first_step);
             scalars_file.remove_duplicate_time_data();
             if (first_step)
             {

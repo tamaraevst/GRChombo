@@ -47,6 +47,12 @@ int runGRChombo(int argc, char *argv[])
         gr_amr, sim_params.origin, sim_params.dx, sim_params.verbosity);
     gr_amr.set_interpolator(&interpolator);
 
+    // Add a scheduler to call specificPostTimeStep on every AMRLevel at t=0
+    auto task = [](GRAMRLevel *level) {
+        if (level->time() == 0.)
+            level->specificPostTimeStep();
+    };
+
     // Engage! Run the evolution
     gr_amr.run(sim_params.stop_time, sim_params.max_steps);
     gr_amr.conclude();
