@@ -8,37 +8,61 @@
 
 #include "Cell.hpp"
 #include "CoordinateTransformations.hpp"
-#include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "MatterCCZ4.hpp"
+#include "BSSNVars.hpp"
+#include "Tensor.hpp"
 #include "CCZ4GeometryModifiedGR.hpp"
 #include "simd.hpp"
 
 //! This class computes Chern Simons and Gauss Bonnet scalars
-template <class matter_t> class ComputeModifiedScalars
+class ComputeModifiedScalars
 {
   public:
+    /// CCZ4 variables
+    template <class data_t> using MetricVars = BSSNVars::VarsWithGauge<data_t>;
+
+    /// CCZ4 variables
     template <class data_t>
-    using Vars = typename MatterCCZ4<matter_t>::template Vars<data_t>;
+    using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
+
+    /// Vars object for Constraints
+    template <class data_t> struct Vars
+    {
+        data_t RGB;
+        data_t starR_R;
+    };
 
     //! Constructor
-    ComputeModifiedScalars(matter_t a_matter,
-                     const double a_dx,
+    ComputeModifiedScalars(const double a_dx,
                      double a_gamma_amplitude, 
                      double a_beta_amplitude, 
                      const int a_c_chernsimons, 
                      const int a_c_gaussbonnet)
-                     : m_matter(a_matter), 
-                     m_dx(a_dx),
+                     : m_dx(a_dx),
                      m_gamma_amplitude(a_gamma_amplitude), 
                      m_beta_amplitude(a_beta_amplitude), 
                      m_c_chernsimons(a_c_chernsimons), 
                      m_c_gaussbonnet(a_c_gaussbonnet),
                      m_deriv(a_dx){}
 
+    template <class data_t> void compute(Cell<data_t> current_cell) const
+    {
+        const auto vars = current_cell.template load_vars<MetricVars>();
+        const auto d1 = m_deriv.template diff1<MetricVars>(current_cell);
+        const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell);
+
+        using namespace TensorAlgebra;
+        const auto h_UU = compute_inverse_sym(vars.h);
+        const auto chris = compute_christoffel(d1.h, h_UU);
+        
+        // Calculate modified scalars
+        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU, chris);
+
+        store_vars(out, current_cell);
+    }
+
   protected:
-    matter_t m_matter;
     const double m_dx;
     const FourthOrderDerivatives m_deriv;
     const int m_c_chernsimons;
@@ -46,24 +70,39 @@ template <class matter_t> class ComputeModifiedScalars
     double m_beta_amplitude;
     double m_gamma_amplitude;
 
-  public:
-    template <class data_t> void compute(Cell<data_t> current_cell) const
+    template <class data_t>
+    void store_vars(Vars<data_t> &out, Cell<data_t> &current_cell) const
+    { 
+      current_cell.store_vars(out.RGB, m_c_gaussbonnet);
+      current_cell.store_vars(out.starR_R, m_c_chernsimons);
+    }
+  
+    // Function for computing Gauss Bonnet and Chern Simons scalars!
+    template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
+    Vars<data_t> modified_scalars(const vars_t<data_t> &vars,
+        const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
+        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris) const
     {
-        const auto matter_vars = current_cell.template load_vars<Vars>();
-        const auto d1 = m_deriv.template diff1<Vars>(current_cell);
-        const auto d2 = m_deriv.template diff2<Vars>(current_cell);
-
         using namespace TensorAlgebra;
-        const auto h_UU = compute_inverse_sym(matter_vars.h);
-        const auto chris = compute_christoffel(d1.h, h_UU);
+        Vars<data_t> out;
 
-        CCZ4GeometryModifiedGR ccz4mod(m_gamma_amplitude, m_beta_amplitude);
-        
-        // Calculate modified scalars
-        const auto modified_scalars = ccz4mod.add_modified_scalars(matter_vars, d1, d2, h_UU, chris);
+        CCZ4GeometryModifiedGR ccz4mod;
 
-        current_cell.store_vars(modified_scalars.RGB, m_c_gaussbonnet);
-        current_cell.store_vars(modified_scalars.starR_R, m_c_chernsimons);
+        const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
+        const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU, chris);
+
+        //Finally compute *RR
+        FOR4(i, j, k, l)
+        {
+            out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
+        }
+
+        out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU, chris);
+
+        DEBUG_OUT(out.RGB); 
+        DEBUG_OUT(out.starR_R);
+
+        return out;
     }
 };
 

@@ -74,7 +74,7 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
-    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude);
+    // CCZ4GeometryModifiedGR ccz4mod;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
@@ -96,7 +96,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
-    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
+    // CCZ4GeometryModifiedGR ccz4mod; 
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {
@@ -141,9 +141,9 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 //Output norms of Gauss-Bonnet and Chern-Simons into output file 
 void ScalarFieldLevel::specificPostTimeStep()
 {
-    CH_TIME("ScalarField::specificPostTimeStep");
+    CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
-    CCZ4GeometryModifiedGR ccz4mod(m_p.gamma_amplitude, m_p.beta_amplitude); 
+    // CCZ4GeometryModifiedGR ccz4mod; 
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     bool first_step = (m_time == 0.);
@@ -151,7 +151,7 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.calculate_scalar_norm)
     {
         fillAllGhosts();
-        BoxLoops::loop(ComputeModifiedScalars<ScalarFieldWithPotential>(scalar_field, m_dx,
+        BoxLoops::loop(ComputeModifiedScalars(m_dx,
                      m_p.gamma_amplitude, 
                      m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
@@ -160,9 +160,9 @@ void ScalarFieldLevel::specificPostTimeStep()
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double L2_ChernSimons = amr_reductions.norm(c_chernsimons);
             double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet);
-            SmallDataIO scalars_file(m_p.data_path,
+            SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
                                          m_dt, m_time, m_restart_time,
-                                         SmallDataIO::NEW, "Modified_Scalars_", first_step);
+                                         SmallDataIO::APPEND, first_step);
             scalars_file.remove_duplicate_time_data();
             if (first_step)
             {
