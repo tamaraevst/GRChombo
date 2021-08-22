@@ -11,6 +11,8 @@
 #include "SixthOrderDerivatives.hpp"
 #include "TraceARemoval.hpp"
 
+#include "FilesystemTools.hpp"
+
 // For RHS update
 #include "MatterCCZ4RHS.hpp"
 
@@ -150,6 +152,9 @@ void ScalarFieldLevel::specificPostTimeStep()
 
     if (m_p.calculate_scalar_norm)
     {
+        if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_dx,
                      m_p.gamma_amplitude, 
