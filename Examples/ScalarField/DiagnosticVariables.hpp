@@ -27,7 +27,10 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
 
     "Mom",
     
-    "ModifiedScalars"};
+    "ChernSimons",
+    
+    "GaussBonnet"
+    };
 }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */
