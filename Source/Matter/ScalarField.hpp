@@ -15,7 +15,6 @@
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS, total num of components
 #include "simd.hpp"
-#include <iostream> 
 #include "DebuggingTools.hpp"
 
 //!  Calculates the matter type specific elements such as the EMTensor and
