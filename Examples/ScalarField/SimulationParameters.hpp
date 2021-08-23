@@ -45,13 +45,11 @@ class SimulationParameters : public SimulationParametersBase
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
-        pp.load("scalars_file_prefix", scalars_file_prefix, std::string("Modified_Scalars_"));
-
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
-        pp.load("gamma_amplitude", gamma_amplitude, 1.0); // for Chern Simons
-        pp.load("beta_amplitude", beta_amplitude, 1.0); // for Gauss Bonnet
+        pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
+        pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
     }
 
     void check_params()
@@ -86,10 +84,11 @@ class SimulationParameters : public SimulationParametersBase
     InitialScalarData::params_t initial_params;
     Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
+
+    //Parameters for modified scalar field equation 
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
-    std::string scalars_file_prefix;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

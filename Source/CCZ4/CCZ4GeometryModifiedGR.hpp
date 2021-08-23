@@ -11,10 +11,6 @@
 #include "TensorAlgebra.hpp"
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
-#include "MatterCCZ4RHS.hpp"
-#include "FourthOrderDerivatives.hpp"
-#include "Cell.hpp"
-#include "DebuggingTools.hpp"
 
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
@@ -22,6 +18,7 @@ class CCZ4GeometryModifiedGR
 {   
     public:
 
+    //struct for some derivative expressions of the lapse
     template <class data_t> struct covd2lapse_t
     {   
         Tensor<2, data_t> covd2lapse;
@@ -29,55 +26,13 @@ class CCZ4GeometryModifiedGR
         Tensor<2, data_t> tr_free_covd2lapse;             
     };
 
+    //struct for \delta_t expressions in the decomposition of the CS and GB terms
     template <class data_t> struct evolution_t
     {
         Tensor<2, data_t> A;
         data_t K;
         data_t chi;
     };
-
-    // template <class data_t> struct modfied_scalar_t
-    // {
-    //     data_t starR_R;
-    //     data_t RGB;
-    // };  
-
-    // protected:
-    // double m_gamma_amplitude;
-    // double m_beta_amplitude;
-
-    // Constructor
-    // CCZ4GeometryModifiedGR(double a_gamma_amplitude, 
-    //                        double a_beta_amplitude) : 
-    //                        m_gamma_amplitude(a_gamma_amplitude),
-    //                        m_beta_amplitude(a_beta_amplitude)
-    //                         {}
-
-    //Function for computing Gauss Bonnet and Chern Simons scalars!
-    // template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
-    // modfied_scalar_t<data_t> add_modified_scalars(const vars_t<data_t> &vars,
-    //     const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-    //     const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
-    // {
-    //     using namespace TensorAlgebra;
-    //     modfied_scalar_t<data_t> out;
-
-    //     const auto E_ij = compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
-    //     const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU, chris);
-
-    //     //Finally compute *RR
-    //     FOR4(i, j, k, l)
-    //     {
-    //         out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
-    //     }
-
-    //     out.RGB = GB_scalar(vars, d1, d2, h_UU, chris);
-
-    //     DEBUG_OUT(out.RGB); 
-    //     DEBUG_OUT(out.starR_R);
-
-    //     return out;
-    // }
 
     /* This fuction computes D_k A_ij in conformal variables. Note that the corresponding quantity for it is covd_Aij[i][j][k].
     Note the order of brackets for the indices [i][j][k] corrresponding to the prder of _k _ij in the actual tensor!

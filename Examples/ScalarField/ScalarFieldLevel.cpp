@@ -76,7 +76,6 @@ void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
     Potential potential(m_p.potential_params);
-    // CCZ4GeometryModifiedGR ccz4mod;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
@@ -98,7 +97,6 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     Potential potential(m_p.potential_params);
-    // CCZ4GeometryModifiedGR ccz4mod; 
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {
@@ -140,7 +138,7 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
         current_state, tagging_criterion);
 }
 
-//Output norms of Gauss-Bonnet and Chern-Simons into output file 
+//Output norms of Gauss-Bonnet and Chern-Simons into file 
 void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");

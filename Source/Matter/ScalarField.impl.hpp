@@ -107,8 +107,6 @@ void ScalarField<potential_t>::add_matter_rhs(
 
     RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU, chris);
  
-    // const auto modified_terms = ccz4mod.add_modified_scalars(vars, d1, d2, h_UU, chris);
-
     // add them to the RHS equation of phi
     total_rhs.phi += - m_gamma_amplitude * starR_R - m_beta_amplitude * RGB;
 

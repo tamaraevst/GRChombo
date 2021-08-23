@@ -36,8 +36,8 @@
 template <class potential_t = DefaultPotential> class ScalarField
 {
     protected:
-    /* The local copy of the potential, switches for Chern Simons and 
-    Gauss Bonnet scalars and their amplitudes*/
+    /* The local copy of the potential, Chern Simons and 
+    Gauss Bonnet amplitudes*/
     potential_t my_potential;
     double m_gamma_amplitude;
     double m_beta_amplitude;

@@ -41,12 +41,6 @@ int runGRChombo(int argc, char *argv[])
                                                                   sim_params);
     setupAMRObject(gr_amr, scalar_field_level_fact);
 
-    // call this after amr object setup so grids known
-    // and need it to stay in scope throughout run
-    AMRInterpolator<Lagrange<4>> interpolator(
-        gr_amr, sim_params.origin, sim_params.dx, sim_params.verbosity);
-    gr_amr.set_interpolator(&interpolator);
-
     // Add a scheduler to call specificPostTimeStep on every AMRLevel at t=0
     auto task = [](GRAMRLevel *level) {
         if (level->time() == 0.)
