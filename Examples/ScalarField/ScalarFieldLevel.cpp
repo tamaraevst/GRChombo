@@ -161,8 +161,8 @@ void ScalarFieldLevel::specificPostTimeStep()
         if (m_level == 0)
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-            double L2_ChernSimons = amr_reductions.norm(c_chernsimons);
-            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet);
+            double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 2, true);
+            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 2, true);
             SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
