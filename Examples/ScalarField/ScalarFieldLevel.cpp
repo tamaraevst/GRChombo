@@ -163,9 +163,6 @@ void ScalarFieldLevel::specificPostTimeStep()
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 2, true);
             double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 2, true);
-            double domain_volume = amr_reductions.get_domain_volume();
-            double normalised_L2_ChernSimons = L2_ChernSimons /(pow(domain_volume, 1.0 / 2.0));
-            double normalised_L2_GaussBonnet = L2_GaussBonnet /(pow(domain_volume, 1.0 / 2.0));
             SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
@@ -174,7 +171,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             {
                 scalars_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
             }
-            scalars_file.write_time_data_line({normalised_L2_ChernSimons, normalised_L2_GaussBonnet});
+            scalars_file.write_time_data_line({L2_ChernSimons, L2_GaussBonnet});
         }
     }
 }
