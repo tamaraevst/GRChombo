@@ -12,8 +12,6 @@
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
 
-#include "DebuggingTools.hpp"
-
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
 class CCZ4GeometryModifiedGR
@@ -147,8 +145,6 @@ class CCZ4GeometryModifiedGR
     Tensor<1, data_t> Z0 = 0.0;
     auto ricci =
         CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
-
-    DEBUG_OUT(ricci.scalar);
 
     auto lapse_derivatives = compute_covd2lapse_quantities(vars, d1, d2, h_UU); 
 

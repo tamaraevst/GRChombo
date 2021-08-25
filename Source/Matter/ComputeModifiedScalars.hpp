@@ -77,13 +77,17 @@ class ComputeModifiedScalars
         const double x = coords.x;
         const double y = coords.y;
         const double z = coords.z;
-
         
         if (x>10.0 || y>10.0 ||z>10.0)
         {
           out.starR_R = 0.0;
         }
-        
+
+        DEBUG_OUT(x);
+        DEBUG_OUT(y);
+        DEBUG_OUT(z);
+        DEBUG_OUT(out.starR_R);
+
         store_vars(out, current_cell);
     }
 

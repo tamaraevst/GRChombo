@@ -143,7 +143,6 @@ void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
-    // CCZ4GeometryModifiedGR ccz4mod; 
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     bool first_step = (m_time == 0.);
