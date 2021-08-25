@@ -154,7 +154,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
         fillAllGhosts();
-        BoxLoops::loop(ComputeModifiedScalars(m_dx,
+        BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
                      m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);

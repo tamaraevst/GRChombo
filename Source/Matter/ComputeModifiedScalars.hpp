@@ -14,6 +14,8 @@
 #include "Tensor.hpp"
 #include "CCZ4GeometryModifiedGR.hpp"
 #include "simd.hpp"
+#include "Coordinates.hpp"
+#include "DebuggingTools.hpp"
 
 //! This class computes Chern Simons and Gauss Bonnet scalars
 class ComputeModifiedScalars
@@ -31,15 +33,25 @@ class ComputeModifiedScalars
     {
         data_t RGB;
         data_t starR_R;
+
+        // template <typename mapping_function_t>
+        // void enum_mapping(mapping_function_t mapping_function)
+        // {
+        //     using namespace VarsTools;
+        //     define_enum_mapping(mapping_function, c_chernsimons, starR_R);
+        //     define_enum_mapping(mapping_function, c_gaussbonnet, RGB);
+        // }
     };
 
     //! Constructor
-    ComputeModifiedScalars(const double a_dx,
+    ComputeModifiedScalars(const std::array<double, CH_SPACEDIM> a_center,
+                     const double a_dx,
                      double a_gamma_amplitude, 
                      double a_beta_amplitude, 
                      const int a_c_chernsimons, 
                      const int a_c_gaussbonnet)
-                     : m_dx(a_dx),
+                     : m_center(a_center),
+                     m_dx(a_dx),
                      m_gamma_amplitude(a_gamma_amplitude), 
                      m_beta_amplitude(a_beta_amplitude), 
                      m_c_chernsimons(a_c_chernsimons), 
@@ -55,9 +67,10 @@ class ComputeModifiedScalars
         using namespace TensorAlgebra;
         const auto h_UU = compute_inverse_sym(vars.h);
         const auto chris = compute_christoffel(d1.h, h_UU);
-        
+        // Get the coordinates
+    const Coordinates<data_t> coords(current_cell, m_dx, m_center);
         // Calculate modified scalars
-        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU);
+        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU, coords);
 
         store_vars(out, current_cell);
     }
@@ -70,6 +83,8 @@ class ComputeModifiedScalars
     double m_beta_amplitude;
     double m_gamma_amplitude;
 
+    const std::array<double, CH_SPACEDIM> m_center; //!< The grid center
+
     template <class data_t>
     void store_vars(Vars<data_t> &out, Cell<data_t> &current_cell) const
     { 
@@ -81,24 +96,34 @@ class ComputeModifiedScalars
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     Vars<data_t> modified_scalars(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU) const
+        const Tensor<2, data_t> &h_UU, const Coordinates<data_t> &coords) const
     {
         using namespace TensorAlgebra;
         Vars<data_t> out;
 
         CCZ4GeometryModifiedGR ccz4mod;
 
+        const data_t x = coords.x;
+        const double y = coords.y;
+        const double z = coords.z;
+
         const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
         const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
 
-        //Finally compute *RR
-        FOR4(i, j, k, l)
+        if (y>10.0 || z>10.0)
+        {   
+            out.starR_R = 0.0;
+        }
+        else{
+            //Finally compute *RR
+            FOR4(i, j, k, l)
         {
             out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
         }
 
         out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
-
+        }
+        DEBUG_OUT(out.starR_R)
         return out;
     }
 };
