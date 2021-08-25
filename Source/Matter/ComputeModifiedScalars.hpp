@@ -68,11 +68,22 @@ class ComputeModifiedScalars
         const auto h_UU = compute_inverse_sym(vars.h);
         const auto chris = compute_christoffel(d1.h, h_UU);
         
-         // Get the coordinates
-        const Coordinates<data_t> coords(current_cell, m_dx, m_center);
         // Calculate modified scalars
-        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU, coords);
+        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU);
 
+        // Get the coordinates  
+        const Coordinates<double> coords(current_cell, m_dx, m_center);
+
+        const double x = coords.x;
+        const double y = coords.y;
+        const double z = coords.z;
+
+        
+        if (x>10.0 || y>10.0 ||z>10.0)
+        {
+          out.starR_R = 0.0;
+        }
+        
         store_vars(out, current_cell);
     }
 
@@ -97,37 +108,39 @@ class ComputeModifiedScalars
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     Vars<data_t> modified_scalars(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const Coordinates<data_t> &coords) const
+        const Tensor<2, data_t> &h_UU) const
     {
         using namespace TensorAlgebra;
         Vars<data_t> out;
 
         CCZ4GeometryModifiedGR ccz4mod;
 
-        const data_t x = coords.x;
-        const double y = coords.y;
-        const double z = coords.z;
-
-        DEBUG_OUT(x);
-        DEBUG_OUT(y);
-        DEBUG_OUT(z);
+        // const data_t x = coords.x;
+        // const double y = coords.y;
+        // const double z = coords.z;
 
         const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
         const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
 
-        if (y>10.0 || z>10.0)
-        {   
-            out.starR_R = 0.0;
-        }
-        else{
-            //Finally compute *RR
-            FOR4(i, j, k, l)
+        FOR4(i, j, k, l)
         {
             out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
         }
 
         out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
-        }
+        // if (y>10.0 || z>10.0)
+        // {   
+        //     out.starR_R = 0.0;
+        // }
+        // else{
+        //     //Finally compute *RR
+        //     FOR4(i, j, k, l)
+        // {
+        //     out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
+        // }
+
+        // out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
+        // }
         DEBUG_OUT(out.starR_R);
         return out;
     }
