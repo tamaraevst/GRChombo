@@ -67,8 +67,9 @@ class ComputeModifiedScalars
         using namespace TensorAlgebra;
         const auto h_UU = compute_inverse_sym(vars.h);
         const auto chris = compute_christoffel(d1.h, h_UU);
-        // Get the coordinates
-    const Coordinates<data_t> coords(current_cell, m_dx, m_center);
+        
+         // Get the coordinates
+        const Coordinates<data_t> coords(current_cell, m_dx, m_center);
         // Calculate modified scalars
         Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU, coords);
 
@@ -107,6 +108,10 @@ class ComputeModifiedScalars
         const double y = coords.y;
         const double z = coords.z;
 
+        DEBUG_OUT(x);
+        DEBUG_OUT(y);
+        DEBUG_OUT(z);
+
         const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
         const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
 
@@ -123,7 +128,7 @@ class ComputeModifiedScalars
 
         out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
         }
-        DEBUG_OUT(out.starR_R)
+        DEBUG_OUT(out.starR_R);
         return out;
     }
 };

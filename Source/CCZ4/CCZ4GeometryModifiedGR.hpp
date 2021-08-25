@@ -70,7 +70,6 @@ class CCZ4GeometryModifiedGR
             }
             
         }
-        DEBUG_OUT(covd_Aij[1][1][1]);
         return covd_Aij;
     }
     /* This function computes some of the useful quantities related to the lapse, more precisely we have:
@@ -122,7 +121,6 @@ class CCZ4GeometryModifiedGR
         {
             out.tr_free_covd2lapse = out.covd2lapse[i][j] - (1.0 / ((double)GR_SPACEDIM)) * vars.h[i][j] * TensorAlgebra::compute_trace(out.covd2lapse, h_UU);
         }
-        DEBUG_OUT(out.tr_covd2lapse);
         return out;
     }
     

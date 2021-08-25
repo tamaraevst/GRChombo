@@ -108,8 +108,6 @@ void ScalarField<potential_t>::add_matter_rhs(
     // add them to the RHS equation of phi
     total_rhs.phi += m_gamma_amplitude * starR_R + m_beta_amplitude * RGB;
 
-    DEBUG_OUT(total_rhs.phi); 
-
     // set the potential values
     data_t V_of_phi = 0.0;
     data_t dVdphi = 0.0;
