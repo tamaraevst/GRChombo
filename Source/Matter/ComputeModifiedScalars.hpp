@@ -78,7 +78,7 @@ class ComputeModifiedScalars
         const double y = coords.y;
         const double z = coords.z;
         
-        if (x>10.0 || y>10.0 ||z>10.0)
+        if (x>6.0 || y>6.0 ||z>6.0)
         {
           out.starR_R = 0.0;
         }

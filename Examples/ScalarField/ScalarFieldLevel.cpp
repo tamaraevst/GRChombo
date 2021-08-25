@@ -157,8 +157,8 @@ void ScalarFieldLevel::specificPostTimeStep()
         if (m_level ==0)
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-            double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 2, true);
-            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 2, true);
+            double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 1, true);
+            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 1, true);
 
             if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
@@ -171,6 +171,20 @@ void ScalarFieldLevel::specificPostTimeStep()
                     scalars_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
                 }
             scalars_file.write_time_data_line({L2_ChernSimons, L2_GaussBonnet});
+
+
+            double MaxChernSimons = amr_reductions.max(c_chernsimons);
+            double MaxGaussBonnet = amr_reductions.max(c_gaussbonnet);
+            SmallDataIO max_file(m_p.data_path + "max_scalars",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            max_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    max_file.write_header_line({"ChernSimonsMax", "GaussBonnetMax"});
+                }
+            max_file.write_time_data_line({MaxChernSimons, MaxGaussBonnet});
+
         }
         
     }
