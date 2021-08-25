@@ -149,27 +149,30 @@ void ScalarFieldLevel::specificPostTimeStep()
 
     if (m_p.calculate_scalar_norm)
     {
-        if (!FilesystemTools::directory_exists(m_p.data_path))
-            FilesystemTools::mkdir_recursive(m_p.data_path);
-
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
                      m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        if (m_level ==0)
+        {
+            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
+            double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 2, true);
+            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 2, true);
 
-        AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-        double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 2, true);
-        double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 2, true);
-        SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
+            if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+            SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
-        scalars_file.remove_duplicate_time_data();
-        if (first_step)
-            {
-                scalars_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
-            }
+            scalars_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    scalars_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
+                }
             scalars_file.write_time_data_line({L2_ChernSimons, L2_GaussBonnet});
+        }
+        
     }
 }
 
