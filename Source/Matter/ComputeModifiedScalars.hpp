@@ -57,7 +57,7 @@ class ComputeModifiedScalars
         const auto chris = compute_christoffel(d1.h, h_UU);
         
         // Calculate modified scalars
-        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU, chris);
+        Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU);
 
         store_vars(out, current_cell);
     }
@@ -81,15 +81,15 @@ class ComputeModifiedScalars
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     Vars<data_t> modified_scalars(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris) const
+        const Tensor<2, data_t> &h_UU) const
     {
         using namespace TensorAlgebra;
         Vars<data_t> out;
 
         CCZ4GeometryModifiedGR ccz4mod;
 
-        const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU, chris);
-        const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU, chris);
+        const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
+        const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
 
         //Finally compute *RR
         FOR4(i, j, k, l)
@@ -97,10 +97,7 @@ class ComputeModifiedScalars
             out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
         }
 
-        out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU, chris);
-
-        DEBUG_OUT(out.RGB); 
-        DEBUG_OUT(out.starR_R);
+        out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
 
         return out;
     }

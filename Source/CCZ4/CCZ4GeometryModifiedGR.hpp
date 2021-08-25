@@ -12,6 +12,8 @@
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
 
+#include "DebuggingTools.hpp"
+
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
 class CCZ4GeometryModifiedGR
@@ -41,9 +43,14 @@ class CCZ4GeometryModifiedGR
     static Tensor<3, data_t>
     compute_covd_Aij(const vars_t<data_t> &vars,
                     const vars_t<Tensor<1, data_t>> &d1,
-                    const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+                    const Tensor<2, data_t> &h_UU)
     {
         Tensor<3, data_t> covd_Aij = 0.0;
+
+        using namespace TensorAlgebra;
+
+        auto chris = compute_christoffel(d1.h, h_UU);
+
         FOR3(i, j, k)
         {
             //This menans D_k A_{ij}
@@ -61,7 +68,9 @@ class CCZ4GeometryModifiedGR
                         vars.A[n][i] * vars.h[j][k] * d1.chi[m]);
                 }
             }
+            
         }
+        DEBUG_OUT(covd_Aij[1][1][1]);
         return covd_Aij;
     }
     /* This function computes some of the useful quantities related to the lapse, more precisely we have:
@@ -73,13 +82,17 @@ class CCZ4GeometryModifiedGR
     static covd2lapse_t<data_t> 
     compute_covd2lapse_quantities(const vars_t<data_t> &vars,
                     const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-                    const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+                    const Tensor<2, data_t> &h_UU)
     {   
+        using namespace TensorAlgebra;
+
         covd2lapse_t<data_t> out;
 
-        data_t dlapse_dot_dchi = TensorAlgebra::compute_dot_product(d1.lapse, d1.chi, h_UU);
+        data_t dlapse_dot_dchi = compute_dot_product(d1.lapse, d1.chi, h_UU);
 
         Tensor<2, data_t> covdtilde2lapse;
+
+        auto chris = compute_christoffel(d1.h, h_UU);
 
         //First, expression for covd2lapse
         FOR2(k, l)
@@ -109,6 +122,7 @@ class CCZ4GeometryModifiedGR
         {
             out.tr_free_covd2lapse = out.covd2lapse[i][j] - (1.0 / ((double)GR_SPACEDIM)) * vars.h[i][j] * TensorAlgebra::compute_trace(out.covd2lapse, h_UU);
         }
+        DEBUG_OUT(out.tr_covd2lapse);
         return out;
     }
     
@@ -136,7 +150,7 @@ class CCZ4GeometryModifiedGR
     auto ricci =
         CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
 
-    auto lapse_derivatives = compute_covd2lapse_quantities(vars, d1, d2, h_UU, chris); 
+    auto lapse_derivatives = compute_covd2lapse_quantities(vars, d1, d2, h_UU); 
 
     data_t divshift = compute_trace(d1.shift);
 
@@ -186,12 +200,14 @@ class CCZ4GeometryModifiedGR
     Tensor<2, data_t>
     compute_chern_simons_electric_term(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+        const Tensor<2, data_t> &h_UU)
     {
         using namespace TensorAlgebra;
 
+        auto chris = compute_christoffel(d1.h, h_UU);
+
         //Calling some functions needed for computation
-        auto covd2lapse = compute_covd2lapse_quantities(vars, d1, d2, h_UU, chris);
+        auto covd2lapse = compute_covd2lapse_quantities(vars, d1, d2, h_UU);
         
         auto rhs = rhs_evolution_quantities(vars, d1, d2);
 
@@ -222,17 +238,19 @@ class CCZ4GeometryModifiedGR
     Tensor<2, data_t>
     compute_magnetic_term(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+        const Tensor<2, data_t> &h_UU)
 
     {
         using namespace TensorAlgebra;
 
         Tensor<2, data_t> Bij = 0.0; 
 
+        auto chris = compute_christoffel(d1.h, h_UU);
+
         const auto epsilon3_LUU = compute_epsilon3_LUU(vars, h_UU);
         // !!!
         // const auto epsilon3_LUU = Weyl4::compute_epsilon3_LUU(vars, h_UU); //This is possible if the fucntion is public?
-        const auto covd_Aij_LLL = compute_covd_Aij(vars, d1, h_UU, chris);
+        const auto covd_Aij_LLL = compute_covd_Aij(vars, d1, h_UU);
 
         //Compute the magnetic term here
         FOR2(i, j)
@@ -252,14 +270,16 @@ class CCZ4GeometryModifiedGR
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>
     data_t GB_scalar(const vars_t<data_t> &vars,
         const vars_t<Tensor<1, data_t>> &d1, const diff2_vars_t<Tensor<2, data_t>> &d2,
-        const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
+        const Tensor<2, data_t> &h_UU)
 {
      
         using namespace TensorAlgebra;
 
         data_t GB_scalar;
 
-        auto lapse_quantities = compute_covd2lapse_quantities(vars, d1, d2, h_UU, chris);
+        auto chris = compute_christoffel(d1.h, h_UU);
+
+        auto lapse_quantities = compute_covd2lapse_quantities(vars, d1, d2, h_UU);
 
         Tensor<1, data_t> Z0 = 0.0;
         auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
@@ -285,10 +305,10 @@ class CCZ4GeometryModifiedGR
         }
 
         //Finally, we add B and M terms that are on the third line of eq (2.4) of the note.
-        Tensor<3, data_t> covd_A = compute_covd_Aij(vars, d1, h_UU, chris);
+        Tensor<3, data_t> covd_A = compute_covd_Aij(vars, d1, h_UU);
 
         //First, define B
-        const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU, chris);
+        const auto B_ij = compute_magnetic_term(vars, d1, d2, h_UU);
         
         //Raise index for B^ij and convert to conformal variables
         Tensor<2, data_t> B_UU;
