@@ -33,14 +33,6 @@ class ComputeModifiedScalars
     {
         data_t RGB;
         data_t starR_R;
-
-        // template <typename mapping_function_t>
-        // void enum_mapping(mapping_function_t mapping_function)
-        // {
-        //     using namespace VarsTools;
-        //     define_enum_mapping(mapping_function, c_chernsimons, starR_R);
-        //     define_enum_mapping(mapping_function, c_gaussbonnet, RGB);
-        // }
     };
 
     //! Constructor
@@ -71,6 +63,10 @@ class ComputeModifiedScalars
         // Calculate modified scalars
         Vars<data_t> out = modified_scalars(vars, d1, d2, h_UU);
 
+        /*This is for computing the norm of Chern Simons on a set domain
+        fixed by the coordinates x,y,z. Comment the bloew out if computing
+        the full evoliution of \phi with modified scalars*/
+        
         // Get the coordinates  
         const Coordinates<double> coords(current_cell, m_dx, m_center);
 
@@ -82,11 +78,6 @@ class ComputeModifiedScalars
         {
           out.starR_R = 0.0;
         }
-
-        DEBUG_OUT(x);
-        DEBUG_OUT(y);
-        DEBUG_OUT(z);
-        DEBUG_OUT(out.starR_R);
 
         store_vars(out, current_cell);
     }
@@ -132,20 +123,7 @@ class ComputeModifiedScalars
         }
 
         out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
-        // if (y>10.0 || z>10.0)
-        // {   
-        //     out.starR_R = 0.0;
-        // }
-        // else{
-        //     //Finally compute *RR
-        //     FOR4(i, j, k, l)
-        // {
-        //     out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
-        // }
-
-        // out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
-        // }
-        DEBUG_OUT(out.starR_R);
+      
         return out;
     }
 };

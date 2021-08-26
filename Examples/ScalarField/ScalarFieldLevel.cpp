@@ -35,6 +35,7 @@
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
 
+#include <cmath>
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -157,24 +158,31 @@ void ScalarFieldLevel::specificPostTimeStep()
         if (m_level ==0)
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-            double L2_ChernSimons = amr_reductions.norm(c_chernsimons, 1, true);
-            double L2_GaussBonnet = amr_reductions.norm(c_gaussbonnet, 1, true);
+            double norm_ChernSimons = amr_reductions.sum(c_chernsimons); //the volume-weighted sum (integral) of Chern Simons
+            double norm_GaussBonnet = amr_reductions.sum(c_gaussbonnet); //the volume-weighted sum (integral) of Gauss Bonnet
+
+            //volume of the domain
+	        double vol = amr_reductions.get_domain_volume();
+            DEBUG_OUT(vol);
+            //normalise over volume
+	        double GB_norm = abs(norm_GaussBonnet) / vol;
+	        double CS_norm = abs(norm_ChernSimons) / vol;
 
             if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
-            SmallDataIO scalars_file(m_p.data_path + "modified_scalars",
+            SmallDataIO scalars_file(m_p.data_path + "modified_scalars_norm",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             scalars_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    scalars_file.write_header_line({"L^2_ChernSimons", "L^2_GaussBonnet"});
+                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet"});
                 }
-            scalars_file.write_time_data_line({L2_ChernSimons, L2_GaussBonnet});
+            scalars_file.write_time_data_line({CS_norm, GB_norm});
 
-
-            double MaxChernSimons = amr_reductions.max(c_chernsimons);
-            double MaxGaussBonnet = amr_reductions.max(c_gaussbonnet);
+            //output max values of the scalars
+            double MaxChernSimons = amr_reductions.max(abs(c_chernsimons));
+            double MaxGaussBonnet = amr_reductions.max(abs(c_gaussbonnet));
             SmallDataIO max_file(m_p.data_path + "max_scalars",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
