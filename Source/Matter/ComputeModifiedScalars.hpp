@@ -17,6 +17,9 @@
 #include "Coordinates.hpp"
 #include "DebuggingTools.hpp"
 
+
+#include <cmath>
+
 //! This class computes Chern Simons and Gauss Bonnet scalars
 class ComputeModifiedScalars
 {
@@ -68,16 +71,16 @@ class ComputeModifiedScalars
         the full evoliution of \phi with modified scalars*/
         
         // Get the coordinates  
-        const Coordinates<double> coords(current_cell, m_dx, m_center);
+        // const Coordinates<double> coords(current_cell, m_dx, m_center);
 
-        const double x = coords.x;
-        const double y = coords.y;
-        const double z = coords.z;
+        // const double x = coords.x;
+        // const double y = coords.y;
+        // const double z = coords.z;
         
-        if (x>6.0 || y>6.0 ||z>6.0)
-        {
-          out.starR_R = 0.0;
-        }
+        // if (x>6.0 || y>6.0 ||z>6.0)
+        // {
+        //   out.starR_R = 0.0;
+        // }
 
         store_vars(out, current_cell);
     }
@@ -110,16 +113,12 @@ class ComputeModifiedScalars
 
         CCZ4GeometryModifiedGR ccz4mod;
 
-        // const data_t x = coords.x;
-        // const double y = coords.y;
-        // const double z = coords.z;
-
         const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
         const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
 
         FOR4(i, j, k, l)
         {
-            out.starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
+            out.starR_R = - 16.0 * vars.chi * vars.chi * h_UU[i][k] * h_UU[j][l] * B_ij[k][l] * E_ij[i][j];
         }
 
         out.RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
