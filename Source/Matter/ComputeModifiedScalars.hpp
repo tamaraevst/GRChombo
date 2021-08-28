@@ -70,12 +70,12 @@ class ComputeModifiedScalars
         fixed by the coordinates x,y,z. Comment the bloew out if computing
         the full evoliution of \phi with modified scalars*/
         
-        // Get the coordinates  
-        // const Coordinates<double> coords(current_cell, m_dx, m_center);
+        // s
+        const Coordinates<double> coords(current_cell, m_dx, m_center);
 
-        // const double x = coords.x;
-        // const double y = coords.y;
-        // const double z = coords.z;
+        const double x = coords.x;
+        const double y = coords.y;
+        const double z = coords.z;
         
         // if (x>6.0 || y>6.0 ||z>6.0)
         // {
