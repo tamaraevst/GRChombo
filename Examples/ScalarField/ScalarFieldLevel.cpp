@@ -205,8 +205,6 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.activate_extraction)
     {
         fillAllGhosts();
-        Potential potential(m_p.potential_params);
-        ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
                      m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),

@@ -36,7 +36,7 @@ class ChernSimonsExtraction : public SphericalExtraction
 
         if (m_params.write_extraction)
         {
-            write_extraction("ChernSimonsExtraction_");
+            write_extraction("ChernSimonsExtraction");
         }
     }
 };
