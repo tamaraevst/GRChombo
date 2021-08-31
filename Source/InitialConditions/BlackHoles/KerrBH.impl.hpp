@@ -61,7 +61,7 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     }
 
     // use a pre collapsed lapse, could also use analytic one
-    // vars.lapse = kerr_lapse;
+    //vars.lapse = kerr_lapse;
     vars.lapse = pow(vars.chi, 0.5);
 
     // Populate the variables on the grid

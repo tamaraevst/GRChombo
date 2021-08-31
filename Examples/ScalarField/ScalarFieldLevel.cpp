@@ -154,7 +154,7 @@ void ScalarFieldLevel::specificPostTimeStep()
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
-                     m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
+                     m_p.beta_amplitude),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
         if (m_level ==0)
         {
@@ -207,7 +207,7 @@ void ScalarFieldLevel::specificPostTimeStep()
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
-                     m_p.beta_amplitude, c_chernsimons, c_gaussbonnet),
+                     m_p.beta_amplitude),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)

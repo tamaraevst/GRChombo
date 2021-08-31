@@ -89,24 +89,11 @@ void ScalarField<potential_t>::add_matter_rhs(
     matter_rhs_excl_potential(total_rhs, vars, d1, d2, advec);
 
     // include modified GR scalars if their switches are on
-    CCZ4GeometryModifiedGR ccz4mod;
-
-    const auto E_ij = ccz4mod.compute_chern_simons_electric_term(vars, d1, d2, h_UU);
-    const auto B_ij = ccz4mod.compute_magnetic_term(vars, d1, d2, h_UU);
-
-    data_t starR_R;
-    data_t RGB;
-
-    //Finally compute *RR
-    FOR4(i, j, k, l)
-    {
-        starR_R = - 8.0 * vars.chi * vars.chi * h_UU[k][i] * h_UU[l][j] * B_ij[k][l] * E_ij[i][j];
-    }
-
-    RGB = ccz4mod.GB_scalar(vars, d1, d2, h_UU);
+    ModifiedScalarsGeometry mod_geom;
+    auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
  
     // add them to the RHS equation of phi
-    total_rhs.phi += m_gamma_amplitude * starR_R + m_beta_amplitude * RGB;
+    total_rhs.phi += m_gamma_amplitude * mod_scalars.CS_scalar + m_beta_amplitude * mod_scalars.GB_scalar;
 
     // set the potential values
     data_t V_of_phi = 0.0;

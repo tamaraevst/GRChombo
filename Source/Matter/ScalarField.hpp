@@ -7,7 +7,7 @@
 #define SCALARFIELD_HPP_
 
 #include "CCZ4Geometry.hpp"
-#include "CCZ4GeometryModifiedGR.hpp"
+#include "ModifiedScalarsGeometry.hpp"
 #include "DefaultPotential.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
