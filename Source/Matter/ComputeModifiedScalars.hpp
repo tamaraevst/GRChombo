@@ -57,21 +57,16 @@ class ComputeModifiedScalars
         ModifiedScalarsGeometry mod_geom;
         auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
 
-        /*This is for computing the norm of Chern Simons on a set domain
-        fixed by the coordinates x,y,z. Comment the bloew out if computing
-        the full evoliution of \phi with modified scalars*/
-        
-        // s
-        // const Coordinates<double> coords(current_cell, m_dx, m_center);
+        //for debugging
+        Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
-        // const double x = coords.x;
-        // const double y = coords.y;
-        // const double z = coords.z;
-        
-        // if (x>6.0 || y>6.0 ||z>6.0)
-        // {
-        //   out.starR_R = 0.0;
-        // }
+        data_t x = coords.x;
+        data_t y = coords.y;
+        data_t z = coords.z;
+
+        const data_t r = coords.get_radius();
+
+        DEBUG_OUT(r);
 
         current_cell.store_vars(mod_scalars.GB_scalar, c_gaussbonnet);
         current_cell.store_vars(mod_scalars.CS_scalar, c_chernsimons);
