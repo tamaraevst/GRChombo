@@ -28,6 +28,10 @@ class SimulationParameters : public SimulationParametersBase
 
     void read_params(GRParmParse &pp)
     {
+        // for regridding
+        pp.load("regrid_threshold_chi", regrid_threshold_chi);
+        pp.load("regrid_threshold_phi", regrid_threshold_phi);
+
         // Initial scalar field data
         initial_params.center =
             center; // already read in SimulationParametersBase
@@ -78,6 +82,9 @@ class SimulationParameters : public SimulationParametersBase
                 "should be within the computational domain");
         }
     }
+
+    // Problem specific parameters
+    Real regrid_threshold_chi, regrid_threshold_phi;
 
     // Initial data for matter and potential and BH
     double G_Newton;

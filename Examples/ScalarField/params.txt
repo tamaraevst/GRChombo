@@ -52,6 +52,11 @@ scalar_mass = 0.2
 kerr_mass = 1.0
 kerr_spin = 0.0
 
+# Regridding
+# Thresholds on the change across a cell which prompts regrid
+regrid_threshold_chi = 0.1
+regrid_threshold_phi = 0.01
+
 #################################################
 # Grid parameters
 
@@ -168,4 +173,5 @@ beta_amplitude = 1.0
 # min_chi = 1.e-4
 # min_lapse = 1.e-4
 
+activate_extraction = 1
 
