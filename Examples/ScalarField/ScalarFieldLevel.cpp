@@ -202,23 +202,23 @@ void ScalarFieldLevel::specificPostTimeStep()
         }
     }
 
-    if (m_p.activate_extraction)
-    {
-        fillAllGhosts();
-        BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
-                     m_p.gamma_amplitude, 
-                     m_p.beta_amplitude),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    // if (m_p.activate_extraction)
+    // {
+    //     fillAllGhosts();
+    //     BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
+    //                  m_p.gamma_amplitude, 
+    //                  m_p.beta_amplitude),
+    //                  m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
-        if (m_level == 0)
-        {
-            bool first_step = (m_dt == m_time);
-            ChernSimonsExtraction cs_extraction(
-                m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
-                c_chernsimons);
-            m_gr_amr.m_interpolator->refresh();
-            cs_extraction.execute_query(m_gr_amr.m_interpolator);
-        }
-    }
+    //     if (m_level == 0)
+    //     {
+    //         bool first_step = (m_dt == m_time);
+    //         ChernSimonsExtraction cs_extraction(
+    //             m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
+    //             c_chernsimons);
+    //         m_gr_amr.m_interpolator->refresh();
+    //         cs_extraction.execute_query(m_gr_amr.m_interpolator);
+    //     }
+    // }
 }
 

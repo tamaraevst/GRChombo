@@ -29,8 +29,8 @@ class SimulationParameters : public SimulationParametersBase
     void read_params(GRParmParse &pp)
     {
         // for regridding
-        pp.load("regrid_threshold_chi", regrid_threshold_chi);
-        pp.load("regrid_threshold_phi", regrid_threshold_phi);
+        // pp.load("regrid_threshold_chi", regrid_threshold_chi);
+        // pp.load("regrid_threshold_phi", regrid_threshold_phi);
 
         // Initial scalar field data
         initial_params.center =
@@ -45,6 +45,9 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("kerr_mass", kerr_params.mass, 1.0);
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
+
+        // whether to do extraction
+        pp.load("activate_extraction", activate_extraction, false);
 
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
@@ -96,6 +99,9 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
+
+    // do extraction?
+    // bool activate_extraction;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */
