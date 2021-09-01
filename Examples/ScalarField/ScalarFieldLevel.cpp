@@ -20,7 +20,7 @@
 #include "NewMatterConstraints.hpp"
 
 // For tag cells
-#include "ChiAndPhiTaggingCriterion.hpp"
+#include "FixedGridsTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ComputePack.hpp"
@@ -135,9 +135,9 @@ void ScalarFieldLevel::preTagCells()
 void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
-    BoxLoops::loop(ChiAndPhiTaggingCriterion(m_dx, m_p.regrid_threshold_chi,
-                                             m_p.regrid_threshold_phi),
-                   current_state, tagging_criterion);
+    BoxLoops::loop(
+        FixedGridsTaggingCriterion(m_dx, m_level, 2.0 * m_p.L, m_p.center),
+        current_state, tagging_criterion);
 }
 
 //Output norms of Gauss-Bonnet and Chern-Simons into file 

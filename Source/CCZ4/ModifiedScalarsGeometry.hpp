@@ -304,7 +304,7 @@ class ModifiedScalarsGeometry
 
         TensorAlgebra::make_trace_free(out.E, vars.h, h_UU);
 
-         TensorAlgebra::make_symmetric(out.B);
+        TensorAlgebra::make_symmetric(out.B);
 
         return out;
     }

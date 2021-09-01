@@ -58,15 +58,13 @@ class ComputeModifiedScalars
         auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
 
         //for debugging
-        Coordinates<data_t> coords(current_cell, m_dx, m_center);
+        // Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
-        data_t x = coords.x;
-        data_t y = coords.y;
-        data_t z = coords.z;
+        // data_t x = coords.x;
+        // data_t y = coords.y;
+        // data_t z = coords.z;
 
-        const data_t r = coords.get_radius();
-
-        DEBUG_OUT(r);
+        // const data_t r = coords.get_radius();
 
         current_cell.store_vars(mod_scalars.GB_scalar, c_gaussbonnet);
         current_cell.store_vars(mod_scalars.CS_scalar, c_chernsimons);
