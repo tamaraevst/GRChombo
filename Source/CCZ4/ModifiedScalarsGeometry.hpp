@@ -13,20 +13,21 @@
 
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
-class ModifiedScalarsGeometry
-{   
-    public:
 
-    /* The computation of E and B here is the same as in Weyl4 class implementation.
+/*The computation of E and B here is the same as in Weyl4 class implementation.
     This comes down to E and B being simplified to the same expressions as in the GR case. 
     Computation of this is shown in my note. Hence, we are indeed safe to use the same 
     expressions as in the Weyl4 class. While it is possible to inherit private functions of Weyl4 class, 
     I think it will make calling the class ComputeModifiedScalars using functions of this class
-    too cubersome in terms of arguments. Furthermore, we will be using these scalar in ScalatField.impl.hpp,
+    too cubersome in terms of arguments. Furthermore, we will be using these scalars in ScalatField,
     so I would like to keep these functions public. Perhaps I am missing some better structure of the code.
     In practice, if we choose to have non-GR evolution equations and constraints, this
     class will have to be changed along with definitons of E and B. This is also why, I would
-    like to leave these fucntions (which are geometrically significant to CS and GB decomposition) public */
+    like to leave these fucntions (which are geometrically significant to CS and GB decomposition) public*/
+
+class ModifiedScalarsGeometry
+{   
+    public:
 
     // Struct for the gravito electric and magnetic parts E and B
     template <class data_t> struct EBterms_t   
@@ -66,6 +67,8 @@ class ModifiedScalarsGeometry
             out.E[i][j] = 0.0;
             out.B[i][j] = 0.0;
         }
+    
+    }
     
     /* This function is for computing GB scalar */
     template <class data_t, template <typename> class vars_t, template <typename> class diff2_vars_t>

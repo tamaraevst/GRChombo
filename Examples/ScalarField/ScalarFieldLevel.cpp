@@ -193,8 +193,8 @@ void ScalarFieldLevel::specificPostTimeStep()
             AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
             //output norms
-            double NormAnalytic = amr_red_diag.norm(c_phianalytic);
-            double NormPhi = amr_red_ev.norm(c_phi);
+            double NormAnalytic = amr_red_diag.norm(c_phianalytic, 1, true);
+            double NormPhi = amr_red_ev.norm(c_phi, 1, true);
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);

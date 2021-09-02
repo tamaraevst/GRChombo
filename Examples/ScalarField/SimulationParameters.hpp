@@ -98,7 +98,7 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
-    bool compare_gb_analytic
+    bool compare_gb_analytic;
 
   
 };
