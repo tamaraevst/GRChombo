@@ -77,7 +77,7 @@ void ScalarFieldLevel::initialData()
 void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
-    DefaultPotential potential();
+    DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
@@ -98,7 +98,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
         a_soln, a_soln, INCLUDE_GHOST_CELLS);
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
-    DefaultPotential potential();
+    DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {
@@ -146,7 +146,7 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
-    DefaultPotential potential();
+    DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     if (!FilesystemTools::directory_exists(m_p.data_path))
