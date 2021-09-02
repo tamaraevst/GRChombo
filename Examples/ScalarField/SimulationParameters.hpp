@@ -83,7 +83,7 @@ class SimulationParameters : public SimulationParametersBase
                     (kerr_params.center[idir] <= (ivN[idir] + 1) * coarsest_dx),
                 "should be within the computational domain");
         }
-    }s
+    }
 
     // Initial data for matter and potential and BH
     double G_Newton;
