@@ -9,6 +9,7 @@
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "UserVariables.hpp"
+#include "ScalarField.hpp"
 
 class GBScalarAnalytic
 {
@@ -35,12 +36,20 @@ class GBScalarAnalytic
 
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
-        current_cell.store_vars(phi_analytic, c_phianalytic);
+        ScalarField<DefaultPotential>::Vars<data_t> scalar_vars;
+
+        data_t phi_numerical = scalar_vars.phi;
+
+        data_t phi_diff = phi_analytic - phi_numerical;
+
+        current_cell.store_vars(phi_diff, c_phianalytic);
     }
 
    protected:
     const double m_dx;
     const std::array<double, CH_SPACEDIM> m_center;
+    double m_gamma_amplitude;
+    double m_beta_amplitude;
 };
 
 #endif /* GBSCALARANALYTIC_HPP_ */

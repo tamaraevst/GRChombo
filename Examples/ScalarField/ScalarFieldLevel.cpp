@@ -194,16 +194,18 @@ void ScalarFieldLevel::specificPostTimeStep()
 
             //output norms
             double NormAnalytic = amr_red_diag.norm(c_phianalytic, 1, true);
-            double NormPhi = amr_red_ev.norm(c_phi, 1, true);
+            // double NormPhi = amr_red_ev.norm(c_phi, 1, true);
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    norm_phi_file.write_header_line({"Phi Norm", "Analytic Phi Norm"});
+                    // norm_phi_file.write_header_line({"Phi Norm", "Analytic Phi Norm"});
+                    norm_phi_file.write_header_line({"Phi Norm"});
                 }
-            norm_phi_file.write_time_data_line({NormPhi, NormAnalytic});
+            // norm_phi_file.write_time_data_line({NormPhi, NormAnalytic});
+            norm_phi_file.write_time_data_line({NormAnalytic});
         }
     }
 }
