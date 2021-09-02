@@ -10,17 +10,22 @@
 #include "Coordinates.hpp"
 #include "UserVariables.hpp"
 #include "ScalarField.hpp"
+#include "DefaultPotential.hpp"
 
 class GBScalarAnalytic
 {
   public:
-    GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx)
-        : m_dx(a_dx), m_center(a_center)
+    GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx, double a_gamma_amplitude,
+                double a_beta_amplitude)
+        : m_dx(a_dx), m_center(a_center), m_gamma_amplitude(a_gamma_amplitude),
+                m_beta_amplitude(a_beta_amplitude)
     {
     }
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
+        ScalarField<DefaultPotential> scalar_field(DefaultPotential(), m_gamma_amplitude, m_beta_amplitude);
+
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
         data_t x = coords.x;

@@ -9,7 +9,7 @@
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 // Problem specific includes
-#include "Potential.hpp"
+#include "DefaultPotential.hpp"
 #include "ScalarField.hpp"
 
 //!  A class for the evolution of a scalar field, minimally coupled to gravity
@@ -28,7 +28,7 @@ class ScalarFieldLevel : public GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
     // Typedef for scalar field
-    typedef ScalarField<Potential> ScalarFieldWithPotential;
+    typedef ScalarField<DefaultPotential> ScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
     virtual void specificAdvance();
@@ -57,7 +57,8 @@ class ScalarFieldLevel : public GRAMRLevel
                                          const FArrayBox &current_state);
 
     //! Things to do after a timestep on each level
-    virtual void specificPostTimeStep() override;
+    virtual void specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                       const double a_time);
 };
 
 #endif /* SCALARFIELDLEVEL_HPP_ */

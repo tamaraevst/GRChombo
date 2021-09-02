@@ -27,7 +27,7 @@
 #include "GammaCalculator.hpp"
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
-#include "Potential.hpp"
+#include "DefaultPotential.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
@@ -77,8 +77,8 @@ void ScalarFieldLevel::initialData()
 void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
-    Potential potential(m_p.potential_params);
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+    // Potential potential(m_p.potential_params);
+    ScalarFieldWithPotential scalar_field(DefaultPotential(), m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
         MatterConstraints<ScalarFieldWithPotential>(
@@ -98,8 +98,8 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
         a_soln, a_soln, INCLUDE_GHOST_CELLS);
 
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
-    Potential potential(m_p.potential_params);
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+    // Potential potential(m_p.potential_params);
+    ScalarFieldWithPotential scalar_field(DefaultPotential(), m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {
         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
@@ -142,11 +142,12 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 }
 
 //Output norms of Gauss-Bonnet and Chern-Simons into file 
-void ScalarFieldLevel::specificPostTimeStep()
+void ScalarFieldLevel::specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_rhs,
+                                       const double a_time)
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+    ScalarFieldWithPotential scalar_field(DefaultPotential(), m_p.gamma_amplitude, m_p.beta_amplitude);
     
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
@@ -184,8 +185,9 @@ void ScalarFieldLevel::specificPostTimeStep()
 
       if (m_p.compare_gb_analytic)
     {
+        ScalarFieldLevel::specificEvalRHS(a_soln, a_rhs, a_time);
         fillAllGhosts();
-        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.gamma_amplitude, m_p.beta_amplitude), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
