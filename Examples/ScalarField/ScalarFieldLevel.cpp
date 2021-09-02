@@ -31,6 +31,7 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
+#include "GBScalarAnalytic.hpp"
 #include "ChernSimonsExtraction.hpp"
 
 #include "SmallDataIO.hpp"
@@ -146,7 +147,7 @@ void ScalarFieldLevel::specificPostTimeStep()
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-    
+
     bool first_step = (m_time == 0.);
 
     if (m_p.calculate_scalar_norm)
@@ -156,6 +157,9 @@ void ScalarFieldLevel::specificPostTimeStep()
                      m_p.gamma_amplitude, 
                      m_p.beta_amplitude),
                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+
         if (m_level ==0)
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
@@ -175,32 +179,35 @@ void ScalarFieldLevel::specificPostTimeStep()
             scalars_file.write_time_data_line({CS_norm, GB_norm});
 
             //output max values of the scalars
-            double MaxChernSimons = amr_reductions.max(c_chernsimons);
+            double MaxAnalytic = amr_reductions.max(c_phianalytic);
             double MaxGaussBonnet = amr_reductions.max(c_gaussbonnet);
-            SmallDataIO max_file(m_p.data_path + "max_scalars",
+            SmallDataIO max_file(m_p.data_path + "max_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             max_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    max_file.write_header_line({"ChernSimonsMax", "GaussBonnetMax"});
+                    max_file.write_header_line({"AnalyticMax", "GaussBonnetMax"});
                 }
-            max_file.write_time_data_line({MaxChernSimons, MaxGaussBonnet});
+            max_file.write_time_data_line({MaxAnalytic, MaxGaussBonnet});
 
             //output max values of the scalars
-            double MinChernSimons = amr_reductions.min(c_chernsimons);
+            double MinAnalytic = amr_reductions.min(c_phianalytic);
             double MinGaussBonnet = amr_reductions.min(c_gaussbonnet);
-            SmallDataIO min_file(m_p.data_path + "min_scalars",
+            SmallDataIO min_file(m_p.data_path + "min_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             min_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    min_file.write_header_line({"ChernSimonsMax", "GaussBonnetMax"});
+                    min_file.write_header_line({"AnalyticMin", "GaussBonnetMin"});
                 }
-            min_file.write_time_data_line({MinChernSimons, MinGaussBonnet});
+            min_file.write_time_data_line({MinAnalytic, MinGaussBonnet});
+
+            
         }
     }
+
 
     // if (m_p.activate_extraction)
     // {
