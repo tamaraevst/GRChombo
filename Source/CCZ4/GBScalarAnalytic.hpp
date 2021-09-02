@@ -33,7 +33,7 @@ class GBScalarAnalytic
 
         data_t xx = (1.0 / M) * r * pow(1 + M / (2.0 * r), 2.0);
 
-        data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + 4.0 / 3.0 * 1.0 / (xx * xx * xx));
+        data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         current_cell.store_vars(phi_analytic, c_phianalytic);
     }

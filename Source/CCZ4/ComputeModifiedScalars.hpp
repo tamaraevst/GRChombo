@@ -21,10 +21,10 @@
 class ComputeModifiedScalars
 {
   public:
-    /// CCZ4 variables
+    /// BSSN variables
     template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
 
-    /// CCZ4 variables
+    /// BSSN variables
     template <class data_t>
     using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
 

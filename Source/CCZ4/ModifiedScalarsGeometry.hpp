@@ -67,6 +67,55 @@ class ModifiedScalarsGeometry
             out.E[i][j] = 0.0;
             out.B[i][j] = 0.0;
         }
+
+        Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
+        data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
+
+        FOR2(i, j)
+        {
+            K_tensor[i][j] = vars.A[i][j] / vars.chi +
+                         1. / 3. * (vars.h[i][j] * vars.K) / vars.chi;
+            FOR(k)
+            {
+                d1_K_tensor[i][j][k] = d1.A[i][j][k] / vars.chi -
+                                   d1.chi[k] / vars.chi * K_tensor[i][j] +
+                                   1. / 3. * d1.h[i][j][k] * vars.K / vars.chi +
+                                   1. / 3. * vars.h[i][j] * d1.K[k] / vars.chi;
+            }
+        }
+
+        // covariant derivative of K
+        FOR3(i, j, k)
+        {
+            covariant_deriv_K_tensor[i][j][k] = d1_K_tensor[i][j][k];
+
+            FOR(l)
+            {
+                covariant_deriv_K_tensor[i][j][k] +=
+                -chris_phys[l][k][i] * K_tensor[l][j] -
+                chris_phys[l][k][j] * K_tensor[i][l];
+            }
+        }
+
+        FOR2(i, j)
+        {
+            out.E[i][j] = ricci.LL[i][j] + vars.K * K_tensor[i][j];
+            
+            FOR2(k, l)
+            {
+                out.E[i][j] +=
+                     -K_tensor[i][k] * K_tensor[l][j] * h_UU[k][l] * vars.chi;
+
+                out.B[i][j] +=
+                epsilon3_LUU[i][k][l] * covariant_deriv_K_tensor[l][j][k];
+            }
+        }
+
+        make_trace_free(out.E, vars.h, h_UU);
+
+        make_symmetric(out.B);
+
+        return out;
     
     }
     

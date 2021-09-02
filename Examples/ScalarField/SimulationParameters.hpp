@@ -83,10 +83,7 @@ class SimulationParameters : public SimulationParametersBase
                     (kerr_params.center[idir] <= (ivN[idir] + 1) * coarsest_dx),
                 "should be within the computational domain");
         }
-    }
-
-    // Problem specific parameters
-    Real regrid_threshold_chi, regrid_threshold_phi;
+    }s
 
     // Initial data for matter and potential and BH
     double G_Newton;
@@ -99,8 +96,6 @@ class SimulationParameters : public SimulationParametersBase
     double beta_amplitude;
     bool calculate_scalar_norm;
     bool compare_gb_analytic;
-
-  
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */
