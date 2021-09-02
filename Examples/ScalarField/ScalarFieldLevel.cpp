@@ -125,6 +125,7 @@ void ScalarFieldLevel::specificUpdateODE(GRLevelData &a_soln,
 {
     // Enforce trace free A_ij
     BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
+    
 }
 
 void ScalarFieldLevel::preTagCells()
@@ -142,8 +143,7 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 }
 
 //Output norms of Gauss-Bonnet and Chern-Simons into file 
-void ScalarFieldLevel::specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_rhs,
-                                       const double a_time)
+void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
@@ -185,9 +185,8 @@ void ScalarFieldLevel::specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_
 
       if (m_p.compare_gb_analytic)
     {
-        ScalarFieldLevel::specificEvalRHS(a_soln, a_rhs, a_time);
         fillAllGhosts();
-        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.gamma_amplitude, m_p.beta_amplitude), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
@@ -195,19 +194,19 @@ void ScalarFieldLevel::specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_
             AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
             //output norms
-            double NormAnalytic = amr_red_diag.norm(c_phianalytic, 1, true);
+            double DiffWithAnalytic = amr_red_diag.norm(c_phinumerical - c_phianalytic, 1, true);
             // double NormPhi = amr_red_ev.norm(c_phi, 1, true);
-            SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
+            SmallDataIO norm_phi_file(m_p.data_path + "normdiff_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
                     // norm_phi_file.write_header_line({"Phi Norm", "Analytic Phi Norm"});
-                    norm_phi_file.write_header_line({"Phi Norm"});
+                    norm_phi_file.write_header_line({"Phi Error Norm"});
                 }
             // norm_phi_file.write_time_data_line({NormPhi, NormAnalytic});
-            norm_phi_file.write_time_data_line({NormAnalytic});
+            norm_phi_file.write_time_data_line({DiffWithAnalytic});
         }
     }
 }

@@ -57,8 +57,7 @@ class ScalarFieldLevel : public GRAMRLevel
                                          const FArrayBox &current_state);
 
     //! Things to do after a timestep on each level
-    virtual void specificPostTimeStep(GRLevelData &a_soln, GRLevelData &a_rhs,
-                                       const double a_time);
+    virtual void specificPostTimeStep() override;
 };
 
 #endif /* SCALARFIELDLEVEL_HPP_ */

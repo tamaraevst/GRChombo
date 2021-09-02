@@ -15,16 +15,13 @@
 class GBScalarAnalytic
 {
   public:
-    GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx, double a_gamma_amplitude,
-                double a_beta_amplitude)
-        : m_dx(a_dx), m_center(a_center), m_gamma_amplitude(a_gamma_amplitude),
-                m_beta_amplitude(a_beta_amplitude)
+    GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx)
+        : m_dx(a_dx), m_center(a_center)
     {
     }
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
-        ScalarField<DefaultPotential> scalar_field(DefaultPotential(), m_gamma_amplitude, m_beta_amplitude);
 
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
@@ -41,20 +38,12 @@ class GBScalarAnalytic
 
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
-        ScalarField<DefaultPotential>::Vars<data_t> scalar_vars;
-
-        data_t phi_numerical = scalar_vars.phi;
-
-        data_t phi_diff = phi_analytic - phi_numerical;
-
-        current_cell.store_vars(phi_diff, c_phianalytic);
+        current_cell.store_vars(phi_analytic, c_phianalytic);
     }
 
    protected:
     const double m_dx;
     const std::array<double, CH_SPACEDIM> m_center;
-    double m_gamma_amplitude;
-    double m_beta_amplitude;
 };
 
 #endif /* GBSCALARANALYTIC_HPP_ */
