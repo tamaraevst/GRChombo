@@ -32,12 +32,11 @@
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
 #include "GBScalarAnalytic.hpp"
-#include "ChernSimonsExtraction.hpp"
 
+// For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
 
-#include <cmath>
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -118,47 +117,6 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                            m_p.formulation, m_p.G_Newton);
         BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
     }
-
-    if (m_p.calculate_scalar_norm)
-    {
-        fillAllGhosts();
-
-        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-
-        bool first_step = (m_time == 0.);
-
-        if (m_level ==0)
-        {
-            AMRReductions<VariableType::evolution> amr_reductions(m_gr_amr);
-            if (!FilesystemTools::directory_exists(m_p.data_path))
-            FilesystemTools::mkdir_recursive(m_p.data_path);
-
-            double MaxAnalytic = amr_reductions.max(c_phianalytic);
-            double MaxPhi = amr_reductions.max(c_phi);
-            SmallDataIO max_phi_file(m_p.data_path + "max_phi_values",
-                                         m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
-            max_phi_file.remove_duplicate_time_data();
-            if (first_step)
-                {
-                    max_phi_file.write_header_line({"PhiMax", "AnalyticPhiMax"});
-                }
-            max_phi_file.write_time_data_line({MaxPhi, MaxAnalytic});
-
-            double MinAnalytic = amr_reductions.min(c_phianalytic);
-            double MinPhi = amr_reductions.min(c_phi);
-            SmallDataIO min_phi_file(m_p.data_path + "min_phi_values",
-                                         m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
-            min_phi_file.remove_duplicate_time_data();
-            if (first_step)
-                {
-                    min_phi_file.write_header_line({"PhiMin", "AnalyticPhiMin"});
-                }
-            min_phi_file.write_time_data_line({MinPhi, MinAnalytic});
-
-        }
-    }
 }
 
 // Things to do at ODE update, after soln + rhs
@@ -189,8 +147,12 @@ void ScalarFieldLevel::specificPostTimeStep()
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
     Potential potential(m_p.potential_params);
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-        
-    bool first_step = (m_time == 0.);
+    
+    if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+
+    // bool first_step = (m_time == 0.);
+    bool first_step = (m_time == m_dt); // if not called in Main
 
     if (m_p.calculate_scalar_norm)
     {
@@ -220,24 +182,29 @@ void ScalarFieldLevel::specificPostTimeStep()
         }
     }
 
+      if (m_p.compare_gb_analytic)
+    {
+        fillAllGhosts();
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
-    // if (m_p.activate_extraction)
-    // {
-    //     fillAllGhosts();
-    //     BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
-    //                  m_p.gamma_amplitude, 
-    //                  m_p.beta_amplitude),
-    //                  m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        if (m_level == 0)
+        {
+            AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
+            AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
-    //     if (m_level == 0)
-    //     {
-    //         bool first_step = (m_dt == m_time);
-    //         ChernSimonsExtraction cs_extraction(
-    //             m_p.extraction_params, m_dt, m_time, first_step, m_restart_time,
-    //             c_chernsimons);
-    //         m_gr_amr.m_interpolator->refresh();
-    //         cs_extraction.execute_query(m_gr_amr.m_interpolator);
-    //     }
-    // }
+            //output norms
+            double NormAnalytic = amr_red_diag.norm(c_phianalytic);
+            double NormPhi = amr_red_ev.norm(c_phi);
+            SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_phi_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_phi_file.write_header_line({"Phi Norm", "Analytic Phi Norm"});
+                }
+            norm_phi_file.write_time_data_line({NormPhi, NormAnalytic});
+        }
+    }
 }
 

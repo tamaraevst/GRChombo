@@ -28,10 +28,6 @@ class SimulationParameters : public SimulationParametersBase
 
     void read_params(GRParmParse &pp)
     {
-        // for regridding
-        // pp.load("regrid_threshold_chi", regrid_threshold_chi);
-        // pp.load("regrid_threshold_phi", regrid_threshold_phi);
-
         // Initial scalar field data
         initial_params.center =
             center; // already read in SimulationParametersBase
@@ -51,6 +47,9 @@ class SimulationParameters : public SimulationParametersBase
 
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
+
+        // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
+        pp.load("compare_gb_analytic", compare_gb_analytic, false);
 
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
@@ -99,9 +98,9 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     bool calculate_scalar_norm;
+    bool compare_gb_analytic
 
-    // do extraction?
-    // bool activate_extraction;
+  
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

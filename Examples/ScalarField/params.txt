@@ -52,11 +52,6 @@ scalar_mass = 0.2
 kerr_mass = 1.0
 kerr_spin = 0.0
 
-# Regridding
-# Thresholds on the change across a cell which prompts regrid
-regrid_threshold_chi = 0.1
-regrid_threshold_phi = 0.01
-
 #################################################
 # Grid parameters
 
@@ -117,7 +112,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 1 2 3          #Theta and Gamma
                          0 1 2 3 1 2 3    #lapse shift and B
                          0 0              #phi and Pi
-vars_parity_diagnostic = 0 1 8 8          #Ham and Mom
+vars_parity_diagnostic = 0 1 8 8 8        #Ham Mom ChernSimons GaussBonnet PhiAnalytic
 
 # if sommerfeld boundaries selected, must select
 # non zero asymptotic values
@@ -166,6 +161,9 @@ sigma = 0.3
 # switch for outputting CS and GB
 calculate_scalar_norm = 1
 
+# compare GB scalar with analytic solution? (only for Schwarzschild)
+compare_gb_analytic = 1
+
 # amplitudes
 gamma_amplitude = 1.0
 beta_amplitude = 1.0
@@ -173,5 +171,4 @@ beta_amplitude = 1.0
 # min_chi = 1.e-4
 # min_lapse = 1.e-4
 
-activate_extraction = 1
 
