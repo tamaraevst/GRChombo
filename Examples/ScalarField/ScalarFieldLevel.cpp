@@ -33,6 +33,9 @@
 #include "ComputeModifiedScalars.hpp"
 #include "GBScalarAnalytic.hpp"
 
+#include "DebuggingTools.hpp"
+#include <iostream>
+
 // For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
@@ -117,6 +120,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
                            m_p.formulation, m_p.G_Newton);
         BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
     }
+
 }
 
 // Things to do at ODE update, after soln + rhs
@@ -152,8 +156,10 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
-    // bool first_step = (m_time == 0.);
-    bool first_step = (m_time == m_dt); // if not called in Main
+   bool first_step =
+        (m_time == 0.); // this form is used when 'specificPostTimeStep' was
+                        // called during setup at t=0 from Main
+    // bool first_step = (m_time == m_dt); // if not called in Main
 
     if (m_p.calculate_scalar_norm)
     {
@@ -188,25 +194,45 @@ void ScalarFieldLevel::specificPostTimeStep()
         fillAllGhosts();
         BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
+        IntVect iv;
+        iv[0] = 0;
+        iv[1] = 0;
+        iv[2] = 0;
+
+        Coordinates<double> coords(iv, m_dx);
+        const double x = coords.x;
+        const double y = coords.y;
+        const double z = coords.z;
+        const double r = coords.get_radius();
+
+        SmallDataIO numeric_phi_file(m_p.data_path + "numeric_phi_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            numeric_phi_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    numeric_phi_file.write_header_line({"Phi"});
+                }
+            numeric_phi_file.write_data_line({c_phinumerical}, r);
+
         if (m_level == 0)
         {
             AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
             AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
             //output norms
-            double DiffWithAnalytic = amr_red_diag.norm(c_phinumerical - c_phianalytic, 1, true);
-            // double NormPhi = amr_red_ev.norm(c_phi, 1, true);
-            SmallDataIO norm_phi_file(m_p.data_path + "normdiff_phi_values",
+            double NormNumericPhi = amr_red_diag.norm(c_phianalytic, 1, true);
+            double NormAnalyticPhi = amr_red_ev.norm(c_phi, 1, true);
+
+            SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    // norm_phi_file.write_header_line({"Phi Norm", "Analytic Phi Norm"});
-                    norm_phi_file.write_header_line({"Phi Error Norm"});
+                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
                 }
-            // norm_phi_file.write_time_data_line({NormPhi, NormAnalytic});
-            norm_phi_file.write_time_data_line({DiffWithAnalytic});
+            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
         }
     }
 }

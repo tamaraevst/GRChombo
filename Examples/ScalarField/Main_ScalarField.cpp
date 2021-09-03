@@ -13,6 +13,7 @@
 #include "DefaultLevelFactory.hpp"
 #include "GRAMR.hpp"
 #include "GRParmParse.hpp"
+#include "MultiLevelTask.hpp"
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
 
@@ -46,6 +47,9 @@ int runGRChombo(int argc, char *argv[])
         if (level->time() == 0.)
             level->specificPostTimeStep();
     };
+
+    MultiLevelTaskPtr<> call_task(task);
+    call_task.execute(gr_amr);
 
     // Engage! Run the evolution
     gr_amr.run(sim_params.stop_time, sim_params.max_steps);
