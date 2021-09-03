@@ -195,35 +195,24 @@ void ScalarFieldLevel::specificPostTimeStep()
         fillAllGhosts();
         BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
-        IntVect iv;
-        iv[0] = 0;
-        iv[1] = 0;
-        iv[2] = 0;
-
-        Coordinates<double> coords(iv, m_dx);
-        const double x = coords.x;
-        const double y = coords.y;
-        const double z = coords.z;
-        const double r = coords.get_radius();
-
-        SmallDataIO numeric_phi_file(m_p.data_path + "numeric_phi_values",
-                                         m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
-        numeric_phi_file.remove_duplicate_time_data();
-        if (first_step)
-            {
-                numeric_phi_file.write_header_line({"Phi"});
-            }
-        numeric_phi_file.write_data_line({c_phi}, r);
-
         if (m_level == 0)
         {
+            SmallDataIO numeric_phi_file(m_p.data_path + "numeric_phi_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            numeric_phi_file.remove_duplicate_time_data();
+            if (first_step)
+             {
+                    numeric_phi_file.write_header_line({"Phi"});
+             }
+            numeric_phi_file.write_data_line({c_phi}, {c_radius});
+
             AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
             AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
             //output norms
-            double NormNumericPhi = amr_red_diag.norm(c_phianalytic, 1, true);
-            double NormAnalyticPhi = amr_red_ev.norm(c_phi, 1, true);
+            double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
+            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,

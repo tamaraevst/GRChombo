@@ -25,10 +25,6 @@ class GBScalarAnalytic
 
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
-        data_t x = coords.x;
-        data_t y = coords.y;
-        data_t z = coords.z;
-
         const data_t r = coords.get_radius();
 
         double M = 1.0;
@@ -39,6 +35,7 @@ class GBScalarAnalytic
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         current_cell.store_vars(phi_analytic, c_phianalytic);
+        current_cell.store_vars(r, c_radius);
     }
 
    protected:
