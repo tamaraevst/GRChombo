@@ -34,6 +34,7 @@
 #include "GBScalarAnalytic.hpp"
 
 #include "DebuggingTools.hpp"
+#include "Coordinates.hpp"
 #include <iostream>
 
 // For post processing
@@ -208,12 +209,12 @@ void ScalarFieldLevel::specificPostTimeStep()
         SmallDataIO numeric_phi_file(m_p.data_path + "numeric_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
-            numeric_phi_file.remove_duplicate_time_data();
-            if (first_step)
-                {
-                    numeric_phi_file.write_header_line({"Phi"});
-                }
-            numeric_phi_file.write_data_line({c_phinumerical}, r);
+        numeric_phi_file.remove_duplicate_time_data();
+        if (first_step)
+            {
+                numeric_phi_file.write_header_line({"Phi"});
+            }
+        numeric_phi_file.write_data_line({c_phi}, r);
 
         if (m_level == 0)
         {

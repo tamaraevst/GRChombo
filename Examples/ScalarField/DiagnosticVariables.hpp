@@ -17,10 +17,6 @@ enum
 
     c_gaussbonnet,
 
-    c_phianalytic,
-
-    c_phinumerical,
-
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -35,10 +31,6 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     
     "GaussBonnet",
 
-    "PhiAnalytic",
-
-    "PhiNumerical"
-    
     };
 }
 

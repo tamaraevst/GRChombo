@@ -62,7 +62,6 @@ template <class potential_t = DefaultPotential> class ScalarField
         {
             VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
             VarsTools::define_enum_mapping(mapping_function, c_Pi, Pi);
-            VarsTools::define_enum_mapping(mapping_function, c_phinumerical, phi);
         }
     };
 
