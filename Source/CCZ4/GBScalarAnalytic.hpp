@@ -9,8 +9,6 @@
 #include "Cell.hpp"
 #include "Coordinates.hpp"
 #include "UserVariables.hpp"
-#include "ScalarField.hpp"
-#include "DefaultPotential.hpp"
 
 class GBScalarAnalytic
 {
@@ -35,7 +33,6 @@ class GBScalarAnalytic
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         current_cell.store_vars(phi_analytic, c_phianalytic);
-        current_cell.store_vars(r, c_radius);
     }
 
    protected:

@@ -8,6 +8,7 @@
 
 #include "Cell.hpp"
 #include "CoordinateTransformations.hpp"
+#include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "BSSNVars.hpp"

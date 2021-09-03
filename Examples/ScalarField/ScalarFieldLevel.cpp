@@ -204,18 +204,16 @@ void ScalarFieldLevel::specificPostTimeStep()
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
-            double MaxR = amr_red_diag.max(c_radius);
-            double MinR = amr_red_diag.min(c_radius);
-
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm", "MinR", "MaxR"});
+                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
                 }
-            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi, MinR, MaxR});
+            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
+
         }
     }
 }
