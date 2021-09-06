@@ -24,21 +24,13 @@ class GBScalarAnalytic
 
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
-        Tensor<2, data_t> spherical_g;
-
-        compute_PL_metric(spherical_g, coords);
-
-        data_t area_element = CoordinateTransformations::area_element_sphere(spherical_g);
-
-        data_t ar_radius = area_element / (4 * M_PI);
-
-        data_t areal_radius = pow(ar_radius, 0.5);
+        data_t r = coords.get_radius();
         
         double M = 1.0;
 
         double beta = 1.0;
 
-        data_t xx = areal_radius / M;
+        data_t xx = r / M;
 
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
