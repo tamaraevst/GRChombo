@@ -71,7 +71,7 @@ class ModifiedScalarsGeometry
         Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
         data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
 
-        FOR2(i, j)
+        FOR(i, j)
         {
             K_tensor[i][j] = vars.A[i][j] / vars.chi +
                          1. / 3. * (vars.h[i][j] * vars.K) / vars.chi;
@@ -85,7 +85,7 @@ class ModifiedScalarsGeometry
         }
 
         // covariant derivative of K
-        FOR3(i, j, k)
+        FOR(i, j, k)
         {
             covariant_deriv_K_tensor[i][j][k] = d1_K_tensor[i][j][k];
 
@@ -97,11 +97,11 @@ class ModifiedScalarsGeometry
             }
         }
 
-        FOR2(i, j)
+        FOR(i, j)
         {
             out.E[i][j] = ricci.LL[i][j] + vars.K * K_tensor[i][j];
             
-            FOR2(k, l)
+            FOR(k, l)
             {
                 out.E[i][j] +=
                      -K_tensor[i][k] * K_tensor[l][j] * h_UU[k][l] * vars.chi;
@@ -130,18 +130,15 @@ class ModifiedScalarsGeometry
 
         modified_scalars_t<data_t> out;
 
-        out.GB_scalar = 0.0;
-        out.CS_scalar = 0.0;
-
         const auto epsilon3_LUU = compute_epsilon3_LUU(vars, h_UU);
 
         auto ebterms = compute_EB_terms(vars, d1, d2, epsilon3_LUU, h_UU, chris);
         Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
         data_t tr_A2 = compute_trace(vars.A, A_UU);
 
-        FOR4(k, l, m , n)
+        FOR(k, l, m , n)
         {
-            out.GB_scalar += 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * 
+            out.GB_scalar = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * 
                         (ebterms.E[k][l] - (1.0)/(3.0 * vars.chi) * vars.h[k][l] * tr_A2) - 
                         8.0 * (vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.B[m][n] * ebterms.B[k][l]);
 
@@ -159,7 +156,7 @@ compute_epsilon3_LUU(const vars_t<data_t> &vars,
         // raised normal vector, NB index 3 is time
         data_t n_U[4];
         n_U[3] = 1. / vars.lapse;
-        FOR1(i) { n_U[i] = -vars.shift[i] / vars.lapse; }
+        FOR(i) { n_U[i] = -vars.shift[i] / vars.lapse; }
 
         // 4D levi civita symbol and 3D levi civita tensor in LLL and LUU form
         const auto epsilon4 = TensorAlgebra::epsilon4D();
@@ -168,14 +165,14 @@ compute_epsilon3_LUU(const vars_t<data_t> &vars,
 
         // Projection of antisymmentric Tensor onto hypersurface - see 8.3.17,
         // Alcubierre
-        FOR3(i, j, k)
+        FOR(i, j, k)
         {
             epsilon3_LLL[i][j][k] = 0.0;
             epsilon3_LUU[i][j][k] = 0.0;
         }
         // projection of 4-antisymetric tensor to 3-tensor on hypersurface
         // note last index contracted as per footnote 86 pg 290 Alcubierre
-        FOR3(i, j, k)
+        FOR(i, j, k)
         {
             for (int l = 0; l < 4; ++l)
             {
@@ -184,9 +181,9 @@ compute_epsilon3_LUU(const vars_t<data_t> &vars,
             }
         }
     // rasing indices
-        FOR3(i, j, k)
+        FOR(i, j, k)
         {
-            FOR2(m, n)
+            FOR(m, n)
             {
                 epsilon3_LUU[i][j][k] += epsilon3_LLL[i][m][n] * h_UU[m][j] *
                                         vars.chi * h_UU[n][k] * vars.chi;

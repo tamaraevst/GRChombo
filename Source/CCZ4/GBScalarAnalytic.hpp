@@ -41,7 +41,7 @@ class GBScalarAnalytic
     const double m_dx;
     const std::array<double, CH_SPACEDIM> m_center;
 
-    template <class data_t> void compute_PL_metric(Tensor<2, data_t> &spherical_g, 
+    template <class data_t> void compute_PG_metric(Tensor<2, data_t> &spherical_g, 
                                         const Coordinates<data_t> coords) const
     {
         // work out where we are on the grid
