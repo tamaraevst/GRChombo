@@ -19,10 +19,6 @@ class GBScalarAnalytic
   public:
     /// BSSN variables
     template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
-
-    /// BSSN variables
-    template <class data_t>
-    using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
     
     GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx)
         : m_dx(a_dx), m_center(a_center)
@@ -38,14 +34,14 @@ class GBScalarAnalytic
         double beta = 1.0;
         
         //For PG coordinates
-        // data_t r = vars.chi * coords.get_radius();
-        // data_t xx = r / M;
-        // data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
+        data_t r = (1.0 / vars.chi) * coords.get_radius();
+        data_t xx = r / M;
+        data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         //For isotropic coordinates
-        data_t r = vars.chi * coords.get_radius();
-        data_t xx = (1 + M / (2.0 * r)) * r / M;
-        data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
+        // data_t r = vars.chi * coords.get_radius();
+        // data_t xx = (1 + M / (2.0 * r)) * r / M;
+        // data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         current_cell.store_vars(phi_analytic, c_phianalytic);
     }

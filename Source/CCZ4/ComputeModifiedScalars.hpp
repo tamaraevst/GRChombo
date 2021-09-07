@@ -26,8 +26,10 @@ class ComputeModifiedScalars
     template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
 
     /// BSSN variables
-    template <class data_t>
-    using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
+     template <class data_t>
+    using Diff2Vars = ADMConformalVars::Diff2VarsNoGauge<data_t>;
+    // template <class data_t>
+    // using Diff2Vars = BSSNVars::Diff2VarsWithGauge<data_t>;
 
     //! Constructor
     ComputeModifiedScalars(const std::array<double, CH_SPACEDIM> a_center,
