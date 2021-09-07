@@ -138,9 +138,8 @@ class ModifiedScalarsGeometry
 
         FOR(k, l, m , n)
         {
-            out.GB_scalar = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * 
-                        (ebterms.E[k][l] - (1.0)/(3.0 * vars.chi) * vars.h[k][l] * tr_A2) - 
-                        8.0 * (vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.B[m][n] * ebterms.B[k][l]);
+            out.GB_scalar = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * ebterms.E[k][l] - 
+                            8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.B[m][n] * ebterms.B[k][l];
 
             out.CS_scalar = - 16.0 * vars.chi * vars.chi * h_UU[m][k] * h_UU[n][l] * ebterms.B[k][l] * ebterms.E[m][n];
         }
