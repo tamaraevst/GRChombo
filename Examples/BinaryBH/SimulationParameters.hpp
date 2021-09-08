@@ -13,6 +13,7 @@
 // Problem specific includes:
 #include "ArrayTools.hpp"
 #include "BoostedBH.hpp"
+// #include "Potential.hpp"
 #ifdef USE_TWOPUNCTURES
 #include "TP_Parameters.hpp"
 #endif
@@ -204,6 +205,20 @@ class SimulationParameters : public SimulationParametersBase
             bh1_params.center[idir] = centerA[idir] + offsetA[idir];
             bh2_params.center[idir] = centerB[idir] + offsetB[idir];
         }
+        // Do we want Weyl extraction and puncture tracking?
+        pp.load("activate_extraction", activate_extraction, false);
+        pp.load("track_punctures", track_punctures, false);
+        pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
+
+        // for scalar
+        pp.load("G_Newton", G_Newton, 1.0);
+        pp.load("amplitude_scalar", amplitude_scalar);
+         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
+        they are \gamma'(0) and \beta'(0) for the scalars respectively.
+        Set them to zero if you do not want the corresponding scalar included. */
+        pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
+        pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
+        // pp.load("scalar_mass", potential_params.scalar_mass);
     }
 #endif /* USE_TWOPUNCTURES */
 
@@ -296,6 +311,7 @@ class SimulationParameters : public SimulationParametersBase
     }
 
     bool track_punctures, calculate_constraint_norms;
+    bool activate_extraction;
     int puncture_tracking_level;
 
     // Collection of parameters necessary for initial conditions
@@ -303,6 +319,14 @@ class SimulationParameters : public SimulationParametersBase
     // e.g. for puncture tracking/tagging
     BoostedBH::params_t bh2_params;
     BoostedBH::params_t bh1_params;
+
+     // Initial data for matter and potential
+    double G_Newton;
+    double amplitude_scalar;
+    //Parameters for modified scalar field equation 
+    double gamma_amplitude;
+    double beta_amplitude;
+    // Potential::params_t potential_params;
 
 #ifdef USE_TWOPUNCTURES
     double tp_offset_plus, tp_offset_minus;

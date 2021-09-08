@@ -1,34 +1,34 @@
+
 /* GRChombo
  * Copyright 2012 The GRChombo collaboration.
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
 #include "BinaryBHLevel.hpp"
-#include "AMRReductions.hpp"
 #include "BinaryBH.hpp"
 #include "BoxLoops.hpp"
-#include "CCZ4RHS.hpp"
 #include "ChiExtractionTaggingCriterion.hpp"
 #include "ChiPunctureExtractionTaggingCriterion.hpp"
 #include "ComputePack.hpp"
+#include "MatterCCZ4RHS.hpp"
+#include "NewMatterConstraints.hpp"
 #include "NanCheck.hpp"
-#include "NewConstraints.hpp"
 #include "PositiveChiAndAlpha.hpp"
+#include "DefaultPotential.hpp"
 #include "PunctureTracker.hpp"
+#include "ScalarField.hpp"
 #include "SetValue.hpp"
-#include "SixthOrderDerivatives.hpp"
-#include "SmallDataIO.hpp"
 #include "TraceARemoval.hpp"
-#include "TwoPuncturesInitialData.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
+#include "AMRReductions.hpp"
 
 // Things to do during the advance step after RK4 steps
 void BinaryBHLevel::specificAdvance()
 {
     // Enforce the trace free A_ij condition and positive chi and alpha
     BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
+                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
 
     // Check for nan's
     if (m_p.nan_check)
@@ -53,10 +53,13 @@ void BinaryBHLevel::initialData()
     // Set up the compute class for the BinaryBH initial data
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
 
-    // First set everything to zero (to avoid undefinded values in constraints)
+    // set the value of phi - constant over the grid
+    SetValue set_phi(m_p.amplitude_scalar, Interval(c_phi, c_phi));
+
+    // First set everything to zero (to avoid undefinded values)
     // then calculate initial data
-    BoxLoops::loop(make_compute_pack(SetValue(0.), binary), m_state_new,
-                   m_state_new, INCLUDE_GHOST_CELLS);
+    BoxLoops::loop(make_compute_pack(SetValue(0.), set_phi, binary),
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 #endif
 }
 
@@ -66,21 +69,15 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 {
     // Enforce positive chi and alpha and trace free A
     BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
-                   a_soln, a_soln, INCLUDE_GHOST_CELLS);
+                   a_soln, a_soln, EXCLUDE_GHOST_CELLS);
 
     // Calculate CCZ4 right hand side
-    if (m_p.max_spatial_derivative_order == 4)
-    {
-        BoxLoops::loop(CCZ4RHS<MovingPunctureGauge, FourthOrderDerivatives>(
-                           m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
-                       a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-    }
-    else if (m_p.max_spatial_derivative_order == 6)
-    {
-        BoxLoops::loop(CCZ4RHS<MovingPunctureGauge, SixthOrderDerivatives>(
-                           m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation),
-                       a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-    }
+    DefaultPotential potential;
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+    MatterCCZ4RHS<ScalarFieldWithPotential> my_ccz4_matter(
+        scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
+        m_p.G_Newton);
+    BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
 }
 
 // enforce trace removal during RK4 substeps
@@ -88,14 +85,14 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
                                       const GRLevelData &a_rhs, Real a_dt)
 {
     // Enforce the trace free A_ij condition
-    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
+    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, EXCLUDE_GHOST_CELLS);
 }
 
-void BinaryBHLevel::preTagCells()
-{
-    // We only use chi in the tagging criterion so only fill the ghosts for chi
-    fillAllGhosts(VariableType::evolution, Interval(c_chi, c_chi));
-}
+// void BinaryBHLevel::preTagCells()
+// {
+//     // We only use chi in the tagging criterion so only fill the ghosts for chi
+//     fillAllGhosts(VariableType::evolution, Interval(c_chi, c_chi));
+// }
 
 // specify the cells to tag
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
@@ -113,6 +110,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 #endif /* USE_TWOPUNCTURES */
         auto puncture_coords =
             m_bh_amr.m_puncture_tracker.get_puncture_coords();
+        const bool activate_extraction = true;
         BoxLoops::loop(ChiPunctureExtractionTaggingCriterion(
                            m_dx, m_level, m_p.max_level, m_p.extraction_params,
                            puncture_coords, m_p.activate_extraction,
@@ -168,28 +166,6 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-    if (m_p.calculate_constraint_norms)
-    {
-        fillAllGhosts();
-        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)),
-                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-        if (m_level == 0)
-        {
-            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-            double L2_Ham = amr_reductions.norm(c_Ham);
-            double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3));
-            SmallDataIO constraints_file(m_p.data_path + "constraint_norms",
-                                         m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
-            constraints_file.remove_duplicate_time_data();
-            if (first_step)
-            {
-                constraints_file.write_header_line({"L^2_Ham", "L^2_Mom"});
-            }
-            constraints_file.write_time_data_line({L2_Ham, L2_Mom});
-        }
-    }
-
     // do puncture tracking on requested level
     if (m_p.track_punctures && m_level == m_p.puncture_tracking_level)
     {
@@ -206,14 +182,12 @@ void BinaryBHLevel::specificPostTimeStep()
 // Things to do before a plot level - need to calculate the Weyl scalars
 void BinaryBHLevel::prePlotLevel()
 {
+    // Populate constraints
     fillAllGhosts();
-    if (m_p.activate_extraction == 1)
-    {
-        BoxLoops::loop(
-            make_compute_pack(
-                Weyl4(m_p.extraction_params.center, m_dx, m_p.formulation),
-                Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
-            m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-    }
+    DefaultPotential potential;
+    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+    BoxLoops::loop(MatterConstraints<ScalarFieldWithPotential>(
+                       scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom1, c_Mom3)),
+                   m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif /* CH_USE_HDF5 */
