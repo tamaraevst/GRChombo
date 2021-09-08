@@ -34,11 +34,14 @@ class ModifiedScalarsGeometry
     {
         Tensor<2, data_t> E; // gravito-electric part
         Tensor<2, data_t> B; // gravito-magnetic part
+
+        Tensor<2, data_t> B_UU; // gravito-magnetic part
     };
 
     template <class data_t> struct modified_scalars_t
     {
-        data_t GB_scalar;
+        data_t GB_scalar_1;
+        data_t GB_scalar_2;
         data_t CS_scalar;
     };
 
@@ -57,6 +60,10 @@ class ModifiedScalarsGeometry
         Tensor<3, data_t> d1_K_tensor;
         Tensor<3, data_t> covariant_deriv_K_tensor;
 
+        Tensor<2, data_t> K_tensor_UU;
+        Tensor<3, data_t> d1_K_tensor_UU;
+        Tensor<3, data_t> covariant_deriv_K_tensor_UU;
+
         const Tensor<3, data_t> chris_phys =
         compute_phys_chris(d1.chi, vars.chi, vars.h, h_UU, chris.ULL);
         Tensor<1, data_t> Z0 = 0.0;
@@ -66,6 +73,8 @@ class ModifiedScalarsGeometry
         {
             out.E[i][j] = 0.0;
             out.B[i][j] = 0.0;
+
+            out.B_UU[i][j] = 0.0;
         }
 
         Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
@@ -75,12 +84,20 @@ class ModifiedScalarsGeometry
         {
             K_tensor[i][j] = vars.A[i][j] / vars.chi +
                          1. / 3. * (vars.h[i][j] * vars.K) / vars.chi;
-            FOR(k)
+
+            K_tensor_UU[i][j] = A_UU[i][j] * vars.chi +
+                         1. / 3. * (h_UU[i][j] * vars.K) * vars.chi;
+            FOR(k, s, n)
             {
                 d1_K_tensor[i][j][k] = d1.A[i][j][k] / vars.chi -
                                    d1.chi[k] / vars.chi * K_tensor[i][j] +
                                    1. / 3. * d1.h[i][j][k] * vars.K / vars.chi +
                                    1. / 3. * vars.h[i][j] * d1.K[k] / vars.chi;
+
+                d1_K_tensor_UU[i][j][k] = h_UU[i][s] * h_UU[j][n] * d1.A[i][j][k] * vars.chi -
+                                   d1.chi[k] * vars.chi * K_tensor_UU[i][j] +
+                                   1. / 3. * h_UU[i][s] * h_UU[j][n]* d1.h[i][j][k] * vars.K * vars.chi +
+                                   1. / 3. * h_UU[i][j] * d1.K[k] * vars.chi;
             }
         }
 
@@ -89,11 +106,17 @@ class ModifiedScalarsGeometry
         {
             covariant_deriv_K_tensor[i][j][k] = d1_K_tensor[i][j][k];
 
+            covariant_deriv_K_tensor_UU[i][j][k] = d1_K_tensor_UU[i][j][k];
+
             FOR(l)
             {
                 covariant_deriv_K_tensor[i][j][k] +=
                 -chris_phys[l][k][i] * K_tensor[l][j] -
                 chris_phys[l][k][j] * K_tensor[i][l];
+
+                covariant_deriv_K_tensor_UU[i][j][k] +=
+                chris_phys[l][k][i] * K_tensor_UU[l][j] +
+                chris_phys[l][k][j] * K_tensor_UU[i][l];
             }
         }
 
@@ -108,12 +131,16 @@ class ModifiedScalarsGeometry
 
                 out.B[i][j] +=
                 epsilon3_LUU[i][k][l] * covariant_deriv_K_tensor[l][j][k];
+
+                out.B_UU[i][j] +=
+                epsilon3_LUU[k][i][l] * covariant_deriv_K_tensor_UU[j][k][l];
             }
         }
 
         make_trace_free(out.E, vars.h, h_UU);
 
         make_symmetric(out.B);
+        make_symmetric(out.B_UU);
 
         return out;
     
@@ -138,8 +165,11 @@ class ModifiedScalarsGeometry
 
         FOR(k, l, m , n)
         {
-            out.GB_scalar = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * ebterms.E[k][l] - 
+            out.GB_scalar_1 = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * ebterms.E[k][l] - 
                             8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.B[m][n] * ebterms.B[k][l];
+
+            out.GB_scalar_2 = 8.0 * vars.chi * vars.chi * h_UU[k][m] * h_UU[l][n] * ebterms.E[m][n] * ebterms.E[k][l] - 
+                            8.0 * ebterms.B[m][n] * ebterms.B_UU[m][n];
 
             out.CS_scalar = - 16.0 * vars.chi * vars.chi * h_UU[m][k] * h_UU[n][l] * ebterms.B[k][l] * ebterms.E[m][n];
         }

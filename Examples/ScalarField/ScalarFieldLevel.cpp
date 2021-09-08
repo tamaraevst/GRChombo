@@ -174,7 +174,8 @@ void ScalarFieldLevel::specificPostTimeStep()
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
-            double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
+            double GB_norm_1 = amr_reductions.norm(c_gaussbonnet_1, 1, true); // L1 norm of Gauss Bonnet
+            double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
 
             if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
@@ -184,9 +185,9 @@ void ScalarFieldLevel::specificPostTimeStep()
             scalars_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet"});
+                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet_1", "norm_GaussBonnet_2"});
                 }
-            scalars_file.write_time_data_line({CS_norm, GB_norm});
+            scalars_file.write_time_data_line({CS_norm, GB_norm_1, GB_norm_2});
         }
     }
 

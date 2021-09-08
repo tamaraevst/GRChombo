@@ -35,10 +35,10 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::compute(
 
     // Call CCZ4 RHS - work out RHS without matter, no dissipation
     Vars<data_t> matter_rhs;
-    this->rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
+    // this->rhs_equation(matter_rhs, matter_vars, d1, d2, advec);
 
     // add RHS matter terms from EM Tensor
-    add_emtensor_rhs(matter_rhs, matter_vars, d1);
+    // add_emtensor_rhs(matter_rhs, matter_vars, d1);
 
     // add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
