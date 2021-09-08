@@ -13,7 +13,7 @@
 // Problem specific includes:
 #include "ArrayTools.hpp"
 #include "BoostedBH.hpp"
-// #include "Potential.hpp"
+#include "InitialScalarData.hpp"
 #ifdef USE_TWOPUNCTURES
 #include "TP_Parameters.hpp"
 #endif
@@ -212,13 +212,13 @@ class SimulationParameters : public SimulationParametersBase
 
         // for scalar
         pp.load("G_Newton", G_Newton, 1.0);
-        pp.load("amplitude_scalar", amplitude_scalar);
+        pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
+        pp.load("scalar_width", initial_scalar_params.width, 1.0);
          /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
         pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
         pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
-        // pp.load("scalar_mass", potential_params.scalar_mass);
     }
 #endif /* USE_TWOPUNCTURES */
 
@@ -321,12 +321,12 @@ class SimulationParameters : public SimulationParametersBase
     BoostedBH::params_t bh1_params;
 
      // Initial data for matter and potential
+    InitialScalarData::params_t initial_scalar_params;
     double G_Newton;
     double amplitude_scalar;
     //Parameters for modified scalar field equation 
     double gamma_amplitude;
     double beta_amplitude;
-    // Potential::params_t potential_params;
 
 #ifdef USE_TWOPUNCTURES
     double tp_offset_plus, tp_offset_minus;

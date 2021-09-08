@@ -52,8 +52,8 @@ momentumA = -0.0841746 -0.000510846 0.0
 momentumB =  0.0841746  0.000510846 0.0
 
 # Scalar params
-scalar_mass = 1.0
-amplitude_scalar = 0.1
+scalar_amplitude = 0.1
+scalar_width = 5.0
 G_Newton = 0.0
 gamma_amplitude = 1
 beta_amplitude = 1
@@ -112,6 +112,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 0 4 6 0 5 0    #K and Aij
                          0 1 2 3          #Theta and Gamma
                          0 1 2 3 1 2 3    #lapse shift and B
+                         0 0              #phi and Pi
 vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
                          0 7              #Weyl
 

@@ -10,14 +10,17 @@
 #include "ChiExtractionTaggingCriterion.hpp"
 #include "ChiPunctureExtractionTaggingCriterion.hpp"
 #include "ComputePack.hpp"
+#include "NewConstraints.hpp"
 #include "MatterCCZ4RHS.hpp"
-#include "NewMatterConstraints.hpp"
+#include "FixedGridsTaggingCriterion.hpp"
+#include "InitialScalarData.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
 #include "DefaultPotential.hpp"
 #include "PunctureTracker.hpp"
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
+#include "SmallDataIO.hpp"
 #include "TraceARemoval.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
@@ -28,7 +31,7 @@ void BinaryBHLevel::specificAdvance()
 {
     // Enforce the trace free A_ij condition and positive chi and alpha
     BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
-                   m_state_new, m_state_new, EXCLUDE_GHOST_CELLS);
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 
     // Check for nan's
     if (m_p.nan_check)
@@ -53,15 +56,17 @@ void BinaryBHLevel::initialData()
     // Set up the compute class for the BinaryBH initial data
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
 
+    InitialScalarData my_scalar_data(m_p.initial_scalar_params, m_dx);
     // set the value of phi - constant over the grid
-    SetValue set_phi(m_p.amplitude_scalar, Interval(c_phi, c_phi));
+    // SetValue set_phi(m_p.amplitude_scalar, Interval(c_phi, c_phi));
 
     // First set everything to zero (to avoid undefinded values)
     // then calculate initial data
-    BoxLoops::loop(make_compute_pack(SetValue(0.), set_phi, binary),
+    BoxLoops::loop(make_compute_pack(SetValue(0.), binary, my_scalar_data),
                    m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 #endif
 }
+
 
 // Calculate RHS during RK4 substeps
 void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
@@ -108,6 +113,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 #else
         puncture_masses = {m_p.bh1_params.mass, m_p.bh2_params.mass};
 #endif /* USE_TWOPUNCTURES */
+
         auto puncture_coords =
             m_bh_amr.m_puncture_tracker.get_puncture_coords();
         const bool activate_extraction = true;
@@ -119,10 +125,18 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     }
     else
     {
-        BoxLoops::loop(ChiExtractionTaggingCriterion(m_dx, m_level,
-                                                     m_p.extraction_params,
-                                                     m_p.activate_extraction),
+        BoxLoops::loop(ChiExtractionTaggingCriterion(
+                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
+                           m_p.activate_extraction),
                        current_state, tagging_criterion);
+    }
+
+    // set the fixed levels - should only happen on first timestep
+    if (m_time == 0.0 && m_level < 6)
+    {
+        BoxLoops::loop(
+            FixedGridsTaggingCriterion(m_dx, m_level, m_p.L, m_p.center),
+            current_state, tagging_criterion, disable_simd());
     }
 }
 
@@ -166,6 +180,28 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
+    if (m_p.calculate_constraint_norms)
+    {
+        fillAllGhosts();
+        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics,
+                       EXCLUDE_GHOST_CELLS);
+        if (m_level == 0)
+        {
+            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
+            double L2_Ham = amr_reductions.norm(c_Ham);
+            double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3));
+            SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
+                                         m_restart_time, SmallDataIO::APPEND,
+                                         first_step);
+            constraints_file.remove_duplicate_time_data();
+            if (first_step)
+            {
+                constraints_file.write_header_line({"L^2_Ham", "L^2_Mom"});
+            }
+            constraints_file.write_time_data_line({L2_Ham, L2_Mom});
+        }
+    }
+
     // do puncture tracking on requested level
     if (m_p.track_punctures && m_level == m_p.puncture_tracking_level)
     {
@@ -186,8 +222,7 @@ void BinaryBHLevel::prePlotLevel()
     fillAllGhosts();
     DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-    BoxLoops::loop(MatterConstraints<ScalarFieldWithPotential>(
-                       scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom1, c_Mom3)),
+    BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)),
                    m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif /* CH_USE_HDF5 */
