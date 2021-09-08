@@ -13,7 +13,6 @@
 // Problem specific includes:
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
-#include "Potential.hpp"
 #include "ScalarField.hpp"
 
 class SimulationParameters : public SimulationParametersBase
@@ -35,7 +34,6 @@ class SimulationParameters : public SimulationParametersBase
                 0.0); // for now the example neglects backreaction
         pp.load("scalar_amplitude", initial_params.amplitude, 0.1);
         pp.load("scalar_width", initial_params.width, 1.0);
-        pp.load("scalar_mass", potential_params.scalar_mass, 0.1);
 
         // Initial Kerr data
         pp.load("kerr_mass", kerr_params.mass, 1.0);
@@ -60,11 +58,6 @@ class SimulationParameters : public SimulationParametersBase
 
     void check_params()
     {
-        warn_parameter("scalar_mass", potential_params.scalar_mass,
-                       potential_params.scalar_mass <
-                           0.2 / coarsest_dx / dt_multiplier,
-                       "oscillations of scalar field do not appear to be "
-                       "resolved on coarsest level");
         warn_parameter("scalar_width", initial_params.width,
                        initial_params.width < 0.5 * L,
                        "is greater than half the domain size");
@@ -88,7 +81,6 @@ class SimulationParameters : public SimulationParametersBase
     // Initial data for matter and potential and BH
     double G_Newton;
     InitialScalarData::params_t initial_params;
-    Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
 
     //Parameters for modified scalar field equation 

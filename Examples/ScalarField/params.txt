@@ -46,7 +46,6 @@ G_Newton = 0.0
 # Scalar field initial data
 scalar_amplitude = 0.1
 scalar_width = 5.0
-scalar_mass = 0.2
 
 # Kerr BH data
 kerr_mass = 1.0

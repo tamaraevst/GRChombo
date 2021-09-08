@@ -17,7 +17,7 @@
 #include "MatterCCZ4RHS.hpp"
 
 // For constraints calculation
-#include "NewMatterConstraints.hpp"
+#include "NewConstraints.hpp"
 
 // For tag cells
 #include "FixedGridsTaggingCriterion.hpp"
@@ -85,8 +85,7 @@ void ScalarFieldLevel::prePlotLevel()
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
-        MatterConstraints<ScalarFieldWithPotential>(
-            scalar_field, m_dx, m_p.G_Newton, c_Ham, Interval(c_Mom, c_Mom))),
+        Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom))),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif
