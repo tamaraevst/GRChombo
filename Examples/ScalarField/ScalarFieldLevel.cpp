@@ -104,7 +104,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
-    {
+    {   
         MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
                       FourthOrderDerivatives>
             my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
@@ -113,7 +113,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 
     }
     else if (m_p.max_spatial_derivative_order == 6)
-    {
+    {   
         MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
                       SixthOrderDerivatives>
             my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
