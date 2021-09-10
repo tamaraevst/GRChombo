@@ -203,17 +203,26 @@ void ScalarFieldLevel::specificPostTimeStep()
 
             //output norms
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
-            double NormNumericChi = amr_red_ev.norm(c_chi, 1, true);
-            double NormNumericK = amr_red_ev.norm(c_K, 1, true);
+            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
+
+
+            double NormChi = amr_red_ev.norm(c_chi, 1, true);
+            double NormK = amr_red_ev.norm(c_K, 1, true);
+
             double Normh11 = amr_red_ev.norm(c_h11, 1, true);
-            double Normh22 = amr_red_ev.norm(c_h22, 1, true);
-            double Normh33 = amr_red_ev.norm(c_h33, 1, true);
             double Normh13 = amr_red_ev.norm(c_h13, 1, true);
             double Normh12 = amr_red_ev.norm(c_h12, 1, true);
-            double NormA23 = amr_red_ev.norm(c_A23, 1, true);
+            double Normh22 = amr_red_ev.norm(c_h22, 1, true);
+            double Normh23 = amr_red_ev.norm(c_h23, 1, true);
+            double Normh33 = amr_red_ev.norm(c_h33, 1, true);
+
+            double NormA11 = amr_red_ev.norm(c_A11, 1, true);
+            double NormA12 = amr_red_ev.norm(c_A11, 1, true);
+            double NormA13 = amr_red_ev.norm(c_A13, 1, true);
             double NormA22 = amr_red_ev.norm(c_A22, 1, true);
-            double NormA12 = amr_red_ev.norm(c_h12, 1, true);
-            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
+            double NormA23 = amr_red_ev.norm(c_A23, 1, true);
+            double NormA33 = amr_red_ev.norm(c_A33, 1, true);
+        
 
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
                                          m_dt, m_time, m_restart_time,
@@ -223,7 +232,37 @@ void ScalarFieldLevel::specificPostTimeStep()
                 {
                     norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm", "Chi", "K", "h11", "h22", "h33", "h13", "h12", "A23", "A22", "A12"});
                 }
-            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi, NormNumericChi, NormNumericK, Normh11, Normh22, Normh33, Normh13, Normh12, NormA23, NormA22, NormA12});
+            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
+
+            SmallDataIO norm_chiK_file(m_p.data_path + "norm_chiK_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_chiK_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_chiK_file.write_header_line({"Chi", "K"});
+                }
+            norm_chiK_file.write_time_data_line({NormChi, NormK});
+
+            SmallDataIO norm_A_file(m_p.data_path + "norm_A_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_A_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_A_file.write_header_line({"A11", "A12", "A13", "A22", "A23", "A33"});
+                }
+            norm_A_file.write_time_data_line({NormA11, NormA12, NormA13, NormA22, NormA23, NormA33});
+
+            SmallDataIO norm_h_file(m_p.data_path + "norm_h_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_h_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_h_file.write_header_line({"h11", "h12", "h13", "h22", "h23", "h33"});
+                }
+            norm_A_file.write_time_data_line({Normh11, Normh12, Normh13, Normh22, Normh23, Normh33});
 
         }
     }
