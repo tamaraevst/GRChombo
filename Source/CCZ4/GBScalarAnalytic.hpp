@@ -31,28 +31,28 @@ class GBScalarAnalytic
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
-        // const auto vars = current_cell.template load_vars<Vars>();
+        const auto vars = current_cell.template load_vars<Vars>();
 
         Tensor<2, data_t> spherical_g;
-        Vars<data_t> vars;
+        // Vars<data_t> vars;
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
-        compute_isotropic_metric(spherical_g, coords);
+        // compute_isotropic_metric(spherical_g, coords);
 
         data_t x = coords.x;
         double y = coords.y;
         double z = coords.z;
         
         double M = 1.0;
-        double beta = 1.0;
+        double beta = 0.5;
         
-        vars.h = CoordinateTransformations::spherical_to_cartesian_LL(spherical_g, x, y, z);
+        // vars.h = CoordinateTransformations::spherical_to_cartesian_LL(spherical_g, x, y, z);
 
-        using namespace TensorAlgebra;
-        // Convert to BSSN vars
-        data_t deth = compute_determinant(vars.h);
-        auto h_UU = compute_inverse_sym(vars.h);
-        vars.chi = pow(deth, -1. / 3.);
+        // using namespace TensorAlgebra;
+        // // Convert to BSSN vars
+        // data_t deth = compute_determinant(vars.h);
+        // auto h_UU = compute_inverse_sym(vars.h);
+        // vars.chi = pow(deth, -1. / 3.);
 
         DEBUG_OUT(vars.chi);
 
