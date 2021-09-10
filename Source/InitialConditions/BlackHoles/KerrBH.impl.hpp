@@ -48,6 +48,8 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     auto h_UU = compute_inverse_sym(vars.h);
     vars.chi = pow(deth, -1. / 3.);
 
+    DEBUG_OUT(vars.chi);
+
     // transform extrinsic curvature into A and TrK - note h is still non
     // conformal version which is what we need here
     vars.K = compute_trace(vars.A, h_UU);

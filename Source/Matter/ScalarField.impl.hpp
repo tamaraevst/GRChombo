@@ -93,7 +93,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
  
     // add them to the RHS equation of phi
-    total_rhs.phi += m_gamma_amplitude * mod_scalars.CS_scalar + m_beta_amplitude * mod_scalars.GB_scalar_1;
+    total_rhs.phi += m_gamma_amplitude * mod_scalars.CS_scalar + m_beta_amplitude * mod_scalars.GB_scalar;
 
     // set the potential values
     data_t V_of_phi = 0.0;

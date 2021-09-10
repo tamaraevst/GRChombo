@@ -15,6 +15,7 @@
 
 // For RHS update
 #include "MatterOnly.hpp"
+#include "MatterCCZ4RHS.hpp"
 
 // For constraints calculation
 #include "NewConstraints.hpp"
@@ -105,7 +106,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     if (m_p.max_spatial_derivative_order == 4)
     {   
-        MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
+        MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
                       FourthOrderDerivatives>
             my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
                            m_p.formulation, m_p.G_Newton);
@@ -114,7 +115,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     }
     else if (m_p.max_spatial_derivative_order == 6)
     {   
-        MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
+        MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
                       SixthOrderDerivatives>
             my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
                            m_p.formulation, m_p.G_Newton);
@@ -173,8 +174,8 @@ void ScalarFieldLevel::specificPostTimeStep()
         {
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
-            double GB_norm_1 = amr_reductions.norm(c_gaussbonnet_1, 1, true); // L1 norm of Gauss Bonnet
-            double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
+            double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
+            // double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
 
             if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
@@ -184,9 +185,9 @@ void ScalarFieldLevel::specificPostTimeStep()
             scalars_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet_1", "norm_GaussBonnet_2"});
+                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet"});
                 }
-            scalars_file.write_time_data_line({CS_norm, GB_norm_1, GB_norm_2});
+            scalars_file.write_time_data_line({CS_norm, GB_norm});
         }
     }
 
@@ -202,6 +203,8 @@ void ScalarFieldLevel::specificPostTimeStep()
 
             //output norms
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
+            double NormNumericChi = amr_red_ev.norm(c_chi, 1, true);
+            double NormNumericK = amr_red_ev.norm(c_K, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
             SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
@@ -210,9 +213,9 @@ void ScalarFieldLevel::specificPostTimeStep()
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
+                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm", "Chi", "K"});
                 }
-            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
+            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi, NormNumericChi, NormNumericK});
 
         }
     }

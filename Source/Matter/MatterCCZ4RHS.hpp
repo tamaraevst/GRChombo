@@ -109,7 +109,6 @@ class MatterCCZ4RHS : public CCZ4RHS<gauge_t, deriv_t>
 
     // Class members
     matter_t my_matter;      //!< The matter object, e.g. a scalar field.
-    const double m_dx;
     const double m_G_Newton; //!< Newton's constant, set to one by default.
 };
 

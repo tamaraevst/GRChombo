@@ -56,8 +56,7 @@ class ComputeModifiedScalars
         ModifiedScalarsGeometry mod_geom;
         auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
 
-        current_cell.store_vars(mod_scalars.GB_scalar_1, c_gaussbonnet_1);
-        current_cell.store_vars(mod_scalars.GB_scalar_2, c_gaussbonnet_2);
+        current_cell.store_vars(mod_scalars.GB_scalar, c_gaussbonnet);
         current_cell.store_vars(mod_scalars.CS_scalar, c_chernsimons);
     }
 

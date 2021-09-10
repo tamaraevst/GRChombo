@@ -49,9 +49,6 @@ class SimulationParameters : public SimulationParametersBase
         // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
         pp.load("compare_gb_analytic", compare_gb_analytic, false);
 
-        //Whether to evolve just matter counterpart
-        pp.load("evolve_just_matter", evolve_just_matter, false);
-
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
@@ -91,7 +88,6 @@ class SimulationParameters : public SimulationParametersBase
     double beta_amplitude;
     bool calculate_scalar_norm;
     bool compare_gb_analytic;
-    bool evolve_just_matter;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

@@ -13,9 +13,10 @@
 #include "CoordinateTransformations.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
-// #include "BSSNVars.hpp"
+#include "BSSNVars.hpp"
 #include "simd.hpp"
 #include <cmath>
+#include "DebuggingTools.hpp"
 
 class GBScalarAnalytic
 {
@@ -52,6 +53,8 @@ class GBScalarAnalytic
         data_t deth = compute_determinant(vars.h);
         auto h_UU = compute_inverse_sym(vars.h);
         vars.chi = pow(deth, -1. / 3.);
+
+        DEBUG_OUT(vars.chi);
 
         //For PG coordinates
         // data_t r = (1.0 / vars.chi) * coords.get_radius();

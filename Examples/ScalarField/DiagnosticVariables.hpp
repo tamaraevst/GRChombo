@@ -15,9 +15,7 @@ enum
 
     c_chernsimons,
 
-    c_gaussbonnet_1,
-
-    c_gaussbonnet_2,
+    c_gaussbonnet,
 
     c_phianalytic,
 
@@ -33,9 +31,7 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     
     "ChernSimons",
     
-    "GaussBonnet1",
-
-    "GaussBonnet2",
+    "GaussBonnet",
 
     "Phi Analytic"
 
