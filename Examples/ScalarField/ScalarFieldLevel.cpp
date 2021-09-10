@@ -205,7 +205,6 @@ void ScalarFieldLevel::specificPostTimeStep()
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
-
             double NormChi = amr_red_ev.norm(c_chi, 1, true);
             double NormK = amr_red_ev.norm(c_K, 1, true);
 
@@ -230,7 +229,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm", "Chi", "K", "h11", "h22", "h33", "h13", "h12", "A23", "A22", "A12"});
+                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
                 }
             norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
 
@@ -262,7 +261,7 @@ void ScalarFieldLevel::specificPostTimeStep()
                 {
                     norm_h_file.write_header_line({"h11", "h12", "h13", "h22", "h23", "h33"});
                 }
-            norm_A_file.write_time_data_line({Normh11, Normh12, Normh13, Normh22, Normh23, Normh33});
+            norm_h_file.write_time_data_line({Normh11, Normh12, Normh13, Normh22, Normh23, Normh33});
 
         }
     }
