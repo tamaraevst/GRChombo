@@ -40,7 +40,7 @@
 // For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
-
+#include "GBScalarAnalytic.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -103,7 +103,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-    if (m_p.matter_only)
+    if (m_p.matter_only == true)
     {
         if (m_p.max_spatial_derivative_order == 4)
         {   
@@ -123,7 +123,7 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
             BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
         }
     }
-    else
+    if (m_p.matter_only == false)
     {
         if (m_p.max_spatial_derivative_order == 4)
         {   
@@ -216,7 +216,7 @@ void ScalarFieldLevel::specificPostTimeStep()
       if (m_p.compare_gb_analytic)
     {
         fillAllGhosts();
-        // BoxLoops::loop(GBScalarAnalytic(m_p.kerr_params, m_p.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(GBScalarAnalytic(m_p.kerr_params.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
