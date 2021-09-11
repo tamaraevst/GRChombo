@@ -17,23 +17,25 @@
 #include "simd.hpp"
 #include <cmath>
 #include "DebuggingTools.hpp"
+#include "KerrBH.hpp"
 
-class GBScalarAnalytic
+class GBScalarAnalytic : public KerrBH
 {
   public:
     /// BSSN variables
-    template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
-    
-    GBScalarAnalytic(std::array<double, CH_SPACEDIM> &a_center, double a_dx)
-        : m_dx(a_dx), m_center(a_center)
+    template <class data_t> using MetricVars = typename KerrBH::template Vars<data_t>;
+
+    GBScalarAnalytic(params_t a_params, std::array<double, CH_SPACEDIM> &a_center, double a_dx):KerrBH(a_params, a_dx), m_center(a_center)
     {
     }
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
-        const auto vars = current_cell.template load_vars<Vars>();
+        KerrBH::compute(current_cell);
 
-        Tensor<2, data_t> spherical_g;
+        const auto vars_schw = current_cell.template load_vars<MetricVars>();
+
+        // Tensor<2, data_t> spherical_g;
         // Vars<data_t> vars;
         Coordinates<data_t> coords(current_cell, m_dx, m_center);
 
@@ -43,7 +45,7 @@ class GBScalarAnalytic
         double y = coords.y;
         double z = coords.z;
         
-        double M = 1.0;
+        double M = m_params.mass;
         double beta = 0.5;
         
         // vars.h = CoordinateTransformations::spherical_to_cartesian_LL(spherical_g, x, y, z);
@@ -54,15 +56,13 @@ class GBScalarAnalytic
         // auto h_UU = compute_inverse_sym(vars.h);
         // vars.chi = pow(deth, -1. / 3.);
 
-        DEBUG_OUT(vars.chi);
-
         //For PG coordinates
         // data_t r = (1.0 / vars.chi) * coords.get_radius();
         // data_t xx = r / M;
         // data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
         // For isotropic coordinates
-        data_t r_conformal = vars.chi * coords.get_radius();
+        data_t r_conformal = vars_schw.chi * coords.get_radius();
         data_t xx = pow((1 + M / (2.0 * r_conformal)), 2) * r_conformal / M;
         data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
@@ -70,8 +70,10 @@ class GBScalarAnalytic
     }
 
    protected:
-    const double m_dx;
+    // const double m_dx;
     const std::array<double, CH_SPACEDIM> m_center;
+    params_t m_params;
+
 
     template <class data_t> void compute_isotropic_metric(Tensor<2, data_t> &spherical_g, 
                                         const Coordinates<data_t> coords) const
