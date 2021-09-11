@@ -40,8 +40,8 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
 
-        // whether to do extraction
-        pp.load("activate_extraction", activate_extraction, false);
+        // whether to do do evolution of matter only
+        pp.load("matter_only", matter_only, false);
 
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
@@ -88,6 +88,7 @@ class SimulationParameters : public SimulationParametersBase
     double beta_amplitude;
     bool calculate_scalar_norm;
     bool compare_gb_analytic;
+    bool matter_only;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

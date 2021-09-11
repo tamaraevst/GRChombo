@@ -35,6 +35,9 @@ void MatterOnly<matter_t, gauge_t, deriv_t>::compute(
 
     // Call CCZ4 RHS - work out RHS without matter, no dissipation
     Vars<data_t> matter_rhs;
+    VarsTools::assign(matter_rhs, 0.); // All components that are not
+                                           // explicitly set in rhs_equation are
+                                           // 0
 
     // add evolution of matter fields themselves
     my_matter.add_matter_rhs(matter_rhs, matter_vars, d1, d2, advec);
