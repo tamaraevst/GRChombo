@@ -77,6 +77,7 @@ class GBScalarAnalytic
         // work out where we are on the grid
         data_t x = coords.x;
         double y = coords.y;
+        double z = coords.z;
 
         // the radius, subject to a floor
         data_t r = coords.get_radius();
@@ -86,22 +87,35 @@ class GBScalarAnalytic
         data_t rho2 = simd_max(x * x + y * y, 1e-12);
         data_t rho = sqrt(rho2);
         data_t sin_theta = rho / r;
+        data_t cos_theta = z / r;
         data_t sin_theta2 = sin_theta * sin_theta;
+        data_t cos_theta2 = cos_theta * cos_theta;
 
         double M = 1.0;
+        double a = 0.0;
 
-        // Metric in isotropic coordinates
-        spherical_g[0][0] = pow((1 + M / (2.0 * r)), 4); 
-        spherical_g[0][1] = 0;
-        spherical_g[0][2] = 0;
+         // calculate useful metric quantities
+        double r_plus = M + sqrt(M * M - a * a);
+        double r_minus = M - sqrt(M * M - a * a);
 
-        spherical_g[1][0] = 0;
-        spherical_g[1][1] = r2 * pow((1 + M / (2.0 * r)), 2);
-        spherical_g[1][2] = 0;
+        // The Boyer-Lindquist coordinate
+        data_t r_BL = r * pow(1.0 + 0.25 * r_plus / r, 2.0);
 
-        spherical_g[2][0] = 0;
-        spherical_g[2][1] = 0;
-        spherical_g[2][2] = r2 * sin_theta2 * pow((1 + M / (2.0 * r)), 2);
+        // Other useful quantities per 1001.4077
+        data_t Sigma = r_BL * r_BL + a * a * cos_theta2;
+        data_t Delta = r_BL * r_BL - 2.0 * M * r_BL + a * a;
+        // In the paper this is just 'A', but not to be confused with A_ij
+        data_t AA = pow(r_BL * r_BL + a * a, 2.0) - Delta * a * a * sin_theta2;
+        // The rr component of the conformal spatial matric
+        data_t gamma_rr =
+        Sigma * pow(r + 0.25 * r_plus, 2.0) / (r * r2 * (r_BL - r_minus));
+
+        // Metric in semi isotropic Kerr-Schild coordinates, r, theta (t or th), phi
+        // (p)
+        FOR(i, j) { spherical_g[i][j] = 0.0; }
+        spherical_g[0][0] = gamma_rr;                // gamma_rr
+        spherical_g[1][1] = Sigma;                   // gamma_tt
+        spherical_g[2][2] = AA / Sigma * sin_theta2; // gamma_p
 
     }
 
