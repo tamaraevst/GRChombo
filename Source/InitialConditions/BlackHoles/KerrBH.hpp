@@ -32,6 +32,19 @@ class KerrBH
         double spin; //!< The spin param a = J/M, so 0 <= |a| <= M
     };
 
+    /// Vars object for Constraints
+    template <class data_t> struct AnalyticVars
+    {
+        data_t phi_analytic;
+
+        template <typename mapping_function_t>
+        void enum_mapping(mapping_function_t mapping_function)
+        {
+            using namespace VarsTools;
+            define_enum_mapping(mapping_function, c_phianalytic, phi_analytic);
+        }
+    };
+
   protected:
     double m_dx;
     params_t m_params;

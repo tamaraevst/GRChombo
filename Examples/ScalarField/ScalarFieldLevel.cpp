@@ -215,8 +215,8 @@ void ScalarFieldLevel::specificPostTimeStep()
 
       if (m_p.compare_gb_analytic)
     {
-        fillAllGhosts();
-        BoxLoops::loop(GBScalarAnalytic(m_p.kerr_params.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        // fillAllGhosts();
+        // BoxLoops::loop(GBScalarAnalytic(m_p.kerr_params.center, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
