@@ -13,7 +13,7 @@
 #include "CoordinateTransformations.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
-#include "BSSNVars.hpp"
+#include "ADMConformalVars.hpp"
 #include "simd.hpp"
 #include <cmath>
 #include "DebuggingTools.hpp"
@@ -23,7 +23,7 @@ class GBScalarAnalytic : public KerrBH
 {
   public:
     /// BSSN variables
-    template <class data_t> using MetricVars = typename KerrBH::template Vars<data_t>;
+    template <class data_t> using MetricVars = ADMConformalVars::VarsWithGauge<data_t>;
 
     GBScalarAnalytic(params_t a_params, std::array<double, CH_SPACEDIM> &a_center, double a_dx):KerrBH(a_params, a_dx), m_center(a_center)
     {
