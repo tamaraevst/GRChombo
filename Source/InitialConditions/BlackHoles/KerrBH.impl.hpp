@@ -68,7 +68,17 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     // NB We stil need to set Gamma^i which is NON ZERO
     // but we do this via a separate class/compute function
     // as we need the gradients of the metric which are not yet available
+
+    //To test things
+    double M = m_params.mass;
+    double beta = 0.5;
+
+    data_t r_conformal = vars.chi * coords.get_radius();
+    data_t xx = pow((1 + M / (2.0 * r_conformal)), 2) * r_conformal / M;
+    data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
+
     current_cell.store_vars(vars);
+    current_cell.store_vars(phi_analytic, c_phianalytic);
 }
 
 template <class data_t>
