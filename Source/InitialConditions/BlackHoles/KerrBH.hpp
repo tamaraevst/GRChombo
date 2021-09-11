@@ -33,17 +33,17 @@ class KerrBH
     };
 
     /// Vars object for Constraints
-    template <class data_t> struct AnalyticVars
-    {
-        data_t phi_analytic;
+    // template <class data_t> struct AnalyticVars
+    // {
+    //     data_t phi_analytic;
 
-        template <typename mapping_function_t>
-        void enum_mapping(mapping_function_t mapping_function)
-        {
-            using namespace VarsTools;
-            define_enum_mapping(mapping_function, c_phianalytic, phi_analytic);
-        }
-    };
+    //     template <typename mapping_function_t>
+    //     void enum_mapping(mapping_function_t mapping_function)
+    //     {
+    //         using namespace VarsTools;
+    //         define_enum_mapping(mapping_function, c_phianalytic, phi_analytic);
+    //     }
+    // };
 
   protected:
     double m_dx;

@@ -24,7 +24,7 @@ class GBScalarAnalytic
     /// BSSN variables
     template <class data_t> using MetricVars = ADMConformalVars::VarsWithGauge<data_t>;
 
-    GBScalarAnalytic(std::array<double, CH_SPACEDIM> a_center, double a_dx) : m_center(a_center), m_dx(a_dx)
+    GBScalarAnalytic(std::array<double, CH_SPACEDIM> a_center, double a_dx, double a_mass, double a_beta_amplitude) : m_center(a_center), m_dx(a_dx), m_mass(a_mass), m_beta_amplitude(a_beta_amplitude)
     {
     }
 
@@ -43,8 +43,8 @@ class GBScalarAnalytic
         double y = coords.y;
         double z = coords.z;
         
-        double M = 1.0;
-        double beta = 0.5;
+        double M = m_mass;
+        double beta = m_beta_amplitude;
         
         vars_is.h = CoordinateTransformations::spherical_to_cartesian_LL(spherical_g, x, y, z);
 
@@ -70,6 +70,8 @@ class GBScalarAnalytic
    protected:
     const double m_dx;
     const std::array<double, CH_SPACEDIM> m_center;
+    const double m_mass;
+    const double m_beta_amplitude;
 
     template <class data_t> void compute_isotropic_metric(Tensor<2, data_t> &spherical_g, 
                                         const Coordinates<data_t> coords) const
