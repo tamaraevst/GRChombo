@@ -42,14 +42,16 @@ int runGRChombo(int argc, char *argv[])
                                                                   sim_params);
     setupAMRObject(gr_amr, scalar_field_level_fact);
 
-    // Add a scheduler to call specificPostTimeStep on every AMRLevel at t=0
-    auto task = [](GRAMRLevel *level) {
-        if (level->time() == 0.)
-            level->specificPostTimeStep();
-    };
+    /* Uncomment this if you want to use bool first_step = (m_time == 0.) in ScalarField.cpp */
+    //Add a scheduler to call specificPostTimeStep on every AMRLevel at t=0
 
-    MultiLevelTaskPtr<> call_task(task);
-    call_task.execute(gr_amr);
+    // auto task = [](GRAMRLevel *level) {
+    //     if (level->time() == 0.)
+    //         level->specificPostTimeStep();
+    // };
+
+    // MultiLevelTaskPtr<> call_task(task);
+    // call_task.execute(gr_amr);
 
     // Engage! Run the evolution
     gr_amr.run(sim_params.stop_time, sim_params.max_steps);

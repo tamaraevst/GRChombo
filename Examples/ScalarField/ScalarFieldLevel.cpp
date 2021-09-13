@@ -32,7 +32,6 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
-#include "GBScalarAnalytic.hpp"
 
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
@@ -179,13 +178,12 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
-   bool first_step =
-        (m_time == 0.); // this form is used when 'specificPostTimeStep' is
+//    bool first_step =
+//         (m_time == 0.); // this form is used when 'specificPostTimeStep' is
                         // called during setup at t=0 from Main
-    // bool first_step = (m_time == m_dt); // if not called in Main
-
+    
     if (m_p.calculate_scalar_norm)
-    {
+    {   
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
@@ -194,6 +192,7 @@ void ScalarFieldLevel::specificPostTimeStep()
 
         if (m_level ==0)
         {
+            bool first_step = (m_time == m_dt); // if not called in Main
             AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
             double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
@@ -216,10 +215,10 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.compare_gb_analytic)
     {
         fillAllGhosts();
-        BoxLoops::loop(GBScalarAnalytic<MovingPunctureGauge, FourthOrderDerivatives>(m_p.kerr_params.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
+            bool first_step = (m_time == m_dt); // if not called in Main
             AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
             AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
