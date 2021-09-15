@@ -25,6 +25,7 @@
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
 #include "AMRReductions.hpp"
+#include "ComputeModifiedScalars.hpp"
 
 // Things to do during the advance step after RK4 steps
 void BinaryBHLevel::specificAdvance()
@@ -149,6 +150,8 @@ void BinaryBHLevel::specificPostTimeStep()
                         // called during setup at t=0 from Main
     // bool first_step = (m_time == m_dt); // if not called in Main
 
+    AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
+
     if (m_p.activate_extraction == 1)
     {
         int min_level = m_p.extraction_params.min_extraction_level();
@@ -187,7 +190,6 @@ void BinaryBHLevel::specificPostTimeStep()
                        EXCLUDE_GHOST_CELLS);
         if (m_level == 0)
         {
-            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
             double L2_Ham = amr_reductions.norm(c_Ham);
             double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3));
             SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
@@ -211,6 +213,105 @@ void BinaryBHLevel::specificPostTimeStep()
         bool write_punctures = at_level_timestep_multiple(coarsest_level);
         m_bh_amr.m_puncture_tracker.execute_tracking(m_time, m_restart_time,
                                                      m_dt, write_punctures);
+    }
+
+    if (m_p.calculate_scalar_norm)
+    {   
+        fillAllGhosts();
+        BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
+                     m_p.gamma_amplitude, 
+                     m_p.beta_amplitude),
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+
+        if (m_level ==0)
+        {
+            double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
+            double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
+            // double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
+
+            if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+            SmallDataIO scalars_file(m_p.data_path + "modified_scalars_l1norm",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            scalars_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    scalars_file.write_header_line({"Norm Chern Simons", "Norm Gauss Bonnet"});
+                }
+            scalars_file.write_time_data_line({CS_norm, GB_norm});
+        }
+    }
+
+    if (m_p.compute_all_norms)
+    {
+        fillAllGhosts();
+
+        if (m_level == 0)
+        {   
+            AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
+            //output norms
+            double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
+
+            double NormChi = amr_red_ev.norm(c_chi, 1, true);
+            double NormK = amr_red_ev.norm(c_K, 1, true);
+
+            double Normh11 = amr_red_ev.norm(c_h11, 1, true);
+            double Normh13 = amr_red_ev.norm(c_h13, 1, true);
+            double Normh12 = amr_red_ev.norm(c_h12, 1, true);
+            double Normh22 = amr_red_ev.norm(c_h22, 1, true);
+            double Normh23 = amr_red_ev.norm(c_h23, 1, true);
+            double Normh33 = amr_red_ev.norm(c_h33, 1, true);
+
+            double NormA11 = amr_red_ev.norm(c_A11, 1, true);
+            double NormA12 = amr_red_ev.norm(c_A11, 1, true);
+            double NormA13 = amr_red_ev.norm(c_A13, 1, true);
+            double NormA22 = amr_red_ev.norm(c_A22, 1, true);
+            double NormA23 = amr_red_ev.norm(c_A23, 1, true);
+            double NormA33 = amr_red_ev.norm(c_A33, 1, true);
+        
+
+            SmallDataIO norm_phi_file(m_p.data_path + "norm_phi_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_phi_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_phi_file.write_header_line({"Phi Numeric Norm"});
+                }
+            norm_phi_file.write_time_data_line({NormNumericPhi});
+
+            SmallDataIO norm_chiK_file(m_p.data_path + "norm_chiK_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_chiK_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_chiK_file.write_header_line({"Chi", "K"});
+                }
+            norm_chiK_file.write_time_data_line({NormChi, NormK});
+
+            SmallDataIO norm_A_file(m_p.data_path + "norm_A_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_A_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_A_file.write_header_line({"A11", "A12", "A13", "A22", "A23", "A33"});
+                }
+            norm_A_file.write_time_data_line({NormA11, NormA12, NormA13, NormA22, NormA23, NormA33});
+
+            SmallDataIO norm_h_file(m_p.data_path + "norm_h_values",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_h_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_h_file.write_header_line({"h11", "h12", "h13", "h22", "h23", "h33"});
+                }
+            norm_h_file.write_time_data_line({Normh11, Normh12, Normh13, Normh22, Normh23, Normh33});
+
+        }
     }
 }
 

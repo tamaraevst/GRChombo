@@ -18,6 +18,9 @@ enum
     c_Weyl4_Re,
     c_Weyl4_Im,
 
+    c_gaussbonnet,
+    c_chernsimons,
+
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -28,7 +31,9 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
 
     "Mom1",     "Mom2",    "Mom3",
 
-    "Weyl4_Re", "Weyl4_Im"};
+    "Weyl4_Re", "Weyl4_Im", 
+    
+    "Gauss Bonnet", "Chern Simons"};
 }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */

@@ -219,6 +219,12 @@ class SimulationParameters : public SimulationParametersBase
         Set them to zero if you do not want the corresponding scalar included. */
         pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
         pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
+
+        // Whether to do calculation of scalars' norms
+        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
+
+        // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
+        pp.load("compute_all_norms", compute_all_norms, false);
     }
 #endif /* USE_TWOPUNCTURES */
 
@@ -312,6 +318,8 @@ class SimulationParameters : public SimulationParametersBase
 
     bool track_punctures, calculate_constraint_norms;
     bool activate_extraction;
+    bool calculate_scalar_norm;
+    bool compute_all_norms;
     int puncture_tracking_level;
 
     // Collection of parameters necessary for initial conditions
