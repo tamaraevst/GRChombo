@@ -172,8 +172,13 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
-    DefaultPotential potential;
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+
+    bool first_step = (m_time == m_dt); // if not called in Main
+
+    AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
+    AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
+    // DefaultPotential potential;
+    // ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
@@ -182,6 +187,27 @@ void ScalarFieldLevel::specificPostTimeStep()
 //         (m_time == 0.); // this form is used when 'specificPostTimeStep' is
                         // called during setup at t=0 from Main
     
+    if (m_p.calculate_constraint_norms)
+    {
+        fillAllGhosts();
+        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom)), m_state_new, m_state_diagnostics,
+                       EXCLUDE_GHOST_CELLS);
+        if (m_level == 0)
+        {
+            double L2_Ham = amr_red_diag.norm(c_Ham);
+            double L2_Mom = amr_red_diag.norm(Interval(c_Mom, c_Mom));
+            SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
+                                         m_restart_time, SmallDataIO::APPEND,
+                                         first_step);
+            constraints_file.remove_duplicate_time_data();
+            if (first_step)
+            {
+                constraints_file.write_header_line({"L^2_Ham", "L^2_Mom"});
+            }
+            constraints_file.write_time_data_line({L2_Ham, L2_Mom});
+        }
+    }
+
     if (m_p.calculate_scalar_norm)
     {   
         fillAllGhosts();
@@ -192,10 +218,8 @@ void ScalarFieldLevel::specificPostTimeStep()
 
         if (m_level ==0)
         {
-            bool first_step = (m_time == m_dt); // if not called in Main
-            AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-            double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
-            double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
+            double CS_norm = amr_red_diag.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
+            double GB_norm = amr_red_diag.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
             // double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
 
             if (!FilesystemTools::directory_exists(m_p.data_path))
@@ -206,7 +230,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             scalars_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    scalars_file.write_header_line({"norm_ChernSimons", "norm_GaussBonnet"});
+                    scalars_file.write_header_line({"Norm Chern Simons", "Norm Gauss Bonnet"});
                 }
             scalars_file.write_time_data_line({CS_norm, GB_norm});
         }
@@ -218,10 +242,6 @@ void ScalarFieldLevel::specificPostTimeStep()
 
         if (m_level == 0)
         {
-            bool first_step = (m_time == m_dt); // if not called in Main
-            AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
-            AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
-
             //output norms
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
