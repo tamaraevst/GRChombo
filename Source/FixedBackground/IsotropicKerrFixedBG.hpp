@@ -57,22 +57,22 @@ class IsotropicKerrFixedBG
         compute_metric_background(metric_vars, current_cell);
 
         // calculate and save chi
-        data_t chi = TensorAlgebra::compute_determinant_sym(metric_vars.gamma);
-        chi = pow(chi, -1.0 / 3.0);
+        data_t chibg = TensorAlgebra::compute_determinant_sym(metric_vars.gamma);
+        chibg = pow(chibg, -1.0 / 3.0);
 
          //For testing against analytic expression for phi
         double M = m_params.mass;
         double beta = 0.5;
 
         // Transform from Schwarzschild to isotropic and make conformal 
-        data_t r =  sqrt(chi) * coords.get_radius();
-        data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
-        data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
+        // data_t r =  sqrt(chi) * coords.get_radius();
+        // data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
+        // data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
   
-        current_cell.store_vars(phi_analytic, c_phianalytic);
+        // current_cell.store_vars(phi_analytic, c_phianalytic);
 
 
-        current_cell.store_vars(chi, c_chi);
+        current_cell.store_vars(chibg, c_chibg);
     }
 
     /// Refer to Witek et al 1401.1548 for reference for

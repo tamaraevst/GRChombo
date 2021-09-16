@@ -24,6 +24,7 @@
 #include "InitialConditions.hpp"
 #include "IsotropicKerrFixedBG.hpp"
 #include "ComputeModifiedScalars.hpp"
+#include "GBScalarAnalytic.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -133,6 +134,8 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.compare_gb_analytic)
     {
         fillAllGhosts();
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.bg_params.mass, m_p.beta_amplitude),
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
         if (m_level == 0)
         {
