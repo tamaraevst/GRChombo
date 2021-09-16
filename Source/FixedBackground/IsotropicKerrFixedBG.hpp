@@ -71,7 +71,6 @@ class IsotropicKerrFixedBG
   
         // current_cell.store_vars(phi_analytic, c_phianalytic);
 
-
         current_cell.store_vars(chibg, c_chibg);
     }
 

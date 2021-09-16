@@ -11,6 +11,7 @@
 #include "GRParmParse.hpp"
 // Problem specific includes:
 #include "IsotropicKerrFixedBG.hpp"
+#include "KerrBH.hpp"
 
 class SimulationParameters : public ChomboParameters
 {
@@ -33,6 +34,11 @@ class SimulationParameters : public ChomboParameters
         pp.load("bh_spin", bg_params.spin, 0.0);
         pp.load("bh_center", bg_params.center, center);
         pp.load("field_amplitude", field_amplitude);
+
+        // Initial Kerr data for modified scalars
+        pp.load("kerr_mass", kerr_params.mass, 1.0);
+        pp.load("kerr_spin", kerr_params.spin, 0.0);
+        pp.load("kerr_center", kerr_params.center, center);
 
         pp.load("inner_r", inner_r, 5.0);
         pp.load("outer_r", outer_r, 500.0);
@@ -79,6 +85,7 @@ class SimulationParameters : public ChomboParameters
     //        dx; // location of coarsest origin and dx
     // Collection of parameters necessary for the sims
     IsotropicKerrFixedBG::params_t bg_params;
+    KerrBH::params_t kerr_params;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

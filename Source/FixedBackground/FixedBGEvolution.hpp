@@ -9,6 +9,7 @@
 #include "ADMFixedBGVars.hpp"
 #include "BSSNVars.hpp"
 #include "CCZ4Geometry.hpp"
+#include "ComputeModifiedScalars.hpp"
 #include "ModifiedScalarsGeometry.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
