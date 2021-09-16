@@ -7,15 +7,15 @@
 #define SIMULATIONPARAMETERS_HPP_
 
 // General includes
-#include "SimulationParametersBase.hpp"
+#include "ChomboParameters.hpp"
 #include "GRParmParse.hpp"
 // Problem specific includes:
 #include "IsotropicKerrFixedBG.hpp"
 
-class SimulationParameters : public SimulationParametersBase
+class SimulationParameters : public ChomboParameters
 {
   public:
-    SimulationParameters(GRParmParse &pp) : SimulationParametersBase(pp)
+    SimulationParameters(GRParmParse &pp) : ChomboParameters(pp)
     {
         // read the problem specific params
         readParams(pp);
@@ -50,6 +50,14 @@ class SimulationParameters : public SimulationParametersBase
         Set them to zero if you do not want the corresponding scalar included. */
         pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
         pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
+
+        // directory to store data (extraction files, puncture data, constraint
+        // norms)
+        pp.load("data_subpath", data_path, std::string(""));
+        if (!data_path.empty() && data_path.back() != '/')
+            data_path += "/";
+        if (output_path != "./" && !output_path.empty())
+            data_path = output_path + data_path;
          
     }
 
@@ -63,6 +71,9 @@ class SimulationParameters : public SimulationParametersBase
 
     bool calculate_scalar_norm;
     bool compare_gb_analytic;
+
+    std::string data_path;
+
 
     //    std::array<double, CH_SPACEDIM> origin,
     //        dx; // location of coarsest origin and dx

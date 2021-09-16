@@ -143,7 +143,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
-            double NormChi = amr_red_ev.norm(c_chi, 1, true);
+            double NormChi = amr_red_ev.norm(c_chibg, 1, true);
             double NormK = amr_red_ev.norm(c_K, 1, true);
 
             double Normh11 = amr_red_ev.norm(c_h11, 1, true);
