@@ -32,7 +32,7 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
-#include "GBScalarAnalytic.hpp"
+// #include "GBScalarAnalytic.hpp"
 
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
@@ -74,6 +74,27 @@ void ScalarFieldLevel::initialData()
     fillAllGhosts();
     BoxLoops::loop(GammaCalculator(m_dx), m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
+
+     if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+
+     bool first_step = (m_time == 0.); 
+     AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
+     if (m_level == 0)
+        {
+            //output norms
+            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
+
+            SmallDataIO norm_phi_analytic_file(m_p.data_path + "norm_phi_analutic_value",
+                                         m_dt, m_time, m_restart_time,
+                                         SmallDataIO::APPEND, first_step);
+            norm_phi_analytic_file.remove_duplicate_time_data();
+            if (first_step)
+                {
+                    norm_phi_analytic_file.write_header_line({"Phi Analytic Norm"});
+                }
+            norm_phi_analytic_file.write_time_data_line({NormAnalyticPhi});
+        }
 }
 
 #ifdef CH_USE_HDF5
@@ -240,14 +261,14 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.compare_gb_analytic)
     {
         fillAllGhosts();
-        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+        // BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
+        //              m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 
         if (m_level == 0)
         {
             //output norms
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
-            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
+            // double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
 
             double NormChi = amr_red_ev.norm(c_chi, 1, true);
             double NormK = amr_red_ev.norm(c_K, 1, true);
@@ -273,9 +294,11 @@ void ScalarFieldLevel::specificPostTimeStep()
             norm_phi_file.remove_duplicate_time_data();
             if (first_step)
                 {
-                    norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
+                    // norm_phi_file.write_header_line({"Phi Analytic Norm", "Phi Numeric Norm"});
+                    norm_phi_file.write_header_line({"Phi Numeric Norm"});
                 }
-            norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
+            // norm_phi_file.write_time_data_line({NormAnalyticPhi, NormNumericPhi});
+            norm_phi_file.write_time_data_line({NormNumericPhi});
 
             SmallDataIO norm_chiK_file(m_p.data_path + "norm_chiK_values",
                                          m_dt, m_time, m_restart_time,
