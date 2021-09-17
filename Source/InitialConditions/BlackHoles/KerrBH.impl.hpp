@@ -64,17 +64,6 @@ template <class data_t> void KerrBH::compute(Cell<data_t> current_cell) const
     // vars.lapse = kerr_lapse;
     vars.lapse = pow(vars.chi, 0.5);
 
-    //For testing against analytic expression for phi
-    // double M = m_params.mass;
-    // double beta = 0.5;
-       
-    // // Transform from Schwarzschild to isotropic and make conformal 
-    // data_t r =  sqrt(vars.chi) * coords.get_radius();
-    // data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
-    // data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
-  
-    // current_cell.store_vars(phi_analytic, c_phianalytic);
-
     // Populate the variables on the grid
     // NB We stil need to set Gamma^i which is NON ZERO
     // but we do this via a separate class/compute function

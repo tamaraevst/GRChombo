@@ -44,12 +44,13 @@ print_progress_only_to_rank_0 = 1
 G_Newton = 0.0
 
 # Scalar field initial data
-scalar_amplitude = 0.1
-scalar_width = 5.0
+scalar_amplitude = 0.0
+scalar_width = 0.0
 
 # Kerr BH data
 kerr_mass = 1.0
 kerr_spin = 0.0
+kerr_center = 64.0 64.0 64.0 # position the BH in the middle of the grid
 
 #################################################
 # Grid parameters
@@ -61,8 +62,8 @@ kerr_spin = 0.0
 # NB - if you have a non-cubic grid, you can specify 'N1' or 'N1_full',
 # 'N2' or 'N2_full' and 'N3' or 'N3_full' ( then dx_coarsest = L/N(max) )
 # NB - the N values need to be multiples of the block_factor
-N_full = 128
-L_full = 256
+N_full = 64
+L_full = 128
 
 # Maximum number of times you can regrid above coarsest level
 max_level = 6 # There are (max_level+1) grids, so min is zero
@@ -86,7 +87,7 @@ tag_buffer_size = 0 # this example uses a fixed grid
 # grid_buffer_size = 8
 # fill_ratio = 0.7
 # num_ghosts = 3
-# center = 256.0 256.0 256.0 # defaults to center of the grid
+center = 0.0 0.0 0.0 # defaults to center of the grid
 
 #################################################
 # Boundary Conditions parameters
@@ -97,8 +98,8 @@ isPeriodic = 0 0 0
 # 0 = static, 1 = sommerfeld, 2 = reflective
 # 3 = extrapolating, 4 = mixed
 # (see BoundaryConditions.hpp for details)
-hi_boundary = 4 4 4
-lo_boundary = 2 2 2
+hi_boundary = 1 1 1
+lo_boundary = 1 1 1
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -129,7 +130,7 @@ extrapolating_vars = phi Pi
 
 # dt will be dx*dt_multiplier on each grid level
 dt_multiplier = 0.25
-stop_time = 100.0
+stop_time = 300.0
 # max_steps = 4
 
 # Spatial derivative order (only affects CCZ4 RHS)
@@ -163,9 +164,12 @@ calculate_scalar_norm = 1
 # compare GB scalar with analytic solution? (only for Schwarzschild)
 compare_gb_analytic = 1
 
+# whether to calcvulate constraint norms
+calculate_constraint_norms = 1
+
 # amplitudes
-gamma_amplitude = 1.0
-beta_amplitude = 1.0
+gamma_amplitude = 0.0
+beta_amplitude = 0.5
 
 # min_chi = 1.e-4
 # min_lapse = 1.e-4

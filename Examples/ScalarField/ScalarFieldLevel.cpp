@@ -174,18 +174,14 @@ void ScalarFieldLevel::specificPostTimeStep()
 {
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
 
-    bool first_step = (m_time == m_dt); // if not called in Main
-
     AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
     AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
-    // DefaultPotential potential;
-    // ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
     
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
-//    bool first_step =
-//         (m_time == 0.); // this form is used when 'specificPostTimeStep' is
+   bool first_step =
+        (m_time == 0.); // this form is used when 'specificPostTimeStep' is
                         // called during setup at t=0 from Main
     
     if (m_p.calculate_constraint_norms)
@@ -248,7 +244,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             //output norms
             double NormNumericPhi = amr_red_ev.norm(c_phi, 1, true);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
-
+            
             double NormChi = amr_red_ev.norm(c_chi, 1, true);
             double NormK = amr_red_ev.norm(c_K, 1, true);
 
