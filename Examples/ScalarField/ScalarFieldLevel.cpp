@@ -32,7 +32,7 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
-// #include "GBScalarAnalytic.hpp"
+#include "GBScalarAnalytic.hpp"
 
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
@@ -240,8 +240,8 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.compare_gb_analytic)
     {
         fillAllGhosts();
-        // BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-        //              m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
+        BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 
         if (m_level == 0)
         {
