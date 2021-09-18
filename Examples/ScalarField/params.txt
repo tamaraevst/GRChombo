@@ -162,7 +162,13 @@ sigma = 0.3
 calculate_scalar_norm = 1
 
 # compare GB scalar with analytic solution? (only for Schwarzschild)
-compare_gb_analytic = 1
+norm_gb_analytic = 1
+
+# calculate the norms of numeric \phi
+norm_numeric_phi = 1
+
+#output norms for geometric variables
+geometric_norms = 1
 
 # whether to calcvulate constraint norms
 calculate_constraint_norms = 1

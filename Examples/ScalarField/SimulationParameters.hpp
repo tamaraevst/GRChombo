@@ -46,8 +46,14 @@ class SimulationParameters : public SimulationParametersBase
         // Whether to do calculation of scalars' norms
         pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
-        // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
-        pp.load("compare_gb_analytic", compare_gb_analytic, false);
+        // Whether to output norm of analytic solution of \phi with GB term as a source (only for Schwarzschild)
+        pp.load("norm_gb_analytic", norm_gb_analytic, false);
+
+        // Whether to output norm of numeric \phi 
+        pp.load("norm_numeric_phi", norm_numeric_phi, false);
+
+        // Whether to calculate norms of \chi, K, A_{ij}, h_{ij}
+        pp.load("geometric_norms", geometric_norms, false);
          
         //Do we want to calculate constraint norms?
         pp.load("calculate_constraint_norms", calculate_constraint_norms, false);
@@ -91,7 +97,9 @@ class SimulationParameters : public SimulationParametersBase
     double beta_amplitude;
 
     bool calculate_scalar_norm;
-    bool compare_gb_analytic;
+    bool norm_gb_analytic;
+    bool norm_numeric_phi;
+    bool geometric_norms;
     bool matter_only;
     bool calculate_constraint_norms;
 };

@@ -31,15 +31,13 @@ class GBScalarAnalytic
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
-        // //load vars
-        // const auto vars_is = current_cell.template load_vars<CCZ4Vars>();
-
       // The cartesian variables 
       Vars<data_t> vars;
       Tensor<2, data_t> spherical_g;
 
       //where am I?
       Coordinates<data_t> coords(current_cell, m_dx, m_center);
+
       // Compute the components in spherical coords as per 1401.1548
       compute_isotropic_metric(spherical_g, coords);
 
@@ -58,7 +56,6 @@ class GBScalarAnalytic
       data_t deth = compute_determinant(vars.h);
       auto h_UU = compute_inverse_sym(vars.h);
       vars.chi = pow(deth, -1. / 3.);
-      DEBUG_OUT(vars.chi);
 
       //rename for convenience
       double M = m_mass;
@@ -68,10 +65,6 @@ class GBScalarAnalytic
       data_t r =  sqrt(vars.chi) * coords.get_radius();
       data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
       data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
-
-      DEBUG_OUT(r);
-      DEBUG_OUT(xx);
-      DEBUG_OUT(phi_analytic);
   
       current_cell.store_vars(phi_analytic, c_phianalytic);
     }
@@ -102,6 +95,7 @@ class GBScalarAnalytic
         data_t cos_theta = z / r;
         data_t sin_theta2 = sin_theta * sin_theta;
 
+        //Mass of the BH
         double M = m_mass;
 
          // calculate useful metric quantities
