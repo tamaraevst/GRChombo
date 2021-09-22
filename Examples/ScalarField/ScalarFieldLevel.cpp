@@ -85,7 +85,7 @@ void ScalarFieldLevel::prePlotLevel()
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
-        Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom))),
+        Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 #endif
@@ -187,12 +187,12 @@ void ScalarFieldLevel::specificPostTimeStep()
     if (m_p.calculate_constraint_norms)
     {
         fillAllGhosts();
-        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom)), m_state_new, m_state_diagnostics,
+        BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics,
                        EXCLUDE_GHOST_CELLS);
         if (m_level == 0)
         {
             double L2_Ham = amr_red_diag.norm(c_Ham);
-            double L2_Mom = amr_red_diag.norm(Interval(c_Mom, c_Mom));
+            double L2_Mom = amr_red_diag.norm(Interval(c_Mom1, c_Mom3));
             SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
                                          m_restart_time, SmallDataIO::APPEND,
                                          first_step);

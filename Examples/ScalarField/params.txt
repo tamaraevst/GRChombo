@@ -112,7 +112,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 1 2 3          #Theta and Gamma
                          0 1 2 3 1 2 3    #lapse shift and B
                          0 0              #phi and Pi
-vars_parity_diagnostic = 0 1 8 8 8        #Ham Mom ChernSimons GaussBonnet PhiAnalytic
+vars_parity_diagnostic = 0 1 2 3 8 8 8    #Ham Mom1, Mom2, Mom3, ChernSimons GaussBonnet PhiAnalytic
 
 # if sommerfeld boundaries selected, must select
 # non zero asymptotic values
