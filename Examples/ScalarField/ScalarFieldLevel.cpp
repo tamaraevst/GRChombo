@@ -74,8 +74,6 @@ void ScalarFieldLevel::initialData()
     fillAllGhosts();
     BoxLoops::loop(GammaCalculator(m_dx), m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
-    // BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-    //                  m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 }
 
 #ifdef CH_USE_HDF5
@@ -252,7 +250,9 @@ void ScalarFieldLevel::specificPostTimeStep()
         if (m_level == 0)
         {
             //output norms
-            
+            fillAllGhosts();
+            BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
         
             SmallDataIO norm_phi_analytic_file(m_p.data_path + "norm_phi_analytic_values",
