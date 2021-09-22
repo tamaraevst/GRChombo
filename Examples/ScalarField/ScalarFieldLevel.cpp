@@ -74,8 +74,8 @@ void ScalarFieldLevel::initialData()
     fillAllGhosts();
     BoxLoops::loop(GammaCalculator(m_dx), m_state_new, m_state_new,
                    EXCLUDE_GHOST_CELLS);
-    BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
+    // BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
+    //                  m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 }
 
 #ifdef CH_USE_HDF5
@@ -216,8 +216,7 @@ void ScalarFieldLevel::specificPostTimeStep()
         {
             double CS_norm = amr_red_diag.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
             double GB_norm = amr_red_diag.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
-            // double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
-
+        
             if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
             SmallDataIO scalars_file(m_p.data_path + "modified_scalars_l1norm",

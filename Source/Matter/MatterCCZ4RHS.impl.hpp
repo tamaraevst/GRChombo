@@ -46,6 +46,27 @@ void MatterCCZ4RHS<matter_t, gauge_t, deriv_t>::compute(
     // Add dissipation to all terms
     this->m_deriv.add_dissipation(matter_rhs, current_cell, this->m_sigma);
 
+    const double dx = 0.1;
+    IntVect iv;
+    iv[0] = 0;
+    iv[1] = 0;
+    iv[2] = 0;
+    Coordinates<double> coords(iv, dx);
+    const double x = coords.x;
+    const double y = coords.y;
+    const double z = coords.z;
+
+    //rename for convenience
+      double M = 1.0;
+      double beta = 0.5;
+       
+      // Transform from Schwarzschild to isotropic and make conformal 
+      data_t r =  sqrt(matter_vars.chi) * coords.get_radius();
+      data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
+      data_t phi_analytic = (2.0 * beta) / (M * M) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
+  
+      current_cell.store_vars(phi_analytic, c_phianalytic);
+
     // Write the rhs into the output FArrayBox
     current_cell.store_vars(matter_rhs);
 }
