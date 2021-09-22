@@ -99,8 +99,7 @@ class GBScalarAnalytic
         double M = m_mass;
 
          // calculate useful metric quantities
-        double r_plus = M + sqrt(M * M);
-        double r_minus = M - sqrt(M * M);
+        double r_plus = 2.0 * M;
 
         // The Boyer-Lindquist coordinate
         data_t r_BL = r * pow(1.0 + 0.25 * r_plus / r, 2.0);
@@ -108,10 +107,9 @@ class GBScalarAnalytic
         // Other useful quantities per 1001.4077
         data_t Sigma = r_BL * r_BL;
         // In the paper this is just 'A', but not to be confused with A_ij
-        data_t AA = pow(r_BL * r_BL, 2.0);
+        data_t AA = pow(r_BL, 4.0);
         // The rr component of the conformal spatial matric
-        data_t gamma_rr =
-        Sigma * pow(r + 0.25 * r_plus, 2.0) / (r * r2 * (r_BL - r_minus));
+        data_t gamma_rr = Sigma * pow(r + 0.25 * r_plus, 2.0) / (r * r2 * r_BL);
 
         // Metric in semi isotropic Kerr-Schild coordinates, r, theta (t or th), phi
         // (p)
