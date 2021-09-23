@@ -177,12 +177,6 @@ void ScalarFieldLevel::specificPostTimeStep()
     AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
     AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
 
-    double vol_ev = amr_red_ev.get_domain_volume();
-    double vol_diag = amr_red_diag.get_domain_volume();
-
-    DEBUG_OUT(vol_ev);
-    DEBUG_OUT(vol_diag);
-
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
@@ -256,7 +250,7 @@ void ScalarFieldLevel::specificPostTimeStep()
             //output norms
             fillAllGhosts();
             BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
+                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
             double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
         
             SmallDataIO norm_phi_analytic_file(m_p.data_path + "norm_phi_analytic_values",
