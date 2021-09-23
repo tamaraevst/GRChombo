@@ -176,7 +176,13 @@ void ScalarFieldLevel::specificPostTimeStep()
 
     AMRReductions<VariableType::diagnostic> amr_red_diag(m_gr_amr);
     AMRReductions<VariableType::evolution> amr_red_ev(m_gr_amr);
-    
+
+    double vol_ev = amr_red_ev.get_domain_volume();
+    double vol_diag = amr_red_diag.get_domain_volume();
+
+    DEBUG_OUT(vol_ev);
+    DEBUG_OUT(vol_diag);
+
     if (!FilesystemTools::directory_exists(m_p.data_path))
             FilesystemTools::mkdir_recursive(m_p.data_path);
 
@@ -215,8 +221,6 @@ void ScalarFieldLevel::specificPostTimeStep()
             double CS_norm = amr_red_diag.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
             double GB_norm = amr_red_diag.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
         
-            if (!FilesystemTools::directory_exists(m_p.data_path))
-            FilesystemTools::mkdir_recursive(m_p.data_path);
             SmallDataIO scalars_file(m_p.data_path + "modified_scalars_l1norm",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
