@@ -45,7 +45,9 @@ class WeylExtraction : public SphericalExtraction
         extract(a_interpolator);
 
         if (m_params.write_extraction)
-            write_extraction(m_params.extraction_file_prefix);
+        {
+            write_extraction("Weyl4ExtractionOut_");
+        }
 
         // now calculate and write the requested spherical harmonic modes
         std::vector<std::pair<std::vector<double>, std::vector<double>>>
@@ -77,7 +79,7 @@ class WeylExtraction : public SphericalExtraction
         for (int imode = 0; imode < m_num_modes; ++imode)
         {
             const auto &mode = m_modes[imode];
-            std::string integrals_filename = m_params.integral_file_prefix +
+            std::string integrals_filename = "Weyl_integral_" +
                                              std::to_string(mode.first) +
                                              std::to_string(mode.second);
             std::vector<std::vector<double>> integrals_for_writing = {

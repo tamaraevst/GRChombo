@@ -11,9 +11,10 @@
 #include "SimulationParametersBase.hpp"
 
 // Problem specific includes:
+#include "CCZ4.hpp"
 #include "InitialScalarData.hpp"
 #include "KerrBH.hpp"
-#include "ScalarField.hpp"
+#include "Potential.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
@@ -34,39 +35,21 @@ class SimulationParameters : public SimulationParametersBase
                 0.0); // for now the example neglects backreaction
         pp.load("scalar_amplitude", initial_params.amplitude, 0.1);
         pp.load("scalar_width", initial_params.width, 1.0);
+        pp.load("scalar_mass", potential_params.scalar_mass, 0.1);
 
         // Initial Kerr data
         pp.load("kerr_mass", kerr_params.mass, 1.0);
         pp.load("kerr_spin", kerr_params.spin, 0.0);
         pp.load("kerr_center", kerr_params.center, center);
-
-        // whether to do do evolution of matter only
-        pp.load("matter_only", matter_only, false);
-
-        // Whether to do calculation of scalars' norms
-        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
-
-        // Whether to output norm of analytic solution of \phi with GB term as a source (only for Schwarzschild)
-        pp.load("norm_gb_analytic", norm_gb_analytic, false);
-
-        // Whether to output norm of numeric \phi 
-        pp.load("norm_numeric_phi", norm_numeric_phi, false);
-
-        // Whether to calculate norms of \chi, K, A_{ij}, h_{ij}
-        pp.load("geometric_norms", geometric_norms, false);
-         
-        //Do we want to calculate constraint norms?
-        pp.load("calculate_constraint_norms", calculate_constraint_norms, false);
-
-        /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
-        they are \gamma'(0) and \beta'(0) for the scalars respectively.
-        Set them to zero if you do not want the corresponding scalar included. */
-        pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
-        pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
     }
 
     void check_params()
     {
+        warn_parameter("scalar_mass", potential_params.scalar_mass,
+                       potential_params.scalar_mass <
+                           0.2 / coarsest_dx / dt_multiplier,
+                       "oscillations of scalar field do not appear to be "
+                       "resolved on coarsest level");
         warn_parameter("scalar_width", initial_params.width,
                        initial_params.width < 0.5 * L,
                        "is greater than half the domain size");
@@ -76,7 +59,7 @@ class SimulationParameters : public SimulationParametersBase
                         std::abs(kerr_params.spin) <= kerr_params.mass,
                         "must satisfy |a| <= M = " +
                             std::to_string(kerr_params.mass));
-        FOR(idir)
+        FOR1(idir)
         {
             std::string name = "kerr_center[" + std::to_string(idir) + "]";
             warn_parameter(
@@ -90,18 +73,8 @@ class SimulationParameters : public SimulationParametersBase
     // Initial data for matter and potential and BH
     double G_Newton;
     InitialScalarData::params_t initial_params;
+    Potential::params_t potential_params;
     KerrBH::params_t kerr_params;
-
-    //Parameters for modified scalar field equation 
-    double gamma_amplitude;
-    double beta_amplitude;
-
-    bool calculate_scalar_norm;
-    bool norm_gb_analytic;
-    bool norm_numeric_phi;
-    bool geometric_norms;
-    bool matter_only;
-    bool calculate_constraint_norms;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

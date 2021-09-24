@@ -36,6 +36,17 @@
         "stop_token": "cpp",
         "streambuf": "cpp",
         "tuple": "cpp",
-        "chrono": "cpp"
+        "chrono": "cpp",
+        "complex": "cpp",
+        "cmath": "cpp",
+        "__debug": "cpp",
+        "__functional_base": "cpp",
+        "__tuple": "cpp",
+        "algorithm": "cpp",
+        "cstddef": "cpp",
+        "exception": "cpp",
+        "fstream": "cpp",
+        "memory": "cpp",
+        "utility": "cpp"
     }
 }

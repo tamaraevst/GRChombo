@@ -52,7 +52,7 @@ class ChiAndPhiTaggingCriterion
         data_t mod_d2_chi = 0;
         data_t mod_d2_phi = 0;
 
-        FOR(idir, jdir)
+        FOR2(idir, jdir)
         {
             mod_d2_chi += d2chi.chi[idir][jdir] * d2chi.chi[idir][jdir];
 

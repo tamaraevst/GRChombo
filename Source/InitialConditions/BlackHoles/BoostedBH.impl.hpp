@@ -41,7 +41,7 @@ Tensor<2, data_t> BoostedBH::Aij(Coordinates<data_t> coords) const
 
     Tensor<2, data_t> out;
 
-    FOR(i, j)
+    FOR2(i, j)
     {
         const double delta = (i == j) ? 1 : 0;
         out[i][j] = 1.5 *

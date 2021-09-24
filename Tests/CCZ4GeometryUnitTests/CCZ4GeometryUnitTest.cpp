@@ -6,7 +6,6 @@
 #include "CCZ4Geometry.hpp"
 #include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
-#include <iomanip>
 #include <iostream>
 
 template <class data_t> struct vars_t
@@ -34,10 +33,8 @@ int main()
     auto ricciZ =
         CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
-    std::cout << std::setprecision(16);
-
     // Compare
-    FOR(i, j)
+    FOR2(i, j)
     {
         double diff = h_UU[i][j] - h_UU_known[i][j];
         if (diff > 1e-14)
@@ -48,7 +45,7 @@ int main()
         }
     }
 
-    FOR(i, j, k)
+    FOR3(i, j, k)
     {
         double diff = chris.ULL[i][j][k] - chris_known[i][j][k];
         if (diff > 1e-14)
@@ -61,7 +58,7 @@ int main()
         }
     }
 
-    FOR(i)
+    FOR1(i)
     {
         double diff = chris.contracted[i] - chris_contracted_known[i];
         if (diff > 1e-14)
@@ -75,7 +72,7 @@ int main()
         }
     }
 
-    FOR(i, j)
+    FOR2(i, j)
     {
         double diff = ricciZ.LL[i][j] - ricciZ_known[i][j];
         if (diff > 1e-14)

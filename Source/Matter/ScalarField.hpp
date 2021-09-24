@@ -7,15 +7,13 @@
 #define SCALARFIELD_HPP_
 
 #include "CCZ4Geometry.hpp"
-#include "ModifiedScalarsGeometry.hpp"
 #include "DefaultPotential.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS, total num of components
-#include "simd.hpp"
-#include "DebuggingTools.hpp"
+#include "VarsTools.hpp"
 
 //!  Calculates the matter type specific elements such as the EMTensor and
 //   matter evolution
@@ -31,23 +29,15 @@
      It assumes minimal coupling of the field to gravity.
      \sa MatterCCZ4(), ConstraintsMatter()
 */
-
 template <class potential_t = DefaultPotential> class ScalarField
 {
-    protected:
-    /* The local copy of the potential, Chern Simons and 
-    Gauss Bonnet amplitudes*/
+  protected:
+    //! The local copy of the potential
     potential_t my_potential;
-    double m_gamma_amplitude;
-    double m_beta_amplitude;
 
-    public:
-    ScalarField(const potential_t a_potential,
-                double a_gamma_amplitude,
-                double a_beta_amplitude) : 
-                my_potential(a_potential),
-                m_gamma_amplitude(a_gamma_amplitude),
-                m_beta_amplitude(a_beta_amplitude){}
+  public:
+    //!  Constructor of class ScalarField, inputs are the matter parameters.
+    ScalarField(const potential_t a_potential) : my_potential(a_potential) {}
 
     //! Structure containing the rhs variables for the matter fields
     template <class data_t> struct Vars

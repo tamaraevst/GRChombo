@@ -11,15 +11,7 @@ enum
 {
     c_Ham,
 
-    c_Mom1,
-    c_Mom2,
-    c_Mom3,
-
-    c_chernsimons,
-
-    c_gaussbonnet,
-
-    c_phianalytic,
+    c_Mom,
 
     NUM_DIAGNOSTIC_VARS
 };
@@ -29,15 +21,7 @@ namespace DiagnosticVariables
 static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     "Ham",
 
-    "Mom1",   "Mom2",    "Mom3",
-    
-    "ChernSimons",
-    
-    "GaussBonnet",
-
-    "Phi Analytic"
-
-    };
+    "Mom"};
 }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */

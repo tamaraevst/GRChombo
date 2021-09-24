@@ -110,7 +110,7 @@ ALWAYS_INLINE data_t compute_trace(const Tensor<2, data_t> &tensor_LL,
                                    const Tensor<2, data_t> &inverse_metric)
 {
     data_t trace = 0.;
-    FOR(i, j) { trace += inverse_metric[i][j] * tensor_LL[i][j]; }
+    FOR2(i, j) { trace += inverse_metric[i][j] * tensor_LL[i][j]; }
     return trace;
 }
 
@@ -119,7 +119,7 @@ template <class data_t>
 ALWAYS_INLINE data_t compute_trace(const Tensor<2, data_t> &tensor_UL)
 {
     data_t trace = 0.;
-    FOR(i) trace += tensor_UL[i][i];
+    FOR1(i) trace += tensor_UL[i][i];
     return trace;
 }
 
@@ -128,7 +128,7 @@ ALWAYS_INLINE data_t
 compute_trace(const Tensor<1, Tensor<1, data_t>> &tensor_UL)
 {
     data_t trace = 0.;
-    FOR(i) trace += tensor_UL[i][i];
+    FOR1(i) trace += tensor_UL[i][i];
     return trace;
 }
 
@@ -138,7 +138,7 @@ ALWAYS_INLINE data_t compute_dot_product(const Tensor<1, data_t> &vector_U,
                                          const Tensor<1, data_t> &covector_L)
 {
     data_t dot_product = 0.;
-    FOR(i) dot_product += vector_U[i] * covector_L[i];
+    FOR1(i) dot_product += vector_U[i] * covector_L[i];
     return dot_product;
 }
 
@@ -150,7 +150,7 @@ ALWAYS_INLINE data_t compute_dot_product(
     const Tensor<2, data_t> &inverse_metric)
 {
     data_t dot_product = 0.;
-    FOR(m, n)
+    FOR2(m, n)
     {
         dot_product += inverse_metric[m][n] * covector1_L[m] * covector2_L[n];
     }
@@ -167,23 +167,9 @@ ALWAYS_INLINE void make_trace_free(Tensor<2, data_t> &tensor_LL,
 {
     auto trace = compute_trace(tensor_LL, inverse_metric);
     double one_over_gr_spacedim = 1. / ((double)GR_SPACEDIM);
-    FOR(i, j)
+    FOR2(i, j)
     {
         tensor_LL[i][j] -= one_over_gr_spacedim * metric[i][j] * trace;
-    }
-}
-
-/// Makes a 2-Tensor symmetric
-template <class data_t, int size>
-ALWAYS_INLINE void make_symmetric(Tensor<2, data_t, size> &tensor_LL)
-{
-    for (int i = 0; i < size; ++i)
-    {
-        for (int j = 0; j < i; ++j)
-        {
-            tensor_LL[i][j] = 0.5 * (tensor_LL[i][j] + tensor_LL[j][i]);
-            tensor_LL[j][i] = tensor_LL[i][j];
-        }
     }
 }
 
@@ -194,7 +180,7 @@ raise_all(const Tensor<1, data_t> &tensor_L,
           const Tensor<2, data_t> &inverse_metric)
 {
     Tensor<1, data_t> tensor_U = 0.;
-    FOR(i, j) { tensor_U[i] += inverse_metric[i][j] * tensor_L[j]; }
+    FOR2(i, j) { tensor_U[i] += inverse_metric[i][j] * tensor_L[j]; }
     return tensor_U;
 }
 
@@ -205,7 +191,7 @@ raise_all(const Tensor<2, data_t> &tensor_LL,
           const Tensor<2, data_t> &inverse_metric)
 {
     Tensor<2, data_t> tensor_UU = 0.;
-    FOR(i, j, k, l)
+    FOR4(i, j, k, l)
     {
         tensor_UU[i][j] +=
             inverse_metric[i][k] * inverse_metric[j][l] * tensor_LL[k][l];
@@ -249,36 +235,52 @@ inline Tensor<3, double> epsilon()
 }
 
 /// Computes the levi-civita symbol (4D, NB, symbol, not the Tensor)
-inline Tensor<4, double, 4> epsilon4D()
+
+inline std::array<std::array<std::array<std::array<int, 4>, 4>, 4>, 4>
+epsilon4D()
 {
-    Tensor<4, double, 4> epsilon4D = {0.0};
-    epsilon4D[0][1][2][3] = 1.0;
-    epsilon4D[0][1][3][2] = -1.0;
-    epsilon4D[0][3][1][2] = 1.0;
-    epsilon4D[0][3][2][1] = -1.0;
-    epsilon4D[0][2][1][3] = -1.0;
-    epsilon4D[0][2][3][1] = 1.0;
+    std::array<std::array<std::array<std::array<int, 4>, 4>, 4>, 4> epsilon4D;
+    // Definition of levi civita 4 - antisymmetric Tensor
+    for (int i = 0; i < 4; ++i)
+    {
+        for (int j = 0; j < 4; ++j)
+        {
+            for (int k = 0; k < 4; ++k)
+            {
+                for (int l = 0; l < 4; ++l)
+                {
+                    epsilon4D[i][j][k][l] = 0;
+                }
+            }
+        }
+    }
+    epsilon4D[0][1][2][3] = 1;
+    epsilon4D[0][1][3][2] = -1;
+    epsilon4D[0][3][1][2] = 1;
+    epsilon4D[0][3][2][1] = -1;
+    epsilon4D[0][2][1][3] = -1;
+    epsilon4D[0][2][3][1] = 1;
 
-    epsilon4D[1][0][2][3] = -1.0;
-    epsilon4D[1][2][0][3] = 1.0;
-    epsilon4D[1][2][3][0] = -1.0;
-    epsilon4D[1][3][2][0] = 1.0;
-    epsilon4D[1][3][0][2] = -1.0;
-    epsilon4D[1][0][3][2] = 1.0;
+    epsilon4D[1][0][2][3] = -1;
+    epsilon4D[1][2][0][3] = 1;
+    epsilon4D[1][2][3][0] = -1;
+    epsilon4D[1][3][2][0] = 1;
+    epsilon4D[1][3][0][2] = -1;
+    epsilon4D[1][0][3][2] = 1;
 
-    epsilon4D[2][0][1][3] = 1.0;
-    epsilon4D[2][0][3][1] = -1.0;
-    epsilon4D[2][3][0][1] = 1.0;
-    epsilon4D[2][3][1][0] = -1.0;
-    epsilon4D[2][1][3][0] = 1.0;
-    epsilon4D[2][1][0][3] = -1.0;
+    epsilon4D[2][0][1][3] = 1;
+    epsilon4D[2][0][3][1] = -1;
+    epsilon4D[2][3][0][1] = 1;
+    epsilon4D[2][3][1][0] = -1;
+    epsilon4D[2][1][3][0] = 1;
+    epsilon4D[2][1][0][3] = -1;
 
-    epsilon4D[3][0][1][2] = -1.0;
-    epsilon4D[3][1][0][2] = 1.0;
-    epsilon4D[3][1][2][0] = -1.0;
-    epsilon4D[3][2][1][0] = 1.0;
-    epsilon4D[3][2][0][1] = -1.0;
-    epsilon4D[3][0][2][1] = 1.0;
+    epsilon4D[3][0][1][2] = -1;
+    epsilon4D[3][1][0][2] = 1;
+    epsilon4D[3][1][2][0] = -1;
+    epsilon4D[3][2][1][0] = 1;
+    epsilon4D[3][2][0][1] = -1;
+    epsilon4D[3][0][2][1] = 1;
 
     return epsilon4D;
 }
@@ -291,20 +293,20 @@ compute_christoffel(const Tensor<2, Tensor<1, data_t>> &d1_metric,
 {
     chris_t<data_t> out;
 
-    FOR(i, j, k)
+    FOR3(i, j, k)
     {
         out.LLL[i][j][k] = 0.5 * (d1_metric[j][i][k] + d1_metric[k][i][j] -
                                   d1_metric[j][k][i]);
     }
-    FOR(i, j, k)
+    FOR3(i, j, k)
     {
         out.ULL[i][j][k] = 0;
-        FOR(l) { out.ULL[i][j][k] += h_UU[i][l] * out.LLL[l][j][k]; }
+        FOR1(l) { out.ULL[i][j][k] += h_UU[i][l] * out.LLL[l][j][k]; }
     }
-    FOR(i)
+    FOR1(i)
     {
         out.contracted[i] = 0;
-        FOR(j, k) { out.contracted[i] += h_UU[j][k] * out.ULL[i][j][k]; }
+        FOR2(j, k) { out.contracted[i] += h_UU[j][k] * out.ULL[i][j][k]; }
     }
 
     return out;
@@ -318,13 +320,13 @@ Tensor<3, data_t> compute_phys_chris(const Tensor<1, data_t> &d1_chi,
                                      const Tensor<3, data_t> &chris_ULL)
 {
     Tensor<3, data_t> chris_phys;
-    FOR(i, j, k)
+    FOR3(i, j, k)
     {
         chris_phys[i][j][k] =
             chris_ULL[i][j][k] -
             0.5 / vars_chi *
                 (delta(i, k) * d1_chi[j] + delta(i, j) * d1_chi[k]);
-        FOR(m)
+        FOR1(m)
         {
             chris_phys[i][j][k] +=
                 0.5 / vars_chi * vars_h[j][k] * h_UU[i][m] * d1_chi[m];

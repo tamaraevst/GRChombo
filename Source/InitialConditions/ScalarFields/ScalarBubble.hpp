@@ -8,7 +8,7 @@
 
 #include "Cell.hpp"
 #include "Coordinates.hpp"
-#include "MatterCCZ4RHS.hpp"
+#include "MatterCCZ4.hpp"
 #include "ScalarField.hpp"
 #include "Tensor.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS - total no. components
@@ -38,7 +38,7 @@ class ScalarBubble
     template <class data_t> void compute(Cell<data_t> current_cell) const;
 
   protected:
-    double m_dx;
+    const double m_dx;
     const params_t m_params; //!< The matter initial condition params
 
     //! Function to compute the value of phi at each point

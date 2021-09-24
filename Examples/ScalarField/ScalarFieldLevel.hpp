@@ -9,7 +9,7 @@
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
 // Problem specific includes
-#include "DefaultPotential.hpp"
+#include "Potential.hpp"
 #include "ScalarField.hpp"
 
 //!  A class for the evolution of a scalar field, minimally coupled to gravity
@@ -28,7 +28,7 @@ class ScalarFieldLevel : public GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
 
     // Typedef for scalar field
-    typedef ScalarField<DefaultPotential> ScalarFieldWithPotential;
+    typedef ScalarField<Potential> ScalarFieldWithPotential;
 
     //! Things to do at the end of the advance step, after RK4 calculation
     virtual void specificAdvance();
@@ -36,10 +36,8 @@ class ScalarFieldLevel : public GRAMRLevel
     //! Initialize data for the field and metric variables
     virtual void initialData();
 
-#ifdef CH_USE_HDF5
     //! routines to do before outputting plot file
     virtual void prePlotLevel();
-#endif
 
     //! RHS routines used at each RK4 step
     virtual void specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
@@ -55,9 +53,6 @@ class ScalarFieldLevel : public GRAMRLevel
     //! Tell Chombo how to tag cells for regridding
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
-
-    //! Things to do after a timestep on each level
-    virtual void specificPostTimeStep() override;
 };
 
 #endif /* SCALARFIELDLEVEL_HPP_ */
