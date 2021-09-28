@@ -59,7 +59,23 @@ class IsotropicKerrFixedBG
         // calculate and save chi
         data_t chi = TensorAlgebra::compute_determinant_sym(metric_vars.gamma);
         chi = pow(chi, -1.0 / 3.0);
+        
+        IntVect iv;
+        iv[0] = 64.0;
+        iv[1] = 64.0;
+        iv[2] = 64.0;
+        double M = 1.0;
+        double beta = 0.5;
+        Coordinates<double> coords1(iv, m_dx);
+        const double x = coords1.x;
+        const double y = coords1.y;
+        const double z = coords1.z;
+        
+        data_t r =  sqrt(chi) * coords.get_radius();
+      data_t xx = pow((1.0 + M / (2.0 * r)), 2.0) * r / M;
+      data_t phi_analytic = ((2.0 * beta) / (M * M)) * (1.0 / xx + 1.0 / (xx * xx) + (4.0 / 3.0) * 1.0 / (xx * xx * xx));
 
+        current_cell.store_vars(phi_analytic, c_phianalytic);
         current_cell.store_vars(chi, c_chi);
     }
 

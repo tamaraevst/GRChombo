@@ -27,8 +27,8 @@
 #include "ForceExtraction.hpp"
 #include "InitialConditions.hpp"
 #include "IsotropicKerrFixedBG.hpp"
-#include "GBScalarAnalytic.hpp"
-
+//#include "GBScalarAnalytic.hpp"
+#include "DebuggingTools.hpp"
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
 {
@@ -121,11 +121,12 @@ void ScalarFieldLevel::specificPostTimeStep()
         {
             bool first_step = (m_time == m_dt);
             //output norms
-            fillAllGhosts();
-            BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.bg_params.mass),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
-        
+            //fillAllGhosts();
+           // BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.bg_params.mass),
+                    // m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1);
+             double vol =  amr_red_diag.get_domain_volume();
+             DEBUG_OUT(vol);
             SmallDataIO norm_phi_analytic_file("norm_phi_analytic_values",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
