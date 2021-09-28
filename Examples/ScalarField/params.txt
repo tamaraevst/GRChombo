@@ -50,7 +50,7 @@ scalar_width = 0.0
 # Kerr BH data
 kerr_mass = 1.0
 kerr_spin = 0.0
-kerr_center = 64.0 64.0 64.0 # position the BH in the middle of the grid
+#kerr_center = 64.0 64.0 64.0 # position the BH in the middle of the grid
 
 #################################################
 # Grid parameters
@@ -87,7 +87,7 @@ tag_buffer_size = 0 # this example uses a fixed grid
 # grid_buffer_size = 8
 # fill_ratio = 0.7
 # num_ghosts = 3
-center = 0.0 0.0 0.0 # defaults to center of the grid
+#center = 0.0 0.0 0.0 # defaults to center of the grid
 
 #################################################
 # Boundary Conditions parameters
@@ -99,7 +99,9 @@ isPeriodic = 0 0 0
 # 3 = extrapolating, 4 = mixed
 # (see BoundaryConditions.hpp for details)
 hi_boundary = 1 1 1
-lo_boundary = 1 1 1
+lo_boundary = 2 2 2
+
+# Use octant symmetry with symmetric BC on the lower boundary (2 2 2) for sphercically symmetric spacetime; for Kerr it would be (1 1 2)
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -112,7 +114,7 @@ vars_parity            = 0 0 4 6 0 5 0    #chi and hij
                          0 1 2 3          #Theta and Gamma
                          0 1 2 3 1 2 3    #lapse shift and B
                          0 0              #phi and Pi
-vars_parity_diagnostic = 0 1 2 3 8 8 8    #Ham Mom1, Mom2, Mom3, ChernSimons GaussBonnet PhiAnalytic
+vars_parity_diagnostic = 0 1 2 3 8 8 8    #Ham Mom1 Mom2 Mom3 ChernSimons GaussBonnet PhiAnalytic
 
 # if sommerfeld boundaries selected, must select
 # non zero asymptotic values
@@ -161,16 +163,13 @@ sigma = 0.3
 # switch for outputting CS and GB
 calculate_scalar_norm = 1
 
-# compare GB scalar with analytic solution? (only for Schwarzschild)
-norm_gb_analytic = 1
-
 # calculate the norms of numeric \phi
 norm_numeric_phi = 1
 
 #output norms for geometric variables
 geometric_norms = 1
 
-# whether to calcvulate constraint norms
+# whether to calculate constraint norms
 calculate_constraint_norms = 1
 
 # amplitudes

@@ -3,22 +3,22 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef ADMCONFORMALVARS_HPP_
-#define ADMCONFORMALVARS_HPP_
+#ifndef CONFORMALVARS_HPP_
+#define CONFORMALVARS_HPP_
 
 #include "Tensor.hpp"
 #include "UserVariables.hpp"
 #include "VarsTools.hpp"
 
-/// Namespace for ADM vars in conformally decomposed form
-/** The structs in this namespace collect all the ADM variables. It's main use
- *is to make a local, nicely laid-out, copy of the ADM variables for the
+/// Namespace for  vars in conformally decomposed form
+/** The structs in this namespace collect all the  variables. It's main use
+ *is to make a local, nicely laid-out, copy of the  variables for the
  *current grid cell (Otherwise, this data would only exist on the grid in the
  *huge, flattened Chombo array). \sa {CCZ4Vars, BSSNVars}
  **/
 namespace ADMConformalVars
 {
-/// Vars object for ADM vars, including gauge vars
+/// Vars object for  vars, including gauge vars
 template <class data_t> struct VarsNoGauge
 {
     data_t chi;          //!< Conformal factor
@@ -46,7 +46,7 @@ template <class data_t> struct VarsNoGauge
     }
 };
 
-/// Vars object for ADM vars, including gauge vars
+/// Vars object for  vars, including gauge vars
 template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
 {
     data_t lapse;
@@ -65,7 +65,7 @@ template <class data_t> struct VarsWithGauge : public VarsNoGauge<data_t>
     }
 };
 
-/// Vars object for ADM vars requiring second derivs, excluding gauge vars
+/// Vars object for  vars requiring second derivs, excluding gauge vars
 template <class data_t> struct Diff2VarsNoGauge
 {
     data_t chi;          //!< Conformal factor
@@ -81,7 +81,7 @@ template <class data_t> struct Diff2VarsNoGauge
     }
 };
 
-/// Vars object for ADM vars requiring second derivs, with gauge vars
+/// Vars object for  vars requiring second derivs, with gauge vars
 template <class data_t>
 struct Diff2VarsWithGauge : public Diff2VarsNoGauge<data_t>
 {
@@ -100,6 +100,6 @@ struct Diff2VarsWithGauge : public Diff2VarsNoGauge<data_t>
                             shift);
     }
 };
-} // namespace ADMConformalVars
+} // namespace ConformalVars
 
-#endif /* ADMCONFORMALVARS_HPP_ */
+#endif /* CONFORMALVARS_HPP_ */

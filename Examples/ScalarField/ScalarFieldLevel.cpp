@@ -32,7 +32,6 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
-#include "GBScalarAnalytic.hpp"
 
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
@@ -184,6 +183,7 @@ void ScalarFieldLevel::specificPostTimeStep()
         (m_time == 0.); // this form is used when 'specificPostTimeStep' is
                         // called during setup at t=0 from Main
     
+    //Calculates L2 norms of Hamiltonian and Momentum constraints
     if (m_p.calculate_constraint_norms)
     {
         if (m_level == 0)
@@ -202,6 +202,7 @@ void ScalarFieldLevel::specificPostTimeStep()
         }
     }
 
+    //Calculates L1 norms of GB and CS scalars
     if (m_p.calculate_scalar_norm)
     {   
         fillAllGhosts();
@@ -226,6 +227,8 @@ void ScalarFieldLevel::specificPostTimeStep()
             scalars_file.write_time_data_line({CS_norm, GB_norm});
         }
     }
+
+    //Calculates L1 norm of numeric \phi
     if (m_p.norm_numeric_phi)
     {   
         if (m_level == 0)
@@ -243,29 +246,8 @@ void ScalarFieldLevel::specificPostTimeStep()
             norm_phi_file.write_time_data_line({NormNumericPhi});
         }
     }
-    if (m_p.norm_gb_analytic)
-    {
-        if (m_level == 0)
-        {
-            //output norms
-            fillAllGhosts();
-            BoxLoops::loop(GBScalarAnalytic(m_p.center, m_dx, m_p.kerr_params.mass, m_p.beta_amplitude),
-                     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-            double NormAnalyticPhi = amr_red_diag.norm(c_phianalytic, 1, true);
-        
-            SmallDataIO norm_phi_analytic_file(m_p.data_path + "norm_phi_analytic_values",
-                                         m_dt, m_time, m_restart_time,
-                                         SmallDataIO::APPEND, first_step);
-            norm_phi_analytic_file.remove_duplicate_time_data();
-            if (first_step)
-                {
-                    norm_phi_analytic_file.write_header_line({"Phi Analytic Norm"});
-                }
-            norm_phi_analytic_file.write_time_data_line({NormAnalyticPhi});
-        }
 
-    }
-
+    //Calculates L1 norms of geometric quantities, useful sometimes for postprocessing/figuring out what's going on
     if (m_p.geometric_norms)
     {
         if(m_level == 0)

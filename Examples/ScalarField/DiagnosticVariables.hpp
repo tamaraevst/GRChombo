@@ -31,11 +31,11 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
 
     "Mom1",   "Mom2",    "Mom3",
     
-    "ChernSimons",
+    "chernsimons",
     
-    "GaussBonnet",
+    "gaussbonnet",
 
-    "Phi Analytic"
+    "phianalytic"
 
     };
 }
