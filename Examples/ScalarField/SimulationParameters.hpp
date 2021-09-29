@@ -44,7 +44,7 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("matter_only", matter_only, false);
 
         // Whether to do calculation of scalars' norms
-        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);d
+        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
         // Whether to output norm of numeric \phi 
         pp.load("norm_numeric_phi", norm_numeric_phi, false);

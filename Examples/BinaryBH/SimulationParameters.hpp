@@ -207,6 +207,7 @@ class SimulationParameters : public SimulationParametersBase
         }
         // Do we want Weyl extraction and puncture tracking?
         pp.load("activate_extraction", activate_extraction, false);
+        pp.load("activate_extraction_phi", activate_extraction_phi, false);
         pp.load("track_punctures", track_punctures, false);
         pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
 
@@ -317,7 +318,7 @@ class SimulationParameters : public SimulationParametersBase
     }
 
     bool track_punctures, calculate_constraint_norms;
-    bool activate_extraction;
+    bool activate_extraction, activate_extraction_phi;
     bool calculate_scalar_norm;
     bool compute_all_norms;
     int puncture_tracking_level;

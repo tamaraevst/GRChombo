@@ -24,6 +24,7 @@
 #include "TraceARemoval.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
+#include "PhiExtraction.hpp"
 #include "AMRReductions.hpp"
 #include "ComputeModifiedScalars.hpp"
 
@@ -149,7 +150,6 @@ void BinaryBHLevel::specificPostTimeStep()
         (m_time == 0.); // this form is used when 'specificPostTimeStep' was
                         // called during setup at t=0 from Main
     // bool first_step = (m_time == m_dt); // if not called in Main
-
     AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
 
     if (m_p.activate_extraction == 1)
@@ -176,6 +176,31 @@ void BinaryBHLevel::specificPostTimeStep()
                     VariableType::diagnostic, Interval(c_Weyl4_Re, c_Weyl4_Im),
                     min_level);
                 WeylExtraction my_extraction(m_p.extraction_params, m_dt,
+                                             m_time, first_step,
+                                             m_restart_time);
+                my_extraction.execute_query(m_gr_amr.m_interpolator);
+            }
+        }
+    }
+
+    if (m_p.activate_extraction_phi == 1)
+    {
+        // AMRReductions<VariableType::evolution> amr_reductions(m_gr_amr);
+        int min_level = m_p.extraction_params.min_extraction_level();
+        bool calculate_phi = at_level_timestep_multiple(min_level);
+        if (calculate_phi)
+        {
+            // Do the extraction on the min extraction level
+            if (m_level == min_level)
+            {
+                CH_TIME("PhiExtraction");
+                // Now refresh the interpolator and do the interpolation
+                // fill ghosts manually to minimise communication
+                bool fill_ghosts = false;
+                m_gr_amr.m_interpolator->refresh(fill_ghosts);
+                // m_gr_amr.fill_multilevel_ghosts(
+                //     VariableType::evolution, c_phi, min_level);
+                PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
                                              m_time, first_step,
                                              m_restart_time);
                 my_extraction.execute_query(m_gr_amr.m_interpolator);

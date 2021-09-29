@@ -154,9 +154,15 @@ class SimulationParametersBase : public ChomboParameters
             pp.load("extraction_file_prefix",
                     extraction_params.extraction_file_prefix,
                     std::string("Weyl4_extraction_"));
+            pp.load("extraction_file_phi_prefix",
+                    extraction_params_phi.extraction_file_prefix,
+                    std::string("Phi_extraction_"));
             pp.load("integral_file_prefix",
                     extraction_params.integral_file_prefix,
                     std::string("Weyl4_mode_"));
+            pp.load("integral_phi_file_prefix",
+                    extraction_params_phi.integral_file_prefix,
+                    std::string("Phi_mode_"));
         }
     }
 
@@ -316,6 +322,7 @@ class SimulationParametersBase : public ChomboParameters
 
     bool activate_extraction;
     SphericalExtraction::params_t extraction_params;
+    SphericalExtraction::params_t extraction_params_phi;
 
     std::string data_path;
 };
