@@ -22,6 +22,7 @@
 #include "SetValue.hpp"
 #include "SmallDataIO.hpp"
 #include "TraceARemoval.hpp"
+#include "TwoPuncturesInitialData.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
 #include "PhiExtraction.hpp"
@@ -49,10 +50,11 @@ void BinaryBHLevel::initialData()
     if (m_verbosity)
         pout() << "BinaryBHLevel::initialData " << m_level << endl;
 #ifdef USE_TWOPUNCTURES
-    TwoPuncturesInitialData two_punctures_initial_data(
-        m_dx, m_p.center, m_tp_amr.m_two_punctures);
+    TwoPuncturesInitialData two_punctures_initial_data(m_dx, m_p.center, m_tp_amr.m_two_punctures);
+    InitialScalarData my_scalar_data(m_p.initial_scalar_params, m_dx);
+
     // Can't use simd with this initial data
-    BoxLoops::loop(two_punctures_initial_data, m_state_new, m_state_new,
+    BoxLoops::loop(make_compute_pack(SetValue(0.),two_punctures_initial_data, my_scalar_data), m_state_new, m_state_new,
                    INCLUDE_GHOST_CELLS, disable_simd());
 #else
     // Set up the compute class for the BinaryBH initial data
