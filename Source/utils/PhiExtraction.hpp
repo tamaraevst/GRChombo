@@ -13,8 +13,8 @@
 
 class PhiExtraction : public SphericalExtraction
 {
-    // protected:
-    // int m_var_enum;
+    protected:
+    int m_var_enum;
     // VariableType m_var_type;
 
   public:
@@ -31,14 +31,15 @@ class PhiExtraction : public SphericalExtraction
     // }
 
     //! The constructor
-    PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
+    PhiExtraction(SphericalExtraction::params_t &a_params, int a_var_enum, double a_dt,
                    double a_time, bool a_first_step,
                    double a_restart_time = 0.0)
         : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
-                              a_restart_time)
+                              a_restart_time), m_var_enum(a_var_enum)
     {
-        add_var(c_phi, VariableType::evolution);
+         add_var(m_var_enum, VariableType::evolution);
     }
+
 
     //! Execute the query
     void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator)
@@ -59,7 +60,7 @@ class PhiExtraction : public SphericalExtraction
             // here the std::vector<double> passed will just have
             // the real and imaginary parts of the Weyl4 scalar as its
             // only components
-            return std::make_pair(r * phi_reim_parts[0],
+        return std::make_pair(r * phi_reim_parts[0],
                                   0.0 * phi_reim_parts[1]);
         };
 
