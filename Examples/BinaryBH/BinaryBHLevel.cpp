@@ -198,11 +198,8 @@ void BinaryBHLevel::specificPostTimeStep()
                 CH_TIME("PhiExtraction");
                 // Now refresh the interpolator and do the interpolation
                 // fill ghosts manually to minimise communication
-                bool fill_ghosts = false;
-                m_gr_amr.m_interpolator->refresh(fill_ghosts);
-                // m_gr_amr.fill_multilevel_ghosts(
-                //     VariableType::evolution, c_phi, min_level);
-                PhiExtraction my_extraction(m_p.extraction_params_phi, c_phi, m_dt,
+                m_gr_amr.m_interpolator->refresh();
+                PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
                                              m_time, first_step,
                                              m_restart_time);
                 my_extraction.execute_query(m_gr_amr.m_interpolator);
