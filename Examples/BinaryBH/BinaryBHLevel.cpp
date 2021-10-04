@@ -197,7 +197,11 @@ void BinaryBHLevel::specificPostTimeStep()
                 CH_TIME("PhiExtraction");
                 // Now refresh the interpolator and do the interpolation
                 // fill ghosts manually to minimise communication
-                m_gr_amr.m_interpolator->refresh();
+                bool fill_ghosts = false;
+                m_gr_amr.m_interpolator->refresh(fill_ghosts);
+                m_gr_amr.fill_multilevel_ghosts(
+                    VariableType::evolution, Interval(c_phi, c_Pi),
+                    min_level);
                 PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
                                              m_time, first_step,
                                              m_restart_time);
@@ -351,19 +355,6 @@ void BinaryBHLevel::prePlotLevel()
             make_compute_pack(
                 Weyl4(m_p.extraction_params.center, m_dx, m_p.formulation),
                 Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
-            m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-    }
-if (m_p.activate_extraction_phi == 1)
-    {
-        DefaultPotential potential;
-        ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-        MatterCCZ4RHS<ScalarFieldWithPotential> my_ccz4_matter(
-        scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
-        m_p.G_Newton);
-
-        BoxLoops::loop(
-            make_compute_pack(
-                my_ccz4_matter, Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
             m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
     }
     

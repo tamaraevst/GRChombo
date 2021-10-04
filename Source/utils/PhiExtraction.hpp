@@ -17,60 +17,12 @@
 //!  The class allows extraction of the values of phi components on
 //!  spherical shells at specified radii, and integration over those shells
 
-#include <fstream>
-#include <string>
-#include <vector>
-#include <cmath> 
-
 class PhiExtraction : public SphericalExtraction
 {
-    protected:
-    // int m_var_enum;
-    // VariableType m_var_type;
-
   public:
     //! The constructor
-    // PhiExtraction(
-    //     SphericalExtraction::params_t &a_params, double a_dt, double a_time,
-    //     bool a_first_step, double a_restart_time = 0.0, int a_var_enum,
-    //     VariableType a_var_type = VariableType::evolution)
-    //     : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
-    //                           a_restart_time),
-    //       m_var_enum(a_var_enum), m_var_type(a_var_type)
-    // {
-    //     add_evolution_vars(m_var_enum, m_var_type);
-    // }
 
-    //! The constructor
-    // PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
-    //                double a_time, bool a_first_step,
-    //                double a_restart_time = 0.0)
-    //     : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
-    //                           a_restart_time)
-    // {   
-    //     add_var(c_phi);
-    // }
-
-    //! The old constructor which assumes it is called in specificPostTimeStep
-    //! so the first time step is when m_time == m_dt
-//     PhiExtraction(SphericalExtraction::params_t a_params, const std::vector<int> a_evolution_vars, double a_dt,
-//                   double a_time, double a_restart_time = 0.0)
-//        : SphericalExtraction(a_params, a_evolution_vars, a_dt, a_time, a_dt,
-//                         a_restart_time)
-//    {
-//        add_evolution_vars({c_phi});
-//    }
-
-//     //! The old constructor which assumes it is called in specificPostTimeStep
-//     //! so the first time step is when m_time == m_dt
-//     PhiExtraction(SphericalExtraction::params_t a_params, double a_dt,
-//                    double a_time, double a_restart_time = 0.0)
-//         : PhiExtraction(a_params, {c_phi}, a_dt, a_time, (a_dt == a_time),
-//                          a_restart_time)
-//     {
-//     }
-
- PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
+    PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
                    double a_time, bool a_first_step,
                    double a_restart_time = 0.0)
         : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
@@ -97,12 +49,14 @@ class PhiExtraction : public SphericalExtraction
          // extract the values of the Weyl scalars on the spheres
         extract(a_interpolator);
 
-        write_extraction("PhiOut_");
+        if (m_params.write_extraction)
+            write_extraction(m_params.extraction_file_prefix);
             
         // now calculate and write the requested spherical harmonic modes
         std::vector<std::pair<std::vector<double>, std::vector<double>>>
             mode_integrals(m_num_modes);
 
+        //normalised by multiplying with radius
         auto integrand = [](std::vector<double> phi_values, double r,
                                                      double theta, double phi){
             return std::make_pair(r * phi_values[0], 0.0 );

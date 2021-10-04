@@ -332,7 +332,6 @@ class SimulationParameters : public SimulationParametersBase
      // Initial data for matter and potential
     InitialScalarData::params_t initial_scalar_params;
     double G_Newton;
-    double amplitude_scalar;
     //Parameters for modified scalar field equation 
     double gamma_amplitude;
     double beta_amplitude;

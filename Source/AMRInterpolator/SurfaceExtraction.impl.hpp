@@ -87,7 +87,7 @@ void SurfaceExtraction<SurfaceGeometry>::add_vars(
     }
 }
 
-//! add a vector of evolutionvariables (no derivatives)
+//! add a vector of evolution variables (no derivatives)
 template <class SurfaceGeometry>
 void SurfaceExtraction<SurfaceGeometry>::add_evolution_vars(
     const std::vector<int> &a_vars)
