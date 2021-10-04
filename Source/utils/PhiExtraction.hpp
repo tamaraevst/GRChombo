@@ -42,26 +42,43 @@ class PhiExtraction : public SphericalExtraction
     // }
 
     //! The constructor
-    PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
-                   double a_time, bool a_first_step,
-                   double a_restart_time = 0.0)
-        : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
-                              a_restart_time)
-    {
-         add_var(c_phi, VariableType::evolution);
-    }
+    // PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
+    //                double a_time, bool a_first_step,
+    //                double a_restart_time = 0.0)
+    //     : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
+    //                           a_restart_time)
+    // {   
+    //     add_var(c_phi);
+    // }
+
+    //! The old constructor which assumes it is called in specificPostTimeStep
+    //! so the first time step is when m_time == m_dt
+    PhiExtraction(SphericalExtraction::params_t a_params, const std::vector<int> a_evolution_vars, double a_dt,
+                  double a_time, double a_restart_time = 0.0)
+       : SphericalExtraction(a_params, a_evolution_vars, a_dt, a_time, a_dt,
+                        a_restart_time)
+   {
+       add_evolution_vars({c_phi});
+   }
+   
+
 
      //! Execute the query
     void execute_query(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {
+
+         // extract the values of the Weyl scalars on the spheres
+        extract(a_interpolator);
+
+        write_extraction("PhiOut_");
+            
         // now calculate and write the requested spherical harmonic modes
         std::vector<std::pair<std::vector<double>, std::vector<double>>>
             mode_integrals(m_num_modes);
 
         auto integrand = [](std::vector<double> phi_values, double r,
                                                      double theta, double phi){
-            return std::make_pair(r * phi_values[0],
-                                    0.0 * phi_values[0]);
+            return std::make_pair(r * phi_values[0], 0.0 );
         };
 
         // add the modes that will be integrated
@@ -76,12 +93,6 @@ class PhiExtraction : public SphericalExtraction
         // do the integration over the surface
         integrate();
 
-        // extract the values of the Weyl scalars on the spheres
-        extract(a_interpolator);
-
-        if (m_params.write_extraction)
-            write_extraction(m_params.extraction_file_prefix);
-       
         // write the integrals
         for (int imode = 0; imode < m_num_modes; ++imode)
         {

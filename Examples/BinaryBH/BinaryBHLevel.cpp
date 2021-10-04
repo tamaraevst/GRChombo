@@ -67,7 +67,7 @@ void BinaryBHLevel::initialData()
     // First set everything to zero (to avoid undefinded values)
     // then calculate initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.), binary, my_scalar_data),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS, disable_simd());
 #endif
 }
 
@@ -185,10 +185,10 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-    if (m_p.activate_extraction_phi == 1)
-    {
+     if (m_p.activate_extraction_phi == 1)
+    {   
         // AMRReductions<VariableType::evolution> amr_reductions(m_gr_amr);
-        int min_level = m_p.extraction_params.min_extraction_level();
+        int min_level = m_p.extraction_params_phi.min_extraction_level();
         bool calculate_phi = at_level_timestep_multiple(min_level);
         if (calculate_phi)
         {
@@ -199,8 +199,8 @@ void BinaryBHLevel::specificPostTimeStep()
                 // Now refresh the interpolator and do the interpolation
                 // fill ghosts manually to minimise communication
                 m_gr_amr.m_interpolator->refresh();
-                PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
-                                             m_time, first_step,
+                PhiExtraction my_extraction(m_p.extraction_params_phi, {c_phi}, m_dt,
+                                             m_time,
                                              m_restart_time);
                 my_extraction.execute_query(m_gr_amr.m_interpolator);
             }
