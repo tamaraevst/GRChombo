@@ -53,13 +53,40 @@ class PhiExtraction : public SphericalExtraction
 
     //! The old constructor which assumes it is called in specificPostTimeStep
     //! so the first time step is when m_time == m_dt
-    PhiExtraction(SphericalExtraction::params_t a_params, const std::vector<int> a_evolution_vars, double a_dt,
-                  double a_time, double a_restart_time = 0.0)
-       : SphericalExtraction(a_params, a_evolution_vars, a_dt, a_time, a_dt,
-                        a_restart_time)
-   {
-       add_evolution_vars({c_phi});
-   }
+//     PhiExtraction(SphericalExtraction::params_t a_params, const std::vector<int> a_evolution_vars, double a_dt,
+//                   double a_time, double a_restart_time = 0.0)
+//        : SphericalExtraction(a_params, a_evolution_vars, a_dt, a_time, a_dt,
+//                         a_restart_time)
+//    {
+//        add_evolution_vars({c_phi});
+//    }
+
+//     //! The old constructor which assumes it is called in specificPostTimeStep
+//     //! so the first time step is when m_time == m_dt
+//     PhiExtraction(SphericalExtraction::params_t a_params, double a_dt,
+//                    double a_time, double a_restart_time = 0.0)
+//         : PhiExtraction(a_params, {c_phi}, a_dt, a_time, (a_dt == a_time),
+//                          a_restart_time)
+//     {
+//     }
+
+ PhiExtraction(SphericalExtraction::params_t &a_params, double a_dt,
+                   double a_time, bool a_first_step,
+                   double a_restart_time = 0.0)
+        : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
+                              a_restart_time)
+    {
+        add_var(c_phi, VariableType::evolution);
+    }
+
+    //! The old constructor which assumes it is called in specificPostTimeStep
+    //! so the first time step is when m_time == m_dt
+    PhiExtraction(SphericalExtraction::params_t a_params, double a_dt,
+                   double a_time, double a_restart_time = 0.0)
+        : PhiExtraction(a_params, a_dt, a_time, (a_dt == a_time),
+                         a_restart_time)
+    {
+    }
    
 
 
@@ -101,8 +128,7 @@ class PhiExtraction : public SphericalExtraction
                                              std::to_string(mode.first) +
                                              std::to_string(mode.second);
             std::vector<std::vector<double>> integrals_phi_for_writing = {
-                std::move(mode_integrals[imode].first),
-                std::move(mode_integrals[imode].second)};
+                std::move(mode_integrals[imode].first)};
             std::vector<std::string> labels = {"integral"};
             write_integrals(integrals_phi_filename, integrals_phi_for_writing, labels);
         }

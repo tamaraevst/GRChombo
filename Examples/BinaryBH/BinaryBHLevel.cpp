@@ -59,18 +59,15 @@ void BinaryBHLevel::initialData()
 #else
     // Set up the compute class for the BinaryBH initial data
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
-
+    
     InitialScalarData my_scalar_data(m_p.initial_scalar_params, m_dx);
-    // set the value of phi - constant over the grid
-    // SetValue set_phi(m_p.amplitude_scalar, Interval(c_phi, c_phi));
 
     // First set everything to zero (to avoid undefinded values)
     // then calculate initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.), binary, my_scalar_data),
-                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS, disable_simd());
+                   m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 #endif
 }
-
 
 // Calculate RHS during RK4 substeps
 void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
@@ -78,7 +75,7 @@ void BinaryBHLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
 {
     // Enforce positive chi and alpha and trace free A
     BoxLoops::loop(make_compute_pack(TraceARemoval(), PositiveChiAndAlpha()),
-                   a_soln, a_soln, EXCLUDE_GHOST_CELLS);
+                   a_soln, a_soln, INCLUDE_GHOST_CELLS);
 
     // Calculate CCZ4 right hand side
     DefaultPotential potential;
@@ -94,7 +91,7 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
                                       const GRLevelData &a_rhs, Real a_dt)
 {
     // Enforce the trace free A_ij condition
-    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, EXCLUDE_GHOST_CELLS);
+    BoxLoops::loop(TraceARemoval(), a_soln, a_soln, INCLUDE_GHOST_CELLS);
 }
 
 // void BinaryBHLevel::preTagCells()
@@ -147,6 +144,8 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
 void BinaryBHLevel::specificPostTimeStep()
 {
     CH_TIME("BinaryBHLevel::specificPostTimeStep");
+    if (m_verbosity)
+        pout() << "BinaryBHLevel::specificPostTimestep " << m_level << endl;
 
     bool first_step =
         (m_time == 0.); // this form is used when 'specificPostTimeStep' was
@@ -199,8 +198,8 @@ void BinaryBHLevel::specificPostTimeStep()
                 // Now refresh the interpolator and do the interpolation
                 // fill ghosts manually to minimise communication
                 m_gr_amr.m_interpolator->refresh();
-                PhiExtraction my_extraction(m_p.extraction_params_phi, {c_phi}, m_dt,
-                                             m_time,
+                PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
+                                             m_time, first_step,
                                              m_restart_time);
                 my_extraction.execute_query(m_gr_amr.m_interpolator);
             }
@@ -343,11 +342,30 @@ void BinaryBHLevel::specificPostTimeStep()
 // Things to do before a plot level - need to calculate the Weyl scalars
 void BinaryBHLevel::prePlotLevel()
 {
-    // Populate constraints
+    if (m_verbosity)
+        pout() << "BinaryBHLevel::prePlotLevel" << m_level << endl;
     fillAllGhosts();
-    DefaultPotential potential;
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-    BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)),
-                   m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    if (m_p.activate_extraction == 1)
+    {
+        BoxLoops::loop(
+            make_compute_pack(
+                Weyl4(m_p.extraction_params.center, m_dx, m_p.formulation),
+                Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
+            m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    }
+if (m_p.activate_extraction_phi == 1)
+    {
+        DefaultPotential potential;
+        ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
+        MatterCCZ4RHS<ScalarFieldWithPotential> my_ccz4_matter(
+        scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
+        m_p.G_Newton);
+
+        BoxLoops::loop(
+            make_compute_pack(
+                my_ccz4_matter, Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
+            m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    }
+    
 }
 #endif /* CH_USE_HDF5 */
