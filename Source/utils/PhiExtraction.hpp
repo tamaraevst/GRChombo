@@ -11,7 +11,7 @@
 #include "Lagrange.hpp"
 #include "SmallDataIO.hpp"
 #include "UserVariables.hpp" 
-#include "SimulationParametersBase.hpp"
+#include "SimulationParameters.hpp"
 #include "SphericalExtraction.hpp"
 
 //!  The class allows extraction of the values of phi components on
@@ -59,7 +59,7 @@ class PhiExtraction : public SphericalExtraction
         //normalised by multiplying with radius
         auto integrand = [](std::vector<double> phi_values, double r,
                                                      double theta, double phi){
-            return std::make_pair(r * phi_values[0], 0.0 );
+            return std::make_pair(r * phi_values[0], 0.0);
         };
 
         // add the modes that will be integrated

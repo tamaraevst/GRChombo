@@ -184,9 +184,8 @@ void BinaryBHLevel::specificPostTimeStep()
         }
     }
 
-     if (m_p.activate_extraction_phi == 1)
+    if (m_p.activate_extraction_phi == 1)
     {   
-        // AMRReductions<VariableType::evolution> amr_reductions(m_gr_amr);
         int min_level = m_p.extraction_params_phi.min_extraction_level();
         bool calculate_phi = at_level_timestep_multiple(min_level);
         if (calculate_phi)
@@ -211,7 +210,10 @@ void BinaryBHLevel::specificPostTimeStep()
     }
 
     if (m_p.calculate_constraint_norms)
-    {
+    {   
+        if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+            
         fillAllGhosts();
         BoxLoops::loop(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics,
                        EXCLUDE_GHOST_CELLS);
@@ -244,6 +246,9 @@ void BinaryBHLevel::specificPostTimeStep()
 
     if (m_p.calculate_scalar_norm)
     {   
+        if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+            
         fillAllGhosts();
         BoxLoops::loop(ComputeModifiedScalars(m_p.center, m_dx,
                      m_p.gamma_amplitude, 
@@ -254,10 +259,7 @@ void BinaryBHLevel::specificPostTimeStep()
         {
             double CS_norm = amr_reductions.norm(c_chernsimons, 1, true); // L1 norm of Chern Simons
             double GB_norm = amr_reductions.norm(c_gaussbonnet, 1, true); // L1 norm of Gauss Bonnet
-            // double GB_norm_2 = amr_reductions.norm(c_gaussbonnet_2, 1, true); // L1 norm of Gauss Bonnet
 
-            if (!FilesystemTools::directory_exists(m_p.data_path))
-            FilesystemTools::mkdir_recursive(m_p.data_path);
             SmallDataIO scalars_file(m_p.data_path + "modified_scalars_l1norm",
                                          m_dt, m_time, m_restart_time,
                                          SmallDataIO::APPEND, first_step);
@@ -271,7 +273,10 @@ void BinaryBHLevel::specificPostTimeStep()
     }
 
     if (m_p.compute_all_norms)
-    {
+    {   
+        if (!FilesystemTools::directory_exists(m_p.data_path))
+            FilesystemTools::mkdir_recursive(m_p.data_path);
+            
         fillAllGhosts();
 
         if (m_level == 0)

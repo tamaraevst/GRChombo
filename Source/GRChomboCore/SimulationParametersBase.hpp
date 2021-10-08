@@ -68,7 +68,6 @@ class SimulationParametersBase : public ChomboParameters
 
         // Extraction params
         pp.load("activate_extraction", activate_extraction, false);
-        pp.load("activate_extraction_phi", activate_extraction_phi, false);
 
         if (activate_extraction)
         {
@@ -158,96 +157,6 @@ class SimulationParametersBase : public ChomboParameters
             pp.load("integral_file_prefix",
                     extraction_params.integral_file_prefix,
                     std::string("Weyl4_mode_"));
-        }
-
-          if (activate_extraction_phi)
-        {
-            pp.load("num_extraction_radii_phi",
-                    extraction_params_phi.num_extraction_radii, 1);
-
-            // Check for multiple extraction radii, otherwise load single
-            // radius/level (for backwards compatibility).
-            if (pp.contains("extraction_levels_phi"))
-            {
-                pp.load("extraction_levels_phi",
-                        extraction_params_phi.extraction_levels,
-                        extraction_params_phi.num_extraction_radii);
-            }
-            else
-            {
-                pp.load("extraction_level_phi", extraction_params_phi.extraction_levels,
-                        1, 0);
-            }
-            if (pp.contains("extraction_radii_phi"))
-            {
-                pp.load("extraction_radii_phi", extraction_params_phi.extraction_radii,
-                        extraction_params_phi.num_extraction_radii);
-            }
-            else
-            {
-                pp.load("extraction_radius_phi", extraction_params_phi.extraction_radii,
-                        1, 0.1);
-            }
-
-            pp.load("num_points_phi_phi", extraction_params_phi.num_points_phi, 2);
-            pp.load("num_points_theta_phi", extraction_params_phi.num_points_theta, 5);
-            if (extraction_params_phi.num_points_theta % 2 == 0)
-            {
-                extraction_params_phi.num_points_theta += 1;
-                pout() << "Parameter: num_points_theta incompatible with "
-                          "Simpson's "
-                       << "rule so increased by 1.\n";
-            }
-            pp.load("extraction_center_phi", extraction_params_phi.center, center);
-
-            if (pp.contains("modes_phi"))
-            {
-                pp.load("num_modes_phi", extraction_params_phi.num_modes);
-                std::vector<int> extraction_modes_vect(
-                    2 * extraction_params_phi.num_modes);
-                pp.load("modes_phi", extraction_modes_vect,
-                        2 * extraction_params_phi.num_modes);
-                extraction_params_phi.modes.resize(extraction_params_phi.num_modes);
-                for (int i = 0; i < extraction_params_phi.num_modes; ++i)
-                {
-                    extraction_params_phi.modes[i].first =
-                        extraction_modes_vect[2 * i];
-                    extraction_params_phi.modes[i].second =
-                        extraction_modes_vect[2 * i + 1];
-                }
-            }
-            else
-            {
-                // by default extraction (l,m) = (2,0), (2,1) and (2,2)
-                extraction_params_phi.num_modes = 3;
-                extraction_params_phi.modes.resize(3);
-                for (int i = 0; i < 3; ++i)
-                {
-                    extraction_params_phi.modes[i].first = 2;
-                    extraction_params_phi.modes[i].second = i;
-                }
-            }
-
-            pp.load("write_extraction_phi", extraction_params_phi.write_extraction,
-                    false);
-
-            std::string extraction_path_phi;
-            pp.load("extraction_subpath_phi", extraction_path_phi, data_path);
-            if (!extraction_path_phi.empty() && extraction_path_phi.back() != '/')
-                extraction_path_phi += "/";
-            if (output_path != "./" && !output_path.empty())
-                extraction_path_phi = output_path + extraction_path_phi;
-
-            extraction_params_phi.data_path = data_path;
-            extraction_params_phi.extraction_path = extraction_path_phi;
-
-            // default names to Weyl extraction
-            pp.load("extraction_file_prefix_phi",
-                    extraction_params_phi.extraction_file_prefix,
-                    std::string("Phi_extraction_"));
-            pp.load("integral_file_prefix_phi",
-                    extraction_params.integral_file_prefix,
-                    std::string("Phi_mode_"));
         }
     }
 
@@ -406,9 +315,7 @@ class SimulationParametersBase : public ChomboParameters
     CCZ4_params_t<> ccz4_params;
 
     bool activate_extraction;
-    bool activate_extraction_phi;
     SphericalExtraction::params_t extraction_params;
-    SphericalExtraction::params_t extraction_params_phi;
 
     std::string data_path;
 };

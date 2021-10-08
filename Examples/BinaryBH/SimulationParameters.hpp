@@ -14,6 +14,7 @@
 #include "ArrayTools.hpp"
 #include "BoostedBH.hpp"
 #include "InitialScalarData.hpp"
+#include "SphericalExtraction.hpp"
 #ifdef USE_TWOPUNCTURES
 #include "TP_Parameters.hpp"
 #endif
@@ -40,6 +41,118 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
         pp.load("calculate_constraint_norms", calculate_constraint_norms,
                 false);
+
+        // Do we want Weyl/Phi extraction and puncture tracking?
+    pp.load("activate_extraction", activate_extraction, false);
+    pp.load("activate_extraction_phi", activate_extraction_phi, false);
+    pp.load("track_punctures", track_punctures, false);
+    pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
+
+    // for scalar
+    pp.load("G_Newton", G_Newton, 1.0);
+    pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
+    pp.load("scalar_width", initial_scalar_params.width, 1.0);
+    /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
+    they are \gamma'(0) and \beta'(0) for the scalars respectively.
+    Set them to zero if you do not want the corresponding scalar included. */
+    pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
+    pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
+
+    // Whether to do calculation of scalars' norms
+    pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
+
+    // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
+    pp.load("compute_all_norms", compute_all_norms, false);
+
+    if (activate_extraction_phi)
+        {
+            pp.load("num_extraction_radii_phi",
+                    extraction_params_phi.num_extraction_radii, 1);
+
+            // Check for multiple extraction radii, otherwise load single
+            // radius/level (for backwards compatibility).
+            if (pp.contains("extraction_levels_phi"))
+            {
+                pp.load("extraction_levels_phi",
+                        extraction_params_phi.extraction_levels,
+                        extraction_params_phi.num_extraction_radii);
+            }
+            else
+            {
+                pp.load("extraction_level_phi", extraction_params_phi.extraction_levels,
+                        1, 0);
+            }
+            if (pp.contains("extraction_radii_phi"))
+            {
+                pp.load("extraction_radii_phi", extraction_params_phi.extraction_radii,
+                        extraction_params_phi.num_extraction_radii);
+            }
+            else
+            {
+                pp.load("extraction_radius_phi", extraction_params_phi.extraction_radii,
+                        1, 0.1);
+            }
+
+            pp.load("num_points_phi_phi", extraction_params_phi.num_points_phi, 2);
+            pp.load("num_points_theta_phi", extraction_params_phi.num_points_theta, 5);
+            if (extraction_params_phi.num_points_theta % 2 == 0)
+            {
+                extraction_params_phi.num_points_theta += 1;
+                pout() << "Parameter: num_points_theta incompatible with "
+                          "Simpson's "
+                       << "rule so increased by 1.\n";
+            }
+            pp.load("extraction_center_phi", extraction_params_phi.center, center);
+
+            if (pp.contains("modes_phi"))
+            {
+                pp.load("num_modes_phi", extraction_params_phi.num_modes);
+                std::vector<int> extraction_modes_vect(
+                    2 * extraction_params_phi.num_modes);
+                pp.load("modes_phi", extraction_modes_vect,
+                        2 * extraction_params_phi.num_modes);
+                extraction_params_phi.modes.resize(extraction_params_phi.num_modes);
+                for (int i = 0; i < extraction_params_phi.num_modes; ++i)
+                {
+                    extraction_params_phi.modes[i].first =
+                        extraction_modes_vect[2 * i];
+                    extraction_params_phi.modes[i].second =
+                        extraction_modes_vect[2 * i + 1];
+                }
+            }
+            else
+            {
+                // by default extraction (l,m) = (2,0), (2,1) and (2,2)
+                extraction_params_phi.num_modes = 3;
+                extraction_params_phi.modes.resize(3);
+                for (int i = 0; i < 3; ++i)
+                {
+                    extraction_params_phi.modes[i].first = 2;
+                    extraction_params_phi.modes[i].second = i;
+                }
+            }
+
+            pp.load("write_extraction_phi", extraction_params_phi.write_extraction,
+                    false);
+
+            std::string extraction_path_phi;
+            pp.load("extraction_subpath_phi", extraction_path_phi, data_path);
+            if (!extraction_path_phi.empty() && extraction_path_phi.back() != '/')
+                extraction_path_phi += "/";
+            if (output_path != "./" && !output_path.empty())
+                extraction_path_phi = output_path + extraction_path_phi;
+
+            extraction_params_phi.data_path = data_path;
+            extraction_params_phi.extraction_path = extraction_path_phi;
+
+            // default names to Weyl extraction
+            pp.load("extraction_file_prefix_phi",
+                    extraction_params_phi.extraction_file_prefix,
+                    std::string("Phi_extraction_"));
+            pp.load("integral_file_prefix_phi",
+                    extraction_params.integral_file_prefix,
+                    std::string("Phi_mode_"));
+        }
     }
 
 #ifdef USE_TWOPUNCTURES
@@ -205,27 +318,6 @@ class SimulationParameters : public SimulationParametersBase
             bh1_params.center[idir] = centerA[idir] + offsetA[idir];
             bh2_params.center[idir] = centerB[idir] + offsetB[idir];
         }
-        // Do we want Weyl extraction and puncture tracking?
-        pp.load("activate_extraction", activate_extraction, false);
-        pp.load("activate_extraction_phi", activate_extraction_phi, false);
-        pp.load("track_punctures", track_punctures, false);
-        pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
-
-        // for scalar
-        pp.load("G_Newton", G_Newton, 1.0);
-        pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
-        pp.load("scalar_width", initial_scalar_params.width, 1.0);
-         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
-        they are \gamma'(0) and \beta'(0) for the scalars respectively.
-        Set them to zero if you do not want the corresponding scalar included. */
-        pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
-        pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
-
-        // Whether to do calculation of scalars' norms
-        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
-
-        // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
-        pp.load("compute_all_norms", compute_all_norms, false);
     }
 #endif /* USE_TWOPUNCTURES */
 
@@ -331,6 +423,7 @@ class SimulationParameters : public SimulationParametersBase
 
      // Initial data for matter and potential
     InitialScalarData::params_t initial_scalar_params;
+    SphericalExtraction::params_t extraction_params_phi;
     double G_Newton;
     //Parameters for modified scalar field equation 
     double gamma_amplitude;
