@@ -6,6 +6,7 @@
 
 #include "BinaryBHLevel.hpp"
 #include "BinaryBH.hpp"
+#include "ScalarField.hpp"
 #include "BoxLoops.hpp"
 #include "ChiExtractionTaggingCriterion.hpp"
 #include "ChiPunctureExtractionTaggingCriterion.hpp"
@@ -13,21 +14,26 @@
 #include "NewConstraints.hpp"
 #include "MatterCCZ4RHS.hpp"
 #include "FixedGridsTaggingCriterion.hpp"
-#include "InitialScalarData.hpp"
+#include "TraceARemoval.hpp"
+// #include "InitialScalarData.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
+
+
 #include "DefaultPotential.hpp"
 #include "PunctureTracker.hpp"
-#include "ScalarField.hpp"
+
 #include "SetValue.hpp"
 #include "SmallDataIO.hpp"
-#include "TraceARemoval.hpp"
+
+#include "AMRReductions.hpp"
+#include "ComputeModifiedScalars.hpp"
+
 #include "TwoPuncturesInitialData.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
 #include "PhiExtraction.hpp"
-#include "AMRReductions.hpp"
-#include "ComputeModifiedScalars.hpp"
+
 
 // Things to do during the advance step after RK4 steps
 void BinaryBHLevel::specificAdvance()
@@ -51,7 +57,8 @@ void BinaryBHLevel::initialData()
         pout() << "BinaryBHLevel::initialData " << m_level << endl;
 #ifdef USE_TWOPUNCTURES
     TwoPuncturesInitialData two_punctures_initial_data(m_dx, m_p.center, m_tp_amr.m_two_punctures);
-    InitialScalarData my_scalar_data(m_p.initial_scalar_params, m_dx);
+    // set the value of phi - constant over the grid
+    SetValue my_scalar_data(m_p.amplitude_scalar, Interval(c_phi, c_phi));
 
     // Can't use simd with this initial data
     BoxLoops::loop(make_compute_pack(SetValue(0.),two_punctures_initial_data, my_scalar_data), m_state_new, m_state_new,
@@ -59,8 +66,8 @@ void BinaryBHLevel::initialData()
 #else
     // Set up the compute class for the BinaryBH initial data
     BinaryBH binary(m_p.bh1_params, m_p.bh2_params, m_dx);
-    
-    InitialScalarData my_scalar_data(m_p.initial_scalar_params, m_dx);
+    // set the value of phi - constant over the grid
+    SetValue my_scalar_data(m_p.amplitude_scalar, Interval(c_phi, c_phi));
 
     // First set everything to zero (to avoid undefinded values)
     // then calculate initial data

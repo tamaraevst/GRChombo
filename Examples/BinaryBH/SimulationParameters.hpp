@@ -50,6 +50,10 @@ class SimulationParameters : public SimulationParametersBase
 
     // for scalar
     pp.load("G_Newton", G_Newton, 1.0);
+
+    //for setting scalar field to some fixed value
+    pp.load("amplitue_scalar", amplitude_scalar, 0.0);
+
     pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
     pp.load("scalar_width", initial_scalar_params.width, 1.0);
     /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
@@ -428,6 +432,7 @@ class SimulationParameters : public SimulationParametersBase
     //Parameters for modified scalar field equation 
     double gamma_amplitude;
     double beta_amplitude;
+    double amplitude_scalar;
 
 #ifdef USE_TWOPUNCTURES
     double tp_offset_plus, tp_offset_minus;
