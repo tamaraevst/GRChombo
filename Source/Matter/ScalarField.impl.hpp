@@ -93,7 +93,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
  
     // add them to the RHS equation of phi
-    total_rhs.phi += m_gamma_amplitude * mod_scalars.CS_scalar + m_beta_amplitude * mod_scalars.GB_scalar;
+    total_rhs.Pi += vars.lapse * m_gamma_amplitude * mod_scalars.CS_scalar + vars.lapse * m_beta_amplitude * mod_scalars.GB_scalar;
 
     // set the potential values
     data_t V_of_phi = 0.0;
@@ -101,7 +101,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     my_potential.compute_potential(V_of_phi, dVdphi, vars);
 
     // adjust RHS for the potential term
-    total_rhs.Pi += -vars.lapse * dVdphi;
+    total_rhs.Pi += -vars.lapse * dVdphi ;
 }
 
 // the RHS excluding the potential tserms
