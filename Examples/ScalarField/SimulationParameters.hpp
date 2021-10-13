@@ -55,6 +55,10 @@ class SimulationParameters : public SimulationParametersBase
         //Do we want to calculate constraint norms?
         pp.load("calculate_constraint_norms", calculate_constraint_norms, false);
 
+        //for excision diagnostics
+        pp.load("inner_r", inner_r, 5.0);
+        pp.load("outer_r", outer_r, 500.0);
+
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
@@ -98,6 +102,8 @@ class SimulationParameters : public SimulationParametersBase
     bool geometric_norms;
     bool matter_only;
     bool calculate_constraint_norms;
+
+    double inner_r, outer_r;
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

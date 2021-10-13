@@ -40,6 +40,7 @@
 // For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
+#include "ExcisionDiagnostics.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -142,7 +143,6 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
             BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
         }
     }
-    
 }
 
 // Things to do at ODE update, after soln + rhs
@@ -188,8 +188,15 @@ void ScalarFieldLevel::specificPostTimeStep()
     {
         if (m_level == 0)
         {
-            double L2_Ham = amr_red_diag.norm(c_Ham);
-            double L2_Mom = amr_red_diag.norm(Interval(c_Mom1, c_Mom3));
+            fillAllGhosts();
+            // excise within horizon
+            BoxLoops::loop(
+            ExcisionDiagnostics(
+                m_dx, m_p.center, m_p.inner_r, m_p.outer_r),
+            m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS,
+            disable_simd());
+            double L2_Ham = amr_red_diag.norm(c_Ham, true);
+            double L2_Mom = amr_red_diag.norm(Interval(c_Mom1, c_Mom3), true);
             SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
                                          m_restart_time, SmallDataIO::APPEND,
                                          first_step);
