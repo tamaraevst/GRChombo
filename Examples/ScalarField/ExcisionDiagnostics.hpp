@@ -14,6 +14,7 @@
 #include "UserVariables.hpp" //This files needs NUM_VARS - total number of components
 #include "VarsTools.hpp"
 #include "simd.hpp"
+#include "DebuggingTools.hpp"
 
 //! Does excision for fixed BG BH solutions
 //! Note that it is does not using simd so one must set disable_simd()
@@ -41,9 +42,15 @@ class ExcisionDiagnostics
         const Coordinates<double> coords(current_cell, m_dx, m_center);
         if (coords.get_radius() < m_inner_r || coords.get_radius() > m_outer_r)
         {
-            current_cell.store_vars(0.0, c_Mom1);
-            current_cell.store_vars(0.0, c_Mom2);
-            current_cell.store_vars(0.0, c_Mom3);
+	    if (coords.get_radius()>m_outer_r)
+		{ double outer = coords.get_radius();
+		   DEBUG_OUT(outer); }
+	    
+            if (coords.get_radius()<m_inner_r)
+                { double inner = coords.get_radius();
+                   DEBUG_OUT(inner); }
+
+            current_cell.store_vars(0.0, c_Mom);
             current_cell.store_vars(0.0, c_Ham);
         } // else do nothing
     }

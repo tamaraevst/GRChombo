@@ -22,6 +22,8 @@
 
 // For tag cells
 #include "FixedGridsTaggingCriterion.hpp"
+#include "ChiTaggingCriterion.hpp"
+#include "HamTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ComputePack.hpp"
@@ -32,7 +34,7 @@
 #include "ScalarField.hpp"
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
-
+#include "ExcisionDiagnostics.hpp"
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
 #include <iostream>
@@ -40,7 +42,7 @@
 // For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
-#include "ExcisionDiagnostics.hpp"
+//#include "ExcisionDiagnostics.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -85,8 +87,10 @@ void ScalarFieldLevel::prePlotLevel()
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
 
     BoxLoops::loop(make_compute_pack(
-        Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
+        Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom), c_Ham_abs_terms, Interval(c_Moms_abs_terms, c_Moms_abs_terms))),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+   
+     BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
 }
 #endif
 
@@ -154,19 +158,30 @@ void ScalarFieldLevel::specificUpdateODE(GRLevelData &a_soln,
     
 }
 
+
 void ScalarFieldLevel::preTagCells()
 {
-    // we don't need any ghosts filled for the fixed grids tagging criterion
-    // used here so don't fill any
+    // Fixed grid - no pre-tagging
+    // Pre tagging - fill ghost cells and calculate Ham terms
+    fillAllEvolutionGhosts();
+    BoxLoops::loop(make_compute_pack(Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom), c_Ham_abs_terms, Interval(c_Moms_abs_terms, c_Moms_abs_terms))),
+        m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 }
 
 void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
-                                               const FArrayBox &current_state)
+                                          const FArrayBox &current_state)
 {
     BoxLoops::loop(
         FixedGridsTaggingCriterion(m_dx, m_level, 2.0 * m_p.L, m_p.center),
         current_state, tagging_criterion);
 }
+
+//void ScalarFieldLevel::computeDiagnosticsTaggingCriterion(
+//    FArrayBox &tagging_criterion, const FArrayBox &current_state_diagnostics)
+//{
+//    BoxLoops::loop(HamTaggingCriterion(m_dx), current_state_diagnostics,
+//                   tagging_criterion);
+//}
 
 //Output norms of Gauss-Bonnet and Chern-Simons into file 
 void ScalarFieldLevel::specificPostTimeStep()
@@ -190,13 +205,11 @@ void ScalarFieldLevel::specificPostTimeStep()
         {
             fillAllGhosts();
             // excise within horizon
-            BoxLoops::loop(
-            ExcisionDiagnostics(
-                m_dx, m_p.center, m_p.inner_r, m_p.outer_r),
-            m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS,
-            disable_simd());
-            double L2_Ham = amr_red_diag.norm(c_Ham, true);
-            double L2_Mom = amr_red_diag.norm(Interval(c_Mom1, c_Mom3), true);
+            BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
+            double L2_Ham = amr_red_diag.norm(c_Ham, 2);
+	    double volume = amr_red_diag.get_domain_volume();
+            DEBUG_OUT(volume);
+            double L2_Mom = amr_red_diag.norm(Interval(c_Mom,c_Mom), 2);
             SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
                                          m_restart_time, SmallDataIO::APPEND,
                                          first_step);

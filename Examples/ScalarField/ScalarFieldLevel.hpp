@@ -50,11 +50,15 @@ class ScalarFieldLevel : public GRAMRLevel
                                    const GRLevelData &a_rhs, Real a_dt);
 
     /// Things to do before tagging cells (i.e. filling ghosts)
-    virtual void preTagCells() override;
+    virtual void preTagCells() override; 
 
     //! Tell Chombo how to tag cells for regridding
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
+    //! Tell Chombo how to tag cells for regridding
+   // virtual void computeDiagnosticsTaggingCriterion(
+   //    FArrayBox &tagging_criterion,
+   //     const FArrayBox &current_state_diagnostics);
 
     //! Things to do after a timestep on each level
     virtual void specificPostTimeStep() override;
