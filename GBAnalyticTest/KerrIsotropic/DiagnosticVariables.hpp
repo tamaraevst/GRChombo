@@ -13,14 +13,14 @@ enum
     c_xMom,
     c_BHMom,
     c_phianalytic,
-
+    c_lapse,
     NUM_DIAGNOSTIC_VARS
 };
 
 namespace DiagnosticVariables
 {
 static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
-    "chi", "xMom", "BHMom", "phianalytic"};
+    "chi", "xMom", "BHMom", "phianalytic", "lapse"};
 }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */
