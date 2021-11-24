@@ -63,8 +63,18 @@ class ModifiedScalarsGeometry
 
         const Tensor<3, data_t> chris_phys =
         compute_phys_chris(d1.chi, vars.chi, vars.h, h_UU, chris.ULL);
-        Tensor<1, data_t> Z0 = 0.0;
-        auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
+
+        //For BSSN
+        // Tensor<1, data_t> Z0 = 0.0;
+        // auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
+
+        //For CCZ4
+        Tensor<1, data_t> Z_over_chi;
+        FOR(i) 
+            {
+                Z_over_chi[i] = 0.5 * (vars.Gamma[i] - chris.contracted[i]);
+            }
+        auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
 
         FOR(i, j)
         {

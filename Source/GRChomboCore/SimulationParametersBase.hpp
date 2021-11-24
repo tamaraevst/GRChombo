@@ -14,6 +14,10 @@
 #include "SphericalExtraction.hpp"
 #include <limits>
 
+#ifdef USE_AHFINDER
+#include "AHFinder.hpp"
+#endif
+
 // add this type alias here for backwards compatibility
 using extraction_params_t = SphericalExtraction::params_t;
 
@@ -158,6 +162,12 @@ class SimulationParametersBase : public ChomboParameters
                     extraction_params.integral_file_prefix,
                     std::string("Weyl4_mode_"));
         }
+#ifdef USE_AHFINDER
+        // Apparent horizon parameters
+        pp.load("AH_activate", AH_activate, false);
+        if (AH_activate)
+            AH_params.read_params(pp, *this);
+#endif
     }
 
     void check_params()
@@ -318,6 +328,11 @@ class SimulationParametersBase : public ChomboParameters
     SphericalExtraction::params_t extraction_params;
 
     std::string data_path;
+
+#ifdef USE_AHFINDER
+    bool AH_activate;
+    AHParams_t<AHFunction> AH_params;
+#endif
 };
 
 #endif /* SIMULATIONPARAMETERSBASE_HPP_ */
