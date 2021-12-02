@@ -19,6 +19,7 @@
 #include "BosonStarSolution.hpp"
 #include <vector>
 #include "parstream.H" //gives pout
+#include "WeightFunction.hpp"
 
 //! Class which solves for the initial data for a spherically symmetric boson
 //! star with phi^4 coupling
@@ -27,7 +28,7 @@ class BosonStar
 
 public:
     //! The constructor
-    BosonStar(BosonStar_params_t a_params_BosonStar,
+    BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
         Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
         int a_verbosity);
 
@@ -38,7 +39,8 @@ public:
     template <class data_t>
     void compute(Cell<data_t> current_cell) const;
 
-    BosonStarSolution m_1d_sol; /*<
+    BosonStarSolution m_1d_sol;
+    BosonStarSolution m_1d_sol2; /*<
     The object that stores the solution found by the 1d ODE integrator */
 
 
@@ -46,6 +48,7 @@ protected:
     double m_dx;
     double m_G_Newton;
     BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
+    BosonStar_params_t m_params_BosonStar2;
     Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
 

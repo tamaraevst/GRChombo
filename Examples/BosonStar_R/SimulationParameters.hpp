@@ -42,6 +42,11 @@ public:
         pp.load("star_centre", bosonstar_params.star_centre,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
+        pp.load("central_amplitude_CSF2",
+                bosonstar2_params.central_amplitude_CSF2);
+        pp.load("eigen2", bosonstar2_params.eigen2, 0);
+        pp.load("gridpoints2",bosonstar2_params.gridpoints2,400000);
+
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);
@@ -50,10 +55,15 @@ public:
         pp.load("BS_binary", bosonstar_params.BS_binary, false);
         pp.load("BS_BH_binary", bosonstar_params.BS_BH_binary, false);
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
+
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
+        pp.load("BS_rapidity2", bosonstar2_params.BS_rapidity2, 0.0);
+
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
+
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
+        pp.load("G_Newton", bosonstar2_params.Newtons_constant2, 1.0);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
@@ -115,6 +125,7 @@ public:
     // Initial data for matter and potential
     double G_Newton;
     BosonStar_params_t bosonstar_params;
+    BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;
 
     // Mass extraction

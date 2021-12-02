@@ -228,7 +228,7 @@ void BinaryBSLevel::doAnalysis()
 
         // Calculate the infinity-norm of all variables specified in params file
         // and output them
-        if (m_p.num_vars_inf_norm > 0)
+         (m_p.num_vars_inf_norm > 0)
         {
             pout() << "Variable infinity norms:\n";
             for (int icomp : m_p.vars_inf_norm)

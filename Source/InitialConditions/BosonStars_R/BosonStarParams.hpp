@@ -23,6 +23,12 @@ struct BosonStar_params_t
     double BlackHoleMass;
     double BS_rapidity;
     std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
+
+    int gridpoints2;
+    int eigen2;
+    double Newtons_constant2;
+    double central_amplitude_CSF2; //!< Central amplitude of the star
+    double BS_rapidity2;
 };
 
 #endif /* BOSONSTARPARAMS_HPP_ */
