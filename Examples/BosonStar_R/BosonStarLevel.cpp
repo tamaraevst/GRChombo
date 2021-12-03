@@ -24,7 +24,7 @@
 // Problem specific includes
 #include "ComputePack.hpp"
 #include "ComplexPotential.hpp"
-#include "BosonStar.hpp"
+#include "BinaryBS.hpp"
 #include "ComplexScalarField.hpp"
 #include "SetValue.hpp"
 
@@ -71,14 +71,14 @@ void BosonStarLevel::initialData()
         pout() << "BosonStarLevel::initialData " << m_level << endl;
 
     // First initalise a BosonStar object
-    BosonStar boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
+    BinaryBS boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
                          m_p.G_Newton, m_dx, m_verbosity);
 
 
     // the max radius the code might need to calculate out to is L*sqrt(3)
     boson_star.compute_1d_solution(4.*m_p.L);
 
-    std::cout << "Finishedd computing 1D solution" << std::endl;
+    std::cout << "Finished computing 1D solution" << std::endl;
 
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star

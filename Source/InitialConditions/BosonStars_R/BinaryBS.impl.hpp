@@ -3,33 +3,33 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#if !defined(BOSONSTAR_HPP_)
-#error "This file should only be included through BosonStar.hpp"
+#if !defined(BINARYBS_HPP_)
+#error "This file should only be included through BinaryBS.hpp"
 #endif
 
-#ifndef BOSONSTAR_IMPL_HPP_
-#define BOSONSTAR_IMPL_HPP_
+#ifndef BINARYBS_IMPL_HPP_
+#define BINARYBS_IMPL_HPP_
 
-#include "BosonStarSolution.hpp" //for BosonStarSolution class
-
-inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
+inline BinaryBS::BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
                     Potential::params_t a_params_potential, double a_G_Newton,
                     double a_dx, int a_verbosity)
-    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_params_BosonStar(a_params_BosonStar),m_params_BosonStar2(a_params_BosonStar2),
+    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_bosonstar(a_bosonstar_params, a_params_potential),m_bosonstar2(a_bosonstar2_params, a_params_potential),
     m_params_potential(a_params_potential), m_verbosity(a_verbosity)
 {
 }
 
-void BosonStar::compute_1d_solution(const double max_r)
+void BinaryBS::compute_1d_solution(const double max_r)
 {
     try
     {
+        std::cout << "For first BS" << std::endl;
         // Set initial parameters and then run the solver for both of the BSs (didnt put it in the constructor)
-        m_1d_sol.set_initialcondition_params(m_params_BosonStar,m_params_potential,max_r);
-        m_1d_sol.main();
+        m_bosonstar.set_initialcondition_params(max_r);
+        m_bosonstar.main();
 
-        m_1d_sol2.set_initialcondition_params(m_params_BosonStar2,m_params_potential,max_r);
-        m_1d_sol2.main();
+        std::cout << "For second BS" << std::endl;
+        m_bosonstar2.set_initialcondition_params(max_r);
+        m_bosonstar2.main();
     }
     catch (std::exception &exception)
     {
@@ -39,7 +39,7 @@ void BosonStar::compute_1d_solution(const double max_r)
 
 // Compute the value of the initial vars on the grid
 template <class data_t>
-void BosonStar::compute(Cell<data_t> current_cell) const
+void BinaryBS::compute(Cell<data_t> current_cell) const
 {
     MatterCCZ4<ComplexScalarField<>>::Vars<data_t> vars;
     // Load variables (should be set to zero if this is a single BS)
@@ -49,17 +49,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     
     // Coordinates for centre of mass
     Coordinates<data_t> coords(current_cell, m_dx,
-        m_params_BosonStar.star_centre);
+        m_bosonstar.m_params_BosonStar.star_centre);
 
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
-    double rapidity = m_params_BosonStar.BS_rapidity;
-    double rapidity2 = m_params_BosonStar2.BS_rapidity;
-    double mu = m_params_BosonStar.mass_ratio;
-    double M = m_params_BosonStar.BlackHoleMass;
-    double separation = m_params_BosonStar.BS_separation;
-    double impact_parameter = m_params_BosonStar.BS_impact_parameter;
-    bool BS_binary = m_params_BosonStar.BS_binary;
-    bool BS_BH_binary = m_params_BosonStar.BS_BH_binary;
+    double rapidity = m_bosonstar.m_params_BosonStar.BS_rapidity;
+    double rapidity2 = m_bosonstar2.m_params_BosonStar.BS_rapidity;
+    double mu = m_bosonstar.m_params_BosonStar.mass_ratio;
+    double M = m_bosonstar.m_params_BosonStar.BlackHoleMass;
+    double separation = m_bosonstar.m_params_BosonStar.BS_separation;
+    double impact_parameter = m_bosonstar.m_params_BosonStar.BS_impact_parameter;
+    bool BS_binary = m_bosonstar.m_params_BosonStar.BS_binary;
+    bool BS_BH_binary = m_bosonstar.m_params_BosonStar.BS_BH_binary;
 
     // Define boosts and coordinate objects
 
@@ -86,12 +86,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // First star physical variables
 
     // Get scalar field modulus, conformal factor, lapse and their gradients
-    double p_ = m_1d_sol.get_p_interp(r);
-    double dp_ = m_1d_sol.get_dp_interp(r);
-    double omega_ = m_1d_sol.get_lapse_interp(r);
-    double omega_prime_ = m_1d_sol.get_dlapse_interp(r);
-    double psi_ = m_1d_sol.get_psi_interp(r);
-    double psi_prime_ = m_1d_sol.get_dpsi_interp(r);
+    double p_ = m_bosonstar.get_p_interp(r);
+    double dp_ = m_bosonstar.get_dp_interp(r);
+    double omega_ = m_bosonstar.get_lapse_interp(r);
+    double omega_prime_ = m_bosonstar.get_dlapse_interp(r);
+    double psi_ = m_bosonstar.get_psi_interp(r);
+    double psi_prime_ = m_bosonstar.get_dpsi_interp(r);
 
     // Get lapse and shift
     double pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_; //this is denominator for the lapse in boosted frame and also 11 component of the 3-metric
@@ -101,7 +101,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     vars.shift[0] += beta_x;
 
     // Get frequency and phase
-    double w_ = m_1d_sol.get_w();
+    double w_ = m_bosonstar.get_w();
     double phase_ = w_*t;
 
     // Get 3-metric components for the fist star in boosted frame and put them into the matrix
@@ -164,12 +164,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
     
         // Run BS solver to be able to find lapse and conformal factor needed for the metric 
-        double p_p = m_1d_sol.get_p_interp(r_p);
-        double dp_p = m_1d_sol.get_dp_interp(r_p);
-        double omega_p = m_1d_sol.get_lapse_interp(r_p);
-        double omega_prime_p = m_1d_sol.get_dlapse_interp(r_p);
-        double psi_p = m_1d_sol.get_psi_interp(r_p);
-        double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
+        double p_p = m_bosonstar.get_p_interp(r_p);
+        double dp_p = m_bosonstar.get_dp_interp(r_p);
+        double omega_p = m_bosonstar.get_lapse_interp(r_p);
+        double omega_prime_p = m_bosonstar.get_dlapse_interp(r_p);
+        double psi_p = m_bosonstar.get_psi_interp(r_p);
+        double psi_prime_p = m_bosonstar.get_dpsi_interp(r_p);
         double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
         //These are the values to be substracted in the initial data
@@ -178,12 +178,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL[0][0] = pc_os_p;
 
         // second star physical variables
-        double p_2 = m_1d_sol2.get_p_interp(r2);
-        double dp_2 = m_1d_sol2.get_dp_interp(r2);
-        double omega_2 = m_1d_sol2.get_lapse_interp(r2);
-        double omega_prime_2 = m_1d_sol2.get_dlapse_interp(r2);
-        double psi_2 = m_1d_sol2.get_psi_interp(r2);
-        double psi_prime_2 = m_1d_sol2.get_dpsi_interp(r2);
+        double p_2 = m_bosonstar2.get_p_interp(r2);
+        double dp_2 = m_bosonstar2.get_dp_interp(r2);
+        double omega_2 = m_bosonstar2.get_lapse_interp(r2);
+        double omega_prime_2 = m_bosonstar2.get_dlapse_interp(r2);
+        double psi_2 = m_bosonstar2.get_psi_interp(r2);
+        double psi_prime_2 = m_bosonstar2.get_dpsi_interp(r2);
         double r_tilde;
 
         // Again, finding the values to be substracted from this second star
@@ -194,12 +194,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double r_p2 = sqrt(x_p2*x_p2+y_p2*y_p2+z_p2*z_p2);
 
         // Get physiical variables needed for the metric
-        double p_p2 = m_1d_sol2.get_p_interp(r_p2);
-        double dp_p2 = m_1d_sol2.get_dp_interp(r_p2);
-        double omega_p2 = m_1d_sol2.get_lapse_interp(r_p2);
-        double omega_prime_p2 = m_1d_sol2.get_dlapse_interp(r_p2);
-        double psi_p2 = m_1d_sol2.get_psi_interp(r_p2);
-        double psi_prime_p2 = m_1d_sol2.get_dpsi_interp(r_p2);
+        double p_p2 = m_bosonstar2.get_p_interp(r_p2);
+        double dp_p2 = m_bosonstar2.get_dp_interp(r_p2);
+        double omega_p2 = m_bosonstar2.get_lapse_interp(r_p2);
+        double omega_prime_p2 = m_bosonstar2.get_dlapse_interp(r_p2);
+        double psi_p2 = m_bosonstar2.get_psi_interp(r_p2);
+        double psi_prime_p2 = m_bosonstar2.get_dpsi_interp(r_p2);
         double pc_os_p2 = psi_p2*psi_p2*c_2*c_2 - omega_p2*omega_p2*s_2*s_2;
 
         // Values to be substracted 
@@ -223,8 +223,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         vars.shift[0] += beta_x2;
  
         // Find frequency and phase for object 2
-        double w_2 = m_1d_sol2.get_w();
-        double phase_2 = m_params_BosonStar.phase*M_PI + w_2*t;
+        double w_2 = m_bosonstar2.get_w();
+        double phase_2 = m_bosonstar.m_params_BosonStar.phase*M_PI + w_2*t;
 
         // Metric components for object 2
         g_zz_2 = psi_2*psi_2;
@@ -309,4 +309,4 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     current_cell.store_vars(vars);
 }
 
-#endif /* BOSONSTAR_IMPL_HPP_ */
+#endif /* BINARYBS_IMPL_HPP_ */

@@ -1,7 +1,7 @@
 #Params for runtime inputs
 
 ##############################################################
-verbosity = 0
+verbosity = 1
 chk_prefix = BosonChk_
 plot_prefix = Bosonp_
 #restart_file =
@@ -109,7 +109,7 @@ vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
-vars_asymptotic_values = 1.00998 0.999867 0.0 0.0 1.00007 0.0 1.00007 #chi and hij
+vars_asymptotic_values = 1.0 1.0 0.0 0.0 1.0 0.0 1.0 #chi and hij
                          0.0 0.0 0.0 0.0 0.0 0.0 0.0 #K and Aij
                          0.0 0.0 0.0 0.0             #Theta and Gamma
                          1.0 0.0 0.0 0.0 0.0 0.0 0.0 #lapse shift and B

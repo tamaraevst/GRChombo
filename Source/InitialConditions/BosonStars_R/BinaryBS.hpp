@@ -3,8 +3,8 @@
  * Please refer to LICENSE in GRChombo's root directory.
  */
 
-#ifndef BOSONSTAR_HPP_
-#define BOSONSTAR_HPP_
+#ifndef BINARYBS_HPP_
+#define BINARYBS_HPP_
 
 #include "Cell.hpp"
 #include "Coordinates.hpp"
@@ -23,12 +23,16 @@
 
 //! Class which solves for the initial data for a spherically symmetric boson
 //! star with phi^4 coupling
-class BosonStar
+class BinaryBS
 {
 
 public:
     //! The constructor
-    BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
+    // BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
+    //     Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
+    //     int a_verbosity);
+
+    BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
         Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
         int a_verbosity);
 
@@ -39,21 +43,21 @@ public:
     template <class data_t>
     void compute(Cell<data_t> current_cell) const;
 
-    BosonStarSolution m_1d_sol;
-    BosonStarSolution m_1d_sol2; /*<
-    The object that stores the solution found by the 1d ODE integrator */
-
 
 protected:
     double m_dx;
     double m_G_Newton;
-    BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
-    BosonStar_params_t m_params_BosonStar2;
+    // BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
+    // BosonStar_params_t m_params_BosonStar2;
     Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
 
+    BosonStarSolution m_bosonstar;
+    BosonStarSolution m_bosonstar2; /*<
+    The object that stores the solution found by the 1d ODE integrator */
+
 };
 
-#include "BosonStar.impl.hpp"
+#include "BinaryBS.impl.hpp"
 
-#endif /* BOSONSTAR_HPP_ */
+#endif /* BINARYBS_HPP_ */

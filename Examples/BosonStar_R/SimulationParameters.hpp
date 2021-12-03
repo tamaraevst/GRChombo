@@ -44,9 +44,9 @@ public:
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
         pp.load("central_amplitude_CSF2",
-                bosonstar2_params.central_amplitude_CSF2);
-        pp.load("eigen2", bosonstar2_params.eigen2, 0);
-        pp.load("gridpoints2",bosonstar2_params.gridpoints2,400000);
+                bosonstar2_params.central_amplitude_CSF, bosonstar_params.central_amplitude_CSF);
+        pp.load("eigen2", bosonstar2_params.eigen, 0);
+        pp.load("gridpoints2",bosonstar2_params.gridpoints,400000);
 
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
@@ -58,13 +58,13 @@ public:
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
 
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
-        pp.load("BS_rapidity2", bosonstar2_params.BS_rapidity2, 0.0);
+        pp.load("BS_rapidity2", bosonstar2_params.BS_rapidity, 0.0);
 
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
 
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
-        pp.load("G_Newton", bosonstar2_params.Newtons_constant2, 1.0);
+        pp.load("G_Newton", bosonstar2_params.Newtons_constant, 1.0);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
