@@ -78,17 +78,25 @@ void BosonStarLevel::initialData()
     // the max radius the code might need to calculate out to is L*sqrt(3)
     boson_star.compute_1d_solution(4.*m_p.L);
 
+    std::cout << "Finishedd computing 1D solution" << std::endl;
+
     // First set everything to zero ... we don't want undefined values in
     // constraints etc, then  initial conditions for Boson Star
     BoxLoops::loop(make_compute_pack(SetValue(0.0), boson_star),
                    m_state_new, m_state_new, INCLUDE_GHOST_CELLS,
                    disable_simd());
 
+    std::cout << "Made everything zero and made compute pack" << std::endl;
+
     BoxLoops::loop(GammaCalculator(m_dx),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                    disable_simd());
 
+    std::cout << "Gamma Calculator" << std::endl;
+
     fillAllGhosts();
+
+    std::cout << "Filled ghosts" << std::endl;
 }
 
 // Things to do before outputting a checkpoint file
