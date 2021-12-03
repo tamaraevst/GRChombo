@@ -54,6 +54,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
     double rapidity = m_params_BosonStar.BS_rapidity;
     double rapidity2 = m_params_BosonStar2.BS_rapidity;
+    double mu = m_params_BosonStar.mass_ratio;
     double M = m_params_BosonStar.BlackHoleMass;
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
@@ -66,8 +67,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-separation/2.)*s_; //set /tilde{t} to zero
-    double x = (coords.x-separation/2.)*c_;
+    double t = (coords.x-mu*separation/2.)*s_; //set /tilde{t} to zero
+    double x = (coords.x-mu*separation/2.)*c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
@@ -76,8 +77,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_2 = cosh(-rapidity2);
     double s_2 = sinh(-rapidity2);
     double v_2 = tanh(-rapidity2);
-    double t2 = (coords.x+separation/2.)*s_2; //set /tilde{t} to zero
-    double x2 = (coords.x+separation/2.)*c_2;
+    double t2 = (coords.x+(1-mu)*separation/2.)*s_2; //set /tilde{t} to zero
+    double x2 = (coords.x+(1-mu)*separation/2.)*c_2;
     double z2 = coords.z;
     double y2 = coords.y-impact_parameter/2.;
     double r2 = sqrt(x2*x2+y2*y2+z2*z2);
@@ -162,7 +163,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double y_p = -impact_parameter;
         double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
     
-        // Run BS solver to be able to find lapse and conformal fcator needed for the metric 
+        // Run BS solver to be able to find lapse and conformal factor needed for the metric 
         double p_p = m_1d_sol.get_p_interp(r_p);
         double dp_p = m_1d_sol.get_dp_interp(r_p);
         double omega_p = m_1d_sol.get_lapse_interp(r_p);
@@ -175,14 +176,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL[1][1] = psi_p*psi_p;
         helferLL[2][2] = psi_p*psi_p;
         helferLL[0][0] = pc_os_p;
-
-        double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
-        (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
-        h11_inf = (2.-helferLL[1][1])*chi_inf, h22_inf = (2.-helferLL[2][2])*chi_inf;
-        /*if (r<3){
-        std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
-                          << ", h22 = " << h22_inf << ", chi inf = " <<
-                          chi_inf << std::endl;}*/
 
         // second star physical variables
         double p_2 = m_1d_sol2.get_p_interp(r2);
@@ -278,6 +271,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
     g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1 * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
+
+    //These are the asymptotics that are used for Helfer trick, in our case asymptotoc values of chi and diagonal h are exacly 1 by construction
+    // double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
+    //     (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
+    //     h11_inf = (2.-helferLL[1][1])*chi_inf, h22_inf = (2.-helferLL[2][2])*chi_inf;
+        /*if (r<3){
+        std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
+                          << ", h22 = " << h22_inf << ", chi inf = " <<
+                          chi_inf << std::endl;}*/
 
     // Now, compute upper and lower components
     gammaLL[0][0] = g_xx;
