@@ -10,6 +10,8 @@
 #ifndef BINARYBS_IMPL_HPP_
 #define BINARYBS_IMPL_HPP_
 
+#include "DebuggingTools.hpp"
+
 inline BinaryBS::BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
                     Potential::params_t a_params_potential, double a_G_Newton,
                     double a_dx, int a_verbosity)
@@ -22,12 +24,10 @@ void BinaryBS::compute_1d_solution(const double max_r)
 {
     try
     {
-        std::cout << "For first BS" << std::endl;
         // Set initial parameters and then run the solver for both of the BSs (didnt put it in the constructor)
         m_bosonstar.set_initialcondition_params(max_r);
         m_bosonstar.main();
 
-        std::cout << "For second BS" << std::endl;
         m_bosonstar2.set_initialcondition_params(max_r);
         m_bosonstar2.main();
     }
@@ -267,6 +267,12 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double weight1 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x, 2)+pow(coords.y-y,2))); // bump at object 1
     double weight2 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x2, 2)+pow(coords.y-y2,2))); //bump at object 2
 
+    if (weight1 < 0.2 || weight2 < 0.2)
+    {
+        DEBUG_OUT(weight1);
+        DEBUG_OUT(weight2);
+    }
+    
     // Initial 3-metric 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
@@ -307,6 +313,8 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);
+    current_cell.store_vars(weight1, c_weight1);
+    current_cell.store_vars(weight2, c_weight2);
 }
 
 #endif /* BINARYBS_IMPL_HPP_ */

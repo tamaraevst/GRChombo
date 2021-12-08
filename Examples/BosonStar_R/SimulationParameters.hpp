@@ -40,8 +40,15 @@ public:
         pp.load("eigen", bosonstar_params.eigen, 0);
         pp.load("gridpoints",bosonstar_params.gridpoints,400000);
         pp.load("mass_ration", bosonstar_params.mass_ratio, 0.5);
-        pp.load("star_centre", bosonstar_params.star_centre,
-                {0.5 * L, 0.5 * L, 0.5 * L});
+
+        std::array<double, CH_SPACEDIM> offset, offset2;
+        pp.load("offset", offset, {0.0, 0.0, 0.0});
+        pp.load("offset2", offset2, {0.0, 0.0, 0.0});
+        FOR(idir)
+        {
+            bosonstar_params.star_centre[idir] = center[idir] + offset[idir];
+            bosonstar2_params.star_centre[idir] = center[idir] + offset2[idir];
+        }        
 
         pp.load("central_amplitude_CSF2",
                 bosonstar2_params.central_amplitude_CSF, bosonstar_params.central_amplitude_CSF);

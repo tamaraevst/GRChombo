@@ -67,7 +67,7 @@ vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
                          0 7              #Weyl4 re im
                          0 1 2 3          #Stresstensor rho s1 s2 s3
                          0 4 6 0 5 0      #Stresstensor s11 s12 s13 s22 s23 s33
-                         0 0 0            #Qphi Fphi Sphi
+                         0 0 0 0 0            #Qphi Fphi Sphi
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
