@@ -67,8 +67,8 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-mu*separation/2.)*s_; //set /tilde{t} to zero
-    double x = (coords.x-mu*separation/2.)*c_;
+    double t = (coords.x-separation)*s_; //set /tilde{t} to zero
+    double x = (coords.x-separation)*c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
@@ -77,8 +77,8 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double c_2 = cosh(-rapidity2);
     double s_2 = sinh(-rapidity2);
     double v_2 = tanh(-rapidity2);
-    double t2 = (coords.x+(1-mu)*separation/2.)*s_2; //set /tilde{t} to zero
-    double x2 = (coords.x+(1-mu)*separation/2.)*c_2;
+    double t2 = (coords.x+separation/2.)*s_2; //set /tilde{t} to zero
+    double x2 = (coords.x+separation/2.)*c_2;
     double z2 = coords.z;
     double y2 = coords.y-impact_parameter/2.;
     double r2 = sqrt(x2*x2+y2*y2+z2*z2);

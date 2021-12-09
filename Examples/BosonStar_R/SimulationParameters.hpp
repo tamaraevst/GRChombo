@@ -89,7 +89,7 @@ public:
                 mass_extraction_params.num_points_theta, 4);
         pp.load("mass_extraction_center",
                 mass_extraction_params.extraction_center,
-                {0.5 * L, 0.5 * L, 0.5 * L});
+                center);
 
         // Weyl extraction
         pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
