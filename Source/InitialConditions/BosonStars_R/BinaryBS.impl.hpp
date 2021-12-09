@@ -266,12 +266,6 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     WeightFunction weight;
     double weight1 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x, 2)+pow(coords.y-y,2))); // bump at object 1
     double weight2 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x2, 2)+pow(coords.y-y2,2))); //bump at object 2
-
-    if (weight1 < 0.2 || weight2 < 0.2)
-    {
-        DEBUG_OUT(weight1);
-        DEBUG_OUT(weight2);
-    }
     
     // Initial 3-metric 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
