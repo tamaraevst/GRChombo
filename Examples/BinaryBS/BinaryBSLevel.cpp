@@ -48,7 +48,7 @@ void BinaryBSLevel::specificAdvance()
 
     // Check for nan's
     if (m_p.nan_check)
-        BoxLoops::loop(NanCheck(), m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
+        BoxLoops::loop(NanCheck("NaNCheck in specific Advance: "), m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                        disable_simd());
 }
 

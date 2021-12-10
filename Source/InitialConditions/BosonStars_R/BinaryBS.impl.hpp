@@ -53,7 +53,9 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
     double rapidity = m_bosonstar.m_params_BosonStar.BS_rapidity;
+    std::cout << "Rapidity 1 is" << rapidity << std::endl;
     double rapidity2 = m_bosonstar2.m_params_BosonStar.BS_rapidity;
+    std::cout << "Rapidity 2 is" << rapidity2 << std::endl;
     double mu = m_bosonstar.m_params_BosonStar.mass_ratio;
     double M = m_bosonstar.m_params_BosonStar.BlackHoleMass;
     double separation = m_bosonstar.m_params_BosonStar.BS_separation;
@@ -67,11 +69,11 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-separation)*s_; //set /tilde{t} to zero
-    double x = (coords.x-separation)*c_;
-    double z = coords.z; //set /tilde{t} to zero
-    double y = coords.y+impact_parameter/2.;
-    double r = sqrt(x*x+y*y+z*z);
+    double t1 = (coords.x-separation)*s_; //set /tilde{t} to zero
+    double x1 = (coords.x-separation)*c_;
+    double z1 = coords.z; //set /tilde{t} to zero
+    double y1 = coords.y+impact_parameter/2.;
+    double r1 = sqrt(x1*x1+y1*y1+z1*z1);
 
     // Second star positioning 
     double c_2 = cosh(-rapidity2);
@@ -86,12 +88,12 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     // First star physical variables
 
     // Get scalar field modulus, conformal factor, lapse and their gradients
-    double p_ = m_bosonstar.get_p_interp(r);
-    double dp_ = m_bosonstar.get_dp_interp(r);
-    double omega_ = m_bosonstar.get_lapse_interp(r);
-    double omega_prime_ = m_bosonstar.get_dlapse_interp(r);
-    double psi_ = m_bosonstar.get_psi_interp(r);
-    double psi_prime_ = m_bosonstar.get_dpsi_interp(r);
+    double p_ = m_bosonstar.get_p_interp(r1);
+    double dp_ = m_bosonstar.get_dp_interp(r1);
+    double omega_ = m_bosonstar.get_lapse_interp(r1);
+    double omega_prime_ = m_bosonstar.get_dlapse_interp(r1);
+    double psi_ = m_bosonstar.get_psi_interp(r1);
+    double psi_prime_ = m_bosonstar.get_dpsi_interp(r1);
 
     // Get lapse and shift
     double pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_; //this is denominator for the lapse in boosted frame and also 11 component of the 3-metric
@@ -100,9 +102,9 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double beta_x = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
     vars.shift[0] += beta_x;
 
-    // Get frequency and phase
+    // Get frequency and phase for star 1
     double w_ = m_bosonstar.get_w();
-    double phase_ = w_*t;
+    double phase_ = w_*t1;
 
     // Get 3-metric components for the fist star in boosted frame and put them into the matrix
     double g_zz_1 = psi_*psi_; 
@@ -128,22 +130,22 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     // Evolution equations for Re and Im parts of scalar field and conjugate momentum in boosted frame
     vars.phi_Re += p_*cos(phase_);
     vars.phi_Im += p_*sin(phase_);
-    vars.Pi_Re += -(1./lapse_1)*( (x/r)*(s_-beta_x*c_)*dp_*cos(phase_) - w_*(c_-beta_x*s_)*p_*sin(phase_) );
-    vars.Pi_Im += -(1./lapse_1)*( (x/r)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
+    vars.Pi_Re += -(1./lapse_1)*( (x1/r1)*(s_-beta_x*c_)*dp_*cos(phase_) - w_*(c_-beta_x*s_)*p_*sin(phase_) );
+    vars.Pi_Im += -(1./lapse_1)*( (x1/r1)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
 
     // Define extrinsic curvature for both of the objects and the total one
     double KLL_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //for object 1
     double KLL_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //for objeect 2
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}}; //total
-    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*psi_);
+    KLL_1[2][2] = -lapse_1*s_*x1*psi_prime_/(r1*psi_);
     KLL_1[1][1] = KLL_1[2][2];
-    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+    KLL_1[0][1] = lapse_1*c_*s_*(y1/r1)*(psi_prime_/psi_ - omega_prime_/omega_ );
+    KLL_1[0][2] = lapse_1*c_*s_*(z1/r1)*(psi_prime_/psi_ - omega_prime_/omega_ );
     KLL_1[1][0] = KLL_1[0][1];
     KLL_1[2][0] = KLL_1[0][2];
     KLL_1[2][1] = 0.;
     KLL_1[1][2] = 0.;
-    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
+    KLL_1[0][0] = lapse_1*(x1/r1)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
 
     double K1=0., K2=0.; //these are componnet of K with upper indices
     FOR2(i,j) K1 += gammaUU_1[i][j]*KLL_1[i][j];
@@ -157,10 +159,10 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     if (BS_binary) //if BS binary or BS/BH binary
     {
         // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data
-        double t_p = (separation)*s_; //set /tilde{t} to zero
-        double x_p = (separation)*c_;
+        double t_p = -(separation)*s_; //set /tilde{t} to zero
+        double x_p = -(separation)*c_;
         double z_p = 0.; //set /tilde{t} to zero
-        double y_p = -impact_parameter;
+        double y_p = impact_parameter;
         double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
     
         // Run BS solver to be able to find lapse and conformal factor needed for the metric 
@@ -184,16 +186,16 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
         double omega_prime_2 = m_bosonstar2.get_dlapse_interp(r2);
         double psi_2 = m_bosonstar2.get_psi_interp(r2);
         double psi_prime_2 = m_bosonstar2.get_dpsi_interp(r2);
-        double r_tilde;
+        // double r_tilde;
 
         // Again, finding the values to be substracted from this second star
-        double t_p2 = (-separation)*s_2; //set /tilde{t} to zero
-        double x_p2 = (-separation)*c_2;
+        double t_p2 = (separation)*s_2; //set /tilde{t} to zero
+        double x_p2 = (separation)*c_2;
         double z_p2 = 0.; //set /tilde{t} to zero
-        double y_p2 = impact_parameter;
+        double y_p2 = -impact_parameter;
         double r_p2 = sqrt(x_p2*x_p2+y_p2*y_p2+z_p2*z_p2);
 
-        // Get physiical variables needed for the metric
+        // Get physical variables needed for the metric
         double p_p2 = m_bosonstar2.get_p_interp(r_p2);
         double dp_p2 = m_bosonstar2.get_dp_interp(r_p2);
         double omega_p2 = m_bosonstar2.get_lapse_interp(r_p2);
@@ -209,7 +211,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
         if (BS_BH_binary)
         {
-            r_tilde = sqrt(r*r + 10e-10);
+            double r_tilde = sqrt(r2*r2 + 10e-10);
             omega_2 = (2.-M/r_tilde)/(2.+M/r_tilde);
             omega_prime_2 = 4.*M/pow(2.*r_tilde + M,2);
             psi_2 = pow(1.+M/(2.*r_tilde),2);
@@ -224,7 +226,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
  
         // Find frequency and phase for object 2
         double w_2 = m_bosonstar2.get_w();
-        double phase_2 = m_bosonstar.m_params_BosonStar.phase*M_PI + w_2*t;
+        double phase_2 = m_bosonstar2.m_params_BosonStar.phase*M_PI + w_2*t2;
 
         // Metric components for object 2
         g_zz_2 = psi_2*psi_2;
@@ -264,9 +266,13 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     
     // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
     WeightFunction weight;
-    double weight1 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x, 2)+pow(coords.y-y,2))); // bump at object 1
-    double weight2 = weight.weightfunction((1/separation) * sqrt(pow(coords.x-x2, 2)+pow(coords.y-y2,2))); //bump at object 2
-    
+
+    double arg1 = (1/separation) * (sqrt(pow(coords.x-x1, 2)+pow(coords.y-y1,2)));
+    double arg2 = (1/separation) * (sqrt(pow(coords.x-x2, 2)+pow(coords.y-y2,2)));
+
+    double weight1 = weight.weightfunction(arg1); // bump at object 1
+    double weight2 = weight.weightfunction(arg2); //bump at object 2
+
     // Initial 3-metric 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
