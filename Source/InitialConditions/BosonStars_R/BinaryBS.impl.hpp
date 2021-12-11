@@ -53,9 +53,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
     double rapidity = m_bosonstar.m_params_BosonStar.BS_rapidity;
-    std::cout << "Rapidity 1 is" << rapidity << std::endl;
     double rapidity2 = m_bosonstar2.m_params_BosonStar.BS_rapidity;
-    std::cout << "Rapidity 2 is" << rapidity2 << std::endl;
     double mu = m_bosonstar.m_params_BosonStar.mass_ratio;
     double M = m_bosonstar.m_params_BosonStar.BlackHoleMass;
     double separation = m_bosonstar.m_params_BosonStar.BS_separation;
