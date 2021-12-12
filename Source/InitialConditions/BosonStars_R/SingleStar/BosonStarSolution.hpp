@@ -60,10 +60,11 @@ private: // private member fucntions functions
 
 
 public:
-    BosonStarSolution(BosonStar_params_t a_params_BosonStar,
-        Potential::params_t a_params_potential);
-
-    void set_initialcondition_params(const double max_r);
+    //Constructor
+    BosonStarSolution();
+    void set_initialcondition_params(BosonStar_params_t m_params_BosonStar,
+                                     Potential::params_t m_params_potential, 
+                                     const double max_r);
     double get_p_interp(const double r) const;
     double get_lapse_interp(const double r) const;
     double get_psi_interp(const double r) const;

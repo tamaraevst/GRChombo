@@ -43,6 +43,10 @@ public:
     template <class data_t>
     void compute(Cell<data_t> current_cell) const;
 
+    BosonStarSolution m_bosonstar;
+    BosonStarSolution m_bosonstar2; /*<
+    The object that stores the solution found by the 1d ODE integrator */
+
 
 protected:
     double m_dx;
@@ -52,9 +56,8 @@ protected:
     Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
 
-    BosonStarSolution m_bosonstar;
-    BosonStarSolution m_bosonstar2; /*<
-    The object that stores the solution found by the 1d ODE integrator */
+    BosonStar_params_t m_bosonstar_params;
+    BosonStar_params_t m_bosonstar2_params;
 
 };
 

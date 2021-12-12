@@ -51,7 +51,7 @@ BS_BH_binary = false
 BlackHoleMass = 0.0 # makes an isotropic black hole at the offset position, make sure BS_separation =/= 0
 
 # centre of the star - only uncomment if you want star off centre
-star_centre = 0 0 0
+star_centre = 512 512 0
 
 # Potential params
 scalar_mass = 1.0
@@ -82,7 +82,7 @@ isPeriodic = 0 0 0
 # 0 = static, 1 = sommerfeld, 2 = reflective
 # (see BoundaryConditions.hpp for details)
 hi_boundary = 1 1 1
-lo_boundary = 2 2 2
+lo_boundary = 1 1 2
 
 # if sommerfeld boundaries selected, must select
 # asymptotic values (in order given by UserVariables.hpp)
@@ -105,7 +105,7 @@ vars_parity_diagnostic = 0 1 2 3          #Ham and Mom
                          0 7              #Weyl4 re im
                          0 1 2 3          #Stresstensor rho s1 s2 s3
                          0 4 6 0 5 0      #Stresstensor s11 s12 s13 s22 s23 s33
-                         0 0 0            #Qphi Fphi Sphi
+                         0 0 0 0 0            #Qphi Fphi Sphi
 
 # if reflective boundaries selected, must set
 # parity of all vars (in order given by UserVariables.hpp)
@@ -176,7 +176,7 @@ vars_inf_norm = 0 7 15 # chi, K, Gamma1
 ##############################################################
 # Mass extraction params
 mass_extraction_center = 0 0 0
-activate_mass_extraction = 1
+activate_mass_extraction = 0
 num_mass_extraction_radii = 3
 mass_extraction_radii = 60. 100. 120. 140. 160. 180. 200. 220.
 mass_extraction_levels = 3 2 1 1 1 1 1 1
@@ -185,7 +185,7 @@ num_points_theta_mass = 24
 
 # GW extraction params
 #default center to grid center, uncomment to change
-extraction_center = 0 0 0 
+#extraction_center = 0 0 0 
 activate_extraction = 1
 activate_gw_extraction = 1
 num_extraction_radii = 8
@@ -204,7 +204,7 @@ modes = 2 0
 
 
 flux_number_of_radii = 8
-flux_do = true
+flux_do = false
 flux_extraction_level = 0
 flux_write_extraction = true
 flux_num_theta = 80

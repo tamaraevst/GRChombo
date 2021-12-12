@@ -15,7 +15,7 @@
 inline BinaryBS::BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
                     Potential::params_t a_params_potential, double a_G_Newton,
                     double a_dx, int a_verbosity)
-    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_bosonstar(a_bosonstar_params, a_params_potential),m_bosonstar2(a_bosonstar2_params, a_params_potential),
+    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_bosonstar_params(a_bosonstar_params),m_bosonstar2_params(a_bosonstar2_params),
     m_params_potential(a_params_potential), m_verbosity(a_verbosity)
 {
 }
@@ -25,10 +25,10 @@ void BinaryBS::compute_1d_solution(const double max_r)
     try
     {
         // Set initial parameters and then run the solver for both of the BSs (didnt put it in the constructor)
-        m_bosonstar.set_initialcondition_params(max_r);
+        m_bosonstar.set_initialcondition_params(m_bosonstar_params, m_params_potential, max_r);
         m_bosonstar.main();
 
-        m_bosonstar2.set_initialcondition_params(max_r);
+        m_bosonstar2.set_initialcondition_params(m_bosonstar2_params, m_params_potential, max_r);
         m_bosonstar2.main();
     }
     catch (std::exception &exception)
@@ -49,17 +49,17 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     
     // Coordinates for centre of mass
     Coordinates<data_t> coords(current_cell, m_dx,
-        m_bosonstar.m_params_BosonStar.star_centre);
+        m_bosonstar_params.star_centre);
 
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
-    double rapidity = m_bosonstar.m_params_BosonStar.BS_rapidity;
-    double rapidity2 = m_bosonstar2.m_params_BosonStar.BS_rapidity;
-    double mu = m_bosonstar.m_params_BosonStar.mass_ratio;
-    double M = m_bosonstar.m_params_BosonStar.BlackHoleMass;
-    double separation = m_bosonstar.m_params_BosonStar.BS_separation;
-    double impact_parameter = m_bosonstar.m_params_BosonStar.BS_impact_parameter;
-    bool BS_binary = m_bosonstar.m_params_BosonStar.BS_binary;
-    bool BS_BH_binary = m_bosonstar.m_params_BosonStar.BS_BH_binary;
+    double rapidity = m_bosonstar_params.BS_rapidity;
+    double rapidity2 =m_bosonstar2_params.BS_rapidity;
+    double mu = m_bosonstar_params.mass_ratio;
+    double M = m_bosonstar_params.BlackHoleMass;
+    double separation = m_bosonstar_params.BS_separation;
+    double impact_parameter = m_bosonstar_params.BS_impact_parameter;
+    bool BS_binary = m_bosonstar_params.BS_binary;
+    bool BS_BH_binary = m_bosonstar_params.BS_BH_binary;
 
     // Define boosts and coordinate objects
 
@@ -224,7 +224,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
  
         // Find frequency and phase for object 2
         double w_2 = m_bosonstar2.get_w();
-        double phase_2 = m_bosonstar2.m_params_BosonStar.phase*M_PI + w_2*t2;
+        double phase_2 = m_bosonstar_params.phase*M_PI + w_2*t2;
 
         // Metric components for object 2
         g_zz_2 = psi_2*psi_2;
