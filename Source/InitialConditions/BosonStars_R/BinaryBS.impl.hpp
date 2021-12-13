@@ -67,8 +67,8 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t1 = (coords.x-separation)*s_; //set /tilde{t} to zero
-    double x1 = (coords.x-separation)*c_;
+    double t1 = (coords.x-separation/2)*s_; //set /tilde{t} to zero
+    double x1 = (coords.x-separation/2)*c_;
     double z1 = coords.z; //set /tilde{t} to zero
     double y1 = coords.y+impact_parameter/2.;
     double r1 = sqrt(x1*x1+y1*y1+z1*z1);
@@ -157,8 +157,8 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     if (BS_binary) //if BS binary or BS/BH binary
     {
         // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data
-        double t_p = -(separation)*s_; //set /tilde{t} to zero
-        double x_p = -(separation)*c_;
+        double t_p = (-separation)*s_; //set /tilde{t} to zero
+        double x_p = (-separation)*c_;
         double z_p = 0.; //set /tilde{t} to zero
         double y_p = impact_parameter;
         double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
@@ -244,21 +244,23 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
             // For BS binary need to add on the second star's variables to the evolution equations
             vars.phi_Re += p_2*cos(phase_2);
             vars.phi_Im += p_2*sin(phase_2);
-            vars.Pi_Re += -(1./lapse_2)*( (x2/r2)*(s_2*(-beta_x2)*c_2)*dp_2*cos(phase_2) - w_2*(c_2*(-beta_x2)*s_2)*p_2*sin(phase_2) );
-            vars.Pi_Im += -(1./lapse_2)*( (x2/r2)*(s_2*(-beta_x2)*c_2)*dp_2*sin(phase_2) + w_2*(c_2*(-beta_x2)*s_2)*p_2*cos(phase_2) );
+            vars.Pi_Re += -(1. / lapse_2) * ((x2/r2) * (s_2 - beta_x2 * c_2) * dp_2 * cos(phase_2) - 
+                            w_2 * (c_2 - beta_x2 * s_2) * p_2*sin(phase_2));
+            vars.Pi_Im += - (1./lapse_2) * ( (x2/r2) * (s_2 - beta_x2 * c_2) * dp_2 * sin(phase_2) + 
+                            w_2 * (c_2 - beta_x2 * s_2) * p_2 * cos(phase_2));
         }
 
         // Find extrinsic curvature for object 2
-        KLL_2[2][2] = -lapse_2*s_2*x2*psi_prime_2/(r2*psi_2);
+        KLL_2[2][2] = -lapse_2 * s_2 * x2 * psi_prime_2 / (r2 * psi_2);
         KLL_2[1][1] = KLL_2[2][2];
-        KLL_2[0][1] = lapse_2*c_2*s_2*(y2/r2)*(psi_prime_2/psi_2 - omega_prime_2/omega_2 );
-        KLL_2[0][2] = lapse_2*c_2*s_2*(z2/r2)*(psi_prime_2/psi_2 - omega_prime_2/omega_2 );
+        KLL_2[0][1] = lapse_2 * c_2 * s_2 * (y2/r2) * (psi_prime_2 / psi_2 - omega_prime_2 / omega_2 );
+        KLL_2[0][2] = lapse_2 * c_2 * s_2 * (z2/r2) * (psi_prime_2 / psi_2 - omega_prime_2 / omega_2 );
         KLL_2[1][0] = KLL_2[0][1];
         KLL_2[2][0] = KLL_2[0][2];
         KLL_2[2][1] = 0.;
         KLL_2[1][2] = 0.;
-        KLL_2[0][0] = lapse_2*(x2/r2)*s_2*c_2*c_2*(psi_prime_2/psi_2 - 2.*omega_prime_2/omega_2 + v_2*v_2*omega_2*omega_prime_2*pow(psi_2,-2));
-        FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
+        KLL_2[0][0] = lapse_2 * (x2/r2) *s_2 * c_2 * c_2 * (psi_prime_2 / psi_2 - 2.*omega_prime_2 / omega_2 + v_2 * v_2 * omega_2 * omega_prime_2 * pow(psi_2,-2));
+        FOR2(i,j) K2 += gammaUU_2[i][j] * KLL_2[i][j];
 
     }
     
@@ -294,20 +296,30 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     gammaUU[2][2] = 1./g_zz;
 
     // Define initial conformal factor 
-    double chi_ = pow(g_xx*g_yy*g_zz,-1./3.);
+    double chi_ = pow(g_xx * g_yy * g_zz, -1./3.);
     vars.chi = chi_;
 
     // Define initial lapse 
-    if (BS_BH_binary){vars.lapse += sqrt(vars.chi);}
-    else if (BS_binary){vars.lapse += sqrt(lapse_1*lapse_1 + lapse_2*lapse_2-1.);}
-    else{vars.lapse += lapse_1;}
+    if (BS_BH_binary)
+    {
+        vars.lapse += sqrt(vars.chi);
+    }
+    else if (BS_binary)
+    {
+        vars.lapse += sqrt(lapse_1 * lapse_1 + lapse_2 * lapse_2 - 1.);
+    }
+    else
+    {
+        vars.lapse += lapse_1;
+    }
 
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
-    FOR2(i,j) vars.h[i][j] = vars.chi*gammaLL[i][j];
-    FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l]*(gammaUU_1[l][k]*KLL_1[k][j] + gammaUU_2[l][k]*KLL_2[k][j]);
-    FOR2(i,j) vars.K += KLL[i][j]*gammaUU[i][j];
-    FOR2(i,j) vars.A[i][j] = chi_*(KLL[i][j]-one_third*vars.K*gammaLL[i][j]);
+    FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
+    FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l] * (gammaUU_1[l][k] * KLL_1[k][j] + 
+                                gammaUU_2[l][k] * KLL_2[k][j]);
+    FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
+    FOR2(i,j) vars.A[i][j] = chi_ * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 
     // Store the initial values of the variables
     current_cell.store_vars(vars);
