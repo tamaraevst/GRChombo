@@ -154,24 +154,40 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
     // Note that for equal mass helferLL = helferLL2
 
+    // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data
+    double t_p = (-separation)*s_; //set /tilde{t} to zero
+    double x_p = (-separation)*c_;
+    double z_p = 0.; //set /tilde{t} to zero
+    double y_p = impact_parameter;
+    double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
+    
+    // Run BS solver to be able to find lapse and conformal factor needed for the metric 
+    double p_p = m_bosonstar.get_p_interp(r_p);
+    double dp_p = m_bosonstar.get_dp_interp(r_p);
+    double omega_p = m_bosonstar.get_lapse_interp(r_p);
+    double omega_prime_p = m_bosonstar.get_dlapse_interp(r_p);
+    double psi_p = m_bosonstar.get_psi_interp(r_p);
+    double psi_prime_p = m_bosonstar.get_dpsi_interp(r_p);
+    double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
+
+    // Again, finding the values to be substracted from this second star
+    double t_p2 = (separation)*s_2; //set /tilde{t} to zero
+    double x_p2 = (separation)*c_2;
+    double z_p2 = 0.; //set /tilde{t} to zero
+    double y_p2 = -impact_parameter;
+    double r_p2 = sqrt(x_p2*x_p2+y_p2*y_p2+z_p2*z_p2);
+
+    // Get physical variables needed for the metric
+    double p_p2 = m_bosonstar2.get_p_interp(r_p2);
+    double dp_p2 = m_bosonstar2.get_dp_interp(r_p2);
+    double omega_p2 = m_bosonstar2.get_lapse_interp(r_p2);
+    double omega_prime_p2 = m_bosonstar2.get_dlapse_interp(r_p2);
+    double psi_p2 = m_bosonstar2.get_psi_interp(r_p2);
+    double psi_prime_p2 = m_bosonstar2.get_dpsi_interp(r_p2);
+    double pc_os_p2 = psi_p2*psi_p2*c_2*c_2 - omega_p2*omega_p2*s_2*s_2;
+
     if (BS_binary) //if BS binary or BS/BH binary
     {
-        // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data
-        double t_p = (-separation)*s_; //set /tilde{t} to zero
-        double x_p = (-separation)*c_;
-        double z_p = 0.; //set /tilde{t} to zero
-        double y_p = impact_parameter;
-        double r_p = sqrt(x_p*x_p+y_p*y_p+z_p*z_p);
-    
-        // Run BS solver to be able to find lapse and conformal factor needed for the metric 
-        double p_p = m_bosonstar.get_p_interp(r_p);
-        double dp_p = m_bosonstar.get_dp_interp(r_p);
-        double omega_p = m_bosonstar.get_lapse_interp(r_p);
-        double omega_prime_p = m_bosonstar.get_dlapse_interp(r_p);
-        double psi_p = m_bosonstar.get_psi_interp(r_p);
-        double psi_prime_p = m_bosonstar.get_dpsi_interp(r_p);
-        double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
-
         //These are the values to be substracted in the initial data
         helferLL[1][1] = psi_p*psi_p;
         helferLL[2][2] = psi_p*psi_p;
@@ -185,22 +201,6 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
         double psi_2 = m_bosonstar2.get_psi_interp(r2);
         double psi_prime_2 = m_bosonstar2.get_dpsi_interp(r2);
         // double r_tilde;
-
-        // Again, finding the values to be substracted from this second star
-        double t_p2 = (separation)*s_2; //set /tilde{t} to zero
-        double x_p2 = (separation)*c_2;
-        double z_p2 = 0.; //set /tilde{t} to zero
-        double y_p2 = -impact_parameter;
-        double r_p2 = sqrt(x_p2*x_p2+y_p2*y_p2+z_p2*z_p2);
-
-        // Get physical variables needed for the metric
-        double p_p2 = m_bosonstar2.get_p_interp(r_p2);
-        double dp_p2 = m_bosonstar2.get_dp_interp(r_p2);
-        double omega_p2 = m_bosonstar2.get_lapse_interp(r_p2);
-        double omega_prime_p2 = m_bosonstar2.get_dlapse_interp(r_p2);
-        double psi_p2 = m_bosonstar2.get_psi_interp(r_p2);
-        double psi_prime_p2 = m_bosonstar2.get_dpsi_interp(r_p2);
-        double pc_os_p2 = psi_p2*psi_p2*c_2*c_2 - omega_p2*omega_p2*s_2*s_2;
 
         // Values to be substracted 
         helferLL2[1][1] = psi_p2*psi_p2;
