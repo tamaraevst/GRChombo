@@ -10,14 +10,14 @@
 #ifndef BOSONSTARSOLUTION_IMPL_HPP_
 #define BOSONSTARSOLUTION_IMPL_HPP_
 
-BosonStarSolution::BosonStarSolution() {}
+// BosonStarSolution::BosonStarSolution() {}
 
-// inline BosonStarSolution::BosonStarSolution(BosonStar_params_t a_params_BosonStar,
-//                     Potential::params_t a_params_potential)
-//     : m_params_BosonStar(a_params_BosonStar), m_params_potential(a_params_potential)
+inline BosonStarSolution::BosonStarSolution(BosonStar_params_t a_params_BosonStar,
+                    Potential::params_t a_params_potential)
+    : m_params_BosonStar(a_params_BosonStar), m_params_potential(a_params_potential)
 
-// {
-// }
+{
+}
 
 void BosonStarSolution::main()
 {
@@ -614,9 +614,7 @@ double BosonStarSolution::get_w() const
 }
 
 
-void BosonStarSolution::set_initialcondition_params(BosonStar_params_t m_params_BosonStar,
-                                     				Potential::params_t m_params_potential,
-									 				const double max_r)
+void BosonStarSolution::set_initialcondition_params(const double max_r)
 {
     gridsize = m_params_BosonStar.gridpoints;
     adaptive_buffer = 0.;//gridsize/10; // numer of gridpoints to intergate more carefully

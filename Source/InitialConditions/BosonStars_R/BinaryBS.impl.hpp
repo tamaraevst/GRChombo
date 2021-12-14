@@ -14,26 +14,46 @@
 
 inline BinaryBS::BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
                     Potential::params_t a_params_potential, double a_G_Newton,
-                    double a_dx, int a_verbosity)
-    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_bosonstar_params(a_bosonstar_params),m_bosonstar2_params(a_bosonstar2_params),
-    m_params_potential(a_params_potential), m_verbosity(a_verbosity)
+                    double a_dx, bool a_identical, int a_verbosity)
+    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_bosonstar(a_bosonstar_params, a_params_potential), m_bosonstar2(a_bosonstar2_params,
+        a_params_potential), m_identical(a_identical), m_verbosity(a_verbosity)
 {
 }
 
 void BinaryBS::compute_1d_solution(const double max_r)
 {
-    try
+    if(m_verbosity)
     {
-        // Set initial parameters and then run the solver for both of the BSs (didnt put it in the constructor)
-        m_bosonstar.set_initialcondition_params(m_bosonstar_params, m_params_potential, max_r);
-        m_bosonstar.main();
+        pout() << "BinaryBS::compute_1d_solution: Computing boson star 1 profile"
+               << std::endl;
+    }
+    m_bosonstar.set_initialcondition_params(max_r);
+    m_bosonstar.main();
 
-        m_bosonstar2.set_initialcondition_params(m_bosonstar2_params, m_params_potential, max_r);
+    if(!m_identical)
+    {
+        if(m_verbosity)
+        {
+            pout() << "BinaryBS::compute_1d_solution:"
+                      " Computing boson star 2 profile" << std::endl;
+        }
+        m_bosonstar2.set_initialcondition_params(max_r);
         m_bosonstar2.main();
     }
-    catch (std::exception &exception)
+    else
     {
-        pout() << exception.what() << "\n";
+        if(m_verbosity)
+        {
+            pout() << "BinaryBS::compute_1d_profile: Boson star 2 identical"
+                      " to star 1; skipping profile computation" << std::endl;
+        }
+
+        // Copy boson_star1 into boson_star2 keeping phase and centre
+        auto boson_star2_centre = m_bosonstar2.m_params_BosonStar.star_centre;
+        double boson_star2_phase = m_bosonstar2.m_params_BosonStar.phase;
+        m_bosonstar2 = m_bosonstar;
+        m_bosonstar2.m_params_BosonStar.star_centre = boson_star2_centre;
+        m_bosonstar2.m_params_BosonStar.phase = boson_star2_phase;
     }
 }
 
@@ -49,17 +69,17 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
     
     // Coordinates for centre of mass
     Coordinates<data_t> coords(current_cell, m_dx,
-        m_bosonstar_params.star_centre);
+        m_bosonstar.m_params_BosonStar.star_centre);
 
     // Import BS parameters andd option of whether this is a BS binary or BS-BH binary
-    double rapidity = m_bosonstar_params.BS_rapidity;
-    double rapidity2 =m_bosonstar2_params.BS_rapidity;
-    double mu = m_bosonstar_params.mass_ratio;
-    double M = m_bosonstar_params.BlackHoleMass;
-    double separation = m_bosonstar_params.BS_separation;
-    double impact_parameter = m_bosonstar_params.BS_impact_parameter;
-    bool BS_binary = m_bosonstar_params.BS_binary;
-    bool BS_BH_binary = m_bosonstar_params.BS_BH_binary;
+    double rapidity = m_bosonstar.m_params_BosonStar.BS_rapidity;
+    double rapidity2 =m_bosonstar2.m_params_BosonStar.BS_rapidity;
+    double mu = m_bosonstar.m_params_BosonStar.mass_ratio;
+    double M = m_bosonstar.m_params_BosonStar.BlackHoleMass;
+    double separation = m_bosonstar.m_params_BosonStar.BS_separation;
+    double impact_parameter = m_bosonstar.m_params_BosonStar.BS_impact_parameter;
+    bool BS_binary = m_bosonstar.m_params_BosonStar.BS_binary;
+    bool BS_BH_binary = m_bosonstar.m_params_BosonStar.BS_BH_binary;
 
     // Define boosts and coordinate objects
 
@@ -224,7 +244,7 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
  
         // Find frequency and phase for object 2
         double w_2 = m_bosonstar2.get_w();
-        double phase_2 = m_bosonstar_params.phase*M_PI + w_2*t2;
+        double phase_2 = m_bosonstar2.m_params_BosonStar.phase*M_PI + w_2*t2;
 
         // Metric components for object 2
         g_zz_2 = psi_2*psi_2;
@@ -272,11 +292,15 @@ void BinaryBS::compute(Cell<data_t> current_cell) const
 
     double weight1 = weight.weightfunction(arg1); // bump at object 1
     double weight2 = weight.weightfunction(arg2); //bump at object 2
+    
+    g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
+    g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
+    g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
 
     // Initial 3-metric 
-    g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
-    g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1 * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
+    // g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
+    // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
+    // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1 * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
     //These are the asymptotics that are used for Helfer trick, in our case asymptotoc values of chi and diagonal h are exacly 1 by construction
     // double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*

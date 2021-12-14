@@ -74,6 +74,12 @@ public:
             pp.load("BS_rapidity2", bosonstar2_params.BS_rapidity, 0.0);
         }  
 
+        pp.load("phase2", bosonstar2_params.phase, 0.0);
+        pp.load("star_centre2", bosonstar2_params.star_centre,
+                {L - bosonstar_params.star_centre[0],
+                 L - bosonstar_params.star_centre[1],
+                 L - bosonstar_params.star_centre[2]});
+
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);

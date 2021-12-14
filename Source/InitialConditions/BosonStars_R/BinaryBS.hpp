@@ -33,7 +33,7 @@ public:
     //     int a_verbosity);
 
     BinaryBS(BosonStar_params_t a_bosonstar_params, BosonStar_params_t a_bosonstar2_params,
-        Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
+        Potential::params_t a_params_potential, double a_G_Newton, double a_dx, bool a_idnetical,
         int a_verbosity);
 
     //! Computes the 1d solution and stores in m_1d_sol
@@ -43,21 +43,21 @@ public:
     template <class data_t>
     void compute(Cell<data_t> current_cell) const;
 
-    BosonStarSolution m_bosonstar;
-    BosonStarSolution m_bosonstar2; /*<
-    The object that stores the solution found by the 1d ODE integrator */
-
 
 protected:
     double m_dx;
     double m_G_Newton;
+    BosonStarSolution m_bosonstar;
+    BosonStarSolution m_bosonstar2; /*<
+    The object that stores the solution found by the 1d ODE integrator */
     // BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
     // BosonStar_params_t m_params_BosonStar2;
-    Potential::params_t m_params_potential; //!< The potential params
+    // Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
+    bool m_identical;
 
-    BosonStar_params_t m_bosonstar_params;
-    BosonStar_params_t m_bosonstar2_params;
+    // BosonStar_params_t m_bosonstar_params;
+    // BosonStar_params_t m_bosonstar2_params;
 
 };
 
