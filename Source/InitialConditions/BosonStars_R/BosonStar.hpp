@@ -17,6 +17,7 @@
 #include "ComplexPotential.hpp"
 #include "BosonStarParams.hpp"
 #include "BosonStarSolution.hpp"
+#include "WeightFunction.hpp"
 #include <vector>
 #include "parstream.H" //gives pout
 
