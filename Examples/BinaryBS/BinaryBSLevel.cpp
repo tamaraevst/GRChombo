@@ -48,7 +48,7 @@ void BinaryBSLevel::specificAdvance()
 
     // Check for nan's
     if (m_p.nan_check)
-        BoxLoops::loop(NanCheck("NaNCheck in specific Advance: "), m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
+        BoxLoops::loop(NanCheck(), m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                        disable_simd());
 }
 
@@ -228,7 +228,7 @@ void BinaryBSLevel::doAnalysis()
 
         // Calculate the infinity-norm of all variables specified in params file
         // and output them
-         (m_p.num_vars_inf_norm > 0)
+        if (m_p.num_vars_inf_norm > 0)
         {
             pout() << "Variable infinity norms:\n";
             for (int icomp : m_p.vars_inf_norm)

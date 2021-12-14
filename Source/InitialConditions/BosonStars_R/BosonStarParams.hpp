@@ -22,7 +22,6 @@ struct BosonStar_params_t
     double Newtons_constant;
     double BlackHoleMass;
     double BS_rapidity;
-    double mass_ratio;
     std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
 };
 

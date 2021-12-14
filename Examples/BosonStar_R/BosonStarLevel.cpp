@@ -24,7 +24,7 @@
 // Problem specific includes
 #include "ComputePack.hpp"
 #include "ComplexPotential.hpp"
-#include "BinaryBS.hpp"
+#include "BosonStar.hpp"
 #include "ComplexScalarField.hpp"
 #include "SetValue.hpp"
 
@@ -71,8 +71,8 @@ void BosonStarLevel::initialData()
         pout() << "BosonStarLevel::initialData " << m_level << endl;
 
     // First initalise a BosonStar object
-    BinaryBS boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
-                         m_p.G_Newton, m_dx, m_p.identical, m_verbosity);
+    BosonStar boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
+                         m_p.G_Newton, m_dx, m_verbosity);
 
 
     // the max radius the code might need to calculate out to is L*sqrt(3)

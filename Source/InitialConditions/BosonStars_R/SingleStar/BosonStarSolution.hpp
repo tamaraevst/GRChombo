@@ -2,12 +2,9 @@
 #ifndef BOSONSTARSOLUTION_HPP_
 #define BOSONSTARSOLUTION_HPP_
 
-#include "BosonStarParams.hpp"
-#include "ComplexPotential.hpp"
 
 class BosonStarSolution
 {
-  friend class BinaryBS;
 
 private: // private member variables/arrays
     double MM, PC; //Klein Gordon mass squared, KG scalr field central amplitude
@@ -18,7 +15,7 @@ private: // private member variables/arrays
     bool solitonic; // false fro mini/lambda star. true for solitonic star
     double EIGEN; // the desired eigenstate, 0 for ground
     int gridsize, adaptive_buffer; // anywhere from 2k-200k is ok
-    int adaptive_stepsize_repetitions = 20;//50; // 0 for no adaptive
+    const int adaptive_stepsize_repetitions = 20;//50; // 0 for no adaptive
   	double L, dx, WW, ww; // L, length of domain, dx.
   	double OM_INF, PSI_INF; // asymptotics of lapse and cpnformal factpr
   	int mid_int; // integer where growing mode becomes relevant
@@ -33,9 +30,6 @@ private: // private member variables/arrays
   	std::vector<double> omega; // lapse
   	std::vector<double> radius_array; //radius
 
-protected:
-    BosonStar_params_t m_params_BosonStar; //!< The complex scalar field params
-    Potential::params_t m_params_potential; //!< The potential params
 
 private: // private member fucntions functions
     void rk4(const double ww_);
@@ -60,13 +54,8 @@ private: // private member fucntions functions
 
 
 public:
-    //Constructor
-    BosonStarSolution(BosonStar_params_t m_params_BosonStar,
-                                     Potential::params_t m_params_potential);
-    void set_initialcondition_params(const double max_r);
-    // BosonStarSolution(BosonStar_params_t a_params_BosonStar,
-    //     Potential::params_t a_params_potential);
-    // void set_initialcondition_params(const double max_r);
+    BosonStarSolution();
+    void set_initialcondition_params(BosonStar_params_t m_params_BosonStar, Potential::params_t m_params_potential, const double max_r);
     double get_p_interp(const double r) const;
     double get_lapse_interp(const double r) const;
     double get_psi_interp(const double r) const;

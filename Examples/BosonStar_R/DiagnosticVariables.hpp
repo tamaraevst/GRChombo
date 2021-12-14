@@ -42,9 +42,6 @@ enum
 
     c_Sphi_source,
 
-    c_weight1,
-    c_weight2,
-
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -64,9 +61,7 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
 
     "rho", "s1", "s2", "s3", "s11", "s12", "s13", "s22", "s23", "s33",
 
-    "Qphi_density", "Fphi_flux", "Sphi_source",
-    
-    "weight1", "weight2" };
+    "Qphi_density", "Fphi_flux", "Sphi_source" };
     }
 
 #endif /* DIAGNOSTICVARIABLES_HPP */
