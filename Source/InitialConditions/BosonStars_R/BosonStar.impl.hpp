@@ -129,18 +129,19 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_p = m_1d_sol.get_psi_interp(r_p);
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
-   
-    helferLL[1][1] = psi_p*psi_p;
-    helferLL[2][2] = psi_p*psi_p;
-    helferLL[0][0] = pc_os_p;
-    double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
-    (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
-    h11_inf = (2.-helferLL[1][1])*chi_inf, h22_inf = (2.-helferLL[2][2])*chi_inf;
+    if (binary)
+    {
+        helferLL[1][1] = psi_p*psi_p;
+        helferLL[2][2] = psi_p*psi_p;
+        helferLL[0][0] = pc_os_p;
+        double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
+        (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
+        h11_inf = (2.-helferLL[1][1])*chi_inf, h22_inf = (2.-helferLL[2][2])*chi_inf;
         /*if (r<3){
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-    
+    }
 
     if (binary)
     {
@@ -215,7 +216,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[0][0] = pc_os_p;
 
     }
-    
     g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
     g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
     g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
