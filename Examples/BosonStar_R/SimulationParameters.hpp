@@ -55,7 +55,7 @@ public:
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
-        bosonstar_params = bosonstar2_params;
+        bosonstar2_params = bosonstar_params;
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
