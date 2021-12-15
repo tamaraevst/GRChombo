@@ -12,6 +12,7 @@
 
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "WeightFunction.hpp"
+#include "DebuggingTools.hpp"
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
@@ -145,23 +146,23 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    WeightFunction weight;
-    double weight1 = 0.0;
-    double weight2 = 0.0;
+    // WeightFunction weight;
+    // double weight1 = 0.0;
+    // double weight2 = 0.0;
 
-    // double arg1, arg2;
+    double arg1, arg2;
     // arg1 = x;
 
-    if (coords.z = m_center[2])
-        {   
-            double scaledr1 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
-            weight1 = weight.compute_weight(scaledr1);
-            DEBUG_OUT(weight1);
-        }
-    else
-        {
-            weight1 = 0;
-        }
+    // if (coords_grid.z = m_center[2])
+    //     {   
+    //         double scaledr1 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
+    //         weight1 = weight.compute_weight(scaledr1);
+    //         DEBUG_OUT(weight1);
+    //     }
+    // else
+    //     {
+    //         weight1 = 0;
+    //     }
 
     if (binary)
     {
@@ -175,6 +176,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
+        arg1 = (1/separation) * (sqrt(pow(coords-grid.x-x, 2)+pow(coords_grid.y-y,2)));
 
         // double pos1x = coords.x - separation/2.*c_;
 
@@ -250,19 +252,40 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        if (coords.z = m_center[2])
-        {
-            double scaledr2 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
-            weight2 = weight.compute_weight(scaledr2);
-        }
-        else
-        {
-            weight2 = 0;
-        }
-
+        // if (coords_grid.z = m_center[2])
+        // {
+        //     double scaledr2 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
+        //     weight2 = weight.compute_weight(scaledr2);
+        // }
+        // else
+        // {
+        //     weight2 = 0;
+        // }
+        arg2 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
         // double pos2x = coords.x*c_ - x;
         // arg2 = x;
     }
+    
+    WeightFunction weight;
+    double weight1, weight2;
+
+     // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
+    if (coords_grid.z = m_center[2])
+    {
+        weight1 = weight.compute_weight(arg1); // bump at object 1
+        weight2 = weight.compute_weight(arg2); //bump at object 2
+    }
+    else
+    {
+        weight1 = 0.0;
+        weight2 = 0.0;
+    }
+
+    if (weight1 > 1.0)
+    {DEBUG_OUT(weight1);}
+
+    if (weight2 > 1.0)
+    {DEBUG_OUT(weight2);}
     
 
     // WeightFunction(m_dx, m_params_BosonStar.star_centre, -separation/2.0, separation) weight1;
