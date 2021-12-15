@@ -67,6 +67,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
 
+    std::array<double, CH_SPACEDIM> new_center;
+    new_center[0] = coords.x*c_;
+    new_center[1] = coords.y;
+    new_center[2] = coords.z;
+
+    std::cout << "Position of star 1" << std::endl;
+    std::cout << x << std::endl;
+    std::cout << "Center" << std::endl;
+    std::cout << new_center[0] << std::endl;
+    std::cout << -(separation/2.) *s_ <<std::endl;
+
     // first star physical variables
     double p_ = m_1d_sol.get_p_interp(r);
     double dp_ = m_1d_sol.get_dp_interp(r);
@@ -131,7 +142,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    WeightFunction weight(m_dx, m_params_BosonStar.star_centre);
+    WeightFunction weight(m_dx, new_center);
     double weight1 = 0.0;
     double weight2 = 0.0;
 
