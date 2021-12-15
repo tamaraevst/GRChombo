@@ -67,10 +67,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
 
-    std::array<double, CH_SPACEDIM> new_center;
-    new_center[0] = coords.x*c_;
-    new_center[1] = coords.y;
-    new_center[2] = coords.z;
+    // std::array<double, CH_SPACEDIM> new_center;
+    // new_center[0] = coords.x*c_;
+    // new_center[1] = coords.y;
+    // new_center[2] = coords.z;
 
     // std::cout << "Position of star 1" << std::endl;
     // std::cout << x << std::endl;
@@ -142,7 +142,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    WeightFunction weight(m_dx, new_center);
+    WeightFunction weight;
     double weight1 = 0.0;
     double weight2 = 0.0;
 
@@ -163,8 +163,16 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           chi_inf << std::endl;}*/
 
         // double pos1x = coords.x - separation/2.*c_;
-        weight1 = weight.compute_weight(current_cell, x, separation*c_);
-
+        double scaledr1 = (1.0 / separation) * sqrt(pow(coords.x - x, 2) + pow(coords.y - y, 2));
+        if (coords.z = 0.0)
+        {
+            weight1 = weight.compute_weight(scaledr1);
+            DEBUG_OUT(weight1);
+        }
+        else
+        {
+            weight1 = 0;
+        }
 
     }
 
@@ -238,7 +246,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        weight2 = weight.compute_weight(current_cell, x, separation*c_);
+        double scaledr2 = (1.0 / separation) * sqrt(pow(coords.x - x, 2) + pow(coords.y - y, 2));
+        if (coords.z = 0.0)
+        {
+            weight2 = weight.compute_weight(scaledr2);
+        }
+        else
+        {
+            weight2 = 0;
+        }
 
         // double pos2x = coords.x*c_ - x;
         // arg2 = x;
@@ -278,8 +294,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     FOR2(i,j) vars.A[i][j] = chi_*(KLL[i][j]-one_third*vars.K*gammaLL[i][j]);
 
     // Store the initial values of the variables
-    // current_cell.store_vars(weight1, c_weight1);
-    // current_cell.store_vars(weight2, c_weight2);
+    current_cell.store_vars(weight1, c_weight1);
+    current_cell.store_vars(weight2, c_weight2);
     current_cell.store_vars(vars);
 }
 
