@@ -176,7 +176,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-        arg1 = (1/separation) * (sqrt(pow(coords-grid.x-x, 2)+pow(coords_grid.y-y,2)));
+        arg1 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
 
         // double pos1x = coords.x - separation/2.*c_;
 
