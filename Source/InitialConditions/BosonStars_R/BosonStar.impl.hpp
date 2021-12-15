@@ -15,8 +15,8 @@
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
-                    double a_dx, int a_verbosity)
-    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_params_BosonStar(a_params_BosonStar), m_params_BosonStar2(a_params_BosonStar2),
+                    double a_dx, const std::array<double, CH_SPACEDIM> a_center, int a_verbosity)
+    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_center(a_center), m_params_BosonStar(a_params_BosonStar), m_params_BosonStar2(a_params_BosonStar2),
     m_params_potential(a_params_potential), m_verbosity(a_verbosity)
 {
 }
@@ -48,6 +48,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //VarsTools::assign(vars, 0.); // Set only the non-zero components below
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
+
+    Coordinates<data_t> coords_grid(current_cell, m_dx,
+        m_center);
 
     double rapidity = m_params_BosonStar.BS_rapidity;
     double rapidity2 = m_params_BosonStar2.BS_rapidity;
@@ -149,6 +152,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // double arg1, arg2;
     // arg1 = x;
 
+    if (coords.z = m_center[2])
+        {   
+            double scaledr1 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
+            weight1 = weight.compute_weight(scaledr1);
+            DEBUG_OUT(weight1);
+        }
+    else
+        {
+            weight1 = 0;
+        }
+
     if (binary)
     {
         helferLL[1][1] = psi_p*psi_p;
@@ -163,16 +177,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           chi_inf << std::endl;}*/
 
         // double pos1x = coords.x - separation/2.*c_;
-        double scaledr1 = (1.0 / separation) * sqrt(pow(coords.x - x, 2) + pow(coords.y - y, 2));
-        if (coords.z = 0.0)
-        {
-            weight1 = weight.compute_weight(scaledr1);
-            DEBUG_OUT(weight1);
-        }
-        else
-        {
-            weight1 = 0;
-        }
 
     }
 
@@ -246,9 +250,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        double scaledr2 = (1.0 / separation) * sqrt(pow(coords.x - x, 2) + pow(coords.y - y, 2));
-        if (coords.z = 0.0)
+        if (coords.z = m_center[2])
         {
+            double scaledr2 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
             weight2 = weight.compute_weight(scaledr2);
         }
         else

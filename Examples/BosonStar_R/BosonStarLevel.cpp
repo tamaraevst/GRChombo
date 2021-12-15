@@ -72,7 +72,7 @@ void BosonStarLevel::initialData()
 
     // First initalise a BosonStar object
     BosonStar boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
-                         m_p.G_Newton, m_dx, m_verbosity);
+                         m_p.G_Newton, m_dx, m_p.center, m_verbosity);
 
 
     // the max radius the code might need to calculate out to is L*sqrt(3)
