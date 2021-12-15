@@ -131,7 +131,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    double arg1, arg2;
+    // double arg1, arg2;
+    // arg1 = (1/separation) * (sqrt(pow(x, 2)+pow(y, 2)));
 
     if (binary)
     {
@@ -147,7 +148,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           chi_inf << std::endl;}*/
 
         // double pos1x = coords.x - separation/2.*c_;
-        arg1 = (1/separation) * (sqrt(pow(x, 2)+pow(y, 2)));
+        
 
     }
 
@@ -222,20 +223,26 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[0][0] = pc_os_p;
 
         // double pos2x = coords.x*c_ - x;
-        arg2 = (1/separation) * (sqrt(pow(x, 2)+pow(y,2)));
+        // arg2 = (1/separation) * (sqrt(pow(x, 2)+pow(y,2)));
     }
+    
+    WeightFunction weight(m_dx, m_params_BosonStar.star_centre);
 
-    WeightFunction weight;
-
+    // WeightFunction(m_dx, m_params_BosonStar.star_centre, -separation/2.0, separation) weight1;
+    // WeightFunction(m_dx, m_params_BosonStar.star_centre, separation/2.0, separation) weight2;
      // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
    
-    double weight1 = weight.weightfunction(arg1); // bump at object 1
-    double weight2 = weight.weightfunction(arg2); //bump at object 2
+    // double weight1 = weight.weightfunction(arg1); // bump at object 1
+    // double weight2 = weight.weightfunction(arg2); //bump at object 2
 
     // Initial 3-metric 
+
+    double weight1 = weight.compute_weight(coords.x, coords.y, coords.z, -separation/2.0, separation);
+    double weight2 = weight.compute_weight(coords.x, coords.y, coords.z, separation/2.0, separation);
+
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1 * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
+    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
     gammaLL[0][0] = g_xx;
     gammaLL[1][1] = g_yy;
@@ -258,8 +265,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     FOR2(i,j) vars.A[i][j] = chi_*(KLL[i][j]-one_third*vars.K*gammaLL[i][j]);
 
     // Store the initial values of the variables
-    current_cell.store_vars(weight1, c_weight1);
-    current_cell.store_vars(weight2, c_weight2);
+    // current_cell.store_vars(weight1, c_weight1);
+    // current_cell.store_vars(weight2, c_weight2);
     current_cell.store_vars(vars);
 }
 
