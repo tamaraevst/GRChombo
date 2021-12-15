@@ -238,6 +238,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
+        weight2 = weight.compute_weight(current_cell, x, separation*c_);
+
         // double pos2x = coords.x*c_ - x;
         // arg2 = x;
     }
@@ -251,9 +253,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // double weight2 = weight.weightfunction(arg2); //bump at object 2
 
     // Initial 3-metric 
-
-    weight2 = weight.compute_weight(current_cell, x, separation*c_);
-
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
     g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
