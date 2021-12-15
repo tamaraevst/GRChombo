@@ -72,11 +72,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     new_center[1] = coords.y;
     new_center[2] = coords.z;
 
-    std::cout << "Position of star 1" << std::endl;
-    std::cout << x << std::endl;
-    std::cout << "Center" << std::endl;
-    std::cout << new_center[0] << std::endl;
-    std::cout << -(separation/2.) *s_ <<std::endl;
+    // std::cout << "Position of star 1" << std::endl;
+    // std::cout << x << std::endl;
+    // std::cout << "Center" << std::endl;
+    // std::cout << new_center[0] << std::endl;
+    // std::cout << -(separation/2.) *s_ <<std::endl;
 
     // first star physical variables
     double p_ = m_1d_sol.get_p_interp(r);
@@ -163,7 +163,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           chi_inf << std::endl;}*/
 
         // double pos1x = coords.x - separation/2.*c_;
-        weight1 = weight.compute_weight(current_cell, x, separation);
+        weight1 = weight.compute_weight(current_cell, x, separation*c_);
 
 
     }
@@ -252,7 +252,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Initial 3-metric 
 
-    weight2 = weight.compute_weight(current_cell, x, separation);
+    weight2 = weight.compute_weight(current_cell, x, separation*c_);
 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
