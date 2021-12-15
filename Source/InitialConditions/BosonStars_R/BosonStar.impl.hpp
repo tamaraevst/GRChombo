@@ -131,8 +131,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    // double arg1, arg2;
-    // arg1 = (1/separation) * (sqrt(pow(x, 2)+pow(y, 2)));
+    double arg1, arg2;
+    arg1 = x;
 
     if (binary)
     {
@@ -223,7 +223,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[0][0] = pc_os_p;
 
         // double pos2x = coords.x*c_ - x;
-        // arg2 = (1/separation) * (sqrt(pow(x, 2)+pow(y,2)));
+        arg2 = x;
     }
     
     WeightFunction weight(m_dx, m_params_BosonStar.star_centre);
@@ -237,8 +237,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Initial 3-metric 
 
-    double weight1 = weight.compute_weight(coords.x, coords.y, coords.z, -separation/2.0, separation);
-    double weight2 = weight.compute_weight(coords.x, coords.y, coords.z, separation/2.0, separation);
+    double weight1 = weight.compute_weight(coords.x, coords.y, coords.z, arg1, separation);
+    double weight2 = weight.compute_weight(coords.x, coords.y, coords.z, arg2, separation);
 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
