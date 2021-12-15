@@ -22,15 +22,15 @@ class WeightFunction
     }
 
     template <class data_t>
-    double compute_weight(data_t coordsx, data_t coordsy, data_t coordsz, double pos, double width) const
+    double compute_weight(Cell<data_t> current_cell, double pos, double width) const
     {
-        // Coordinates<data_t> coords(current_cell, m_dx, m_center);
+        Coordinates<data_t> coords(current_cell, m_dx, m_center);
         
         double weightfunc;
 
-        if (coordsz = 0.0)
+        if (coords.z = 0.0)
         {
-            double scaledr = sqrt(pow(coordsx - pos,2) + pow(coordsy, 2)) / (width) ;
+            double scaledr = sqrt(pow(coords.x - pos,2) + pow(coords.y, 2)) / (width) ;
 
             if (scaledr <= 1)
             {
