@@ -146,7 +146,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
 
-        double pos1x = coords.x-separation/2.
+        double pos1x = coords.x-separation/2.0;
         arg1 = (1/separation) * (sqrt(pow(pos1x, 2)+pow(coords.y, 2)));
 
     }
@@ -223,7 +223,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        double pos2x = coords.x+separation/2.
+        double pos2x = coords.x+separation/2.0;
         arg2 = (1/separation) * (sqrt(pow(pos2x, 2)+pow(coords.y,2)));
     }
 
