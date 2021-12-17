@@ -47,6 +47,8 @@
 // For Ang Mom Integrating
 #include "AngMomFlux.hpp"
 
+#include "ComputeWeightFunction.hpp"
+
 // for chombo grid Functions
 #include "AMRReductions.hpp"
 
@@ -130,7 +132,7 @@ void BosonStarLevel::prePlotLevel()
                       Interval(c_Mom1, c_Mom3)), NoetherCharge(),
                       EMTensor<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
-                      Interval(c_s11,c_s33))),
+                      Interval(c_s11,c_s33)), ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx, m_p.center)),
                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
 }

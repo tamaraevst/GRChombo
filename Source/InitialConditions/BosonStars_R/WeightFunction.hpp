@@ -1,20 +1,10 @@
 #ifndef WEIGHTFUNCTION_HPP_
 #define WEIGHTFUNCTION_HPP_
 
-// Chombo includes
-#include "IntVect.H"
-
-#include "simd.hpp"
-#include "VarsTools.hpp"
-#include <array>
-#include "Cell.hpp"
-#include "Coordinates.hpp"
-#include "DebuggingTools.hpp"
-
 class WeightFunction
 {
-
     public:
+
     WeightFunction(){}
 
     double compute_weight(double scaledr) const
@@ -32,6 +22,7 @@ class WeightFunction
         }
 
     }
+
     
 };
 

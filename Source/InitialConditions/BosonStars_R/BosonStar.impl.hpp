@@ -71,17 +71,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
 
-    // std::array<double, CH_SPACEDIM> new_center;
-    // new_center[0] = coords.x*c_;
-    // new_center[1] = coords.y;
-    // new_center[2] = coords.z;
-
-    // std::cout << "Position of star 1" << std::endl;
-    // std::cout << x << std::endl;
-    // std::cout << "Center" << std::endl;
-    // std::cout << new_center[0] << std::endl;
-    // std::cout << -(separation/2.) *s_ <<std::endl;
-
     // first star physical variables
     double p_ = m_1d_sol.get_p_interp(r);
     double dp_ = m_1d_sol.get_dp_interp(r);
@@ -146,23 +135,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
 
-    // WeightFunction weight;
-    // double weight1 = 0.0;
-    // double weight2 = 0.0;
-
-    double arg1, arg2;
-    // arg1 = x;
-
-    // if (coords_grid.z = m_center[2])
-    //     {   
-    //         double scaledr1 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
-    //         weight1 = weight.compute_weight(scaledr1);
-    //         DEBUG_OUT(weight1);
-    //     }
-    // else
-    //     {
-    //         weight1 = 0;
-    //     }
+    double arg1 = 42.0;
+    double arg2 = 42.0;
 
     if (binary)
     {
@@ -177,9 +151,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
         arg1 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
-
-        // double pos1x = coords.x - separation/2.*c_;
-
     }
 
     if (binary)
@@ -252,25 +223,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        // if (coords_grid.z = m_center[2])
-        // {
-        //     double scaledr2 = (1.0 / separation) * sqrt(pow(coords_grid.x - x, 2) + pow(coords_grid.y - y, 2));
-        //     weight2 = weight.compute_weight(scaledr2);
-        // }
-        // else
-        // {
-        //     weight2 = 0;
-        // }
         arg2 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
-        // double pos2x = coords.x*c_ - x;
-        // arg2 = x;
     }
     
     WeightFunction weight;
     double weight1, weight2;
 
      // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    if (coords_grid.z = m_center[2])
+    if ((coords_grid.z = m_center[2]))
     {
         weight1 = weight.compute_weight(arg1); // bump at object 1
         weight2 = weight.compute_weight(arg2); //bump at object 2
@@ -286,15 +246,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     if (weight2 > 1.0)
     {DEBUG_OUT(weight2);}
+
+    if (coords_grid.x == x && coords_grid.y == y && coords_grid.z == 0)
+    {
+        pout() << "The value of weigth function 1: " << weight1;
+        pout() << "The value of weigth function 2: " << weight2;
+    }
     
-
-    // WeightFunction(m_dx, m_params_BosonStar.star_centre, -separation/2.0, separation) weight1;
-    // WeightFunction(m_dx, m_params_BosonStar.star_centre, separation/2.0, separation) weight2;
-     // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-   
-    // double weight1 = weight.weightfunction(arg1); // bump at object 1
-    // double weight2 = weight.weightfunction(arg2); //bump at object 2
-
     // Initial 3-metric 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
@@ -320,9 +278,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     FOR2(i,j) vars.K += KLL[i][j]*gammaUU[i][j];
     FOR2(i,j) vars.A[i][j] = chi_*(KLL[i][j]-one_third*vars.K*gammaLL[i][j]);
 
-    // Store the initial values of the variables
-    current_cell.store_vars(weight1, c_weight1);
-    current_cell.store_vars(weight2, c_weight2);
     current_cell.store_vars(vars);
 }
 
