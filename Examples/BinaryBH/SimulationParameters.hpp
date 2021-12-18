@@ -149,7 +149,7 @@ class SimulationParameters : public SimulationParametersBase
             extraction_params_phi.data_path = data_path;
             extraction_params_phi.extraction_path = extraction_path_phi;
 
-            // default names to Weyl extraction
+            // default names to Phi extraction
             pp.load("extraction_file_prefix_phi",
                     extraction_params_phi.extraction_file_prefix,
                     std::string("Phi_extraction_"));

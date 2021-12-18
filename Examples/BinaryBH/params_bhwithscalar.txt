@@ -40,25 +40,24 @@ print_progress_only_to_rank_0 = 1
 
 # provide 'offset' or 'center'
 
-massA = 0.48847892320123
-massB = 0.48847892320123
+#massA = 0.48847892320123
+#massB = 0.48847892320123
 
-offsetA = 0.0 6.10679 0.0
-offsetB = 0.0 -6.10679 0.0
+#offsetA = 0.0 6.10679 0.0
+#offsetB = 0.0 -6.10679 0.0
 # centerA = 256 232 256
 # centerB = 256 250 256
 
-momentumA = -0.0841746 -0.000510846 0.0
-momentumB =  0.0841746  0.000510846 0.0
+#momentumA = -0.0841746 -0.000510846 0.0
+#momentumB =  0.0841746  0.000510846 0.0
 
 # Scalar params
 
-scalar_amplitude = 0.0
-scalar_width = 0.0
+amplitude_scalar = 0.0
 G_Newton = 0.0
 
-gamma_amplitude = 1.0
-beta_amplitude = 1.0
+gamma_amplitude = 0.0
+beta_amplitude = 0.025
 
 #################################################
 # Grid parameters
