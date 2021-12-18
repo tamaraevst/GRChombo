@@ -154,7 +154,7 @@ class SimulationParameters : public SimulationParametersBase
                     extraction_params_phi.extraction_file_prefix,
                     std::string("Phi_extraction_"));
             pp.load("integral_file_prefix_phi",
-                    extraction_params.integral_file_prefix,
+                    extraction_params_phi.integral_file_prefix,
                     std::string("Phi_mode_"));
         }
     }
