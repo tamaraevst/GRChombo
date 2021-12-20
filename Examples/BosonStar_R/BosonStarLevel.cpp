@@ -74,7 +74,7 @@ void BosonStarLevel::initialData()
 
     // First initalise a BosonStar object
     BosonStar boson_star(m_p.bosonstar_params, m_p.bosonstar2_params, m_p.potential_params,
-                         m_p.G_Newton, m_dx, m_p.center, m_verbosity);
+                         m_p.G_Newton, m_dx, m_verbosity);
 
 
     // the max radius the code might need to calculate out to is L*sqrt(3)
@@ -132,7 +132,7 @@ void BosonStarLevel::prePlotLevel()
                       Interval(c_Mom1, c_Mom3)), NoetherCharge(),
                       EMTensor<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
-                      Interval(c_s11,c_s33)), ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx, m_p.center)),
+                      Interval(c_s11,c_s33)), ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx)),
                       m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
 }

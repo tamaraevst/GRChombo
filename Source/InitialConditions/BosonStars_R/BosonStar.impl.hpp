@@ -16,8 +16,8 @@
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
-                    double a_dx, const std::array<double, CH_SPACEDIM> a_center, int a_verbosity)
-    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_center(a_center), m_params_BosonStar(a_params_BosonStar), m_params_BosonStar2(a_params_BosonStar2),
+                    double a_dx, int a_verbosity)
+    :m_dx(a_dx), m_G_Newton(a_G_Newton), m_params_BosonStar(a_params_BosonStar), m_params_BosonStar2(a_params_BosonStar2),
     m_params_potential(a_params_potential), m_verbosity(a_verbosity)
 {
 }
@@ -49,9 +49,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //VarsTools::assign(vars, 0.); // Set only the non-zero components below
     Coordinates<data_t> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
-
-    Coordinates<data_t> coords_grid(current_cell, m_dx,
-        m_center);
 
     double rapidity = m_params_BosonStar.BS_rapidity;
     double rapidity2 = m_params_BosonStar2.BS_rapidity;
@@ -150,7 +147,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-        arg1 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
+        arg1 = (2.0/separation) * (sqrt(pow(coords.x-separation/2.0, 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     if (binary)
@@ -223,23 +220,16 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        arg2 = (1/separation) * (sqrt(pow(coords_grid.x-x, 2)+pow(coords_grid.y-y,2)));
+        arg2 = (2.0/separation) * (sqrt(pow(coords.x+separation/2.0, 2)+pow(coords.y,2)+pow(coords.z,2)));
     }
     
     WeightFunction weight;
     double weight1, weight2;
 
      // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    if ((coords_grid.z = m_center[2]))
-    {
-        weight1 = weight.compute_weight(arg1); // bump at object 1
-        weight2 = weight.compute_weight(arg2); //bump at object 2
-    }
-    else
-    {
-        weight1 = 0.0;
-        weight2 = 0.0;
-    }
+    
+    weight1 = weight.compute_weight(arg1); // bump at object 1
+    weight2 = weight.compute_weight(arg2); //bump at object 2
 
     if (weight1 > 1.0)
     {DEBUG_OUT(weight1);}
@@ -247,11 +237,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     if (weight2 > 1.0)
     {DEBUG_OUT(weight2);}
 
-    if (coords_grid.x == x && coords_grid.y == y && coords_grid.z == 0)
-    {
-        pout() << "The value of weigth function 1: " << weight1;
-        pout() << "The value of weigth function 2: " << weight2;
-    }
     
     // Initial 3-metric 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
