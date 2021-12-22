@@ -39,6 +39,8 @@ public:
         pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("eigen", bosonstar_params.eigen, 0);
         pp.load("gridpoints",bosonstar_params.gridpoints,400000);
+        pp.load("star_centre1", bosonstar_params.star_centre);
+
         pp.load("star_centre", bosonstar_params.star_centre,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
@@ -53,9 +55,24 @@ public:
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
+        pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
+        // Initialize values for bosonstar2_params to same as bosonstar_params
+        // and then assign that ones that should differ below
         bosonstar2_params = bosonstar_params;
+
+        // Are the two stars' profiles identical
+        pp.load("identical", identical, false);
+
+        // Boson Star 2 parameters
+        if (!identical)
+        {
+            pp.load("central_amplitude_CSF2",
+                    bosonstar2_params.central_amplitude_CSF);
+            pp.load("BS_rapidity2",
+                    bosonstar2_params.BS_rapidity);
+        }
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
@@ -116,6 +133,8 @@ public:
 
     // Initial data for matter and potential
     double G_Newton;
+    bool identical; // whether or not the 2 boson stars have the same profile
+
     BosonStar_params_t bosonstar_params;
     BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;

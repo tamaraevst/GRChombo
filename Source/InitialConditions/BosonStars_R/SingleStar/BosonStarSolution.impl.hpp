@@ -259,7 +259,7 @@ double BosonStarSolution::ww_IB(double lower_ww_, double upper_ww_)
 }
 
 
-// integrate the full ODE system from r=0 to dx*gridsize, this may (probably will) blow up at laarge raadius, but it is fixed by other functions aafterwards.
+// integrate the full ODE system from r=0 to dx*gridsize, this may (probably will) blow up at large radius, but it is fixed by other functions afterwards.
 // it has smaller stepsize for the first (adaptive_buffer) steps.
 void BosonStarSolution::rk4(const double ww_)
 {
@@ -325,9 +325,9 @@ void BosonStarSolution::rk4(const double ww_)
 
 }
 
-// takes an integrated ODE system and starts at point (iter) and re-integrates but enforcing scalara field to decaay or be in vacuum
-// the integral is adaptive in that it aaccelerates ar later radius in order to find correct asymptotic behaviour. It will shout if the radius reached is below 10e10
-// bool adaaptive is true if stepsize is supposed to be adaptive aat large radius and false for constant stepsize
+// takes an integrated ODE system and starts at point (iter) and re-integrates but enforcing scalar field to decay or be in vacuum
+// the integral is adaptive in that it accelerates at later radius in order to find correct asymptotic behaviour. It will shout if the radius reached is below 10e10
+// bool adaptive is true if stepsize is supposed to be adaptive at large radius and false for constant stepsize
 void BosonStarSolution::rk4_asymp(const int iter, const bool adaptive, const double ww_)
 {
     double k1, k2, k3, k4, q1, q2, q3, q4, x_=iter*dx, h, delta = (double)gridsize;

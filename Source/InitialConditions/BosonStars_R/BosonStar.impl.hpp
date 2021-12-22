@@ -25,7 +25,7 @@ inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_par
 void BosonStar::compute_1d_solution(const double max_r)
 {
     try
-    {
+    {   
         //set initial parameters and then run the solver (didnt put it in the constructor)
         m_1d_sol.set_initialcondition_params(m_params_BosonStar,m_params_potential,max_r);
         m_1d_sol.main();
@@ -57,13 +57,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double M = m_params_BosonStar.BlackHoleMass;
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
+    double q = m_params_BosonStar.mass_ratio;
 
     // boosts and coordinate objects
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-separation/2.)*s_; //set /tilde{t} to zero
-    double x = (coords.x-separation/2.)*c_;
+    double t = (coords.x-separation/(q+1))*s_; //set /tilde{t} to zero
+    double x = (coords.x-separation/(q+1))*c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
@@ -147,7 +148,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-        arg1 = (2.0/separation) * (sqrt(pow(coords.x-separation/2.0, 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        arg1 = (2.0/separation) * (sqrt(pow(coords.x-separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     if (binary)
@@ -155,8 +156,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity2);
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
-        t = (coords.x+separation/2.)*s_; //set /tilde{t} to zero
-        x = (coords.x+separation/2.)*c_;
+        t = (coords.x+separation*q/(q+1))*s_; //set /tilde{t} to zero
+        x = (coords.x+separation*q/(q+1))*c_;
         z = coords.z;
         y = coords.y-impact_parameter/2.;
         r = sqrt(x*x+y*y+z*z);
@@ -220,7 +221,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        arg2 = (2.0/separation) * (sqrt(pow(coords.x+separation/2.0, 2)+pow(coords.y,2)+pow(coords.z,2)));
+        arg2 = (2.0/separation) * (sqrt(pow(coords.x+separation*q/(q+1), 2)+pow(coords.y,2)+pow(coords.z,2)));
     }
     
     WeightFunction weight;

@@ -48,6 +48,7 @@ public:
 protected:
     double m_dx;
     double m_G_Newton;
+    bool m_identical;
     BosonStar_params_t m_params_BosonStar;
     BosonStar_params_t m_params_BosonStar2; //!< The complex scalar field params
     Potential::params_t m_params_potential; //!< The potential params
