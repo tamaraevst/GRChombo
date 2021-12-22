@@ -34,7 +34,9 @@ class SimulationParameters : public SimulationParametersBase
                 0.0); // for now the example neglects backreaction
         pp.load("scalar_amplitude", initial_params.amplitude, 0.1);
         pp.load("scalar_width", initial_params.width, 1.0);
-
+        
+        pp.load("amplitude_scalar", amplitude_scalar, 0.0);
+        
         // Initial Kerr data
         pp.load("kerr_mass", kerr_params.mass, 1.0);
         pp.load("kerr_spin", kerr_params.spin, 0.0);
@@ -96,6 +98,8 @@ class SimulationParameters : public SimulationParametersBase
     //Parameters for modified scalar field equation 
     double gamma_amplitude;
     double beta_amplitude;
+
+    double amplitude_scalar;
 
     bool calculate_scalar_norm;
     bool norm_numeric_phi;

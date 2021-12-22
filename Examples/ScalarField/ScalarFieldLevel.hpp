@@ -56,9 +56,9 @@ class ScalarFieldLevel : public GRAMRLevel
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
                                          const FArrayBox &current_state);
     //! Tell Chombo how to tag cells for regridding
-   // virtual void computeDiagnosticsTaggingCriterion(
-   //    FArrayBox &tagging_criterion,
-   //     const FArrayBox &current_state_diagnostics);
+    //virtual void computeDiagnosticsTaggingCriterion(
+    //   FArrayBox &tagging_criterion,
+    //    const FArrayBox &current_state_diagnostics);
 
     //! Things to do after a timestep on each level
     virtual void specificPostTimeStep() override;

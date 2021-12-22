@@ -41,7 +41,12 @@ class ExcisionDiagnostics
     {
         const Coordinates<double> coords(current_cell, m_dx, m_center);
         if (coords.get_radius() < m_inner_r || coords.get_radius() > m_outer_r)
-        {
+        {   
+            current_cell.store_vars(0.0, c_Mom1);
+            current_cell.store_vars(0.0, c_Mom2);
+            current_cell.store_vars(0.0, c_Mom3);
+            current_cell.store_vars(0.0, c_Ham);
+
 	    if (coords.get_radius()>m_outer_r)
 		{ double outer = coords.get_radius();
 		   DEBUG_OUT(outer); }
@@ -49,9 +54,6 @@ class ExcisionDiagnostics
             if (coords.get_radius()<m_inner_r)
                 { double inner = coords.get_radius();
                    DEBUG_OUT(inner); }
-
-            current_cell.store_vars(0.0, c_Mom);
-            current_cell.store_vars(0.0, c_Ham);
         } // else do nothing
     }
 };

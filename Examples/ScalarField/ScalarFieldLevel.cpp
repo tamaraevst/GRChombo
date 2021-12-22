@@ -42,7 +42,6 @@
 // For post processing
 #include "SmallDataIO.hpp"
 #include "AMRReductions.hpp"
-//#include "ExcisionDiagnostics.hpp"
 
 // Things to do at each advance step, after the RK4 is calculated
 void ScalarFieldLevel::specificAdvance()
@@ -68,9 +67,12 @@ void ScalarFieldLevel::initialData()
 
     // First set everything to zero then initial conditions for scalar field -
     // here a Kerr BH and a scalar field profile
+    
+    SetValue my_scalar_data(m_p.amplitude_scalar, Interval(c_phi, c_phi));
+
     BoxLoops::loop(
         make_compute_pack(SetValue(0.), KerrBH(m_p.kerr_params, m_dx),
-                          InitialScalarData(m_p.initial_params, m_dx)),
+                          my_scalar_data),
         m_state_new, m_state_new, INCLUDE_GHOST_CELLS);
 
     fillAllGhosts();
@@ -83,14 +85,12 @@ void ScalarFieldLevel::initialData()
 void ScalarFieldLevel::prePlotLevel()
 {
     fillAllGhosts();
-    DefaultPotential potential;
-    ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-
+    
     BoxLoops::loop(make_compute_pack(
-        Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom), c_Ham_abs_terms, Interval(c_Moms_abs_terms, c_Moms_abs_terms))),
+        Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
    
-     BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
+    BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
 }
 #endif
 
@@ -107,46 +107,25 @@ void ScalarFieldLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     // Calculate MatterCCZ4 right hand side with matter_t = ScalarField
     DefaultPotential potential;
     ScalarFieldWithPotential scalar_field(potential, m_p.gamma_amplitude, m_p.beta_amplitude);
-    if (m_p.matter_only == true)
-    {
-        if (m_p.max_spatial_derivative_order == 4)
-        {   
-            MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
+    
+   
+    if (m_p.max_spatial_derivative_order == 4)
+       {   
+         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
                       FourthOrderDerivatives>
-            my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
+         my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
                            m_p.formulation, m_p.G_Newton);
-            BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+         BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
 
-        }
-        else if (m_p.max_spatial_derivative_order == 6)
-        {   
-            MatterOnly<ScalarFieldWithPotential, MovingPunctureGauge,
+       }
+    else if (m_p.max_spatial_derivative_order == 6)
+       {   
+         MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
                       SixthOrderDerivatives>
-            my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
+         my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
                            m_p.formulation, m_p.G_Newton);
-            BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-        }
-    }
-    if (m_p.matter_only == false)
-    {
-        if (m_p.max_spatial_derivative_order == 4)
-        {   
-            MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
-                      FourthOrderDerivatives>
-            my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
-                           m_p.formulation, m_p.G_Newton);
-            BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-
-        }
-        else if (m_p.max_spatial_derivative_order == 6)
-        {   
-            MatterCCZ4RHS<ScalarFieldWithPotential, MovingPunctureGauge,
-                      SixthOrderDerivatives>
-            my_ccz4_matter(scalar_field, m_p.ccz4_params, m_dx, m_p.sigma,
-                           m_p.formulation, m_p.G_Newton);
-            BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
-        }
-    }
+         BoxLoops::loop(my_ccz4_matter, a_soln, a_rhs, EXCLUDE_GHOST_CELLS);
+       }
 }
 
 // Things to do at ODE update, after soln + rhs
@@ -163,9 +142,11 @@ void ScalarFieldLevel::preTagCells()
 {
     // Fixed grid - no pre-tagging
     // Pre tagging - fill ghost cells and calculate Ham terms
-    fillAllEvolutionGhosts();
-    BoxLoops::loop(make_compute_pack(Constraints(m_dx, c_Ham, Interval(c_Mom, c_Mom), c_Ham_abs_terms, Interval(c_Moms_abs_terms, c_Moms_abs_terms))),
-        m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+    //fillAllEvolutionGhosts();
+    //BoxLoops::loop(make_compute_pack(Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3), c_Ham_abs_terms, Interval(c_Moms_abs_terms, c_Moms_abs_terms))),
+   //     m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+   // We only use chi in the tagging criterion so only fill the ghosts for chi
+   // fillAllGhosts(VariableType::evolution, Interval(c_chi, c_chi));
 }
 
 void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
@@ -174,6 +155,7 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     BoxLoops::loop(
         FixedGridsTaggingCriterion(m_dx, m_level, 2.0 * m_p.L, m_p.center),
         current_state, tagging_criterion);
+//    BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
 
 //void ScalarFieldLevel::computeDiagnosticsTaggingCriterion(
@@ -206,10 +188,8 @@ void ScalarFieldLevel::specificPostTimeStep()
             fillAllGhosts();
             // excise within horizon
             BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
-            double L2_Ham = amr_red_diag.norm(c_Ham, 2);
-	    double volume = amr_red_diag.get_domain_volume();
-            DEBUG_OUT(volume);
-            double L2_Mom = amr_red_diag.norm(Interval(c_Mom,c_Mom), 2);
+            double L2_Ham = amr_red_diag.norm(c_Ham, 2, true);
+            double L2_Mom = amr_red_diag.norm(Interval(c_Mom1, c_Mom3), 2, true);
             SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
                                          m_restart_time, SmallDataIO::APPEND,
                                          first_step);
