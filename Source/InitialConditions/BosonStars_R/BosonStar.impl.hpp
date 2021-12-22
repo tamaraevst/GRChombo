@@ -148,7 +148,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-        arg1 = (2.0/separation) * (sqrt(pow(coords.x-separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        arg1 = (1.0/separation) * (sqrt(pow(coords.x+separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     if (binary)
@@ -221,7 +221,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         helferLL2[2][2] = psi_p*psi_p;
         helferLL2[0][0] = pc_os_p;
 
-        arg2 = (2.0/separation) * (sqrt(pow(coords.x+separation*q/(q+1), 2)+pow(coords.y,2)+pow(coords.z,2)));
+        arg2 = (1.0/separation) * (sqrt(pow(coords.x-separation*q/(q+1), 2)+pow(coords.y,2)+pow(coords.z,2)));
     }
     
     WeightFunction weight;
