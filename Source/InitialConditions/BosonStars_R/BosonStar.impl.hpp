@@ -16,9 +16,9 @@
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
-                    double a_dx, int a_verbosity)
+                    double a_dx, bool a_identical, int a_verbosity)
     :m_dx(a_dx), m_G_Newton(a_G_Newton), m_params_BosonStar(a_params_BosonStar), m_params_BosonStar2(a_params_BosonStar2),
-    m_params_potential(a_params_potential), m_verbosity(a_verbosity)
+    m_params_potential(a_params_potential), m_identical(a_identical), m_verbosity(a_verbosity)
 {
 }
 
@@ -259,9 +259,18 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double pc_os_p2 = psi_p2*psi_p2*c_*c_ - omega_p2*omega_p2*s_*s_;
 
         //This is the effect of star 2 on star 1
-        helferLL2[1][1] = psi_p2*psi_p2;
-        helferLL2[2][2] = psi_p2*psi_p2;
-        helferLL2[0][0] = pc_os_p2;
+        if (m_identical == 1)
+        {
+            helferLL2[1][1] = psi_p*psi_p;
+            helferLL2[2][2] = psi_p*psi_p;
+            helferLL2[0][0] = pc_os_p;
+        }
+        else
+        {
+            helferLL2[1][1] = psi_p2*psi_p2;
+            helferLL2[2][2] = psi_p2*psi_p2;
+            helferLL2[0][0] = pc_os_p2;
+        }
 
         //Argument of weight function to be applied to to star 2
         arg2 = (1.0/separation) * (sqrt(pow(coords.x+separation*q/(q+1), 2)+pow(coords.y,2)+pow(coords.z,2)));

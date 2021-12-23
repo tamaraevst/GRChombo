@@ -29,7 +29,7 @@ class BosonStar
 public:
     //! The constructor
     BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
-        Potential::params_t a_params_potential, double a_G_Newton, double a_dx,
+        Potential::params_t a_params_potential, double a_G_Newton, double a_dx, bool a_identical,
         int a_verbosity);
 
     //! Computes the 1d solution and stores in m_1d_sol
