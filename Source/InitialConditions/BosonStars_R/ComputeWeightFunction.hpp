@@ -50,20 +50,22 @@ class ComputeWeightFunction
 
         double separation = m_params_BosonStar.BS_separation;
         double q = m_params_BosonStar.mass_ratio;
+        double alpha = m_params_BosonStar.alpha_stretch;
 
+        WeightFunction weightfunction;
+
+        double stretching_factor1 = weightfunction.stretching_factor(coords.x-separation/(q+1), coords.y, alpha);
         double argument1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1)), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
+        double stretching_factor2 = weightfunction.stretching_factor(coords.x+q*separation/(q+1), coords.y, alpha);
         double argument2 = (1.0/ separation) * (sqrt(pow((coords.x+q*separation/(q+1)), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 	
         double weight_func1 = 42.0;
         double weight_func2 = 42.0;
-
-        WeightFunction weightfunction;
-
+        
         weight_func1 = weightfunction.compute_weight(argument1); // bump at object 1
         weight_func2 = weightfunction.compute_weight(argument2); //bump at object 2
        
-	
     	out.weight1 = weight_func1;
     	out.weight2 = weight_func2;
 

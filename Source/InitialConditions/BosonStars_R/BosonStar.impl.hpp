@@ -63,6 +63,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     double q = m_params_BosonStar.mass_ratio;
+    double alpha = m_params_BosonStar.alpha_stretch;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -158,9 +159,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //of weight functions these values should never appear
     double arg1 = 42.0;
     double arg2 = 42.0;
+
+    WeightFunction weight;
     
-    double check_y = max(fabs(coords.y) - 2*separation, 0);
-    double check_z = max(fabs(coords.z) - 2*separation, 0);
+    //double check_y = max(fabs(coords.y) - 2*separation, 0);
+    //double check_z = max(fabs(coords.z) - 2*separation, 0);
 
     if (binary)
     {
@@ -174,9 +177,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-        
+    double stretching_factor1 = weight.stretching_factor(x_p, y_p, alpha);
         //Argument of weight function to be applied to star 1
-	arg1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1)), 2)+pow(check_y,2)+pow(check_z, 2)));
+	arg1 = (stretching_factor1/separation) * (sqrt(pow((coords.x-separation/(q+1)), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     if (binary)
@@ -275,12 +278,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[2][2] = psi_p2*psi_p2;
             helferLL2[0][0] = pc_os_p2;
         }
+        
+        double stretching_factor2 = weight.stretching_factor(x_p, y_p, alpha);
 
         //Argument of weight function to be applied to star 2
-        arg2 = (1.0/separation) * (sqrt(pow(coords.x+q*separation/(q+1), 2)+pow(check_y,2)+pow(check_z, 2)));
+        arg2 = (stretching_factor2/separation) * (sqrt(pow(coords.x+q*separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
-    
-    WeightFunction weight;
+
     double weight1, weight2;
 
      // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 

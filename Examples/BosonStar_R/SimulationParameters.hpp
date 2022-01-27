@@ -55,6 +55,7 @@ public:
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
+        pp.load("alpha_stretch", bosonstar_params.alpha_stretch, bosonstar_params.BS_separation*2.0);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
         // Initialize values for bosonstar2_params to same as bosonstar_params
