@@ -53,7 +53,6 @@ protected:
     BosonStar_params_t m_params_BosonStar2; //!< The complex scalar field params
     Potential::params_t m_params_potential; //!< The potential params
     int m_verbosity;
-
 };
 
 #include "BosonStar.impl.hpp"

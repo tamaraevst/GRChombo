@@ -13,6 +13,7 @@
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "WeightFunction.hpp"
 #include "DebuggingTools.hpp"
+#include "Max.hpp"
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
@@ -72,8 +73,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-q*separation/(q+1))*s_; //set /tilde{t} to zero
-    double x = (coords.x-q*separation/(q+1))*c_;
+    double t = (coords.x-separation/(q+1))*s_; //set /tilde{t} to zero
+    double x = (coords.x-separation/(q+1))*c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
@@ -139,7 +140,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Note that for equal mass helferLL = helferLL2
 
-     // This is the effect of object 1 on object 2 and hence represents the value to be substracted in the initial data 
+     // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data from the position of object 1 
     double t_p = (-separation)*s_; //set /tilde{t} to zero
     double x_p = (-separation)*c_;
     double z_p = 0.; //set /tilde{t} to zero
@@ -157,6 +158,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //of weight functions these values should never appear
     double arg1 = 42.0;
     double arg2 = 42.0;
+    
+    double check_y = max(fabs(coords.y) - 2*separation, 0);
+    double check_z = max(fabs(coords.z) - 2*separation, 0);
 
     if (binary)
     {
@@ -170,9 +174,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-
-        //Argument of weight function to be applied to to star 1
-        arg1 = (1.0/separation) * (sqrt(pow(coords.x-q*separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        
+        //Argument of weight function to be applied to star 1
+	arg1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1)), 2)+pow(check_y,2)+pow(check_z, 2)));
     }
 
     if (binary)
@@ -181,8 +185,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity2);
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
-        t = (coords.x+separation/(q+1))*s_; //set /tilde{t} to zero
-        x = (coords.x+separation/(q+1))*c_;
+        t = (coords.x+q*separation/(q+1))*s_; //set /tilde{t} to zero
+        x = (coords.x+q*separation/(q+1))*c_;
         z = coords.z;
         y = coords.y-impact_parameter/2.;
         r = sqrt(x*x+y*y+z*z);
@@ -242,7 +246,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
         FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
-        // Again, finding the values to be substracted from star 1
+        // Again, finding the values to be substracted from position of star 2
         double t_p2 = (separation)*s_; //set /tilde{t} to zero
         double x_p2 = (separation)*c_;
         double z_p2 = 0.; //set /tilde{t} to zero
@@ -272,8 +276,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[0][0] = pc_os_p2;
         }
 
-        //Argument of weight function to be applied to to star 2
-        arg2 = (1.0/separation) * (sqrt(pow(coords.x+separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z,2)));
+        //Argument of weight function to be applied to star 2
+        arg2 = (1.0/separation) * (sqrt(pow(coords.x+q*separation/(q+1), 2)+pow(check_y,2)+pow(check_z, 2)));
     }
     
     WeightFunction weight;
@@ -292,9 +296,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     {DEBUG_OUT(weight2);}
     
     // Initial 3-metric 
-    g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL2[0][0] - 1.0) + weight2 * (helferLL[0][0] - 1.0));
-    g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL2[1][1] - 1.0) + weight2 * (helferLL[1][1] - 1.0));
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL2[2][2] - 1.0) + weight2 * (helferLL[2][2] - 1.0));
+    g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
+    g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
+    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
     // Now, compute upper and lower components
     gammaLL[0][0] = g_xx;

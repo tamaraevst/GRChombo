@@ -51,9 +51,9 @@ class ComputeWeightFunction
         double separation = m_params_BosonStar.BS_separation;
         double q = m_params_BosonStar.mass_ratio;
 
-        double argument1 = (1.0/separation) * (sqrt(pow(coords.x-separation*q/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1)), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
-        double argument2 = (1.0/ separation) * (sqrt(pow(coords.x+separation/(q+1), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument2 = (1.0/ separation) * (sqrt(pow((coords.x+q*separation/(q+1)), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 	
         double weight_func1 = 42.0;
         double weight_func2 = 42.0;
