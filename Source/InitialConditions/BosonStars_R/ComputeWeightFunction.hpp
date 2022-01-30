@@ -55,22 +55,13 @@ class ComputeWeightFunction
         double impact_parameter = m_params_BosonStar.BS_impact_parameter;
         double alpha = m_params_BosonStar.alpha_stretch;
 
-        double c_ = cosh(rapidity);
-        double x = (coords.x-separation/(q+1))*c_;
-        double y = coords.y+impact_parameter/2.;
-        double z = coords.z; //set /tilde{t} to zero
-
-        double c_2 = cosh(-rapidity2);
-        double x2 = (coords.x+q*separation/(q+1))*c_2;
-        double y2 = coords.y-impact_parameter/2.;
-
         WeightFunction weightfunction;
 
-        double factor1 = weightfunction.stretching_factor(x, y, alpha);
-        double argument1 = (factor1/separation) * (sqrt(pow(x, 2)+pow(y,2)+pow(z, 2)));
+        double factor1 = weightfunction.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
+        double argument1 = (factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
-        double factor2 = weightfunction.stretching_factor2(x2, y2, alpha);
-        double argument2 = (factor2/ separation) * (sqrt(pow(x2, 2)+pow(y2,2)+pow(z, 2)));
+        double factor2 = weightfunction.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
+        double argument2 = (factor2/ separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 	
         double weight_func1 = 42.0;
         double weight_func2 = 42.0;

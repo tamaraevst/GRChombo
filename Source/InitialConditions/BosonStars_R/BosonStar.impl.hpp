@@ -165,6 +165,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //double check_y = max(fabs(coords.y) - 2*separation, 0);
     //double check_z = max(fabs(coords.z) - 2*separation, 0);
 
+    double stretch_factor1 = weight.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
+    //Argument of weight function to be applied to star 1
+	arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+
     if (binary)
     {
         helferLL[1][1] = psi_p*psi_p;
@@ -177,9 +181,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         std::cout << "h00 = " << h00_inf << ", h11 = " << h11_inf
                           << ", h22 = " << h22_inf << ", chi inf = " <<
                           chi_inf << std::endl;}*/
-    double stretch_factor1 = weight.stretching_factor(x, y, alpha);
-        //Argument of weight function to be applied to star 1
-	arg1 = (stretch_factor1/separation) * (sqrt(pow(x, 2)+pow(y,2)+pow(z, 2)));
     }
 
     if (binary)
@@ -279,10 +280,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[0][0] = pc_os_p2;
         }
         
-        double stretch_factor2 = weight.stretching_factor2(x, y, alpha);
+        double stretch_factor2 = weight.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
 
         //Argument of weight function to be applied to star 2
-        arg2 = (stretch_factor2/separation) * (sqrt(pow(x, 2)+pow(y,2)+pow(z, 2)));
+        arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     double weight1, weight2;
