@@ -27,13 +27,21 @@ class WeightFunction
 
     double stretching_factor(double coord_x, double coord_y, double alpha_zero)
     {
-        double sin_half_angle_squared = (1.0 - (coord_x) / sqrt(pow(coord_x, 2) + pow(coord_y, 2))) / (2.0);
-        
+        double sin_half_angle_squared = (1.0 / 2.0) * (1.0 - (coord_x) / (sqrt(pow(coord_x, 2) + pow(coord_y, 2))));
+
         double stretch = alpha_zero + (1.0 - alpha_zero) * sin_half_angle_squared;
 
         return stretch;
     }
-    
+
+    double stretching_factor2(double coord_x, double coord_y, double alpha_zero)
+    {
+        double cos_half_angle_squared = (1.0 / 2.0) * (1.0 + (coord_x) / (sqrt(pow(coord_x, 2) + pow(coord_y, 2))));
+
+        double stretch2 = alpha_zero + (1.0 - alpha_zero) * cos_half_angle_squared;
+
+        return stretch2;
+    }
 };
 
 #endif /* WEIGHTFUNCTION_HPP_ */
