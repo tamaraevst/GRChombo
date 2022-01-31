@@ -293,17 +293,32 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     weight1 = weight.compute_weight(arg1); // bump at object 1
     weight2 = weight.compute_weight(arg2); //bump at object 2
 
-    //Just some sanoty checks
+    //Just some sanity checks
     if (weight1 > 1.0)
     {DEBUG_OUT(weight1);}
 
     if (weight2 > 1.0)
     {DEBUG_OUT(weight2);}
+
+    double Htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+    double htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+
+    Htensor[0][0] = (1.0/2.0) * (helferLL[0][0] + helferLL2[0][0] - 2.0);
+    Htensor[1][1] = (1.0/2.0) * (helferLL[1][1] + helferLL2[1][1] - 2.0);
+    Htensor[2][2] = (1.0/2.0) * (helferLL[2][2] + helferLL2[2][2] - 2.0);
+
+    htensor[0][0] = (1.0/2.0) * (helferLL[0][0] - helferLL2[0][0]);
+    htensor[1][1] = (1.0/2.0) * (helferLL[1][1] - helferLL2[1][1]);
+    htensor[2][2] = (1.0/2.0) * (helferLL[2][2] - helferLL2[2][2]);
     
     // Initial 3-metric 
-    g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
-    g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
+    // g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
+    // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
+    // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
+
+    g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
+    g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
+    g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);;
 
     // Now, compute upper and lower components
     gammaLL[0][0] = g_xx;
