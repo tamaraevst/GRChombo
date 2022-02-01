@@ -167,7 +167,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     double stretch_factor1 = weight.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
     //Argument of weight function to be applied to star 1
-	arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+	arg1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
     if (binary)
     {
@@ -283,7 +283,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double stretch_factor2 = weight.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
 
         //Argument of weight function to be applied to star 2
-        arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        arg2 = (1.0/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     double weight1, weight2;
@@ -318,7 +318,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
     g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);;
+    g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
 
     // Now, compute upper and lower components
     gammaLL[0][0] = g_xx;

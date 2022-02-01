@@ -58,10 +58,10 @@ class ComputeWeightFunction
         WeightFunction weightfunction;
 
         double factor1 = weightfunction.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
-        double argument1 = (factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
         double factor2 = weightfunction.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
-        double argument2 = (factor2/ separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument2 = (1.0/ separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 	
         double weight_func1 = 42.0;
         double weight_func2 = 42.0;
