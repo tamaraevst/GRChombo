@@ -64,6 +64,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     double q = m_params_BosonStar.mass_ratio;
     double alpha = m_params_BosonStar.alpha_stretch;
+    bool do_stretch = m_params_BosonStar.do_stretch;
+    int n_weight = m_params_BosonStar.n_power;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -160,14 +162,20 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double arg1 = 42.0;
     double arg2 = 42.0;
 
+    double stretch_factor1 = 1.0;
+    double stretch_factor2 = 1.0;
+
     WeightFunction weight;
     
     //double check_y = max(fabs(coords.y) - 2*separation, 0);
     //double check_z = max(fabs(coords.z) - 2*separation, 0);
 
-    double stretch_factor1 = weight.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
+    if (do_stretch)
+    {
+        double stretch_factor1 = weight.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
+    }
     //Argument of weight function to be applied to star 1
-	arg1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+	arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 
     if (binary)
     {
@@ -280,18 +288,21 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[0][0] = pc_os_p2;
         }
         
-        double stretch_factor2 = weight.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
-
+        if (do_stretch)
+        {
+            double stretch_factor2 = weight.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
+        }
+  
         //Argument of weight function to be applied to star 2
-        arg2 = (1.0/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
     double weight1, weight2;
 
      // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
     
-    weight1 = weight.compute_weight(arg1); // bump at object 1
-    weight2 = weight.compute_weight(arg2); //bump at object 2
+    weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
+    weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
 
     //Just some sanity checks
     if (weight1 > 1.0)

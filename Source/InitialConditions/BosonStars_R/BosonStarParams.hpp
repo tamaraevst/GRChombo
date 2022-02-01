@@ -24,6 +24,8 @@ struct BosonStar_params_t
     double BS_rapidity;
     double mass_ratio;
     double alpha_stretch;
+    bool do_stretch;
+    int n_power;
     std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
 };
 

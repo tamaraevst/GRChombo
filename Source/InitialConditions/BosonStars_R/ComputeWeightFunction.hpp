@@ -54,20 +54,31 @@ class ComputeWeightFunction
         double rapidity2 = m_params_BosonStar2.BS_rapidity;
         double impact_parameter = m_params_BosonStar.BS_impact_parameter;
         double alpha = m_params_BosonStar.alpha_stretch;
+        bool do_stretch = m_params_BosonStar.do_stretch;
+        int n_weight = m_params_BosonStar.n_power;
 
         WeightFunction weightfunction;
+        double factor1, factor2;
 
-        double factor1 = weightfunction.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
-        double argument1 = (1.0/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        if (do_stretch)
+        {
+            factor1 = weightfunction.stretching_factor((coords.x-separation/(q+1))*cosh(rapidity), coords.y, alpha);
+            factor2 = weightfunction.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
+        }
+        else
+        {
+            factor1 = 1.0;
+            factor2 = 1.0;
+        }
 
-        double factor2 = weightfunction.stretching_factor2((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, alpha);
-        double argument2 = (1.0/ separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument1 = (factor1/separation) * (sqrt(pow((coords.x-separation/(q+1))*cosh(rapidity), 2)+pow(coords.y,2)+pow(coords.z, 2)));
+        double argument2 = (factor2/ separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
 	
         double weight_func1 = 42.0;
         double weight_func2 = 42.0;
         
-        weight_func1 = weightfunction.compute_weight(argument1); // bump at object 1
-        weight_func2 = weightfunction.compute_weight(argument2); //bump at object 2
+        weight_func1 = weightfunction.compute_weight(argument1, n_weight); // bump at object 1
+        weight_func2 = weightfunction.compute_weight(argument2, n_weight); //bump at object 2
        
     	out.weight1 = weight_func1;
     	out.weight2 = weight_func2;
