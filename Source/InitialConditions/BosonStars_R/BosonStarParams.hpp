@@ -26,6 +26,7 @@ struct BosonStar_params_t
     double alpha_stretch;
     bool do_stretch;
     int n_power;
+    int id_choice; // initial data choice: 0 - plain superposition, 1 - Thomas' trick, 2 - weight functions trick
     std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
 };
 

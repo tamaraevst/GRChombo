@@ -66,6 +66,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double alpha = m_params_BosonStar.alpha_stretch;
     bool do_stretch = m_params_BosonStar.do_stretch;
     int n_weight = m_params_BosonStar.n_power;
+    int initial_data_choice = m_params_BosonStar.id_choice;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -76,8 +77,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-separation/(q+1))*s_; //set /tilde{t} to zero
-    double x = (coords.x-separation/(q+1))*c_;
+    double t = (coords.x-separation/(q+1.))*s_; //set /tilde{t} to zero
+    double x = (coords.x-separation/(q+1.))*c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y+impact_parameter/2.;
     double r = sqrt(x*x+y*y+z*z);
@@ -197,8 +198,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity2);
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
-        t = (coords.x+q*separation/(q+1))*s_; //set /tilde{t} to zero
-        x = (coords.x+q*separation/(q+1))*c_;
+        t = (coords.x+q*separation/(q+1.))*s_; //set /tilde{t} to zero
+        x = (coords.x+q*separation/(q+1.))*c_;
         z = coords.z;
         y = coords.y-impact_parameter/2.;
         r = sqrt(x*x+y*y+z*z);
@@ -327,9 +328,26 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
     // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
-    g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
-    g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
-    g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
+    if (initial_data_choice == 0)
+    {
+        g_xx = g_xx_1 + g_xx_2 - 1.0;
+        g_yy = g_yy_1 + g_yy_2 - 1.0;
+        g_zz = g_zz_1 + g_zz_2 - 1.0;
+    }
+
+    if (initial_data_choice == 1)
+    {
+        g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
+        g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
+        g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
+    }
+
+     if (initial_data_choice == 2)
+    {
+        g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
+        g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
+        g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
+    }
 
     // Now, compute upper and lower components
     gammaLL[0][0] = g_xx;

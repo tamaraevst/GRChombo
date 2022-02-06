@@ -57,6 +57,7 @@ public:
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("do_stretch", bosonstar_params.do_stretch, false);
         pp.load("n_power", bosonstar_params.n_power, 3);
+        pp.load("id_choice", bosonstar_params.id_choice, 3);
         pp.load("alpha_stretch", bosonstar_params.alpha_stretch, 0.1);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
