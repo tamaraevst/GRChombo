@@ -67,6 +67,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     bool do_stretch = m_params_BosonStar.do_stretch;
     int n_weight = m_params_BosonStar.n_power;
     int initial_data_choice = m_params_BosonStar.id_choice;
+    double radius_width = m_params_BosonStar.radius_width;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -144,7 +145,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Note that for equal mass helferLL = helferLL2
 
-     // This is the effect of object 2 on object 1 and hence represents the value to be substracted in the initial data from the position of object 1 
+     // This is the effect of object 1 on object 2 and hence represents the value to be substracted in the initial data from the position of object 2 
     double t_p = (-separation)*s_; //set /tilde{t} to zero
     double x_p = (-separation)*c_;
     double z_p = 0.; //set /tilde{t} to zero
@@ -157,7 +158,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_p = m_1d_sol.get_psi_interp(r_p);
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p*psi_p*c_*c_ - omega_p*omega_p*s_*s_;
-
+    
     //Initialise weight function arguments to some random values - good check if in the compute
     //of weight functions these values should never appear
     double arg1 = 42.0;
@@ -204,7 +205,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         y = coords.y-impact_parameter/2.;
         r = sqrt(x*x+y*y+z*z);
 
-        //Ssecond star physical variables
+        //Second star physical variables
         p_ = m_1d_sol2.get_p_interp(r);
         dp_ = m_1d_sol2.get_dp_interp(r);
         omega_ = m_1d_sol2.get_lapse_interp(r);
@@ -235,7 +236,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         gammaUU_2[1][1] = 1./g_yy_2;
         gammaUU_2[2][2] = 1./g_zz_2;
 
-
         if (BS_BH_binary)
         {
             //do not need to modify scalar field or momentum if we have a black hole
@@ -259,8 +259,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
         FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
-        // Again, finding the values to be substracted from position of star 2
-        double t_p2 = (separation)*s_; //set /tilde{t} to zero
+        // Again, finding the values to be substracted from position of star 1, that is below we find the effect of star 2 on star 1
         double x_p2 = (separation)*c_;
         double z_p2 = 0.; //set /tilde{t} to zero
         double y_p2 = -impact_parameter;
@@ -275,7 +274,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double psi_prime_p2 = m_1d_sol2.get_dpsi_interp(r_p2);
         double pc_os_p2 = psi_p2*psi_p2*c_*c_ - omega_p2*omega_p2*s_*s_;
 
-        //This is the effect of star 2 on star 1
         if (m_identical == 1)
         {
             helferLL2[1][1] = psi_p*psi_p;
@@ -298,20 +296,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x+q*separation/(q+1))*cosh(-rapidity2), 2)+pow(coords.y,2)+pow(coords.z, 2)));
     }
 
-    double weight1, weight2;
-
-     // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    
-    weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
-    weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
-
-    //Just some sanity checks
-    if (weight1 > 1.0)
-    {DEBUG_OUT(weight1);}
-
-    if (weight2 > 1.0)
-    {DEBUG_OUT(weight2);}
-
     double Htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
 
@@ -319,46 +303,168 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     Htensor[1][1] = (1.0/2.0) * (helferLL[1][1] + helferLL2[1][1] - 2.0);
     Htensor[2][2] = (1.0/2.0) * (helferLL[2][2] + helferLL2[2][2] - 2.0);
 
-    htensor[0][0] = (1.0/2.0) * (helferLL[0][0] - helferLL2[0][0]);
-    htensor[1][1] = (1.0/2.0) * (helferLL[1][1] - helferLL2[1][1]);
-    htensor[2][2] = (1.0/2.0) * (helferLL[2][2] - helferLL2[2][2]);
+    htensor[0][0] = (1.0/2.0) * (helferLL2[0][0] - helferLL[0][0]);
+    htensor[1][1] = (1.0/2.0) * (helferLL2[1][1] - helferLL[1][1]);
+    htensor[2][2] = (1.0/2.0) * (helferLL2[2][2] - helferLL[2][2]);
     
     // Initial 3-metric 
     // g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
     // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
     // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
-    if (initial_data_choice == 0)
+    double chi_;
+    if (initial_data_choice !=4 )
     {
+        if (initial_data_choice == 0)
+        {
+            g_xx = g_xx_1 + g_xx_2 - 1.0;
+            g_yy = g_yy_1 + g_yy_2 - 1.0;
+            g_zz = g_zz_1 + g_zz_2 - 1.0;
+        }
+
+        if (initial_data_choice == 1)
+        {
+            g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
+            g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
+            g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
+        }
+
+        if (initial_data_choice == 2)
+        {
+            double weight1, weight2;
+
+            // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
+    
+            weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
+            weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
+
+            //Just some sanity checks
+            if (weight1 > 1.0)
+            {DEBUG_OUT(weight1);}
+
+            if (weight2 > 1.0)
+            {DEBUG_OUT(weight2);}
+
+            g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
+            g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
+            g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
+        }
+
+        if (initial_data_choice == 3)
+        {
+            g_xx = g_xx_1 + g_xx_2 - 1.0;
+            g_yy = g_yy_1 + g_yy_2 - 1.0;
+            g_zz = g_zz_1 + g_zz_2 - 1.0;
+        }
+
+        // Now, compute upper and lower components
+        gammaLL[0][0] = g_xx;
+        gammaLL[1][1] = g_yy;
+        gammaLL[2][2] = g_zz;
+        gammaUU[0][0] = 1./g_xx;
+        gammaUU[1][1] = 1./g_yy;
+        gammaUU[2][2] = 1./g_zz;
+
+        // Define initial conformal factor
+        chi_ = pow(g_xx*g_yy*g_zz,-1./3.);
+    }
+    
+    if (initial_data_choice == 4)
+    {
+        //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
+        double x_11 = 0.;
+        double z_11 = 0.; //set /tilde{t} to zero
+        double y_11 = 0.;
+        double r_11 = sqrt(x_11*x_11+y_11*y_11+z_11*z_11);
+        double p_11 = m_1d_sol.get_p_interp(r_11);
+        double dp_11 = m_1d_sol.get_dp_interp(r_11);
+        double omega_11 = m_1d_sol.get_lapse_interp(r_11);
+        double omega_prime_11 = m_1d_sol.get_dlapse_interp(r_11);
+        double psi_11 = m_1d_sol.get_psi_interp(r_11);
+        double psi_prime_11 = m_1d_sol.get_dpsi_interp(r_11);
+        double pc_os_11 = psi_11*psi_11*c_*c_ - omega_11*omega_11*s_*s_;
+
+        //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
+        double x_22 = 0.;
+        double z_22 = 0.; //set /tilde{t} to zero
+        double y_22 = 0.;
+        double r_22 = sqrt(x_22*x_22+y_22*y_22+z_22*z_22);
+        double p_22 = m_1d_sol2.get_p_interp(r_22);
+        double dp_22 = m_1d_sol2.get_dp_interp(r_22);
+        double omega_22 = m_1d_sol2.get_lapse_interp(r_22);
+        double omega_prime_22 = m_1d_sol2.get_dlapse_interp(r_p);
+        double psi_22 = m_1d_sol2.get_psi_interp(r_22);
+        double psi_prime_22 = m_1d_sol2.get_dpsi_interp(r_22);
+        double pc_os_22 = psi_22*psi_22*c_*c_ - omega_22*omega_22*s_*s_;
+
+        double superpose_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+        double superpose_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
+        
+        double g_zz_11 = psi_11*psi_11;
+        double g_yy_11 = psi_11*psi_11;
+        double g_xx_11 = pc_os_11;
+
+        double g_zz_22 = psi_22*psi_22;
+        double g_yy_22 = psi_22*psi_22;
+        double g_xx_22 = pc_os_22;
+
+        // This  is \gamma_{ij}(x_A)
+        superpose_1[0][0] = g_xx_11 + helferLL2[0][0] - 1;
+        superpose_1[1][1] = g_yy_11 + helferLL2[1][1] - 1;
+        superpose_1[2][2] = g_zz_11 + helferLL2[2][2] - 1;
+
+        // This  is \gamma_{ij}(x_B)
+        superpose_1[0][0] = g_xx_22 + helferLL[0][0] - 1;
+        superpose_1[1][1] = g_yy_22 + helferLL[1][1] - 1;
+        superpose_1[2][2] = g_zz_22 + helferLL[2][2] - 1;
+
+        //This is \chi(x_A)
+        double chi_1 = pow(superpose_1[0][0] * superpose_1[1][1] * superpose_1[2][2], -1./3.);
+        //This is \chi(x_B)
+        double chi_2 = pow(superpose_2[0][0] * superpose_2[1][1] * superpose_2[2][2], -1./3.);
+        
+        //This is \chi^A(x_A)
+        double chi1_1 = pow(g_xx_11 * g_yy_11 * g_zz_11, -1./3.);
+        //This is \chi^B(x_B)
+        double chi2_2 = pow(g_xx_22 * g_yy_22 * g_zz_22, -1./3.);
+        
+        //This is \delta_A
+        double delta_1 = chi1_1 - chi_1;
+        //This is \delta_B
+        double delta_2 = chi2_2 - chi_2;
+
+        //Plain superposition 
         g_xx = g_xx_1 + g_xx_2 - 1.0;
         g_yy = g_yy_1 + g_yy_2 - 1.0;
         g_zz = g_zz_1 + g_zz_2 - 1.0;
+
+        double chi_plain = pow(g_xx * g_yy * g_zz, -1./3.);
+
+        double profile1 = weight.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, radius_width);
+        double profile2 = weight.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, radius_width);
+        
+        double profile_11 = weight.profile_chi(0., 0., radius_width);
+        double argument_xB_xA = (separation/(q+1))* (q*cosh(-rapidity2) - cosh(rapidity));
+        double profile_12 = weight.profile_chi(argument_xB_xA, 0., radius_width);
+        
+        double argument_xA_xB = (separation/(q+1))* (cosh(rapidity) - q*cosh(-rapidity2));
+        double profile_21 = weight.profile_chi(argument_xA_xB, 0., radius_width);
+        double profile_22 = weight.profile_chi(0., 0., radius_width);
+
+        double value1 = (-profile_21*delta_2 + profile_22*delta_1)/(profile_11*profile_22 - profile_12*profile_21);
+        double value2 = (profile_11*delta_2 - profile_12*delta_1)/(profile_11*profile_22 - profile_12*profile_21);
+
+        chi_ = chi_plain + profile1 * value1 + profile2 * value2;
+
+        // Now, compute upper and lower components
+        gammaLL[0][0] = g_xx;
+        gammaLL[1][1] = g_yy;
+        gammaLL[2][2] = g_zz;
+        gammaUU[0][0] = 1./g_xx;
+        gammaUU[1][1] = 1./g_yy;
+        gammaUU[2][2] = 1./g_zz;
     }
 
-    if (initial_data_choice == 1)
-    {
-        g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
-        g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
-        g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
-    }
-
-     if (initial_data_choice == 2)
-    {
-        g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
-        g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
-        g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
-    }
-
-    // Now, compute upper and lower components
-    gammaLL[0][0] = g_xx;
-    gammaLL[1][1] = g_yy;
-    gammaLL[2][2] = g_zz;
-    gammaUU[0][0] = 1./g_xx;
-    gammaUU[1][1] = 1./g_yy;
-    gammaUU[2][2] = 1./g_zz;
-
-    // Define initial conformal factor
-    double chi_ = pow(g_xx*g_yy*g_zz,-1./3.);
     vars.chi = chi_;
 
     // Define initial lapse
