@@ -313,7 +313,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
     double chi_;
-    if (initial_data_choice !=4 )
+    if (initial_data_choice !=3 )
     {
         if (initial_data_choice == 0)
         {
@@ -350,13 +350,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
         }
 
-        if (initial_data_choice == 3)
-        {
-            g_xx = g_xx_1 + g_xx_2 - 1.0;
-            g_yy = g_yy_1 + g_yy_2 - 1.0;
-            g_zz = g_zz_1 + g_zz_2 - 1.0;
-        }
-
         // Now, compute upper and lower components
         gammaLL[0][0] = g_xx;
         gammaLL[1][1] = g_yy;
@@ -369,7 +362,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         chi_ = pow(g_xx*g_yy*g_zz,-1./3.);
     }
     
-    if (initial_data_choice == 4)
+    if (initial_data_choice == 3)
     {
         //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
         double x_11 = 0.;
