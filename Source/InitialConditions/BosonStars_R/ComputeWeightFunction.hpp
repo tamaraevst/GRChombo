@@ -57,7 +57,8 @@ class ComputeWeightFunction
         bool do_stretch = m_params_BosonStar.do_stretch;
         int n_weight = m_params_BosonStar.n_power;
         int id_choice = m_params_BosonStar.id_choice;
-        double radius_width = m_params_BosonStar.radius_width;
+        double radius_width1 = m_params_BosonStar.radius_width1;
+        double radius_width2 = m_params_BosonStar.radius_width2;
 
         WeightFunction weightfunction;
 
@@ -94,8 +95,8 @@ class ComputeWeightFunction
 
         if (id_choice == 3)
         {
-            double profile_func1 = weightfunction.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width);
-            double profile_func2 = weightfunction.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, coords.z, radius_width);
+            double profile_func1 = weightfunction.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width1);
+            double profile_func2 = weightfunction.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, coords.z, radius_width2);
 
             current_cell.store_vars(profile_func1, c_profile1);
             current_cell.store_vars(profile_func2, c_profile2);

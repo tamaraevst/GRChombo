@@ -67,7 +67,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     bool do_stretch = m_params_BosonStar.do_stretch;
     int n_weight = m_params_BosonStar.n_power;
     int initial_data_choice = m_params_BosonStar.id_choice;
-    double radius_width = m_params_BosonStar.radius_width;
+    double radius_width1 = m_params_BosonStar.radius_width1;
+    double radius_width2 = m_params_BosonStar.radius_width2;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -431,16 +432,16 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double chi_plain = pow(g_xx * g_yy * g_zz, -1./3.);
 
         //Find all the profile functions needed
-        double profile1 = weight.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width);
-        double profile2 = weight.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, coords.z, radius_width);
+        double profile1 = weight.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width1);
+        double profile2 = weight.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, coords.z, radius_width2);
         
-        double profile_11 = weight.profile_chi(0., 0., 0., radius_width);
+        double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
         double argument_xB_xA = (separation/(q+1))* (-q*cosh(-rapidity2) - cosh(rapidity));
-        double profile_12 = weight.profile_chi(argument_xB_xA, 0., 0., radius_width);
+        double profile_12 = weight.profile_chi(argument_xB_xA, 0., 0., radius_width1);
         
         double argument_xA_xB = (separation/(q+1))* (cosh(rapidity) + q*cosh(-rapidity2));
-        double profile_21 = weight.profile_chi(argument_xA_xB, 0., 0., radius_width);
-        double profile_22 = weight.profile_chi(0., 0., 0., radius_width);
+        double profile_21 = weight.profile_chi(argument_xA_xB, 0., 0., radius_width2);
+        double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
 
         double value1 = (-profile_21*delta_2 + profile_22*delta_1)/(profile_11*profile_22 - profile_12*profile_21);
         double value2 = (profile_11*delta_2 - profile_12*delta_1)/(profile_11*profile_22 - profile_12*profile_21);
