@@ -406,9 +406,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         superpose_1[2][2] = g_zz_11 + helferLL2[2][2] - 1;
 
         // This  is \gamma_{ij}(x_B) = \gamma_B(x_B) + \gamma_A(x_B) - 1
-        superpose_1[0][0] = g_xx_22 + helferLL[0][0] - 1;
-        superpose_1[1][1] = g_yy_22 + helferLL[1][1] - 1;
-        superpose_1[2][2] = g_zz_22 + helferLL[2][2] - 1;
+        superpose_2[0][0] = g_xx_22 + helferLL[0][0] - 1;
+        superpose_2[1][1] = g_yy_22 + helferLL[1][1] - 1;
+        superpose_2[2][2] = g_zz_22 + helferLL[2][2] - 1;
 
         //This is \chi(x_A)
         double chi_1 = pow(superpose_1[0][0] * superpose_1[1][1] * superpose_1[2][2], -1./3.);
