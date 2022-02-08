@@ -64,9 +64,9 @@ class WeightFunction
         return stretch2;
     }
 
-    double profile_chi(double coord_x, double coord_y, double radius_width)
+    double profile_chi(double coord_x, double coord_y, double coord_z, double radius_width)
     {
-        double denom = sqrt(pow(radius_width, 2) + pow(coord_x, 2) + pow(coord_y, 2));
+        double denom = sqrt(pow(radius_width, 2) + pow(coord_x, 2) + pow(coord_y, 2)+ pow(coord_z, 2));
         return 1. / denom;
     }
 };

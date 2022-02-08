@@ -94,8 +94,8 @@ class ComputeWeightFunction
 
         if (id_choice == 3)
         {
-            double profile_func1 = weightfunction.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, radius_width);
-            double profile_func2 = weightfunction.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, radius_width);
+            double profile_func1 = weightfunction.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width);
+            double profile_func2 = weightfunction.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y, coords.z, radius_width);
 
             current_cell.store_vars(profile_func1, c_profile1);
             current_cell.store_vars(profile_func2, c_profile2);
