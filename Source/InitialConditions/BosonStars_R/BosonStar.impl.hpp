@@ -320,6 +320,27 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
         }
 
+        if (initial_data_choice == 5)
+        {
+            double weight1, weight2;
+
+            // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
+    
+            weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
+            weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
+
+            //Just some sanity checks
+            if (weight1 > 1.0)
+            {DEBUG_OUT(weight1);}
+
+            if (weight2 > 1.0)
+            {DEBUG_OUT(weight2);}
+            
+            g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL2[0][0] - 1.0) + weight2 * (helferLL[0][0] - 1.0));
+            g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL2[1][1] - 1.0) + weight2 * (helferLL[1][1] - 1.0));
+            g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL2[2][2] - 1.0) + weight2 * (helferLL[2][2] - 1.0));
+        }
+
         if (initial_data_choice == 2)
         {
             double weight1, weight2;
