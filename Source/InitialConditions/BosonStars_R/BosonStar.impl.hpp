@@ -69,6 +69,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     int initial_data_choice = m_params_BosonStar.id_choice;
     double radius_width1 = m_params_BosonStar.radius_width1;
     double radius_width2 = m_params_BosonStar.radius_width2;
+    int conformal_power = m_params_BosonStar.conformal_factor_power;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
@@ -335,7 +336,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
             if (weight2 > 1.0)
             {DEBUG_OUT(weight2);}
-            
+
             g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL2[0][0] - 1.0) + weight2 * (helferLL[0][0] - 1.0));
             g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL2[1][1] - 1.0) + weight2 * (helferLL[1][1] - 1.0));
             g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL2[2][2] - 1.0) + weight2 * (helferLL[2][2] - 1.0));
@@ -431,15 +432,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         superpose_2[1][1] = g_yy_22 + helferLL[1][1] - 1;
         superpose_2[2][2] = g_zz_22 + helferLL[2][2] - 1;
 
+        double n_power = conformal_power / 12.0;
+
         //This is \chi(x_A)
-        double chi_1 = pow(superpose_1[0][0] * superpose_1[1][1] * superpose_1[2][2], -1./3.);
+        double chi_1 = pow(superpose_1[0][0] * superpose_1[1][1] * superpose_1[2][2], n_power);
         //This is \chi(x_B)
-        double chi_2 = pow(superpose_2[0][0] * superpose_2[1][1] * superpose_2[2][2], -1./3.);
-        
+        double chi_2 = pow(superpose_2[0][0] * superpose_2[1][1] * superpose_2[2][2], n_power);
+
         //This is \chi^A(x_A)
-        double chi1_1 = pow(g_xx_11 * g_yy_11 * g_zz_11, -1./3.);
+        double chi1_1 = pow(g_xx_11 * g_yy_11 * g_zz_11, n_power);
         //This is \chi^B(x_B)
-        double chi2_2 = pow(g_xx_22 * g_yy_22 * g_zz_22, -1./3.);
+        double chi2_2 = pow(g_xx_22 * g_yy_22 * g_zz_22, n_power);
         
         //This is \delta_A
         double delta_1 = chi1_1 - chi_1;
@@ -450,7 +453,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         g_xx = g_xx_1 + g_xx_2 - 1.0;
         g_yy = g_yy_1 + g_yy_2 - 1.0;
         g_zz = g_zz_1 + g_zz_2 - 1.0;
-        double chi_plain = pow(g_xx * g_yy * g_zz, -1./3.);
+
+        double chi_plain = pow(g_xx * g_yy * g_zz, n_power);
 
         //Find all the profile functions needed
         double profile1 = weight.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y, coords.z, radius_width1);

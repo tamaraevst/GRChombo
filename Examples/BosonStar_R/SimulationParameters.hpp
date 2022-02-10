@@ -60,6 +60,7 @@ public:
         pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
         pp.load("radius_width2", bosonstar_params.radius_width2, 20.);
+        pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, -4);
         pp.load("alpha_stretch", bosonstar_params.alpha_stretch, 0.1);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
