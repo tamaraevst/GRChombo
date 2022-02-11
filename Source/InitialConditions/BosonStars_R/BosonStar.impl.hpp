@@ -396,7 +396,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double omega_prime_11 = m_1d_sol.get_dlapse_interp(r_11);
         double psi_11 = m_1d_sol.get_psi_interp(r_11);
         double psi_prime_11 = m_1d_sol.get_dpsi_interp(r_11);
-        double pc_os_11 = pow(psi_11, conformal_power)*cosh(rapidity)*cosh(rapidity) - omega_11*omega_11*sinh(rapidity)*sinh(rapidity);
+        double pc_os_11 = pow(psi_11, -conformal_power/2.0)*cosh(rapidity)*cosh(rapidity) - omega_11*omega_11*sinh(rapidity)*sinh(rapidity);
 
         //If one uses fixing conformal trick, we need to have the vales of the metric of star 2 at its centre
         double r_22 = 0.;
@@ -406,20 +406,20 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double omega_prime_22 = m_1d_sol2.get_dlapse_interp(r_22);
         double psi_22 = m_1d_sol2.get_psi_interp(r_22);
         double psi_prime_22 = m_1d_sol2.get_dpsi_interp(r_22);
-        double pc_os_22 = pow(psi_22, conformal_power)*cosh(-rapidity2)*cosh(-rapidity2) - omega_22*omega_22*sinh(-rapidity2)*sinh(-rapidity2);
+        double pc_os_22 = pow(psi_22, -conformal_power/2.0)*cosh(-rapidity2)*cosh(-rapidity2) - omega_22*omega_22*sinh(-rapidity2)*sinh(-rapidity2);
 
         //These are to be filled in with plain supporposed metric components evaluated at x_A and x_B respectively 
         double superpose_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
         double superpose_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
         
         //metric components of \gamma_A(x_A)
-        double g_zz_11 = pow(psi_11, conformal_power);
-        double g_yy_11 = pow(psi_11, conformal_power);
+        double g_zz_11 = pow(psi_11, -conformal_power/2.0);
+        double g_yy_11 = pow(psi_11, -conformal_power/2.0);
         double g_xx_11 = pc_os_11;
 
          //metric components of \gamma_B(x_B)
-        double g_zz_22 = pow(psi_22, conformal_power);
-        double g_yy_22 = pow(psi_22, conformal_power);
+        double g_zz_22 = pow(psi_22, -conformal_power/2.0);
+        double g_yy_22 = pow(psi_22, -conformal_power/2.0);
         double g_xx_22 = pc_os_22;
 
         // This  is \gamma_{ij}(x_A) = \gamma_A(x_A) + \gamma_B(x_A) - 1
