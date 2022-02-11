@@ -80,11 +80,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x-separation/(q+1.))*s_; //set /tilde{t} to zero
-    double x = (coords.x-separation/(q+1.))*c_;
+    double t = (coords.x - separation / (q+1.)) * s_; //set /tilde{t} to zero
+    double x = (coords.x - separation / (q+1.)) * c_;
     double z = coords.z; //set /tilde{t} to zero
-    double y = coords.y+impact_parameter/2.;
-    double r = sqrt(x*x+y*y+z*z);
+    double y = coords.y + impact_parameter  /2.;
+    double r = sqrt(x * x + y * y + z * z);
 
     // First star physical variables
     double p_ = m_1d_sol.get_p_interp(r);
@@ -96,7 +96,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Get scalar field modulus, conformal factor, lapse and their gradients
     double pc_os = pow(psi_, -conformal_power/2.0)*c_*c_ - omega_*omega_*s_*s_;
-    double lapse_1 = sqrt(omega_*pow(psi_, -conformal_power/2.0))/(sqrt(pc_os));
+    double lapse_1 = (omega_*pow(psi_, -conformal_power/4.0))/(sqrt(pc_os));
     double lapse_2 = 1.;
     double w_ = m_1d_sol.get_w();
 
@@ -130,15 +130,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     gammaUU_1[1][1] = 1./g_yy_1;
     gammaUU_1[2][2] = 1./g_zz_1;
 
-    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*sqrt(pow(psi_, -conformal_power/2.0)));
+    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*(pow(psi_, -conformal_power/4.0)));
     KLL_1[1][1] = KLL_1[2][2];
-    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - omega_prime_/omega_ );
-    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - omega_prime_/omega_ );
+    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/((pow(psi_, -conformal_power/4.0))) - omega_prime_/omega_ );
+    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/((pow(psi_, -conformal_power/4.0))) - omega_prime_/omega_ );
     KLL_1[1][0] = KLL_1[0][1];
     KLL_1[2][0] = KLL_1[0][2];
     KLL_1[2][1] = 0.;
     KLL_1[1][2] = 0.;
-    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
+    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/(pow(psi_, -conformal_power/4.0)) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
     FOR2(i,j) K1 += gammaUU_1[i][j]*KLL_1[i][j];
 
     // Here we use Thomas Helfer's trick and find the corresponding fixed values to be substracted in the initial guess
@@ -227,8 +227,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             psi_prime_ = -(M/(r_tilde*r_tilde))*(1.+M/(2.*r_tilde));
         }
 
-        pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_;
-        lapse_2 = omega_*sqrt(pow(psi_, -conformal_power/2.0))/(sqrt(pc_os));
+        pc_os = pow(psi_, -conformal_power/2.0)*c_*c_ - omega_*omega_*s_*s_;
+        lapse_2 = omega_*(pow(psi_, -conformal_power/4.0))/(sqrt(pc_os));
         w_ = m_1d_sol2.get_w();
         phase_ = m_params_BosonStar.phase*M_PI + w_*t;
         beta_x = s_*c_*(pow(psi_, -conformal_power/2.0)-omega_*omega_)/(pc_os);
@@ -252,15 +252,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             vars.Pi_Im += -(1./lapse_2)*( (x/r)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
         }
 
-        KLL_2[2][2] = -lapse_2*s_*x*psi_prime_/(r*sqrt(pow(psi_, -conformal_power/2.0)));
+        KLL_2[2][2] = -lapse_2*s_*x*psi_prime_/(r*(pow(psi_, -conformal_power/4.0)));
         KLL_2[1][1] = KLL_2[2][2];
-        KLL_2[0][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/sqrt(pow(psi_, -conformal_power/2.0)) - omega_prime_/omega_ );
-        KLL_2[0][2] = lapse_2*c_*s_*(z/r)*(psi_prime_/sqrt(pow(psi_, -conformal_power/2.0)) - omega_prime_/omega_ );
+        KLL_2[0][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/(pow(psi_, -conformal_power/4.0)) - omega_prime_/omega_ );
+        KLL_2[0][2] = lapse_2*c_*s_*(z/r)*(psi_prime_/(pow(psi_, -conformal_power/4.0)) - omega_prime_/omega_ );
         KLL_2[1][0] = KLL_2[0][1];
         KLL_2[2][0] = KLL_2[0][2];
         KLL_2[2][1] = 0.;
         KLL_2[1][2] = 0.;
-        KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
+        KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/(pow(psi_, -conformal_power/4.0)) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
         FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
         // Again, finding the values to be substracted from position of star 1, that is below we find the effect of star 2 on star 1
@@ -396,7 +396,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double omega_prime_11 = m_1d_sol.get_dlapse_interp(r_11);
         double psi_11 = m_1d_sol.get_psi_interp(r_11);
         double psi_prime_11 = m_1d_sol.get_dpsi_interp(r_11);
-        double pc_os_11 = psi_11*psi_11*cosh(rapidity)*cosh(rapidity) - omega_11*omega_11*sinh(rapidity)*sinh(rapidity);
+        double pc_os_11 = pow(psi_11, conformal_power)*cosh(rapidity)*cosh(rapidity) - omega_11*omega_11*sinh(rapidity)*sinh(rapidity);
 
         //If one uses fixing conformal trick, we need to have the vales of the metric of star 2 at its centre
         double r_22 = 0.;
@@ -406,20 +406,20 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double omega_prime_22 = m_1d_sol2.get_dlapse_interp(r_22);
         double psi_22 = m_1d_sol2.get_psi_interp(r_22);
         double psi_prime_22 = m_1d_sol2.get_dpsi_interp(r_22);
-        double pc_os_22 = psi_22*psi_22*cosh(-rapidity2)*cosh(-rapidity2) - omega_22*omega_22*sinh(-rapidity2)*sinh(-rapidity2);
+        double pc_os_22 = pow(psi_22, conformal_power)*cosh(-rapidity2)*cosh(-rapidity2) - omega_22*omega_22*sinh(-rapidity2)*sinh(-rapidity2);
 
         //These are to be filled in with plain supporposed metric components evaluated at x_A and x_B respectively 
         double superpose_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
         double superpose_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
         
         //metric components of \gamma_A(x_A)
-        double g_zz_11 = psi_11*psi_11;
-        double g_yy_11 = psi_11*psi_11;
+        double g_zz_11 = pow(psi_11, conformal_power);
+        double g_yy_11 = pow(psi_11, conformal_power);
         double g_xx_11 = pc_os_11;
 
          //metric components of \gamma_B(x_B)
-        double g_zz_22 = psi_22*psi_22;
-        double g_yy_22 = psi_22*psi_22;
+        double g_zz_22 = pow(psi_22, conformal_power);
+        double g_yy_22 = pow(psi_22, conformal_power);
         double g_xx_22 = pc_os_22;
 
         // This  is \gamma_{ij}(x_A) = \gamma_A(x_A) + \gamma_B(x_A) - 1
