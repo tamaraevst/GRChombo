@@ -95,17 +95,17 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_ = m_1d_sol.get_dpsi_interp(r);
 
     // Get scalar field modulus, conformal factor, lapse and their gradients
-    double pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_;
-    double lapse_1 = omega_*psi_/(sqrt(pc_os));
+    double pc_os = pow(psi_, -conformal_power/2.0)*c_*c_ - omega_*omega_*s_*s_;
+    double lapse_1 = sqrt(omega_*pow(psi_, -conformal_power/2.0))/(sqrt(pc_os));
     double lapse_2 = 1.;
     double w_ = m_1d_sol.get_w();
 
     //Write in phase, shift, metric componnets of star 1 and initialise metric components of star 2
     double phase_ = w_*t;
-    double beta_x = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
+    double beta_x = s_*c_*(pow(psi_, -conformal_power/2.0)-omega_*omega_)/(pc_os);
     vars.shift[0] += beta_x;
-    double g_zz_1 = psi_*psi_;
-    double g_yy_1 = psi_*psi_;
+    double g_zz_1 = pow(psi_, -conformal_power/2.0);
+    double g_yy_1 = pow(psi_, -conformal_power/2.0);
     double g_xx_1 = pc_os;
     double g_xx_2=0., g_yy_2=0., g_zz_2=0., g_xx, g_yy, g_zz;
 
@@ -130,15 +130,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     gammaUU_1[1][1] = 1./g_yy_1;
     gammaUU_1[2][2] = 1./g_zz_1;
 
-    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*psi_);
+    KLL_1[2][2] = -lapse_1*s_*x*psi_prime_/(r*sqrt(pow(psi_, -conformal_power/2.0)));
     KLL_1[1][1] = KLL_1[2][2];
-    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+    KLL_1[0][1] = lapse_1*c_*s_*(y/r)*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - omega_prime_/omega_ );
+    KLL_1[0][2] = lapse_1*c_*s_*(z/r)*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - omega_prime_/omega_ );
     KLL_1[1][0] = KLL_1[0][1];
     KLL_1[2][0] = KLL_1[0][2];
     KLL_1[2][1] = 0.;
     KLL_1[1][2] = 0.;
-    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
+    KLL_1[0][0] = lapse_1*(x/r)*s_*c_*c_*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
     FOR2(i,j) K1 += gammaUU_1[i][j]*KLL_1[i][j];
 
     // Here we use Thomas Helfer's trick and find the corresponding fixed values to be substracted in the initial guess
@@ -185,8 +185,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     if (binary)
     {
-        helferLL[1][1] = psi_p*psi_p;
-        helferLL[2][2] = psi_p*psi_p;
+        helferLL[1][1] = pow(psi_p, -conformal_power/2.0);
+        helferLL[2][2] = pow(psi_p, -conformal_power/2.0);
         helferLL[0][0] = pc_os_p;
         double chi_inf = pow((2.-helferLL[0][0])*(2.-helferLL[1][1])*
         (2.-helferLL[2][2]),-1./3.), h00_inf = (2.-helferLL[0][0])*chi_inf,
@@ -228,13 +228,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         }
 
         pc_os = psi_*psi_*c_*c_ - omega_*omega_*s_*s_;
-        lapse_2 = omega_*psi_/(sqrt(pc_os));
+        lapse_2 = omega_*sqrt(pow(psi_, -conformal_power/2.0))/(sqrt(pc_os));
         w_ = m_1d_sol2.get_w();
         phase_ = m_params_BosonStar.phase*M_PI + w_*t;
-        beta_x = s_*c_*(psi_*psi_-omega_*omega_)/(pc_os);
+        beta_x = s_*c_*(pow(psi_, -conformal_power/2.0)-omega_*omega_)/(pc_os);
         vars.shift[0] += beta_x;
-        g_zz_2 = psi_*psi_;
-        g_yy_2 = psi_*psi_;
+        g_zz_2 = pow(psi_, -conformal_power/2.0);
+        g_yy_2 = pow(psi_, -conformal_power/2.0);
         g_xx_2 = pc_os;
         gammaUU_2[0][0] = 1./g_xx_2;
         gammaUU_2[1][1] = 1./g_yy_2;
@@ -252,15 +252,15 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             vars.Pi_Im += -(1./lapse_2)*( (x/r)*(s_-beta_x*c_)*dp_*sin(phase_) + w_*(c_-beta_x*s_)*p_*cos(phase_) );
         }
 
-        KLL_2[2][2] = -lapse_2*s_*x*psi_prime_/(r*psi_);
+        KLL_2[2][2] = -lapse_2*s_*x*psi_prime_/(r*sqrt(pow(psi_, -conformal_power/2.0)));
         KLL_2[1][1] = KLL_2[2][2];
-        KLL_2[0][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
-        KLL_2[0][2] = lapse_2*c_*s_*(z/r)*(psi_prime_/psi_ - omega_prime_/omega_ );
+        KLL_2[0][1] = lapse_2*c_*s_*(y/r)*(psi_prime_/sqrt(pow(psi_, -conformal_power/2.0)) - omega_prime_/omega_ );
+        KLL_2[0][2] = lapse_2*c_*s_*(z/r)*(psi_prime_/sqrt(pow(psi_, -conformal_power/2.0)) - omega_prime_/omega_ );
         KLL_2[1][0] = KLL_2[0][1];
         KLL_2[2][0] = KLL_2[0][2];
         KLL_2[2][1] = 0.;
         KLL_2[1][2] = 0.;
-        KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/psi_ - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,-2));
+        KLL_2[0][0] = lapse_2*(x/r)*s_*c_*c_*(psi_prime_/(sqrt(pow(psi_, -conformal_power/2.0))) - 2.*omega_prime_/omega_ + v_*v_*omega_*omega_prime_*pow(psi_,conformal_power/2.0));
         FOR2(i,j) K2 += gammaUU_2[i][j]*KLL_2[i][j];
 
         // Again, finding the values to be substracted from position of star 1, that is below we find the effect of star 2 on star 1
@@ -276,18 +276,18 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double omega_prime_p2 = m_1d_sol2.get_dlapse_interp(r_p2);
         double psi_p2 = m_1d_sol2.get_psi_interp(r_p2);
         double psi_prime_p2 = m_1d_sol2.get_dpsi_interp(r_p2);
-        double pc_os_p2 = psi_p2*psi_p2*c_*c_ - omega_p2*omega_p2*s_*s_;
+        double pc_os_p2 = pow(psi_p2, -conformal_power/2.0)*c_*c_ - omega_p2*omega_p2*s_*s_;
 
         if (m_identical == 1)
         {
-            helferLL2[1][1] = psi_p*psi_p;
-            helferLL2[2][2] = psi_p*psi_p;
+            helferLL2[1][1] = pow(psi_p,-conformal_power/2.0);
+            helferLL2[2][2] = pow(psi_p, -conformal_power/2.0);
             helferLL2[0][0] = pc_os_p;
         }
         else
         {
-            helferLL2[1][1] = psi_p2*psi_p2;
-            helferLL2[2][2] = psi_p2*psi_p2;
+            helferLL2[1][1] = pow(psi_p2,-conformal_power/2.0);
+            helferLL2[2][2] = pow(psi_p2,-conformal_power/2.0);
             helferLL2[0][0] = pc_os_p2;
         }
         
