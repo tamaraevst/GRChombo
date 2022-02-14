@@ -204,7 +204,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
         t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
-        x = (coords.x + q * separation / (q +1 .)) * c_;
+        x = (coords.x + q * separation / (q + 1.)) * c_;
         z = coords.z;
         y = coords.y - impact_parameter / 2.;
         r = sqrt(x * x + y * y + z * z);
