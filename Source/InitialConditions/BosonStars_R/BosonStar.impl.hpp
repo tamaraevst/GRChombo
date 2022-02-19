@@ -148,6 +148,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     
     // Here is the conformal factor that will be differently calculated depending on the choice of the initial data
     double chi_;
+    double chi_plain;
 
      // This is the effect of object 1 on object 2 and hence represents the value to be substracted in the initial data from the position of object 2 
     double t_p = (-separation) * s_; //set /tilde{t} to zero
@@ -383,7 +384,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         gammaUU[2][2] = 1./g_zz;
 
         // Define initial conformal factor
-        chi_ = pow(g_xx*g_yy*g_zz, -1. / 3.);
+        chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
     }
     
     if (initial_data_choice == 3)
@@ -423,14 +424,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double g_xx_22 = pc_os_22;
 
         // This  is \gamma_{ij}(x_A) = \gamma_A(x_A) + \gamma_B(x_A) - 1
-        superpose_1[0][0] = g_xx_11 + helferLL2[0][0] - 1;
-        superpose_1[1][1] = g_yy_11 + helferLL2[1][1] - 1;
-        superpose_1[2][2] = g_zz_11 + helferLL2[2][2] - 1;
+        superpose_1[0][0] = g_xx_11 + helferLL2[0][0] - 1.;
+        superpose_1[1][1] = g_yy_11 + helferLL2[1][1] - 1.;
+        superpose_1[2][2] = g_zz_11 + helferLL2[2][2] - 1.;
 
         // This  is \gamma_{ij}(x_B) = \gamma_B(x_B) + \gamma_A(x_B) - 1
-        superpose_2[0][0] = g_xx_22 + helferLL[0][0] - 1;
-        superpose_2[1][1] = g_yy_22 + helferLL[1][1] - 1;
-        superpose_2[2][2] = g_zz_22 + helferLL[2][2] - 1;
+        superpose_2[0][0] = g_xx_22 + helferLL[0][0] - 1.;
+        superpose_2[1][1] = g_yy_22 + helferLL[1][1] - 1.;
+        superpose_2[2][2] = g_zz_22 + helferLL[2][2] - 1.;
 
         double n_power = conformal_power / 12.0;
 
@@ -454,7 +455,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         g_yy = g_yy_1 + g_yy_2 - 1.0;
         g_zz = g_zz_1 + g_zz_2 - 1.0;
 
-        double chi_plain = pow(g_xx * g_yy * g_zz, n_power);
+        chi_plain = pow(g_xx * g_yy * g_zz, n_power);
 
         //Find all the profile functions needed
         double profile1 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, coords.z, radius_width1);
@@ -491,10 +492,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
-    FOR2(i,j) vars.h[i][j] = pow(vars.chi, - 4.0 / conformal_power)*gammaLL[i][j];
+    FOR2(i,j) vars.h[i][j] = pow(chi_plain, - 4.0 / conformal_power) * gammaLL[i][j];
     FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l] * (gammaUU_1[l][k] * KLL_1[k][j] + gammaUU_2[l][k] * KLL_2[k][j]);
     FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
-    FOR2(i,j) vars.A[i][j] = chi_ * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
+    FOR2(i,j) vars.A[i][j] = chi_plain * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 
     current_cell.store_vars(vars);
 }
