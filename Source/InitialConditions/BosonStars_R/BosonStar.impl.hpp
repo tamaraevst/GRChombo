@@ -385,6 +385,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
         // Define initial conformal factor
         chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
+
+        chi_plain = chi_;
     }
     
     if (initial_data_choice == 3)
