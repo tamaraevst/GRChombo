@@ -28,11 +28,19 @@ void BosonStar::compute_1d_solution(const double max_r)
     try
     {   
         //set initial parameters and then run the solver (didnt put it in the constructor)
+        
+        pout() << "Setting initial conditions for Star 1" << endl;
         m_1d_sol.set_initialcondition_params(m_params_BosonStar,m_params_potential,max_r);
+        pout() << "Running the solver for Star 1" << endl;
         m_1d_sol.main();
+        pout() << "Completed for star 1" << endl;
 
+        pout() << "Setting initial conditions for Star 2" << endl
         m_1d_sol2.set_initialcondition_params(m_params_BosonStar2,m_params_potential,max_r);
+        pout() << "Running the solver for Star 2" << endl;
         m_1d_sol2.main();
+        pout() << "Completed for star 2" << endl;
+
     }
     catch (std::exception &exception)
     {
@@ -132,13 +140,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     KLL_1[2][2] = -lapse_1 * s_ * x * psi_prime_ / (r * psi_);
     KLL_1[1][1] = KLL_1[2][2];
-    KLL_1[0][1] = lapse_1 * c_ * s_ * (y / r) * (psi_prime_ / psi_ - omega_prime_ / omega_ );
-    KLL_1[0][2] = lapse_1 * c_ * s_ * (z / r) * (psi_prime_ / psi_ - omega_prime_ / omega_ );
+    KLL_1[0][1] = lapse_1 * c_ * s_ * (y / r) * (psi_prime_ / psi_ - omega_prime_ / omega_);
+    KLL_1[0][2] = lapse_1 * c_ * s_ * (z / r) * (psi_prime_ / psi_ - omega_prime_ / omega_);
     KLL_1[1][0] = KLL_1[0][1];
     KLL_1[2][0] = KLL_1[0][2];
     KLL_1[2][1] = 0.;
     KLL_1[1][2] = 0.;
-    KLL_1[0][0] = lapse_1 * (x / r) * s_ * c_ * c_ * (psi_prime_ / psi_ - 2. * omega_prime_ / omega_ + v_ * v_ * omega_ * omega_prime_ * pow(psi_,-2));
+    KLL_1[0][0] = lapse_1 * (x / r) * s_ * c_ * c_ * (psi_prime_ / psi_ - 2. * omega_prime_ / omega_ + v_ * v_ * omega_ * omega_prime_ * pow(psi_, -2));
     FOR2(i,j) K1 += gammaUU_1[i][j] * KLL_1[i][j];
 
     // Here we use Thomas Helfer's trick and find the corresponding fixed values to be substracted in the initial guess
@@ -166,13 +174,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     
     //Initialise weight function arguments to some random values - good check if in the compute
     //of weight functions these values should never appear
-    double arg1 = 42.0;
-    double arg2 = 42.0;
+    // double arg1 = 42.0;
+    // double arg2 = 42.0;
 
-    double stretch_factor1 = 1.0;
-    double stretch_factor2 = 1.0;
+    // double stretch_factor1 = 1.0;
+    // double stretch_factor2 = 1.0;
 
-    WeightFunction weight;
+    // WeightFunction weight;
     
     //double check_y = max(fabs(coords.y) - 2*separation, 0);
     //double check_z = max(fabs(coords.z) - 2*separation, 0);
@@ -182,7 +190,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //     double stretch_factor1 = weight.stretching_factor((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, alpha);
     // }
     //Argument of weight function to be applied to star 1
-	arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x - separation / (q+1)) * cosh(rapidity), 2) + pow(coords.y,2) + pow(coords.z, 2)));
+	// arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x - separation / (q+1)) * cosh(rapidity), 2) + pow(coords.y,2) + pow(coords.z, 2)));
 
     if (binary)
     {
@@ -255,8 +263,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
         KLL_2[2][2] = -lapse_2 * s_ * x * psi_prime_ / (r * psi_);
         KLL_2[1][1] = KLL_2[2][2];
-        KLL_2[0][1] = lapse_2 * c_ * s_ * (y / r) * (psi_prime_ / psi_ - omega_prime_ / omega_ );
-        KLL_2[0][2] = lapse_2 * c_ * s_ * (z / r) * (psi_prime_ / psi_ - omega_prime_ / omega_ );
+        KLL_2[0][1] = lapse_2 * c_ * s_ * (y / r) * (psi_prime_ / psi_ - omega_prime_ / omega_);
+        KLL_2[0][2] = lapse_2 * c_ * s_ * (z / r) * (psi_prime_ / psi_ - omega_prime_ / omega_);
         KLL_2[1][0] = KLL_2[0][1];
         KLL_2[2][0] = KLL_2[0][2];
         KLL_2[2][1] = 0.;
@@ -298,7 +306,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         // }
   
         //Argument of weight function to be applied to star 2
-        arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), 2) + pow(coords.y,2) + pow(coords.z, 2)));
+        // arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), 2) + pow(coords.y,2) + pow(coords.z, 2)));
     }
     
     // Initial 3-metric 
@@ -489,10 +497,20 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     g_yy = g_yy_1 + g_yy_2 - 1.0;
     g_zz = g_zz_1 + g_zz_2 - 1.0;
 
+    //Now, compute upper and lower components
+    gammaLL[0][0] = g_xx;
+    gammaLL[1][1] = g_yy;
+    gammaLL[2][2] = g_zz;
+    gammaUU[0][0] = 1. / g_xx;
+    gammaUU[1][1] = 1. / g_yy;
+    gammaUU[2][2] = 1. / g_zz;
+
     // Define initial conformal factor
     chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
 
     chi_plain = chi_;
+
+    vars.chi = chi_;
 
     // Define initial lapse
     if (BS_BH_binary){vars.lapse += sqrt(vars.chi);}
