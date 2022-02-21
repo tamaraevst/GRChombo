@@ -510,7 +510,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // chi_plain = chi_;
 
-    vars.chi = chi_;
+    vars.chi = pow(chi_, - 4.0 / conformal_power);
 
     // Define initial lapse
     if (BS_BH_binary){vars.lapse += sqrt(vars.chi);}
@@ -519,10 +519,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
-    FOR2(i,j) vars.h[i][j] = pow(chi_plain, - 4.0 / conformal_power) * gammaLL[i][j];
+    FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
     FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l] * (gammaUU_1[l][k] * KLL_1[k][j] + gammaUU_2[l][k] * KLL_2[k][j]);
     FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
-    FOR2(i,j) vars.A[i][j] = chi_plain * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
+    FOR2(i,j) vars.A[i][j] = vars.chi * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 
     current_cell.store_vars(vars);
 }
