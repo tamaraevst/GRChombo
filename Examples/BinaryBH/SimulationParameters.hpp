@@ -42,6 +42,16 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("calculate_constraint_norms", calculate_constraint_norms,
                 false);
 
+        pp.load("bh_tagging_buffers", bh_tagging_buffers, {0.5, 0.5});
+        pp.load("tag_punctures_max_levels", tag_punctures_max_levels,
+                {max_level, max_level});
+        pp.load("tag_horizons_max_levels", tag_horizons_max_levels,
+                {max_level, max_level});
+        pp.load("puncture_tag_min_separation", puncture_tag_min_separation,
+                1.0e-3);
+	pp.load("threshold_phi", regrid_threshold_phi);
+        pp.load("threshold_chi", regrid_threshold_chi);
+
         // Do we want Weyl/Phi extraction and puncture tracking?
     pp.load("activate_extraction", activate_extraction, false);
     pp.load("activate_extraction_phi", activate_extraction_phi, false);
@@ -52,7 +62,7 @@ class SimulationParameters : public SimulationParametersBase
     pp.load("G_Newton", G_Newton, 1.0);
 
     //for setting scalar field to some fixed value
-    pp.load("amplitue_scalar", amplitude_scalar, 0.0);
+    pp.load("amplitude_scalar", amplitude_scalar, 0.0);
 
     pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
     pp.load("scalar_width", initial_scalar_params.width, 1.0);
@@ -433,7 +443,14 @@ class SimulationParameters : public SimulationParametersBase
     double gamma_amplitude;
     double beta_amplitude;
     double amplitude_scalar;
-
+    
+    // Tagging
+    std::array<double, 2> bh_tagging_buffers;
+    std::array<int, 2> tag_punctures_max_levels;
+    std::array<int, 2> tag_horizons_max_levels;
+    double puncture_tag_min_separation;
+    double regrid_threshold_phi;
+    double regrid_threshold_chi;
 #ifdef USE_TWOPUNCTURES
     double tp_offset_plus, tp_offset_minus;
     TP::Parameters tp_params;
