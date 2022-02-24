@@ -45,6 +45,8 @@ enum
     c_weight1,
     c_weight2,
 
+    c_factor,
+
     c_profile1,
     c_profile2,
 
@@ -70,7 +72,9 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     "Qphi_density", "Fphi_flux", "Sphi_source",
     
     "weight1", "weight2",
-    
+
+    "factor",
+        
     "profile1", "profile2" };
     
     }
