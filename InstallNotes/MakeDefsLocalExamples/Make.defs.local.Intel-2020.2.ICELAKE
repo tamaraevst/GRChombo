@@ -1,0 +1,24 @@
+DIM            ?= 3
+DEBUG          = FALSE
+OPT            = HIGH
+PRECISION      = DOUBLE
+PROFILE        = FALSE
+CXX            = icpc
+FC             = ifort
+MPI            = TRUE
+OPENMPCC       = TRUE
+MPICXX         = mpiicpc
+XTRACONFIG     = .ICELAKE.ICC2020.2
+USE_64         = TRUE
+USE_HDF        = TRUE
+HDFINCFLAGS    = -I/usr/local/Cluster-Apps/hdf5/nompi/1.8.16/include
+HDFLIBFLAGS    = -L/usr/local/Cluster-Apps/hdf5/nompi/1.8.16/lib -lhdf5 -lz
+HDFMPIINCFLAGS = -I/usr/local/Cluster-Apps/hdf5/mpi/intel/2019.3/1.10.5/include
+HDFMPILIBFLAGS = -L/usr/local/Cluster-Apps/hdf5/mpi/intel/2019.3/1.10.5/lib -lhdf5 -lz
+NAMESPACE      = TRUE
+USE_MT         = FALSE
+cxxdbgflags    = -g
+cxxoptflags    = -g -ipo -qoverride-limits -no-prec-div -fp-model fast=2 -xICELAKE-SERVER -qopt-zmm-usage=high
+fdbgflags      = -g
+foptflags      = -g -no-prec-div -fp-model fast=2 -xICELAKE-SERVER -qopt-zmm-usage=high
+syslibflags    = -mkl=sequential

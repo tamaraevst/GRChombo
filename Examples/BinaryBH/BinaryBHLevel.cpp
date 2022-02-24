@@ -10,10 +10,12 @@
 #include "BoxLoops.hpp"
 #include "ChiExtractionTaggingCriterion.hpp"
 #include "ChiPunctureExtractionTaggingCriterion.hpp"
+#include "BinaryPunctureTaggingCriterion.hpp"
 #include "ComputePack.hpp"
 #include "NewConstraints.hpp"
 #include "MatterCCZ4RHS.hpp"
 #include "FixedGridsTaggingCriterion.hpp"
+#include "ChiAndPhiTaggingCriterion.hpp"
 #include "TraceARemoval.hpp"
 // #include "InitialScalarData.hpp"
 #include "NanCheck.hpp"
@@ -111,41 +113,29 @@ void BinaryBHLevel::specificUpdateODE(GRLevelData &a_soln,
 void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                             const FArrayBox &current_state)
 {
+    std::array<double, 2> puncture_masses;
+    std::vector<std::array<double, CH_SPACEDIM>> punctures;
+
     if (m_p.track_punctures)
     {
-        std::vector<double> puncture_masses;
-#ifdef USE_TWOPUNCTURES
-        // use calculated bare masses from TwoPunctures
         puncture_masses = {m_tp_amr.m_two_punctures.mm,
                            m_tp_amr.m_two_punctures.mp};
-#else
-        puncture_masses = {m_p.bh1_params.mass, m_p.bh2_params.mass};
-#endif /* USE_TWOPUNCTURES */
-
-        auto puncture_coords =
-            m_bh_amr.m_puncture_tracker.get_puncture_coords();
-        const bool activate_extraction = true;
-        BoxLoops::loop(ChiPunctureExtractionTaggingCriterion(
-                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
-                           puncture_coords, m_p.activate_extraction,
-                           m_p.track_punctures, puncture_masses),
-                       current_state, tagging_criterion);
+        punctures = m_tp_amr.m_puncture_tracker.get_puncture_coords();
     }
-    else
-    {
-        BoxLoops::loop(ChiExtractionTaggingCriterion(
-                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
-                           m_p.activate_extraction),
-                       current_state, tagging_criterion);
-    }
+    BoxLoops::loop(BinaryPunctureTaggingCriterion<FourthOrderDerivatives>(
+                       m_dx, m_level, m_p.tag_horizons_max_levels,
+                       m_p.tag_punctures_max_levels, m_p.extraction_params,
+                       punctures, m_p.activate_extraction, m_p.track_punctures,
+                       puncture_masses, m_p.bh_tagging_buffers,
+                       m_p.puncture_tag_min_separation),
+                   current_state, tagging_criterion);
 
-    // set the fixed levels - should only happen on first timestep
-    if (m_time == 0.0 && m_level < 6)
-    {
-        BoxLoops::loop(
-            FixedGridsTaggingCriterion(m_dx, m_level, m_p.L, m_p.center),
+    // set tagging criterion for scalar field
+    BoxLoops::loop(
+            ChiAndPhiTaggingCriterion(
+            m_dx,  m_p.regrid_threshold_chi, m_p.regrid_threshold_phi),
             current_state, tagging_criterion, disable_simd());
-    }
+    
 }
 
 void BinaryBHLevel::specificPostTimeStep()

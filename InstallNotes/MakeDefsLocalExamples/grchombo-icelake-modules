@@ -1,0 +1,25 @@
+module use --append /etc/scl/modulefiles
+module use --append /usr/local/software/spack/spack-modules/icelake-20210927/linux-centos8-icelake
+module use --append /usr/local/software/spack/spack-modules/icelake-20210927/linux-centos8-x86_64
+module use --append /usr/share/Modules/modulefiles
+module use --append /etc/modulefiles
+module use --append /usr/share/modulefiles
+module use --append /usr/local/software/spack/current/share/spack/tcl/linux-rhel7-x86_64
+module use --append /usr/local/software/modulefiles
+module use --append /usr/local/Cluster-Config/modulefiles
+module load --notuasked dot
+module load --notuasked rhel8/slurm
+module load --notuasked singularity
+module load --notuasked rhel8/global
+module load --notuasked cuda
+module load --notuasked intel/compilers
+module load --notuasked intel/mkl/2020.2
+module load --notuasked intel/impi/2020.2/intel
+module load --notuasked intel/libs/idb
+module load --notuasked intel/libs
+module load --notuasked intel/libs/ipp
+module load --notuasked intel/libs/daal
+module load --notuasked intel/bundles/complib
+module load rhel8/default-icl
+module load hdf5/mpi/intel/2019.3/1.10.5
+
