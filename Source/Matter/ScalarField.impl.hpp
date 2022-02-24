@@ -122,7 +122,7 @@ void ScalarField<potential_t>::matter_rhs_excl_potential(
     // evolution equations for scalar field and (minus) its conjugate momentum
 
     rhs.phi = vars.lapse * vars.Pi_Re + advec.phi;
-    rhs.Pi = vars.lapse * vars.K * vars.Pi_Re + advec.Pi_Re;
+    rhs.Pi_Re = vars.lapse * vars.K * vars.Pi_Re + advec.Pi_Re;
 
     FOR(i, j)
     {

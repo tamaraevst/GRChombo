@@ -196,7 +196,7 @@ void BinaryBHLevel::specificPostTimeStep()
                 bool fill_ghosts = false;
                 m_gr_amr.m_interpolator->refresh(fill_ghosts);
                 m_gr_amr.fill_multilevel_ghosts(
-                    VariableType::evolution, Interval(c_phi, c_Pi),
+                    VariableType::evolution, Interval(c_phi, c_Pi_Re),
                     min_level);
                 PhiExtraction my_extraction(m_p.extraction_params_phi, m_dt,
                                              m_time, first_step,
