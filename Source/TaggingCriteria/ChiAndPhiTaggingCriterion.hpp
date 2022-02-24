@@ -56,7 +56,7 @@ class ChiAndPhiTaggingCriterion
         {
             mod_d2_chi += d2chi.chi[idir][jdir] * d2chi.chi[idir][jdir];
 
-            mod_d2_phi += d2.Pi[idir][jdir] * d2.Pi[idir][jdir] +
+            mod_d2_phi += d2.Pi_Re[idir][jdir] * d2.Pi_Re[idir][jdir] +
                           d2.phi[idir][jdir] * d2.phi[idir][jdir];
         }
 
