@@ -135,7 +135,7 @@ void BosonStarLevel::prePlotLevel()
                       EMTensor<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
                       Interval(c_s11,c_s33))),
-                      m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
+                      m_state_new, m_state_diagnostics, INCLUDE_GHOST_CELLS);
 
 }
 
