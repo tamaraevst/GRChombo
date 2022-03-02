@@ -42,6 +42,7 @@ class SimulationParameters : public SimulationParametersBase
         pp.load("calculate_constraint_norms", calculate_constraint_norms,
                 false);
 
+        //For Two Puncture binary tagging
         pp.load("bh_tagging_buffers", bh_tagging_buffers, {0.5, 0.5});
         pp.load("tag_punctures_max_levels", tag_punctures_max_levels,
                 {max_level, max_level});
@@ -49,62 +50,61 @@ class SimulationParameters : public SimulationParametersBase
                 {max_level, max_level});
         pp.load("puncture_tag_min_separation", puncture_tag_min_separation,
                 1.0e-3);
-	pp.load("threshold_phi", regrid_threshold_phi);
+
+        //For chi and phi tagging
+	    pp.load("threshold_phi", regrid_threshold_phi);
         pp.load("threshold_chi", regrid_threshold_chi);
 
         // Do we want Weyl/Phi extraction and puncture tracking?
-    pp.load("activate_extraction", activate_extraction, false);
-    pp.load("activate_extraction_phi", activate_extraction_phi, false);
-    pp.load("track_punctures", track_punctures, false);
-    pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
+        pp.load("activate_extraction", activate_extraction, false);
+        pp.load("activate_extraction_phi", activate_extraction_phi, false);
+        pp.load("track_punctures", track_punctures, false);
+        pp.load("puncture_tracking_level", puncture_tracking_level, max_level);
 
-    // for scalar
-    pp.load("G_Newton", G_Newton, 1.0);
+        // for scalar
+        pp.load("G_Newton", G_Newton, 1.0);
 
-    //for setting scalar field to some fixed value
-    pp.load("amplitude_scalar", amplitude_scalar, 0.0);
+        //for setting scalar field to some fixed value
+        pp.load("amplitude_scalar", amplitude_scalar, 0.0);
 
-    pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
-    pp.load("scalar_width", initial_scalar_params.width, 1.0);
-    /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
-    they are \gamma'(0) and \beta'(0) for the scalars respectively.
-    Set them to zero if you do not want the corresponding scalar included. */
-    pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
-    pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
+        pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
+        pp.load("scalar_width", initial_scalar_params.width, 1.0);
+        /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
+        they are \gamma'(0) and \beta'(0) for the scalars respectively.
+        Set them to zero if you do not want the corresponding scalar included. */
+        pp.load("gamma_amplitude", gamma_amplitude, 0.0); // for Chern Simons
+        pp.load("beta_amplitude", beta_amplitude, 0.0); // for Gauss Bonnet
 
-    // Whether to do calculation of scalars' norms
-    pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
+        // Whether to do calculation of scalars' norms
+        pp.load("calculate_scalar_norm", calculate_scalar_norm, false);
 
-    // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
-    pp.load("compute_all_norms", compute_all_norms, false);
+        // Whether to compare with analytic solution of \phi with GB term as a source (only for Schwarzschild)
+        pp.load("compute_all_norms", compute_all_norms, false);
 
-    if (activate_extraction_phi)
+        if (activate_extraction_phi)
         {
-            pp.load("num_extraction_radii_phi",
-                    extraction_params_phi.num_extraction_radii, 1);
+            pp.load("num_extraction_radii_phi", extraction_params_phi.num_extraction_radii, 1);
 
             // Check for multiple extraction radii, otherwise load single
             // radius/level (for backwards compatibility).
             if (pp.contains("extraction_levels_phi"))
             {
-                pp.load("extraction_levels_phi",
-                        extraction_params_phi.extraction_levels,
-                        extraction_params_phi.num_extraction_radii);
+                pp.load("extraction_levels_phi", extraction_params_phi.extraction_levels,
+                            extraction_params_phi.num_extraction_radii);
             }
             else
             {
-                pp.load("extraction_level_phi", extraction_params_phi.extraction_levels,
-                        1, 0);
+                pp.load("extraction_level_phi", extraction_params_phi.extraction_levels, 1, 0);
             }
             if (pp.contains("extraction_radii_phi"))
             {
                 pp.load("extraction_radii_phi", extraction_params_phi.extraction_radii,
-                        extraction_params_phi.num_extraction_radii);
+                            extraction_params_phi.num_extraction_radii);
             }
             else
             {
                 pp.load("extraction_radius_phi", extraction_params_phi.extraction_radii,
-                        1, 0.1);
+                            1, 0.1);
             }
 
             pp.load("num_points_phi_phi", extraction_params_phi.num_points_phi, 2);
@@ -113,25 +113,25 @@ class SimulationParameters : public SimulationParametersBase
             {
                 extraction_params_phi.num_points_theta += 1;
                 pout() << "Parameter: num_points_theta incompatible with "
-                          "Simpson's "
-                       << "rule so increased by 1.\n";
+                            "Simpson's "
+                        << "rule so increased by 1.\n";
             }
             pp.load("extraction_center_phi", extraction_params_phi.center, center);
 
             if (pp.contains("modes_phi"))
             {
                 pp.load("num_modes_phi", extraction_params_phi.num_modes);
-                std::vector<int> extraction_modes_vect(
-                    2 * extraction_params_phi.num_modes);
-                pp.load("modes_phi", extraction_modes_vect,
+                    std::vector<int> extraction_modes_vect(
                         2 * extraction_params_phi.num_modes);
-                extraction_params_phi.modes.resize(extraction_params_phi.num_modes);
+                pp.load("modes_phi", extraction_modes_vect,
+                            2 * extraction_params_phi.num_modes);
+                    extraction_params_phi.modes.resize(extraction_params_phi.num_modes);
                 for (int i = 0; i < extraction_params_phi.num_modes; ++i)
                 {
                     extraction_params_phi.modes[i].first =
-                        extraction_modes_vect[2 * i];
+                            extraction_modes_vect[2 * i];
                     extraction_params_phi.modes[i].second =
-                        extraction_modes_vect[2 * i + 1];
+                            extraction_modes_vect[2 * i + 1];
                 }
             }
             else
@@ -147,25 +147,25 @@ class SimulationParameters : public SimulationParametersBase
             }
 
             pp.load("write_extraction_phi", extraction_params_phi.write_extraction,
-                    false);
+                        false);
 
             std::string extraction_path_phi;
             pp.load("extraction_subpath_phi", extraction_path_phi, data_path);
             if (!extraction_path_phi.empty() && extraction_path_phi.back() != '/')
-                extraction_path_phi += "/";
+                    extraction_path_phi += "/";
             if (output_path != "./" && !output_path.empty())
-                extraction_path_phi = output_path + extraction_path_phi;
+                    extraction_path_phi = output_path + extraction_path_phi;
 
             extraction_params_phi.data_path = data_path;
             extraction_params_phi.extraction_path = extraction_path_phi;
 
             // default names to Phi extraction
             pp.load("extraction_file_prefix_phi",
-                    extraction_params_phi.extraction_file_prefix,
-                    std::string("Phi_extraction_"));
+                        extraction_params_phi.extraction_file_prefix,
+                        std::string("Phi_extraction_"));
             pp.load("integral_file_prefix_phi",
-                    extraction_params_phi.integral_file_prefix,
-                    std::string("Phi_mode_"));
+                        extraction_params_phi.integral_file_prefix,
+                        std::string("Phi_mode_"));
         }
     }
 
@@ -451,6 +451,7 @@ class SimulationParameters : public SimulationParametersBase
     double puncture_tag_min_separation;
     double regrid_threshold_phi;
     double regrid_threshold_chi;
+    
 #ifdef USE_TWOPUNCTURES
     double tp_offset_plus, tp_offset_minus;
     TP::Parameters tp_params;
