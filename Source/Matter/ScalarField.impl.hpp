@@ -45,7 +45,7 @@ void ScalarField<potential_t>::emtensor_excl_potential(
     const Tensor<3, data_t> &chris_ULL)
 {
     // Useful quantity Vt
-    data_t Vt = -vars.Pi_Re * vars.Pi_Re;
+    data_t Vt = -vars.Pi * vars.Pi;
     FOR(i, j) { Vt += vars.chi * h_UU[i][j] * d1.phi[i] * d1.phi[j]; }
 
     // Calculate components of EM Tensor
@@ -60,10 +60,10 @@ void ScalarField<potential_t>::emtensor_excl_potential(
     out.S = vars.chi * TensorAlgebra::compute_trace(out.Sij, h_UU);
 
     // S_i (note lower index) = - n^a T_ai
-    FOR(i) { out.Si[i] = -d1.phi[i] * vars.Pi_Re; }
+    FOR(i) { out.Si[i] = -d1.phi[i] * vars.Pi; }
 
     // rho = n^a n^b T_ab
-    out.rho = vars.Pi_Re * vars.Pi_Re + 0.5 * Vt;
+    out.rho = vars.Pi * vars.Pi + 0.5 * Vt;
 }
 
 // Adds in the RHS for the matter vars
@@ -93,7 +93,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     auto mod_scalars = mod_geom.mod_scalars(vars, d1, d2, h_UU, chris);
  
     // add them to the RHS equation of phi
-    total_rhs.Pi_Re += vars.lapse * m_gamma_amplitude * mod_scalars.CS_scalar + vars.lapse * m_beta_amplitude * mod_scalars.GB_scalar;
+    total_rhs.Pi += vars.lapse * m_gamma_amplitude * mod_scalars.CS_scalar + vars.lapse * m_beta_amplitude * mod_scalars.GB_scalar;
 
     // set the potential values
     data_t V_of_phi = 0.0;
@@ -101,7 +101,7 @@ void ScalarField<potential_t>::add_matter_rhs(
     my_potential.compute_potential(V_of_phi, dVdphi, vars);
 
     // adjust RHS for the potential term
-    total_rhs.Pi_Re += -vars.lapse * dVdphi ;
+    total_rhs.Pi += -vars.lapse * dVdphi ;
 }
 
 // the RHS excluding the potential tserms
@@ -121,18 +121,18 @@ void ScalarField<potential_t>::matter_rhs_excl_potential(
 
     // evolution equations for scalar field and (minus) its conjugate momentum
 
-    rhs.phi = vars.lapse * vars.Pi_Re + advec.phi;
-    rhs.Pi_Re = vars.lapse * vars.K * vars.Pi_Re + advec.Pi_Re;
+    rhs.phi = vars.lapse * vars.Pi + advec.phi;
+    rhs.Pi = vars.lapse * vars.K * vars.Pi + advec.Pi;
 
     FOR(i, j)
     {
         // includes non conformal parts of chris not included in chris_ULL
-        rhs.Pi_Re += h_UU[i][j] * (-0.5 * d1.chi[j] * vars.lapse * d1.phi[i] +
+        rhs.Pi += h_UU[i][j] * (-0.5 * d1.chi[j] * vars.lapse * d1.phi[i] +
                                 vars.chi * vars.lapse * d2.phi[i][j] +
                                 vars.chi * d1.lapse[i] * d1.phi[j]);
         FOR(k)
         {
-            rhs.Pi_Re += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] *
+            rhs.Pi += -vars.chi * vars.lapse * h_UU[i][j] * chris.ULL[k][i][j] *
                       d1.phi[k];
         }
     }
