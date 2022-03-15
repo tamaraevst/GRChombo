@@ -48,6 +48,8 @@ enum
     c_profile1,
     c_profile2,
 
+    c_testHam,
+
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -71,7 +73,11 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     
     "weight1", "weight2",
         
-    "profile1", "profile2" };
+    "profile1", "profile2",
+    
+    "testHam"
+    
+     };
     
     }
 
