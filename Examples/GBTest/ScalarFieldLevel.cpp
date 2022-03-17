@@ -34,7 +34,6 @@
 #include "SetValue.hpp"
 #include "ComputeModifiedScalars.hpp"
 #include "GBAnalyticScalar.hpp"
-#include "ExcisionDiagnostics.hpp"
 #include "DebuggingTools.hpp"
 #include "Coordinates.hpp"
 #include <iostream>
@@ -90,7 +89,6 @@ void ScalarFieldLevel::prePlotLevel()
         Constraints(m_dx, c_Ham, Interval(c_Mom1, c_Mom3))),
         m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
    
-    BoxLoops::loop(ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r), m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
 }
 #endif
 
@@ -155,15 +153,8 @@ void ScalarFieldLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     BoxLoops::loop(
         FixedGridsTaggingCriterion(m_dx, m_level, 2.0 * m_p.L, m_p.center),
         current_state, tagging_criterion);
-//    BoxLoops::loop(ChiTaggingCriterion(m_dx), current_state, tagging_criterion);
 }
 
-//void ScalarFieldLevel::computeDiagnosticsTaggingCriterion(
-//    FArrayBox &tagging_criterion, const FArrayBox &current_state_diagnostics)
-//{
-//    BoxLoops::loop(HamTaggingCriterion(m_dx), current_state_diagnostics,
-//                   tagging_criterion);
-//}
 
 //Output norms of Gauss-Bonnet and Chern-Simons into file 
 void ScalarFieldLevel::specificPostTimeStep()
@@ -171,9 +162,7 @@ void ScalarFieldLevel::specificPostTimeStep()
     CH_TIME("ScalarFieldLevel::specificPostTimeStep");
 
     fillAllGhosts();
-    // excise within horizon
-    BoxLoops::loop(make_compute_pack(GBAnalyticScalar(m_dx, m_p.kerr_params.center), 
-                                            ExcisionDiagnostics(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r)),
+    BoxLoops::loop(GBAnalyticScalar(m_dx, m_p.kerr_params.center, m_p.inner_r, m_p.outer_r),
                                             m_state_diagnostics, m_state_diagnostics, SKIP_GHOST_CELLS, disable_simd());
 
     if (!FilesystemTools::directory_exists(m_p.data_path))
