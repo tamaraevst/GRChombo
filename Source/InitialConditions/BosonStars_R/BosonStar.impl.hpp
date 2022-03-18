@@ -35,7 +35,7 @@ void BosonStar::compute_1d_solution(const double max_r)
         m_1d_sol.main();
         pout() << "Completed for star 1" << endl;
 
-        pout() << "Setting initial conditions for Star 2" << endl
+        pout() << "Setting initial conditions for Star 2" << endl;
         m_1d_sol2.set_initialcondition_params(m_params_BosonStar2,m_params_potential,max_r);
         pout() << "Running the solver for Star 2" << endl;
         m_1d_sol2.main();
@@ -172,26 +172,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p * psi_p * c_ * c_ - omega_p * omega_p * s_ * s_;
     
-    //Initialise weight function arguments to some random values - good check if in the compute
-    //of weight functions these values should never appear
-    // double arg1 = 42.0;
-    // double arg2 = 42.0;
-
-    // double stretch_factor1 = 1.0;
-    // double stretch_factor2 = 1.0;
-
-    // WeightFunction weight;
-    
-    //double check_y = max(fabs(coords.y) - 2*separation, 0);
-    //double check_z = max(fabs(coords.z) - 2*separation, 0);
-
-    // if (do_stretch)
-    // {
-    //     double stretch_factor1 = weight.stretching_factor((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, alpha);
-    // }
-    //Argument of weight function to be applied to star 1
-	// arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x - separation / (q+1)) * cosh(rapidity), 2) + pow(coords.y,2) + pow(coords.z, 2)));
-
     if (binary)
     {
         helferLL[1][1] = psi_p * psi_p;
@@ -298,204 +278,12 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[1][1] = psi_p2 * psi_p2;
             helferLL2[2][2] = psi_p2 * psi_p2;
             helferLL2[0][0] = pc_os_p2;
-        }
-        
-        // if (do_stretch)
-        // {
-        //     double stretch_factor2 = weight.stretching_factor2((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), coords.y, alpha);
-        // }
-  
-        //Argument of weight function to be applied to star 2
-        // arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), 2) + pow(coords.y,2) + pow(coords.z, 2)));
+        }  
     }
-    
-    // Initial 3-metric 
-    // g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
-    // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
-    // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
 
-    // if (initial_data_choice !=3 )
-    // {
-    //     if (initial_data_choice == 0)
-    //     {
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0;
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0;
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0;
-    //     }
-
-    //     if (initial_data_choice == 1)
-    //     {
-    //         g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
-    //         g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
-    //         g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
-    //     }
-
-    //     if (initial_data_choice == 5)
-    //     {
-    //         double weight1, weight2;
-
-    //         // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    
-    //         weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
-    //         weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
-
-    //         //Just some sanity checks
-    //         if (weight1 > 1.0)
-    //         {DEBUG_OUT(weight1);}
-
-    //         if (weight2 > 1.0)
-    //         {DEBUG_OUT(weight2);}
-
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL2[0][0] - 1.0) + weight2 * (helferLL[0][0] - 1.0));
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL2[1][1] - 1.0) + weight2 * (helferLL[1][1] - 1.0));
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL2[2][2] - 1.0) + weight2 * (helferLL[2][2] - 1.0));
-    //     }
-
-    //     if (initial_data_choice == 2)
-    //     {
-    //         double weight1, weight2;
-
-    //         // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    
-    //         weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
-    //         weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
-
-    //         //Just some sanity checks
-    //         if (weight1 > 1.0)
-    //         {DEBUG_OUT(weight1);}
-
-    //         if (weight2 > 1.0)
-    //         {DEBUG_OUT(weight2);}
-
-    //         double Htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    //         double htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-
-    //         Htensor[0][0] = (1.0/2.0) * (helferLL[0][0] + helferLL2[0][0] - 2.0);
-    //         Htensor[1][1] = (1.0/2.0) * (helferLL[1][1] + helferLL2[1][1] - 2.0);
-    //         Htensor[2][2] = (1.0/2.0) * (helferLL[2][2] + helferLL2[2][2] - 2.0);
-
-    //         htensor[0][0] = (1.0/2.0) * (helferLL2[0][0] - helferLL[0][0]);
-    //         htensor[1][1] = (1.0/2.0) * (helferLL2[1][1] - helferLL[1][1]);
-    //         htensor[2][2] = (1.0/2.0) * (helferLL2[2][2] - helferLL[2][2]);
-
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
-    //     }
-
-    //     // Now, compute upper and lower components
-    //     gammaLL[0][0] = g_xx;
-    //     gammaLL[1][1] = g_yy;
-    //     gammaLL[2][2] = g_zz;
-    //     gammaUU[0][0] = 1./g_xx;
-    //     gammaUU[1][1] = 1./g_yy;
-    //     gammaUU[2][2] = 1./g_zz;
-
-    //     // Define initial conformal factor
-    //     chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
-
-    //     chi_plain = chi_;
-    // }
-    
-   
-    // //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
-    // double r_11 = 0.;
-    // double p_11 = m_1d_sol.get_p_interp(r_11);
-    // double dp_11 = m_1d_sol.get_dp_interp(r_11);
-    // double omega_11 = m_1d_sol.get_lapse_interp(r_11);
-    // double omega_prime_11 = m_1d_sol.get_dlapse_interp(r_11);
-    // double psi_11 = m_1d_sol.get_psi_interp(r_11);
-    // double psi_prime_11 = m_1d_sol.get_dpsi_interp(r_11);
-    // double pc_os_11 = psi_11 * psi_11 * cosh(rapidity) * cosh(rapidity) - omega_11 * omega_11 * sinh(rapidity) * sinh(rapidity);
-
-    // //If one uses fixing conformal trick, we need to have the vales of the metric of star 2 at its centre
-    // double r_22 = 0.;
-    // double p_22 = m_1d_sol2.get_p_interp(r_22);
-    // double dp_22 = m_1d_sol2.get_dp_interp(r_22);
-    // double omega_22 = m_1d_sol2.get_lapse_interp(r_22);
-    // double omega_prime_22 = m_1d_sol2.get_dlapse_interp(r_22);
-    // double psi_22 = m_1d_sol2.get_psi_interp(r_22);
-    // double psi_prime_22 = m_1d_sol2.get_dpsi_interp(r_22);
-    // double pc_os_22 = psi_22 * psi_22 * cosh(-rapidity2) * cosh(-rapidity2) - omega_22 * omega_22 * sinh(-rapidity2) * sinh(-rapidity2);
-
-    // //These are to be filled in with plain supporposed metric components evaluated at x_A and x_B respectively 
-    // double superpose_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    // double superpose_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-        
-    // //metric components of \gamma_A(x_A)
-    // double g_zz_11 = psi_11 * psi_11;
-    // double g_yy_11 = psi_11 * psi_11;
-    // double g_xx_11 = pc_os_11;
-
-    // //metric components of \gamma_B(x_B)
-    // double g_zz_22 = psi_22 * psi_22;
-    // double g_yy_22 = psi_22 * psi_22;
-    // double g_xx_22 = pc_os_22;
-
-    // // This  is \gamma_{ij}(x_A) = \gamma_A(x_A) + \gamma_B(x_A) - 1
-    // superpose_1[0][0] = g_xx_11 + helferLL2[0][0] - 1.;
-    // superpose_1[1][1] = g_yy_11 + helferLL2[1][1] - 1.;
-    // superpose_1[2][2] = g_zz_11 + helferLL2[2][2] - 1.;
-
-    // // This  is \gamma_{ij}(x_B) = \gamma_B(x_B) + \gamma_A(x_B) - 1
-    // superpose_2[0][0] = g_xx_22 + helferLL[0][0] - 1.;
-    // superpose_2[1][1] = g_yy_22 + helferLL[1][1] - 1.;
-    // superpose_2[2][2] = g_zz_22 + helferLL[2][2] - 1.;
-
-    // double n_power = conformal_power / 12.0;
-
-    // //This is \chi(x_A)
-    // double chi_1 = pow(superpose_1[0][0] * superpose_1[1][1] * superpose_1[2][2], n_power);
-    // //This is \chi(x_B)
-    // double chi_2 = pow(superpose_2[0][0] * superpose_2[1][1] * superpose_2[2][2], n_power);
-
-    // //This is \chi^A(x_A)
-    // double chi1_1 = pow(g_xx_11 * g_yy_11 * g_zz_11, n_power);
-    // //This is \chi^B(x_B)
-    // double chi2_2 = pow(g_xx_22 * g_yy_22 * g_zz_22, n_power);
-        
-    // //This is \delta_A
-    // double delta_1 = chi1_1 - chi_1;
-    // //This is \delta_B
-    // double delta_2 = chi2_2 - chi_2;
-
-    // //Plain superposition 
-    // g_xx = g_xx_1 + g_xx_2 - 1.0;
-    // g_yy = g_yy_1 + g_yy_2 - 1.0;
-    // g_zz = g_zz_1 + g_zz_2 - 1.0;
-
-    // chi_plain = pow(g_xx * g_yy * g_zz, n_power);
-
-    // //Find all the profile functions needed
-    // double profile1 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, coords.z, radius_width1);
-    // double profile2 = weight.profile_chi((coords.x + q * separation / (q+1)) * cosh(-rapidity2), coords.y, coords.z, radius_width2);
-        
-    // double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
-    // double argument_xB_xA = (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-    // double profile_12 = weight.profile_chi(argument_xB_xA, 0., 0., radius_width1);
-        
-    // double argument_xA_xB = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-    // double profile_21 = weight.profile_chi(argument_xA_xB, 0., 0., radius_width2);
-    // double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
-
-    // double value1 = (-profile_21 * delta_2 + profile_22 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
-    // double value2 = (profile_11 * delta_2 - profile_12 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
-
-    // chi_ = chi_plain + profile1 * value1 + profile2 * value2;
-
-    // // Now, compute upper and lower components
-    // gammaLL[0][0] = g_xx;
-    // gammaLL[1][1] = g_yy;
-    // gammaLL[2][2] = g_zz;
-    // gammaUU[0][0] = 1. / g_xx;
-    // gammaUU[1][1] = 1. / g_yy;
-    // gammaUU[2][2] = 1. / g_zz;
-
-    // vars.chi = chi_;
-
-    g_xx = g_xx_1 + g_xx_2 - 1.0;
-    g_yy = g_yy_1 + g_yy_2 - 1.0;
-    g_zz = g_zz_1 + g_zz_2 - 1.0;
+    g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
+    g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
+    g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
 
     //Now, compute upper and lower components
     gammaLL[0][0] = g_xx;
@@ -504,11 +292,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     gammaUU[0][0] = 1. / g_xx;
     gammaUU[1][1] = 1. / g_yy;
     gammaUU[2][2] = 1. / g_zz;
-
+    
     // Define initial conformal factor
     chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
-
-    chi_plain = chi_;
 
     vars.chi = chi_;
 
@@ -519,10 +305,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
-    FOR2(i,j) vars.h[i][j] = pow(chi_plain, - 4.0 / conformal_power) * gammaLL[i][j];
+    FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
     FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l] * (gammaUU_1[l][k] * KLL_1[k][j] + gammaUU_2[l][k] * KLL_2[k][j]);
     FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
-    FOR2(i,j) vars.A[i][j] = chi_plain * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
+    FOR2(i,j) vars.A[i][j] = vars.chi * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 
     current_cell.store_vars(vars);
 }
