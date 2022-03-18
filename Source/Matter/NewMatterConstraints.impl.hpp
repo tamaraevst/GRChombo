@@ -44,7 +44,7 @@ void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
     // Hamiltonian constraint
     if (m_c_Ham >= 0 || m_c_Ham_abs_terms >= 0)
     {
-        out.Ham += -16.0 * M_PI * m_G_Newton * emtensor.rho;
+	out.Ham += -16.0 * M_PI * m_G_Newton * emtensor.rho;
         out.Ham_abs_terms += 16.0 * M_PI * m_G_Newton * abs(emtensor.rho);
     }
 
