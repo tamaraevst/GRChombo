@@ -88,8 +88,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x - separation / 2.) * s_; //set /tilde{t} to zero
-    double x = (coords.x - separation / 2.) * c_;
+    double t = (coords.x - separation / (q + 1.)) * s_; //set /tilde{t} to zero
+    double x = (coords.x - separation / (q + 1.)) * c_;
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y + impact_parameter / 2.;
     double r = sqrt(x * x + y * y + z * z);
@@ -192,8 +192,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity2);
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
-        t = (coords.x + separation / 2.) * s_; //set /tilde{t} to zero
-        x = (coords.x + separation / 2.) * c_;
+        t = (coords.x + separation * q / (q + 1.)) * s_; //set /tilde{t} to zero
+        x = (coords.x + separation * q / (q + 1.)) * c_;
         z = coords.z;
         y = coords.y - impact_parameter / 2.;
         r = sqrt(x * x + y * y + z * z);
