@@ -21,6 +21,21 @@ class BHAMR : public GRAMR
 
     BHAMR() {}
 
+   ~BHAMR()
+    {
+#if defined(USE_AHFINDER) && !defined(DISABLE_AHFINDER)
+        // destroy horizon pointers and finalize PETSc
+        for (auto &ah : m_apparent_horizons)
+            delete ah;
+        AHFinder::finalize();
+#endif
+    }
+
+#if defined(USE_AHFINDER) && !defined(DISABLE_AHFINDER)
+    std::vector<ApparentHorizon<AHInterpolation<AHSphericalCoords>> *>
+        m_apparent_horizons;
+#endif
+
     void set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator) override
     {
         GRAMR::set_interpolator(a_interpolator);
