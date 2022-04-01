@@ -80,11 +80,11 @@ int runGRChombo(int argc, char *argv[])
     if (sim_params.AH_activate)
     {
         AHFinder::initialize(sim_params.AH_params.num_ranks, argc, argv);
-        AHFinder::add_ah(bh_amr, sim_params.initial_puncture_coords[0],
+        AHFinder::add_ah(bh_amr, sim_params.bh1_params.center,
                          0.5 * bh_amr.m_two_punctures.mm, sim_params.AH_params,
                          sim_params.data_path + "stats",
                          sim_params.data_path + "coords");
-        AHFinder::add_ah(bh_amr, sim_params.initial_puncture_coords[1],
+        AHFinder::add_ah(bh_amr, sim_params.bh2_params.center,
                          0.5 * bh_amr.m_two_punctures.mp, sim_params.AH_params,
                          sim_params.data_path + "stats",
                          sim_params.data_path + "coords");
