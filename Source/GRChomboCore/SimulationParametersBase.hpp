@@ -7,6 +7,7 @@
 #define SIMULATIONPARAMETERSBASE_HPP_
 
 // General includes
+#include "AHFinder.hpp"
 #include "BoundaryConditions.hpp"
 #include "CCZ4RHS.hpp"
 #include "ChomboParameters.hpp"
@@ -158,7 +159,22 @@ class SimulationParametersBase : public ChomboParameters
                     extraction_params.integral_file_prefix,
                     std::string("Weyl4_mode_"));
         }
-
+#ifdef USE_AHFINDER
+        // Apparent horizon parameters
+        pp.load("AH_activate", AH_activate, false);
+        if (AH_activate)
+        {
+            pp.load("AH_num_ranks", AH_params.num_ranks, 0); // 0 means "all"
+            pp.load("AH_num_points_u", AH_params.num_points_u);
+            pp.load("AH_num_points_v", AH_params.num_points_v);
+            pp.load("AH_solve_interval", AH_params.solve_interval, 1);
+            pp.load("AH_print_interval", AH_params.print_interval, 1);
+            pp.load("AH_max_failed_convergences",
+                    AH_params.max_failed_convergences, 1);
+            pp.load("AH_updateCenter", AH_params.updateCenter, true);
+            pp.load("AH_level", AH_params.level, 0);
+        }
+#endif
     }
 
     void check_params()
@@ -319,6 +335,11 @@ class SimulationParametersBase : public ChomboParameters
     SphericalExtraction::params_t extraction_params;
 
     std::string data_path;
+
+#ifdef USE_AHFINDER
+    bool AH_activate;
+    AHFinder::params AH_params;
+#endif
 
 };
 
