@@ -12,6 +12,7 @@
 
 // Chombo includes
 #include "AMRLevel.H"
+#include "LoHiSide.H"
 
 // Our includes
 #include "BoundaryConditions.hpp"
@@ -58,6 +59,7 @@ template <typename InterpAlgo> class AMRInterpolator
     const AMR &getAMR() const;
     const std::array<double, CH_SPACEDIM> &get_coarsest_dx();
     const std::array<double, CH_SPACEDIM> &get_coarsest_origin();
+    bool get_boundary_reflective(Side::LoHiSide a_side, int a_dir);
 
   private:
     void computeLevelLayouts();
@@ -96,7 +98,7 @@ template <typename InterpAlgo> class AMRInterpolator
     MPIContext m_mpi;
     std::vector<int> m_mpi_mapping;
 
-    // Memoisation of boxes previously found
+    // Memorisation of boxes previously found
     std::vector<int> m_mem_level;
     std::vector<int> m_mem_box;
 

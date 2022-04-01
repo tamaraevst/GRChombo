@@ -85,11 +85,21 @@ AMRInterpolator<InterpAlgo>::get_coarsest_origin()
 }
 
 template <typename InterpAlgo>
+bool AMRInterpolator<InterpAlgo>::get_boundary_reflective(Side::LoHiSide a_side,
+                                                          int a_dir)
+{
+    if (a_side == Side::Lo)
+        return m_lo_boundary_reflective[a_dir];
+    else
+        return m_hi_boundary_reflective[a_dir];
+}
+
+template <typename InterpAlgo>
 void AMRInterpolator<InterpAlgo>::limit_num_levels(unsigned int num_levels)
 {
     CH_TIME("AMRInterpolator::limit_num_levels");
 
-    int max_num_levels = const_cast<AMR &>(m_gr_amr).getAMRLevels().size();
+    int max_num_levels = const_cast<GRAMR &>(m_gr_amr).getAMRLevels().size();
     if (num_levels > max_num_levels || num_levels == 0)
     {
         m_num_levels = max_num_levels;
@@ -806,7 +816,7 @@ void AMRInterpolator<InterpAlgo>::set_reflective_BC()
                                  .domainBox()
                                  .bigEnd();
 
-    FOR(i)
+    FOR1(i)
     {
         m_upper_corner[i] = (big_end[i] + 1) * m_coarsest_dx[i];
 
@@ -834,7 +844,7 @@ int AMRInterpolator<InterpAlgo>::get_var_parity(int comp,
                       "extracting diagnostic variables with reflective BC");
 
     int parity = 1;
-    FOR(dir)
+    FOR1(dir)
     {
         double coord = query.m_coords[dir][point_idx];
         if ((m_lo_boundary_reflective[dir] && coord < 0.) ||
