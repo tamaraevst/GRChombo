@@ -9,6 +9,15 @@
 #include "GRAMR.hpp"
 #include "PunctureTracker.hpp"
 
+#if defined(USE_AHFINDER) && !defined(DISABLE_AHFINDER)
+#include "AHInterpolation.hpp"
+#include "AHSphericalCoords.hpp"
+#include "ApparentHorizon.hpp"
+#endif
+
+// Chombo namespace
+#include "UsingNamespace.H"
+
 /// A child of Chombo's AMR class to interface with tools which require
 /// access to the whole AMR hierarchy, and those of GRAMR
 /**
