@@ -160,7 +160,7 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     // set tagging criterion for scalar field
 
     // set the fixed levels - should only happen on first timestep
-    if (m_time == 0.0 && m_level < 6)
+    if (m_time == 0.0)
     {
         BoxLoops::loop(
             FixedGridsTaggingCriterion(m_dx, m_level, m_p.L, m_p.center),
