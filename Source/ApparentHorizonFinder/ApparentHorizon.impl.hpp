@@ -4,7 +4,7 @@
  */
 
 #ifndef _APPARENTHORIZON_IMPL_HPP_
-#define _APPARENTHORIZONI_IMPL_HPP_
+#define _APPARENTHORIZON_IMPL_HPP_
 
 #if !defined(_APPARENTHORIZON_HPP_)
 #error "This file should only be included through ApparentHorizon.hpp"

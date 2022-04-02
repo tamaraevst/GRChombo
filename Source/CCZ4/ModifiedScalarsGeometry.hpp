@@ -82,8 +82,8 @@ class ModifiedScalarsGeometry
             out.B[i][j] = 0.0;
         }
 
-        Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
-        data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
+        // Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
+        // data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
 
         FOR(i, j)
         {
