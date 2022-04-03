@@ -10,6 +10,7 @@
 #include "TensorAlgebra.hpp"
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
+#include "CCZ4.hpp"
 
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
@@ -82,9 +83,6 @@ class ModifiedScalarsGeometry
             out.B[i][j] = 0.0;
         }
 
-        Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
-        data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
-
         FOR(i, j)
         {
             K_tensor[i][j] = vars.A[i][j] / vars.chi +
@@ -155,8 +153,6 @@ class ModifiedScalarsGeometry
         const auto epsilon3_LUU = compute_epsilon3_LUU(vars, h_UU);
 
         auto ebterms = compute_EB_terms(vars, d1, d2, epsilon3_LUU, h_UU, chris);
-        Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
-        data_t tr_A2 = compute_trace(vars.A, A_UU);
 
         FOR(k, l, m , n)
         {

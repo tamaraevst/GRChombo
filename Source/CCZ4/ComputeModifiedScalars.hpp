@@ -11,7 +11,6 @@
 #include "Coordinates.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "BSSNVars.hpp"
 #include "Tensor.hpp"
 #include "ModifiedScalarsGeometry.hpp"
 #include "UserVariables.hpp" //This files needs c_NUM - total number of components
@@ -23,7 +22,7 @@ class ComputeModifiedScalars
 {
   public:
     /// BSSN variables
-    template <class data_t> using Vars = BSSNVars::VarsWithGauge<data_t>;
+    template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>;
 
     /// BSSN variables
      template <class data_t>
