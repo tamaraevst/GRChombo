@@ -25,7 +25,7 @@ void ScalarBubble::compute(Cell<data_t> current_cell) const
 
     // set the field vars
     vars.phi = compute_phi(coords);
-    vars.Pi = 0;
+    vars.Pi_Re = 0;
 
     // start with unit lapse and flat metric (must be relaxed for chi)
     vars.lapse = 1;
