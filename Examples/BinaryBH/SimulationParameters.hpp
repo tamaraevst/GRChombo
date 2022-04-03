@@ -13,7 +13,6 @@
 // Problem specific includes:
 #include "ArrayTools.hpp"
 #include "BoostedBH.hpp"
-#include "InitialScalarData.hpp"
 #include "SphericalExtraction.hpp"
 #ifdef USE_TWOPUNCTURES
 #include "TP_Parameters.hpp"
@@ -67,8 +66,6 @@ class SimulationParameters : public SimulationParametersBase
         //for setting scalar field to some fixed value
         pp.load("amplitude_scalar", amplitude_scalar, 0.0);
 
-        pp.load("scalar_amplitude", initial_scalar_params.amplitude, 0.1);
-        pp.load("scalar_width", initial_scalar_params.width, 1.0);
         /* Amplitudes set in front of Chern Simons and Gauss Bonnet scalars, 
         they are \gamma'(0) and \beta'(0) for the scalars respectively.
         Set them to zero if you do not want the corresponding scalar included. */
@@ -436,7 +433,6 @@ class SimulationParameters : public SimulationParametersBase
     BoostedBH::params_t bh1_params;
 
      // Initial data for matter and potential
-    InitialScalarData::params_t initial_scalar_params;
     SphericalExtraction::params_t extraction_params_phi;
     double G_Newton;
     //Parameters for modified scalar field equation 
