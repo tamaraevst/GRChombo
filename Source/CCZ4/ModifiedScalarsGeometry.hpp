@@ -115,7 +115,8 @@ class ModifiedScalarsGeometry
         // data_t K_minus_theta = vars.K;
         
         //For CCZ4
-        data_t K_minus_theta -= vars.Theta;
+        data_t K_minus_theta = vars.K;
+        K_minus_theta -= vars.Theta;
 
         FOR(i, j)
         {
