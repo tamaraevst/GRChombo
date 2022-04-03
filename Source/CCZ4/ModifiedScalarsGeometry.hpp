@@ -111,9 +111,15 @@ class ModifiedScalarsGeometry
             }
         }
 
+        //This is for BSSN
+        // data_t K_minus_theta = vars.K;
+        
+        //For CCZ4
+        data_t K_minus_theta -= vars.Theta;
+
         FOR(i, j)
         {
-            out.E[i][j] = ricci.LL[i][j] + vars.K * K_tensor[i][j];
+            out.E[i][j] = ricci.LL[i][j] + K_minus_theta * K_tensor[i][j];
             
             FOR(k, l)
             {
