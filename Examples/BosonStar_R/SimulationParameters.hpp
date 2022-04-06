@@ -111,6 +111,8 @@ public:
         // Do we want to calculate and write the Noether Charge to a file
         pp.load("calculate_noether_charge", calculate_noether_charge, false);
 
+        pp.load("calculate_noether_charge", calculate_adm_mass, false);
+
         // Variables for outputting to plot files
         //pp.load("num_plot_vars", num_plot_vars, 0);
         //pp.load("plot_vars", plot_vars, num_plot_vars, 0);
@@ -157,6 +159,8 @@ public:
 
     // Do we want to write the Noether Charge to a file
     bool calculate_noether_charge;
+
+    bool calculate_adm_mass;
 
     // Vars for outputting in plot files
     //int num_plot_vars;

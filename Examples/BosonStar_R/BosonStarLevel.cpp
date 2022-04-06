@@ -236,6 +236,26 @@ void BosonStarLevel::doAnalysis()
             noether_charge_file.write_time_data_line({noether_charge});
         }
 
+        if (m_p.calculate_adm_mass)
+        {
+            //noether charge should be calculated pre-check and pre plot
+            //so automatically here
+
+            // compute integrated volume weighted noether charge integral
+
+            double adm_mass = amr_reductions.norm(c_Madm);
+            SmallDataIO adm_mass_file("ADMmass", m_dt, m_time,
+                                            m_restart_time,
+                                            SmallDataIO::APPEND,
+                                            first_step);
+            adm_mass_file.remove_duplicate_time_data();
+            if (m_time == 0.)
+            {
+                adm_mass_file.write_header_line({"ADMmass"});
+            }
+            adm_mass_file.write_time_data_line({adm_mass});
+        }
+
         // Compute the maximum of mod_phi and write it to a file
         double mod_phi_max = amr_reductions.max(c_mod_phi);
         SmallDataIO mod_phi_max_file("mod_phi_max", m_dt, m_time,
