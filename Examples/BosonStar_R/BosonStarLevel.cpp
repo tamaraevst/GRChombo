@@ -34,7 +34,7 @@
 #include "EMTensor.hpp"
 #include "MomFluxCalc.hpp"
 #include "SourceIntPreconditioner.hpp"
-//#include "MassExtraction.hpp"
+#include "ADMMassExtraction.hpp"
 
 // For GW extraction
 #include "MatterWeyl4.hpp"
@@ -46,8 +46,6 @@
 
 // For Ang Mom Integrating
 #include "AngMomFlux.hpp"
-
-#include "ComputeWeightFunction.hpp"
 
 // for chombo grid Functions
 #include "AMRReductions.hpp"
@@ -89,8 +87,6 @@ void BosonStarLevel::initialData()
     BoxLoops::loop(GammaCalculator(m_dx),
                    m_state_new, m_state_new, EXCLUDE_GHOST_CELLS,
                    disable_simd());
-
-    BoxLoops::loop(ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 
     fillAllGhosts();
 }
@@ -174,21 +170,25 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
-    bool first_step = (m_time == 0.0);
+
+    bool first_step = (m_dt == m_time);
+
+    // First compute the ADM Mass integrand values on the grid
+    fillAllGhosts();
+    Potential potential(m_p.potential_params);
+    ComplexScalarFieldWithPotential complex_scalar_field(potential);
+    auto weyl4_adm_compute_pack =
+               make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
+               complex_scalar_field,m_p.extraction_params.extraction_center,
+               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
+    BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
+                        EXCLUDE_GHOST_CELLS);
+
     if (m_p.activate_weyl_extraction == 1 &&
        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
     {
         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
-        // First compute the ADM Mass integrand values on the grid
-        fillAllGhosts();
-        Potential potential(m_p.potential_params);
-        ComplexScalarFieldWithPotential complex_scalar_field(potential);
-        auto weyl4_adm_compute_pack =
-               make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
-               complex_scalar_field,m_p.extraction_params.extraction_center,
-               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
-        BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
-                        EXCLUDE_GHOST_CELLS);
+        
         // Do the extraction on the min extraction level
         if (m_level == m_p.extraction_params.min_extraction_level())
         {
@@ -205,6 +205,23 @@ void BosonStarLevel::doAnalysis()
                                          first_step, m_restart_time);
             gw_extraction.execute_query(m_gr_amr.m_interpolator);
         }
+    }
+
+    if (m_p.activate_mass_extraction == 1 &&
+        m_level == m_p.mass_extraction_params.min_extraction_level())
+    {
+        if (m_verbosity)
+        {
+            pout() << "BinaryBSLevel::specificPostTimeStep:"
+                      " Extracting mass." << endl;
+        }
+
+        // Now refresh the interpolator and do the interpolation
+        m_gr_amr.m_interpolator->refresh();
+        ADMMassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
+                                    m_time, m_restart_time,
+                                    first_step);
+        mass_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
     // noether charge, max mod phi, min chi, constraint violations
