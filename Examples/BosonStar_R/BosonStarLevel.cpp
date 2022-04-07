@@ -34,7 +34,7 @@
 #include "EMTensor.hpp"
 #include "MomFluxCalc.hpp"
 #include "SourceIntPreconditioner.hpp"
-//#include "MassExtraction.hpp"
+#include "ADMMassExtraction.hpp"
 
 // For GW extraction
 #include "MatterWeyl4.hpp"
@@ -174,21 +174,25 @@ void BosonStarLevel::specificUpdateODE(GRLevelData &a_soln,
 void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
-    bool first_step = (m_time == 0.0);
+
+    bool first_step = (m_dt == m_time);
+
+    // First compute the ADM Mass integrand values on the grid
+    fillAllGhosts();
+    Potential potential(m_p.potential_params);
+    ComplexScalarFieldWithPotential complex_scalar_field(potential);
+    auto weyl4_adm_compute_pack =
+               make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
+               complex_scalar_field,m_p.extraction_params.extraction_center,
+               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
+    BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
+                        EXCLUDE_GHOST_CELLS);
+
     if (m_p.activate_weyl_extraction == 1 &&
        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
     {
         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
-        // First compute the ADM Mass integrand values on the grid
-        fillAllGhosts();
-        Potential potential(m_p.potential_params);
-        ComplexScalarFieldWithPotential complex_scalar_field(potential);
-        auto weyl4_adm_compute_pack =
-               make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
-               complex_scalar_field,m_p.extraction_params.extraction_center,
-               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
-        BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
-                        EXCLUDE_GHOST_CELLS);
+        
         // Do the extraction on the min extraction level
         if (m_level == m_p.extraction_params.min_extraction_level())
         {
@@ -205,6 +209,23 @@ void BosonStarLevel::doAnalysis()
                                          first_step, m_restart_time);
             gw_extraction.execute_query(m_gr_amr.m_interpolator);
         }
+    }
+
+    if (m_p.activate_mass_extraction == 1 &&
+        m_level == m_p.mass_extraction_params.min_extraction_level())
+    {
+        if (m_verbosity)
+        {
+            pout() << "BinaryBSLevel::specificPostTimeStep:"
+                      " Extracting mass." << endl;
+        }
+
+        // Now refresh the interpolator and do the interpolation
+        m_gr_amr.m_interpolator->refresh();
+        ADMMassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
+                                    m_time, m_restart_time,
+                                    first_step);
+        mass_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
     // noether charge, max mod phi, min chi, constraint violations
@@ -234,26 +255,6 @@ void BosonStarLevel::doAnalysis()
                 noether_charge_file.write_header_line({"Noether Charge"});
             }
             noether_charge_file.write_time_data_line({noether_charge});
-        }
-
-        if (m_p.calculate_adm_mass)
-        {
-            //noether charge should be calculated pre-check and pre plot
-            //so automatically here
-
-            // compute integrated volume weighted noether charge integral
-
-            double adm_mass = amr_reductions.norm(c_Madm);
-            SmallDataIO adm_mass_file("ADMmass", m_dt, m_time,
-                                            m_restart_time,
-                                            SmallDataIO::APPEND,
-                                            first_step);
-            adm_mass_file.remove_duplicate_time_data();
-            if (m_time == 0.)
-            {
-                adm_mass_file.write_header_line({"ADMmass"});
-            }
-            adm_mass_file.write_time_data_line({adm_mass});
         }
 
         // Compute the maximum of mod_phi and write it to a file
