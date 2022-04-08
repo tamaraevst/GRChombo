@@ -109,7 +109,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double w_ = m_1d_sol.get_w();
 
     //Write in phase, shift, metric componnets of star 1 and initialise metric components of star 2
-    double phase_ = w_ * t;
+    double phase_ = m_params_BosonStar.phase * M_PI + w_ * t;
     double beta_x = s_ * c_ * (psi_ * psi_ - omega_ * omega_) / (pc_os);
     vars.shift[0] += beta_x;
     double g_zz_1 = psi_ * psi_;
@@ -239,7 +239,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         pc_os = psi_ * psi_ * c_ *c_ - omega_ * omega_ * s_ * s_;
         lapse_2 = omega_ * psi_ / (sqrt(pc_os));
         w_ = m_1d_sol2.get_w();
-        phase_ = m_params_BosonStar.phase * M_PI + w_ * t;
+        phase_ = w_ * t;
         beta_x = s_ * c_ * (psi_ * psi_ - omega_ * omega_) / (pc_os);
         vars.shift[0] += beta_x;
         g_zz_2 = psi_ * psi_;
