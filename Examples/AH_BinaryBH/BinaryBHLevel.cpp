@@ -17,10 +17,8 @@
 #include "FixedGridsTaggingCriterion.hpp"
 #include "ChiAndPhiTaggingCriterion.hpp"
 #include "TraceARemoval.hpp"
-// #include "InitialScalarData.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
-
 
 #include "DefaultPotential.hpp"
 #include "PunctureTracker.hpp"
@@ -160,12 +158,12 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     // set tagging criterion for scalar field
 
     // set the fixed levels - should only happen on first timestep
-    if (m_time == 0.0)
-    {
-        BoxLoops::loop(
-            FixedGridsTaggingCriterion(m_dx, m_level, m_p.L, m_p.center),
-            current_state, tagging_criterion, disable_simd());
-    }
+    // if (m_time == 0.0)
+    // {
+    //     BoxLoops::loop(
+    //         FixedGridsTaggingCriterion(m_dx, m_level, m_p.L, m_p.center),
+    //         current_state, tagging_criterion, disable_simd());
+    // }
 
     // BoxLoops::loop(
     //         ChiAndPhiTaggingCriterion(

@@ -10,6 +10,7 @@
 #include "TensorAlgebra.hpp"
 #include "Tensor.hpp"
 #include "CCZ4Geometry.hpp"
+#include "CCZ4.hpp"
 
 /*This class has functions to assist with the computation of Chern Simons 
 and Gauss Bonnet scalars*/
@@ -50,6 +51,9 @@ class ModifiedScalarsGeometry
         const Tensor<2, data_t> &h_UU, const chris_t<data_t> &chris)
     {
         using namespace TensorAlgebra;
+        const Tensor<3, data_t> chris_phys =
+        compute_phys_chris(d1.chi, vars.chi, vars.h, h_UU, chris.ULL);
+
         EBterms_t<data_t> out;
         
         //Extrinsic curvature and derivatives
@@ -57,24 +61,15 @@ class ModifiedScalarsGeometry
         Tensor<3, data_t> d1_K_tensor;
         Tensor<3, data_t> covariant_deriv_K_tensor;
 
-        Tensor<2, data_t> K_tensor_UU;
-        Tensor<3, data_t> d1_K_tensor_UU;
-        Tensor<3, data_t> covariant_deriv_K_tensor_UU;
-
-        const Tensor<3, data_t> chris_phys =
-        compute_phys_chris(d1.chi, vars.chi, vars.h, h_UU, chris.ULL);
-
         //For BSSN
-        // Tensor<1, data_t> Z0 = 0.0;
-        // auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z0);
+        // double dZ_coeff = 0.;
+        // auto ricci_and_Z_terms = CCZ4Geometry::compute_ricci_Z_general(
+        // vars, d1, d2, h_UU, chris, dZ_coeff);
 
         //For CCZ4
-        Tensor<1, data_t> Z_over_chi;
-        FOR(i) 
-            {
-                Z_over_chi[i] = 0.5 * (vars.Gamma[i] - chris.contracted[i]);
-            }
-        auto ricci = CCZ4Geometry::compute_ricci_Z(vars, d1, d2, h_UU, chris, Z_over_chi);
+        double dZ_coeff = 1.;
+        auto ricci_and_Z_terms = CCZ4Geometry::compute_ricci_Z_general(
+        vars, d1, d2, h_UU, chris, dZ_coeff);
 
         FOR(i, j)
         {
@@ -82,14 +77,11 @@ class ModifiedScalarsGeometry
             out.B[i][j] = 0.0;
         }
 
-        // Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
-        // data_t tr_A2 = compute_trace(vars.A, A_UU); // A^{ij} A_{ij}
-
         FOR(i, j)
         {
             K_tensor[i][j] = vars.A[i][j] / vars.chi +
                          1. / 3. * (vars.h[i][j] * vars.K) / vars.chi;
-            FOR(k, s, n)
+            FOR(k)
             {
                 d1_K_tensor[i][j][k] = d1.A[i][j][k] / vars.chi -
                                    d1.chi[k] / vars.chi * K_tensor[i][j] +
@@ -111,9 +103,16 @@ class ModifiedScalarsGeometry
             }
         }
 
+        //This is for BSSN
+        // data_t K_minus_theta = vars.K;
+        
+        //For CCZ4
+        data_t K_minus_theta = vars.K;
+        K_minus_theta -= vars.Theta;
+
         FOR(i, j)
         {
-            out.E[i][j] = ricci.LL[i][j] + vars.K * K_tensor[i][j];
+            out.E[i][j] = ricci_and_Z_terms.LL[i][j] + K_minus_theta * K_tensor[i][j];
             
             FOR(k, l)
             {
@@ -148,8 +147,6 @@ class ModifiedScalarsGeometry
         const auto epsilon3_LUU = compute_epsilon3_LUU(vars, h_UU);
 
         auto ebterms = compute_EB_terms(vars, d1, d2, epsilon3_LUU, h_UU, chris);
-        Tensor<2, data_t> A_UU = raise_all(vars.A, h_UU);
-        data_t tr_A2 = compute_trace(vars.A, A_UU);
 
         FOR(k, l, m , n)
         {
