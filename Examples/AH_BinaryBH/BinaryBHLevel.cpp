@@ -15,7 +15,6 @@
 #include "NewConstraints.hpp"
 #include "MatterCCZ4RHS.hpp"
 #include "FixedGridsTaggingCriterion.hpp"
-#include "ChiAndPhiTaggingCriterion.hpp"
 #include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
