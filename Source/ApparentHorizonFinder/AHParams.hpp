@@ -164,7 +164,7 @@ template <class AHFunction>
 void AHParams_t<AHFunction>::read_params(GRParmParse &pp,
                                          const ChomboParameters &a_p)
 {
-    pp.load("AH_num_ranks", num_ranks, 0); // 0 means "all"
+    pp.load("AH_", num_ranks, 0); // 0 means "all"
 
     pp.load("AH_num_points_u", num_points_u);
 #if CH_SPACEDIM == 3

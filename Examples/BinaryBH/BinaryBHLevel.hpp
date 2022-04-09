@@ -8,6 +8,8 @@
 
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
+#include "DefaultPotential.hpp"
+#include "ScalarField.hpp"
 // TPAMR.hpp includes BHAMR.hpp
 #include "TPAMR.hpp"
 
@@ -21,6 +23,9 @@ class BinaryBHLevel : public GRAMRLevel
 #ifdef USE_TWOPUNCTURES
     TPAMR &m_tp_amr = dynamic_cast<TPAMR &>(m_gr_amr);
 #endif /* USE_TWOPUNCTURES */
+
+    // Typedef for scalar field
+    typedef ScalarField<DefaultPotential> ScalarFieldWithPotential;
 
     /// Things to do at every full timestep
     ///(might include several substeps, e.g. in RK4)

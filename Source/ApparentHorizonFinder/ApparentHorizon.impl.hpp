@@ -582,7 +582,7 @@ void ApparentHorizon<SurfaceGeometry, AHFunction>::check_convergence()
     CH_TIME("ApparentHorizon::check_convergence");
 
     // Check SNES convergence reasons in:
-    // https://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/SNES/SNESConvergedReason.html#SNESConvergedReason
+    // https://www.mcs.anl.gov/petsc/petsc-current/docs/manuals/SNES/SNESConvergedReason.html#SNESConvergedReason
 
     int result;
     if (PETScCommunicator::is_rank_active())

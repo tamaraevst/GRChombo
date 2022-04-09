@@ -7,13 +7,15 @@
 #define SCALARFIELD_HPP_
 
 #include "CCZ4Geometry.hpp"
+#include "ModifiedScalarsGeometry.hpp"
 #include "DefaultPotential.hpp"
 #include "DimensionDefinitions.hpp"
 #include "FourthOrderDerivatives.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
 #include "UserVariables.hpp" //This files needs NUM_VARS, total num of components
-#include "VarsTools.hpp"
+#include "simd.hpp"
+#include "DebuggingTools.hpp"
 
 //!  Calculates the matter type specific elements such as the EMTensor and
 //   matter evolution
@@ -29,21 +31,29 @@
      It assumes minimal coupling of the field to gravity.
      \sa MatterCCZ4(), ConstraintsMatter()
 */
+
 template <class potential_t = DefaultPotential> class ScalarField
 {
-  protected:
-    //! The local copy of the potential
+    protected:
+    /* The local copy of the potential, Chern Simons and 
+    Gauss Bonnet amplitudes*/
     potential_t my_potential;
+    double m_gamma_amplitude;
+    double m_beta_amplitude;
 
-  public:
-    //!  Constructor of class ScalarField, inputs are the matter parameters.
-    ScalarField(const potential_t a_potential) : my_potential(a_potential) {}
+    public:
+    ScalarField(const potential_t a_potential,
+                double a_gamma_amplitude,
+                double a_beta_amplitude) : 
+                my_potential(a_potential),
+                m_gamma_amplitude(a_gamma_amplitude),
+                m_beta_amplitude(a_beta_amplitude){}
 
     //! Structure containing the rhs variables for the matter fields
     template <class data_t> struct Vars
     {
         data_t phi;
-        data_t Pi;
+        data_t Pi_Re;
 
         /// Defines the mapping between members of Vars and Chombo grid
         /// variables (enum in User_Variables)
@@ -51,7 +61,7 @@ template <class potential_t = DefaultPotential> class ScalarField
         void enum_mapping(mapping_function_t mapping_function)
         {
             VarsTools::define_enum_mapping(mapping_function, c_phi, phi);
-            VarsTools::define_enum_mapping(mapping_function, c_Pi, Pi);
+            VarsTools::define_enum_mapping(mapping_function, c_Pi_Re, Pi_Re);
         }
     };
 
