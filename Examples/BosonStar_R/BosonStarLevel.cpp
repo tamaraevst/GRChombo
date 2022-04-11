@@ -219,8 +219,7 @@ void BosonStarLevel::doAnalysis()
         // Now refresh the interpolator and do the interpolation
         m_gr_amr.m_interpolator->refresh();
         ADMMassExtraction mass_extraction(m_p.mass_extraction_params, m_dt,
-                                    m_time, m_restart_time,
-                                    first_step);
+                                    m_time, first_step, m_restart_time);
         mass_extraction.execute_query(m_gr_amr.m_interpolator);
     }
 
