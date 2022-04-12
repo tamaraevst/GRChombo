@@ -82,7 +82,10 @@ public:
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
-        pp.load("num_mass_extraction_radii",
+        pp.load("mass_write_extraction",
+                mass_extraction_params.write_extraction,
+                false);
+	pp.load("num_mass_extraction_radii",
                 mass_extraction_params.num_extraction_radii, 1);
         pp.load("mass_extraction_levels",
                 mass_extraction_params.extraction_levels,

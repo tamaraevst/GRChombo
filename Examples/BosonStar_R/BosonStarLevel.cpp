@@ -180,7 +180,7 @@ void BosonStarLevel::doAnalysis()
     auto weyl4_adm_compute_pack =
                make_compute_pack(MatterWeyl4<ComplexScalarFieldWithPotential>(
                complex_scalar_field,m_p.extraction_params.extraction_center,
-               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.L, m_dx));
+               m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.center, m_dx));
     BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
                         EXCLUDE_GHOST_CELLS);
 
