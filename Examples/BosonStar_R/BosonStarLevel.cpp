@@ -171,7 +171,7 @@ void BosonStarLevel::doAnalysis()
 {
     CH_TIME("BosonStarLevel::specificPostTimeStep");
 
-    bool first_step = (m_dt == m_time);
+    bool first_step = (m_time == 0.0);
 
     // First compute the ADM Mass integrand values on the grid
     fillAllGhosts();
