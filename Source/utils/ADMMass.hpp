@@ -32,11 +32,11 @@ class ADMMass
     const FourthOrderDerivatives
         m_deriv; //!< An object for calculating derivatives of the variables
     const double m_dx;
-    const double m_L;
+    const std::array<double,CH_SPACEDIM> m_centre;
 
   public:
-    ADMMass(double a_L, double a_dx)
-        : m_deriv(a_dx), m_dx(a_dx), m_L(a_L) {}
+    ADMMass(const std::array<double,CH_SPACEDIM> a_centre, double a_dx)
+        : m_deriv(a_dx), m_dx(a_dx), m_centre(a_centre) {}
 
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
@@ -50,7 +50,7 @@ class ADMMass
 
         // Surface element for integration
         Coordinates<data_t> coords(current_cell, m_dx,
-                                   {0.5 * m_L, 0.5 * m_L, 0.5 * m_L});
+                                   m_centre);
         data_t r = coords.get_radius();
         Tensor<1, data_t> x = {coords.x, coords.y, coords.z};
         // This is multiplied by r^2 as SphericalExtraction assumes it is

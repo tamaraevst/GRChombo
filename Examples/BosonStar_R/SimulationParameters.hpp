@@ -82,6 +82,9 @@ public:
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
+        pp.load("mass_write_extraction",
+                mass_extraction_params.write_extraction,
+                false);
         pp.load("num_mass_extraction_radii",
                 mass_extraction_params.num_extraction_radii, 1);
         pp.load("mass_extraction_levels",
@@ -150,7 +153,6 @@ public:
     extraction_params_t mass_extraction_params;
 
     int activate_weyl_extraction;
-
 
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;
