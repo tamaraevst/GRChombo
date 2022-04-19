@@ -289,15 +289,17 @@ void BosonStarLevel::doAnalysis()
 
         double L2_Ham = amr_reductions.norm(c_Ham);
         double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3));
+        double L1_Ham = amr_reductions.norm(c_Ham, 1);
+        double L1_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), 1);
         SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
                                      m_restart_time, SmallDataIO::APPEND,
                                      first_step);
         constraints_file.remove_duplicate_time_data();
         if (first_step)
         {
-            constraints_file.write_header_line({"L^2_Ham", "L^2_Mom"});
+            constraints_file.write_header_line({"L^2_Ham", "L^2_Mom", "L^1_Ham", "L^1_Mom",});
         }
-        constraints_file.write_time_data_line({L2_Ham, L2_Mom});
+        constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
     }
 
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
