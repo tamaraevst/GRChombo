@@ -209,9 +209,9 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     if (binary)
     {   
         //Second star positioning
-        c_ = cosh(rapidity2);
-        s_ = sinh(rapidity2);
-        v_ = tanh(rapidity2);
+        c_ = cosh(-rapidity2);
+        s_ = sinh(-rapidity2);
+        v_ = tanh(-rapidity2);
         t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
         x = (coords.x + q * separation / (q + 1.)) * c_;
         z = coords.z;
