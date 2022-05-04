@@ -15,11 +15,10 @@
 #include "NewConstraints.hpp"
 #include "MatterCCZ4RHS.hpp"
 // #include "FixedGridsTaggingCriterion.hpp"
-#include "ChiAndPhiTaggingCriterion.hpp"
+//#include "ChiAndPhiTaggingCriterion.hpp"
 #include "TraceARemoval.hpp"
 #include "NanCheck.hpp"
 #include "PositiveChiAndAlpha.hpp"
-
 
 #include "DefaultPotential.hpp"
 #include "PunctureTracker.hpp"
@@ -166,10 +165,10 @@ void BinaryBHLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
     //         current_state, tagging_criterion, disable_simd());
     // }
 
-    BoxLoops::loop(
-            ChiAndPhiTaggingCriterion(
-            m_dx,  m_p.regrid_threshold_chi, m_p.regrid_threshold_phi),
-            current_state, tagging_criterion, disable_simd());
+    //BoxLoops::loop(
+    //        ChiAndPhiTaggingCriterion(
+    //        m_dx,  m_p.regrid_threshold_chi, m_p.regrid_threshold_phi),
+    //        current_state, tagging_criterion, disable_simd());
     
 }
 

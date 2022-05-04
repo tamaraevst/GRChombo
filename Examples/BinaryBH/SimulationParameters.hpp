@@ -51,8 +51,8 @@ class SimulationParameters : public SimulationParametersBase
                 1.0e-3);
 
         //For chi and phi tagging
-	    pp.load("threshold_phi", regrid_threshold_phi);
-        pp.load("threshold_chi", regrid_threshold_chi);
+//	    pp.load("threshold_phi", regrid_threshold_phi);
+//        pp.load("threshold_chi", regrid_threshold_chi);
 
         // Do we want Weyl/Phi extraction and puncture tracking?
         pp.load("activate_extraction", activate_extraction, false);
