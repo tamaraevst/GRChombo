@@ -44,7 +44,7 @@ class BinaryBHLevel : public GRAMRLevel
                                    Real a_dt) override;
 
     /// Things to do before tagging cells (i.e. filling ghosts)
-    virtual void preTagCells() override;
+    //virtual void preTagCells() override;
 
     /// Identify and tag the cells that need higher resolution
     virtual void
