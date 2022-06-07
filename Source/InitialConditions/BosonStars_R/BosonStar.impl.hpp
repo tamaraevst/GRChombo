@@ -71,10 +71,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     double q = m_params_BosonStar.mass_ratio;
-    double alpha = m_params_BosonStar.alpha_stretch;
-    bool do_stretch = m_params_BosonStar.do_stretch;
-    int n_weight = m_params_BosonStar.n_power;
-    int initial_data_choice = m_params_BosonStar.id_choice;
     double radius_width1 = m_params_BosonStar.radius_width1;
     double radius_width2 = m_params_BosonStar.radius_width2;
     int conformal_power = m_params_BosonStar.conformal_factor_power;
@@ -172,26 +168,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p * psi_p * c_ * c_ - omega_p * omega_p * s_ * s_;
     
-    //Initialise weight function arguments to some random values - good check if in the compute
-    //of weight functions these values should never appear
-    // double arg1 = 42.0;
-    // double arg2 = 42.0;
-
-    // double stretch_factor1 = 1.0;
-    // double stretch_factor2 = 1.0;
+    //Initialise weight function calculation
 
     WeightFunction weight;
     
-    //double check_y = max(fabs(coords.y) - 2*separation, 0);
-    //double check_z = max(fabs(coords.z) - 2*separation, 0);
-
-    // if (do_stretch)
-    // {
-    //     double stretch_factor1 = weight.stretching_factor((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, alpha);
-    // }
-    //Argument of weight function to be applied to star 1
-	// arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x - separation / (q+1)) * cosh(rapidity), 2) + pow(coords.y,2) + pow(coords.z, 2)));
-
     if (binary)
     {
         helferLL[1][1] = psi_p * psi_p;
@@ -298,106 +278,8 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             helferLL2[1][1] = psi_p2 * psi_p2;
             helferLL2[2][2] = psi_p2 * psi_p2;
             helferLL2[0][0] = pc_os_p2;
-        }
-        
-        // if (do_stretch)
-        // {
-        //     double stretch_factor2 = weight.stretching_factor2((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), coords.y, alpha);
-        // }
-  
-        //Argument of weight function to be applied to star 2
-        // arg2 = (stretch_factor2/separation) * (sqrt(pow((coords.x + q * separation / (q + 1)) * cosh(-rapidity2), 2) + pow(coords.y,2) + pow(coords.z, 2)));
-    }
-    
-    // Initial 3-metric 
-    // g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL[0][0] - 1.0) + weight2 * (helferLL2[0][0] - 1.0));
-    // g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL[1][1] - 1.0) + weight2 * (helferLL2[1][1] - 1.0));
-    // g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL[2][2] - 1.0) + weight2 * (helferLL2[2][2] - 1.0));
-
-    // if (initial_data_choice !=3 )
-    // {
-    //     if (initial_data_choice == 0)
-    //     {
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0;
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0;
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0;
-    //     }
-
-    //     if (initial_data_choice == 1)
-    //     {
-    //         g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
-    //         g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
-    //         g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
-    //     }
-
-    //     if (initial_data_choice == 5)
-    //     {
-    //         double weight1, weight2;
-
-    //         // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    
-    //         weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
-    //         weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
-
-    //         //Just some sanity checks
-    //         if (weight1 > 1.0)
-    //         {DEBUG_OUT(weight1);}
-
-    //         if (weight2 > 1.0)
-    //         {DEBUG_OUT(weight2);}
-
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0 - (weight1 * (helferLL2[0][0] - 1.0) + weight2 * (helferLL[0][0] - 1.0));
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0 - (weight1 * (helferLL2[1][1] - 1.0) + weight2 * (helferLL[1][1] - 1.0));
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0 - (weight1  * (helferLL2[2][2] - 1.0) + weight2 * (helferLL[2][2] - 1.0));
-    //     }
-
-    //     if (initial_data_choice == 2)
-    //     {
-    //         double weight1, weight2;
-
-    //         // Use weight function for initial data. In case of BS-BH binary helferLL/helferLL2 varibales are zero so it doesn't make a difference there 
-    
-    //         weight1 = weight.compute_weight(arg1, n_weight); // bump at object 1
-    //         weight2 = weight.compute_weight(arg2, n_weight); //bump at object 2
-
-    //         //Just some sanity checks
-    //         if (weight1 > 1.0)
-    //         {DEBUG_OUT(weight1);}
-
-    //         if (weight2 > 1.0)
-    //         {DEBUG_OUT(weight2);}
-
-    //         double Htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    //         double htensor[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-
-    //         Htensor[0][0] = (1.0/2.0) * (helferLL[0][0] + helferLL2[0][0] - 2.0);
-    //         Htensor[1][1] = (1.0/2.0) * (helferLL[1][1] + helferLL2[1][1] - 2.0);
-    //         Htensor[2][2] = (1.0/2.0) * (helferLL[2][2] + helferLL2[2][2] - 2.0);
-
-    //         htensor[0][0] = (1.0/2.0) * (helferLL2[0][0] - helferLL[0][0]);
-    //         htensor[1][1] = (1.0/2.0) * (helferLL2[1][1] - helferLL[1][1]);
-    //         htensor[2][2] = (1.0/2.0) * (helferLL2[2][2] - helferLL[2][2]);
-
-    //         g_xx = g_xx_1 + g_xx_2 - 1.0 - Htensor[0][0] - htensor[0][0] * (weight1 - weight2);
-    //         g_yy = g_yy_1 + g_yy_2 - 1.0 - Htensor[1][1] - htensor[1][1] * (weight1 - weight2);
-    //         g_zz = g_zz_1 + g_zz_2 - 1.0 - Htensor[2][2] - htensor[2][2] * (weight1 - weight2);
-    //     }
-
-    //     // Now, compute upper and lower components
-    //     gammaLL[0][0] = g_xx;
-    //     gammaLL[1][1] = g_yy;
-    //     gammaLL[2][2] = g_zz;
-    //     gammaUU[0][0] = 1./g_xx;
-    //     gammaUU[1][1] = 1./g_yy;
-    //     gammaUU[2][2] = 1./g_zz;
-
-    //     // Define initial conformal factor
-    //     chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
-
-    //     chi_plain = chi_;
-    // }
-    
-   
+        } 
+   }
     //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
     double r_11 = 0.;
     double p_11 = m_1d_sol.get_p_interp(r_11);
@@ -490,25 +372,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     gammaUU[0][0] = 1. / g_xx;
     gammaUU[1][1] = 1. / g_yy;
     gammaUU[2][2] = 1. / g_zz;
-
-    // vars.chi = chi_;
-
-    // g_xx = g_xx_1 + g_xx_2 - 1.0;
-    // g_yy = g_yy_1 + g_yy_2 - 1.0;
-    // g_zz = g_zz_1 + g_zz_2 - 1.0;
-
-    //Now, compute upper and lower components
-    // gammaLL[0][0] = g_xx;
-    // gammaLL[1][1] = g_yy;
-    // gammaLL[2][2] = g_zz;
-    // gammaUU[0][0] = 1. / g_xx;
-    // gammaUU[1][1] = 1. / g_yy;
-    // gammaUU[2][2] = 1. / g_zz;
-
-    // Define initial conformal factor
-    // chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
-
-    // chi_plain = chi_;
 
     vars.chi = pow(chi_, - 4.0 / conformal_power);
 

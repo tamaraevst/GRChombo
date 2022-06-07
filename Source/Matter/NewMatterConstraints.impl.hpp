@@ -41,13 +41,11 @@ void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
     // Energy Momentum Tensor
     const auto emtensor = my_matter.compute_emtensor(vars, d1, h_UU, chris.ULL);
 
-    data_t test_Ham;
     // Hamiltonian constraint
     if (m_c_Ham >= 0 || m_c_Ham_abs_terms >= 0)
     {
         out.Ham += -16.0 * M_PI * m_G_Newton * emtensor.rho;
         out.Ham_abs_terms += 16.0 * M_PI * m_G_Newton * abs(emtensor.rho);
-        test_Ham = 16.0 * M_PI * m_G_Newton * emtensor.rho;
     }
 
     // Momentum constraints
@@ -62,7 +60,6 @@ void MatterConstraints<matter_t>::compute(Cell<data_t> current_cell) const
     }
     // Write the constraints into the output FArrayBox
     store_vars(out, current_cell);
-    current_cell.store_vars(test_Ham, c_testHam);
 }
 
 #endif /* NEWMATTERCONSTRAINTS_IMPL_HPP_ */
