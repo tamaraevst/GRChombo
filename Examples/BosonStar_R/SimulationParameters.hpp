@@ -26,6 +26,10 @@ public:
 
     void readParams(GRParmParse &pp)
     {
+#ifdef USE_AHFINDER
+        pp.load("AH_1_initial_guess", AH_1_initial_guess);
+        pp.load("AH_2_initial_guess", AH_2_initial_guess);
+#endif
         // for regridding
         pp.load("regrid_threshold_phi", regrid_threshold_phi);
         pp.load("regrid_threshold_chi", regrid_threshold_chi);
@@ -147,6 +151,11 @@ public:
     BosonStar_params_t bosonstar_params;
     BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;
+
+#ifdef USE_AHFINDER
+    double AH_1_initial_guess;
+    double AH_2_initial_guess;
+#endif
 
     // Mass extraction
     int activate_mass_extraction;

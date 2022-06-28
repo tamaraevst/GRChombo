@@ -8,6 +8,7 @@
 
 #include "DefaultLevelFactory.hpp"
 #include "GRAMRLevel.hpp"
+#include "BHAMR.hpp"
 // Problem specific includes
 #include "ComplexPotential.hpp"
 #include "ComplexScalarField.hpp"
@@ -22,6 +23,7 @@ class BosonStarLevel : public GRAMRLevel
     friend class DefaultLevelFactory<BosonStarLevel>;
     // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
+    BHAMR &m_bh_amr = dynamic_cast<BHAMR &>(m_gr_amr);
 
     // Typedef for scalar field
     typedef ComplexScalarField<Potential> ComplexScalarFieldWithPotential;
