@@ -282,8 +282,8 @@ void BosonStarLevel::doAnalysis()
 
         // constraeints calculated pre check and pre plot so done here already
 
-        double L2_Ham = amr_reductions.norm(c_Ham, true);
-        double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), true);
+        double L2_Ham = amr_reductions.norm(c_Ham, 2, true);
+        double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), 2, true);
 	double L1_Ham = amr_reductions.norm(c_Ham, 1, true);
         double L1_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), 1, true);
         SmallDataIO constraints_file("constraint_norms", m_dt, m_time,
