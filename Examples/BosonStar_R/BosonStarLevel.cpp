@@ -183,6 +183,9 @@ void BosonStarLevel::doAnalysis()
                m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.center, m_dx));
     BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
                         EXCLUDE_GHOST_CELLS);
+    BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
+                      complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
+                      Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
 
     if (m_p.activate_weyl_extraction == 1 &&
        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
