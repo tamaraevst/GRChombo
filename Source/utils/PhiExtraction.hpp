@@ -28,7 +28,7 @@ class PhiExtraction : public SphericalExtraction
         : SphericalExtraction(a_params, a_dt, a_time, a_first_step,
                               a_restart_time)
     {
-        add_var(c_phi, VariableType::evolution);
+        add_var(c_phi, VariableType::diagnostic);
     }
 
     //! The old constructor which assumes it is called in specificPostTimeStep
@@ -59,7 +59,7 @@ class PhiExtraction : public SphericalExtraction
         //normalised by multiplying with radius
         auto integrand = [](std::vector<double> phi_values, double r,
                                                      double theta, double phi){
-            return std::make_pair(r * phi_values[0], 0.0);
+            return std::make_pair(r * phi_values[0], r * phi_values[1]);
         };
 
         // add the modes that will be integrated
@@ -82,8 +82,9 @@ class PhiExtraction : public SphericalExtraction
                                              std::to_string(mode.first) +
                                              std::to_string(mode.second);
             std::vector<std::vector<double>> integrals_phi_for_writing = {
-                std::move(mode_integrals[imode].first)};
-            std::vector<std::string> labels = {"integral"};
+                std::move(mode_integrals[imode].first),
+		std::move(mode_integrals[imode].second)};
+            std::vector<std::string> labels = {"integral_Re", "integral_Im"};
             write_integrals(integrals_phi_filename, integrals_phi_for_writing, labels);
         }
     }
