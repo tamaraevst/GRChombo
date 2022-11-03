@@ -26,7 +26,7 @@ struct BosonStar_params_t
     double alpha_stretch;
     bool do_stretch;
     int n_power;
-    int id_choice; // initial data choice: 0 - plain superposition, 1 - Thomas' trick, 2 - weight functions trick, 3 - for fixing conformal factor
+    int id_choice; // initial data choice: 0 - plain superposition, 1 - Thomas' trick, 2 - fixing conformal factor method
     double radius_width1;
     double radius_width2;
     int conformal_factor_power;

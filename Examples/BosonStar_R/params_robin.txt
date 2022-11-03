@@ -1,3 +1,6 @@
+# NOTE! There is a mistake in the parity order of diagnostic variables! This will produce false results.
+
+
 #Params for runtime inputs
 
 verbosity = 0
