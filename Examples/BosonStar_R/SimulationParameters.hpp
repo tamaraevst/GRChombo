@@ -55,13 +55,9 @@ public:
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
-        pp.load("do_stretch", bosonstar_params.do_stretch, false);
-        pp.load("n_power", bosonstar_params.n_power, 3);
-        pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
         pp.load("radius_width2", bosonstar_params.radius_width2, 20.);
         pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, -4);
-        pp.load("alpha_stretch", bosonstar_params.alpha_stretch, 0.1);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
         // Initialize values for bosonstar2_params to same as bosonstar_params

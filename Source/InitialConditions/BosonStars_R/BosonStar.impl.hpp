@@ -71,10 +71,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     double q = m_params_BosonStar.mass_ratio;
-    double alpha = m_params_BosonStar.alpha_stretch;
-    bool do_stretch = m_params_BosonStar.do_stretch;
-    int n_weight = m_params_BosonStar.n_power;
-    int initial_data_choice = m_params_BosonStar.id_choice;
     double radius_width1 = m_params_BosonStar.radius_width1;
     double radius_width2 = m_params_BosonStar.radius_width2;
     int conformal_power = m_params_BosonStar.conformal_factor_power;
@@ -172,26 +168,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double psi_prime_p = m_1d_sol.get_dpsi_interp(r_p);
     double pc_os_p = psi_p * psi_p * c_ * c_ - omega_p * omega_p * s_ * s_;
     
-    //Initialise weight function arguments to some random values - good check if in the compute
-    //of weight functions these values should never appear
-    // double arg1 = 42.0;
-    // double arg2 = 42.0;
-
-    // double stretch_factor1 = 1.0;
-    // double stretch_factor2 = 1.0;
+    //Initialise weight function calculation
 
     WeightFunction weight;
     
-    //double check_y = max(fabs(coords.y) - 2*separation, 0);
-    //double check_z = max(fabs(coords.z) - 2*separation, 0);
-
-    // if (do_stretch)
-    // {
-    //     double stretch_factor1 = weight.stretching_factor((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, alpha);
-    // }
-    //Argument of weight function to be applied to star 1
-	// arg1 = (stretch_factor1/separation) * (sqrt(pow((coords.x - separation / (q+1)) * cosh(rapidity), 2) + pow(coords.y,2) + pow(coords.z, 2)));
-
     if (binary)
     {
         helferLL[1][1] = psi_p * psi_p;

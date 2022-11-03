@@ -13,6 +13,7 @@
 #include "SimulationParametersBase.hpp"
 #include "Tensor.hpp"
 #include "Coordinates.hpp"
+#include "DebuggingTools.hpp"
 
 class ComplexPhiAndChiExtractionTaggingCriterion
 {
@@ -74,7 +75,7 @@ class ComplexPhiAndChiExtractionTaggingCriterion
             d2_chi_ratio += d2chi.chi[idir][jdir] * d2chi.chi[idir][jdir] /
                           (1e-2 + abs(d1chi.chi[idir] * d1chi.chi[jdir]));
         }
-
+	
         data_t criterion_phi = m_dx * sqrt(d2_phi_ratio) / m_threshold_phi;
         data_t criterion_chi = m_dx * sqrt(d2_chi_ratio) / m_threshold_chi;
 
