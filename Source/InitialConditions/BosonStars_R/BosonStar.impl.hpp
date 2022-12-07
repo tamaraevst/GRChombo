@@ -74,6 +74,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double radius_width1 = m_params_BosonStar.radius_width1;
     double radius_width2 = m_params_BosonStar.radius_width2;
     int conformal_power = m_params_BosonStar.conformal_factor_power;
+    int initial_data_choice = m_params_BosonStar.id_choice;
 
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
