@@ -40,6 +40,9 @@
 #include "MatterWeyl4.hpp"
 #include "WeylExtraction.hpp"
 
+// For Star Tracking
+#include "GaussianFitTracking.hpp"
+
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
@@ -303,6 +306,17 @@ void BosonStarLevel::doAnalysis()
             constraints_file.write_header_line({"L^2_Ham", "L^2_Mom", "L^1_Ham", "L^1_Mom",});
         }
         constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
+    }
+
+    if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
+    {
+        CH_TIME("BosonStarLevel::doAnalysis::gaussfit");
+        GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
+                                        m_time,m_restart_time,first_step,m_p.L,m_level);
+
+        gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
+        std::vector<double> dummy;
+        gaussian_fit_tracking.get_BH_centres(dummy);
     }
 
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
