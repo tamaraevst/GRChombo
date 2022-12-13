@@ -41,7 +41,7 @@
 #include "WeylExtraction.hpp"
 
 // For Star Tracking
-#include "GaussianFitTracking.hpp"
+
 
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
@@ -308,15 +308,19 @@ void BosonStarLevel::doAnalysis()
         constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
     }
 
-    if (m_p.gaussfit_params.do_star_tracking && m_level==m_p.gaussfit_params.AMR_level)
+    if (m_p.do_star_track && m_level == m_p.star_track_level)
     {
-        CH_TIME("BosonStarLevel::doAnalysis::gaussfit");
-        GaussianFitTracking gaussian_fit_tracking(m_p.gaussfit_params,m_dt,
-                                        m_time,m_restart_time,first_step,m_p.L,m_level);
+        // if at restart time read data from dat file,
+        // will default to param file if restart time is 0
+        if (fabs(m_time - m_restart_time) < m_dt * 1.1)
+        {
+            m_st_amr.m_star_tracker.read_old_centre_from_dat(
+                "StarCentres", m_dt, m_time, m_restart_time, first_step);
+        }
 
-        gaussian_fit_tracking.do_star_tracking(m_gr_amr.m_interpolator);
-        std::vector<double> dummy;
-        gaussian_fit_tracking.get_BH_centres(dummy);
+        m_st_amr.m_star_tracker.update_star_centres(c_mod_phi);
+        m_st_amr.m_star_tracker.write_to_dat("StarCentres", m_dt, m_time,
+                                             m_restart_time, first_step);
     }
 
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)

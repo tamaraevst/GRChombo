@@ -14,7 +14,6 @@
 #include "ComplexPotential.hpp"
 #include "BosonStarParams.hpp"
 #include "AngMomFluxParams.hpp"
-#include "GaussianFitTrackingParams.hpp"
 
 class SimulationParameters : public SimulationParametersBase
 {
@@ -79,19 +78,6 @@ public:
         }
 
         // Star Tracking
-        pp.load("do_star_tracking", gaussfit_params.do_star_tracking, 0);
-        pp.load("num_points_gaussian_fit", gaussfit_params.num_points, 50);
-        // will be replaced
-        pp.load("tracked_field_index", gaussfit_params.field_index, 30);
-        pp.load("search_width", gaussfit_params.search_width, 16.);
-        pp.load("tracking_BH_cutoff", gaussfit_params.BH_cutoff, 0.05);
-        pp.load("tracking_AMR_level", gaussfit_params.AMR_level,0);
-        pp.load("track_both_centres", gaussfit_params.track_both_centres, true);
-        pp.load("track_min_separation", gaussfit_params.track_min_separation, 5.);
-        pp.load("tracking_centre", gaussfit_params.track_centre,
-                {0.,0.,0.});
-        pp.load("tracking_centres", gaussfit_params.track_centres,
-                {0.,0.,0.,0.,0.,0.});
         pp.load("star_track_centre", star_track_centre,
                 {0.5 * L, 0.5 * L, 0.5 * L});
         pp.load("do_star_track", do_star_track, false);
@@ -169,8 +155,7 @@ public:
     BosonStar_params_t bosonstar_params;
     BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;
-    GaussFit_params_t gaussfit_params;
-
+    
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;

@@ -21,7 +21,7 @@ class STAMR : public GRAMR
 
     STAMR() {}
 
-    void set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator)
+    void set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator) override
     {
         GRAMR::set_interpolator(a_interpolator);
         m_star_tracker.set_interpolator(a_interpolator);
