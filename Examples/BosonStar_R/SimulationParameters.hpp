@@ -54,6 +54,7 @@ public:
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
+        pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
         pp.load("radius_width2", bosonstar_params.radius_width2, 20.);

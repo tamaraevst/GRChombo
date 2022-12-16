@@ -23,8 +23,6 @@ struct BosonStar_params_t
     double BlackHoleMass;
     double BS_rapidity;
     double mass_ratio;
-    double alpha_stretch;
-    bool do_stretch;
     int n_power;
     int id_choice; // initial data choice: 0 - plain superposition, 1 - Thomas' trick, 2 - fixing conformal factor method
     double radius_width1;
