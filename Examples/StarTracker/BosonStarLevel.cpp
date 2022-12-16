@@ -40,6 +40,9 @@
 #include "MatterWeyl4.hpp"
 #include "WeylExtraction.hpp"
 
+// For Star Tracking
+
+
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
@@ -303,6 +306,21 @@ void BosonStarLevel::doAnalysis()
             constraints_file.write_header_line({"L^2_Ham", "L^2_Mom", "L^1_Ham", "L^1_Mom",});
         }
         constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
+    }
+
+    if (m_p.do_star_track && m_level == m_p.star_track_level)
+    {
+        // if at restart time read data from dat file,
+        // will default to param file if restart time is 0
+        if (fabs(m_time - m_restart_time) < m_dt * 1.1)
+        {
+            m_st_amr.m_star_tracker.read_old_centre_from_dat(
+                "StarCentres", m_dt, m_time, m_restart_time, first_step);
+        }
+
+        m_st_amr.m_star_tracker.update_star_centres(c_mod_phi);
+        m_st_amr.m_star_tracker.write_to_dat("StarCentres", m_dt, m_time,
+                                             m_restart_time, first_step);
     }
 
     //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)

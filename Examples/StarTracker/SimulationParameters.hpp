@@ -48,6 +48,7 @@ public:
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);
         pp.load("solitonic", potential_params.solitonic, false);
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
+        pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("BS_binary", bosonstar_params.BS_binary, false);
         pp.load("BS_BH_binary", bosonstar_params.BS_BH_binary, false);
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
@@ -75,6 +76,17 @@ public:
             pp.load("BS_rapidity2",
                     bosonstar2_params.BS_rapidity);
         }
+
+        // Star Tracking
+        pp.load("star_track_centre", star_track_centre,
+                {0.5 * L, 0.5 * L, 0.5 * L});
+        pp.load("do_star_track", do_star_track, false);
+        pp.load("number_of_stars", number_of_stars, 1);
+        pp.load("initial_star_centres", initial_star_centres,
+                3 * number_of_stars);
+        pp.load("star_track_resolution", star_track_resolution, 21);
+        pp.load("star_track_width", star_track_width, 20.);
+        pp.load("star_track_level", star_track_level, 0);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
@@ -143,7 +155,7 @@ public:
     BosonStar_params_t bosonstar_params;
     BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;
-
+    
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
@@ -164,6 +176,13 @@ public:
     int num_vars_inf_norm;
     std::vector<int> vars_inf_norm;
 
+    std::array<double, CH_SPACEDIM> star_track_centre;
+    bool do_star_track;
+    int number_of_stars;
+    std::vector<double> initial_star_centres;
+    int star_track_resolution;
+    double star_track_width;
+    int star_track_level;
     int flux_extraction_level; // specifies times (level) to do angmom flux extraction
 };
 

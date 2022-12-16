@@ -9,6 +9,10 @@
 #include "InterpolationQuery.hpp"
 #include "SmallDataIO.hpp"   // for writing data
 #include "UserVariables.hpp" // for writing data
+#include "nr3.h"
+#include "GaussJ.h"
+#include "FitMRQ.h"
+#include "FitExample.h"
 
 //! Set punctures post restart
 void StarTracker::test()
@@ -22,10 +26,11 @@ void StarTracker::update_star_centres(int a_field_index)
     int i_max = m_num_stars * 3;
     int n1, n2, n3;
     double delta;
-    std::vector<double> x_coords(i_tot);
-    std::vector<double> y_coords(i_tot);
-    std::vector<double> z_coords(i_tot);
-    std::vector<double> vals(i_tot);
+    VecDoub_I x_coords(i_tot);
+    VecDoub_I y_coords(i_tot);
+    VecDoub_I z_coords(i_tot);
+    VecDoub_I all_zeros(i_tot);
+    VecDoub_I vals(i_tot);
 
     // setup positions in a 3d cross about old centre
     for (int n = 0; n < m_num_stars; n++)
@@ -50,6 +55,10 @@ void StarTracker::update_star_centres(int a_field_index)
             x_coords[n3 * m_resolution + i] = m_star_coords[3 * n];
             y_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 1];
             z_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 2] + delta;
+            
+            all_zeros[n1 * m_resolution + i] = 0.0;
+            all_zeros[n2 * m_resolution + i] = 0.0;
+            all_zeros[n3 * m_resolution + i] = 0.0;
         }
     }
 
@@ -62,6 +71,9 @@ void StarTracker::update_star_centres(int a_field_index)
     query.addComp(a_field_index, vals.data(), Derivative::LOCAL,
                   VariableType::diagnostic);
     m_interpolator->interp(query);
+
+    Fitmrq fitmrq(x_coords, vals, all_zeros, all_zeros, fgauss);
+    // Fitmrq fitmrq(fgauss);
 
     // calculate expectations of
     double x_int, x_weighted_int, y_int, y_weighted_int, z_int, z_weighted_int;

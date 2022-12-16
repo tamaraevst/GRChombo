@@ -423,6 +423,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double chi1_1 = pow(g_xx_11 * g_yy_11 * g_zz_11, n_power);
         //This is \chi^B(x_B)
         double chi2_2 = pow(g_xx_22 * g_yy_22 * g_zz_22, n_power);
+
+        if (BS_BH_binary)
+        {
+            double chi2_2 = 1000000;
+        }
             
         //This is \delta_A
         double delta_1 = chi1_1 - chi_1;
