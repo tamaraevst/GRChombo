@@ -31,6 +31,8 @@ void BosonStar::compute_1d_solution(const double max_r)
         
         pout() << "Setting initial conditions for Star 1" << endl;
         m_1d_sol.set_initialcondition_params(m_params_BosonStar,m_params_potential,max_r);
+        int initial_data_construction = m_params_BosonStar.id_choice;
+        pout() << "I am running initial data choice No: " << initial_data_construction << endl;
         pout() << "Running the solver for Star 1" << endl;
         m_1d_sol.main();
         pout() << "Completed for star 1" << endl;
@@ -295,8 +297,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //Plain superposition 
     if (initial_data_choice == 0)
     {
-        pout() << "I'm using plain superposition for initial data" << endl;
-
         g_xx = g_xx_1 + g_xx_2 - 1.0;
         g_yy = g_yy_1 + g_yy_2 - 1.0;
         g_zz = g_zz_1 + g_zz_2 - 1.0;
@@ -334,8 +334,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //Thomas' trick
     if (initial_data_choice == 1)
     {
-        pout() << "I'm using equal-mass fix for initial data superposition" << endl;
-
         g_xx = g_xx_1 + g_xx_2 - helferLL[0][0];
         g_yy = g_yy_1 + g_yy_2 - helferLL[1][1];
         g_zz = g_zz_1 + g_zz_2 - helferLL[2][2];
@@ -371,8 +369,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     //Our new method of fixing the conformal factor (with arbitrary n power) to its central equilibrium value
     if (initial_data_choice == 2)
     {
-        pout() << "I'm using improved method using the fix with the conformal factor for initial data superposition" << endl;
-
         //If one uses fixing conformal trick, we need to have the vales of the metric of star 1 at its centre
         double r_11 = 0.;
         double p_11 = m_1d_sol.get_p_interp(r_11);
