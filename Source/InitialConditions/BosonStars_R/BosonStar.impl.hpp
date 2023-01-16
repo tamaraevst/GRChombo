@@ -69,6 +69,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double rapidity2 = m_params_BosonStar2.BS_rapidity;
     bool binary = m_params_BosonStar.BS_binary;
     bool BS_BH_binary = m_params_BosonStar.BS_BH_binary;
+    bool antiboson = m_params_BosonStar.antiboson;
     double M = m_params_BosonStar.BlackHoleMass;
     double separation = m_params_BosonStar.BS_separation;
     double impact_parameter = m_params_BosonStar.BS_impact_parameter;
@@ -232,6 +233,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         pc_os = psi_ * psi_ * c_ *c_ - omega_ * omega_ * s_ * s_;
         lapse_2 = omega_ * psi_ / (sqrt(pc_os));
         w_ = m_1d_sol2.get_w();
+        if (antiboson)
+        {
+            phase_ = - (w_ * t);
+        }
         phase_ = w_ * t;
         beta_x = s_ * c_ * (psi_ * psi_ - omega_ * omega_) / (pc_os);
         vars.shift[0] += beta_x;

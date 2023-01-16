@@ -19,6 +19,7 @@ struct BosonStar_params_t
     double BS_impact_parameter;
     bool BS_binary;
     bool BS_BH_binary;
+    bool antiboson;
     double Newtons_constant;
     double BlackHoleMass;
     double BS_rapidity;
