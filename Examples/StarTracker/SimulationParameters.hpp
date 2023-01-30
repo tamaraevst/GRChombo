@@ -51,6 +51,7 @@ public:
         pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("BS_binary", bosonstar_params.BS_binary, false);
         pp.load("BS_BH_binary", bosonstar_params.BS_BH_binary, false);
+        pp.load("antiboson", bosonstar_params.antiboson, false);
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
