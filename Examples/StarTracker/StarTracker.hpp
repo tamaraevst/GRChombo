@@ -56,6 +56,8 @@ class StarTracker
 
     void test();
 
+    double gaussian(double x, double a, double b, double c);
+
     ALWAYS_INLINE void
     set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {

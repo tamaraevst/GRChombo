@@ -9,10 +9,12 @@
 #include "InterpolationQuery.hpp"
 #include "SmallDataIO.hpp"   // for writing data
 #include "UserVariables.hpp" // for writing data
-#include "nr3.h"
-#include "GaussJ.hpp"
-#include "FitMRQ.hpp"
-#include "FitExample.hpp"
+#include "CurveFit.hpp"
+
+// #include "nr3.h"
+// #include "GaussJ.hpp"
+// #include "FitMRQ.hpp"
+// #include "FitExample.hpp"
 
 //! Set punctures post restart
 void StarTracker::test()
@@ -20,9 +22,15 @@ void StarTracker::test()
     std::cout << "test shout for STAMR ! " << std::endl;
 }
 
+double StarTracker::gaussian(double x, double a, double b, double c)
+{
+    const double z = (x - b) / c;
+    return a * exp(-0.5 * z * z);
+}
+
 void StarTracker::update_star_centres(int a_field_index)
 {
-    int i_tot = m_num_stars * m_resolution * 3;
+    int i_tot = m_resolution;
     int i_max = m_num_stars * 3;
     int n1, n2, n3;
     double delta;
@@ -33,39 +41,23 @@ void StarTracker::update_star_centres(int a_field_index)
     std::vector<double> a_vector(i_tot);
     std::vector<double> vals(i_tot);
 
-    // setup positions in a 3d cross about old centre
-    for (int n = 0; n < m_num_stars; n++)
-    {
-        n1 = 3 * n;     // index of x gaussian
-        n2 = 3 * n + 1; // index of y gaussian
-        n3 = 3 * n + 2; // index of z gaussian
-
         for (int i = 0; i < m_resolution; i++)
         {
 
             delta = m_width * (double(i) / double(m_resolution - 1) - 0.5);
 
-            x_coords[n1 * m_resolution + i] = m_star_coords[3 * n] + delta;
-            y_coords[n1 * m_resolution + i] = m_star_coords[3 * n + 1];
-            z_coords[n1 * m_resolution + i] = m_star_coords[3 * n + 2];
+            x_coords[i] = m_star_coords[0] + delta;
+            y_coords[i] = m_star_coords[ 1];
+            z_coords[i] = m_star_coords[2];
 
-            x_coords[n2 * m_resolution + i] = m_star_coords[3 * n];
-            y_coords[n2 * m_resolution + i] = m_star_coords[3 * n + 1] + delta;
-            z_coords[n2 * m_resolution + i] = m_star_coords[3 * n + 2];
+            // x_coords[n2 * m_resolution + i] = m_star_coords[3 * n];
+            // y_coords[n2 * m_resolution + i] = m_star_coords[3 * n + 1] + delta;
+            // z_coords[n2 * m_resolution + i] = m_star_coords[3 * n + 2];
 
-            x_coords[n3 * m_resolution + i] = m_star_coords[3 * n];
-            y_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 1];
-            z_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 2] + delta;
-            
-            sigma_vector[n1 * m_resolution + i] = 0.0;
-            sigma_vector[n2 * m_resolution + i] = 0.0;
-            sigma_vector[n3 * m_resolution + i] = 0.0;
-
-            a_vector[n1 * m_resolution + i] = 0.0;
-            a_vector[n2 * m_resolution + i] = 0.0;
-            a_vector[n3 * m_resolution + i] = 0.0;
+            // x_coords[n3 * m_resolution + i] = m_star_coords[3 * n];
+            // y_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 1];
+            // z_coords[n3 * m_resolution + i] = m_star_coords[3 * n + 2] + delta;
         }
-    }
 
     // interpolate field values on 3d cross
     m_interpolator->refresh();
@@ -77,15 +69,14 @@ void StarTracker::update_star_centres(int a_field_index)
                   VariableType::diagnostic);
     m_interpolator->interp(query);
 
-    Fitmrq fitmrq(x_coords, vals, sigma_vector, a_vector, fgauss);
-    Fitmrq fit();
+    auto r = curve_fit(gaussian, {1.0, 0.0, 1.0}, x_coords, vals);
 
-    for (int n = 0; n < m_num_stars; n++)
-    {
-         m_star_coords[n1] = a_vector[n1];
-         m_star_coords[n2] = a_vector[n1];
-         m_star_coords[n3] = a_vector[n1];
-    }
+    std::cout << "result: " << r[0] << ' ' << r[1] << ' ' << r[2] << '\n';
+
+
+    m_star_coords[0] = r[0] + m_centre[0];
+    m_star_coords[1] = r[0];
+    m_star_coords[2] = r[0];
     // m_star_coords[n2] = y_weighted_int / y_int;
     // m_star_coords[n3] = z_weighted_int / z_int;
 

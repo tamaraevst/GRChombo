@@ -10,6 +10,8 @@
 #		$(error The BosonStar example requires BOOST_ROOT to be set to the root of the boost library directory.)
 #endif
 
+XTRALIBFLAGS = -lgsl
+
 GRCHOMBO_SOURCE = ../../Source
 
 ebase := Main_BosonStar
