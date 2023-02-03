@@ -175,6 +175,7 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
         }    
 
         m_star_coords[3 * num_star] = sum1 / sum2;
+        std::cout << sum1 / sum2 << std::endl;
     }
 
     if (direction == 1)

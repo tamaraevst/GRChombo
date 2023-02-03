@@ -319,7 +319,7 @@ void BosonStarLevel::doAnalysis()
                 "StarCentres", m_dt, m_time, m_restart_time, first_step);
         }
 
-        m_st_amr.m_star_tracker.update_star_centres(c_mod_phi, m_dt);
+        m_st_amr.m_star_tracker.update_star_centres(c_mod_chi, m_dt);
         m_st_amr.m_star_tracker.write_to_dat("StarCentres", m_dt, m_time,
                                              m_restart_time, first_step);
     }
