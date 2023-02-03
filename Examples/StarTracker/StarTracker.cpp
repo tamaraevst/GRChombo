@@ -103,14 +103,124 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
     }
 }
 
-void StarTracker::update_star_centres(int a_field_index, std::string direction)
+void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
+{
+    double delta;
+
+    std::vector<double> x_coords(m_points);
+    std::vector<double> y_coords(m_points);
+    std::vector<double> z_coords(m_points);
+
+    std::vector<double> sigma_vector(m_points);
+    std::vector<double> a_vector(3);
+    std::vector<double> vals(m_points);
+    std::vector<double> vals_f(m_points);
+
+    for (int i = 0; i < m_points; i++)
+    {
+        delta = m_width * (double(i) / double(m_points - 1) - 0.5);
+
+        if (direction == 0 )
+        {
+            x_coords[i] = m_star_coords[3 * num_star] + delta;
+            y_coords[i] = m_star_coords[3 * num_star + 1];
+            z_coords[i] = m_star_coords[3 * num_star + 2];
+        }
+
+        if (direction == 1 )
+        {
+            x_coords[i] = m_star_coords[3 * num_star];
+            y_coords[i] = m_star_coords[3 * num_star + 1] + delta;
+            z_coords[i] = m_star_coords[3 * num_star + 2];
+        }
+
+        if (direction == 2 )
+        {
+            x_coords[i] = m_star_coords[3 * num_star];
+            y_coords[i] = m_star_coords[3 * num_star + 1];
+            z_coords[i] = m_star_coords[3 * num_star + 2] + delta;
+        }
+
+        sigma_vector[i] = 1.0;
+    }
+ 
+    m_interpolator->refresh();
+    InterpolationQuery query(m_points);
+    query.setCoords(0, x_coords.data());
+    query.setCoords(1, y_coords.data());
+    query.setCoords(2, z_coords.data());
+    query.addComp(a_field_index, vals.data(), Derivative::LOCAL,
+                  VariableType::evolution);
+    m_interpolator->interp(query);
+
+    for (int i = 0; i < m_points; i++)
+    {
+    	vals_f[i] = 1 - vals[i];	
+    }
+
+    double fmax = *max_element(vals_f.begin(), vals_f.end());
+    double fmin = *min_element(vals_f.begin(), vals_f.end());
+
+    std::vector<double> weight(m_points);
+    double sum1 = 0.0;
+    double sum2 = 0.0;
+
+    if (direction == 0)
+    {
+        for (int i = 0; i < m_points; i++)
+        {
+            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 += x_coords[3 * num_star] * weight[i];
+            sum2 += weight[i];
+        }    
+
+        m_star_coords[3 * num_star] = sum1 / sum2;
+    }
+
+    if (direction == 1)
+    {
+        for (int i = 0; i < m_points; i++)
+        {
+            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 += y_coords[3 * num_star + 1] * weight[i];
+            sum2 += weight[i];
+        }    
+
+        m_star_coords[3 * num_star + 1] = sum1 / sum2;
+    }
+
+    if (direction == 2)
+    {
+        for (int i = 0; i < m_points; i++)
+        {
+            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 += z_coords[3 * num_star + 2] * weight[i];
+            sum2 += weight[i];
+        }    
+
+        m_star_coords[3 * num_star + 2] = sum1 / sum2;
+    }
+
+}
+
+void StarTracker::update_star_centres(int a_field_index, double a_dt)
 {
     if (m_direction == "x")
     {
         double starA_0 = find_centre(a_field_index, 0, 0);
-        m_star_coords[0] = starA_0;
+        if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0)
+            {m_star_coords[0] = starA_0;}
+        else 
+            {
+                find_max_min(a_field_index, 0, 0);
+            }
         double starB_0 = find_centre(a_field_index, 1, 0);
-        m_star_coords[3] = starB_0;
+        if ((abs(starB_0 - m_star_coords[3]) / a_dt) < 1.0)
+            {m_star_coords[3] = starB_0;}
+        else 
+            {
+                find_max_min(a_field_index, 1, 0);
+            }
     }
 
     if (m_direction == "xy")

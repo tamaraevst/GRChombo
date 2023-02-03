@@ -67,7 +67,9 @@ class StarTracker
 
     double find_centre(int a_field_index, int num_star, int direction);
 
-    void update_star_centres(int a_field_index, std::string a_direction);
+    void find_max_min(int a_field_index, int num_star, int direction);
+
+    void update_star_centres(int a_field_index, double a_dt);
 
     // void get_star_centres(std::vector<double> &a_centre);
 
