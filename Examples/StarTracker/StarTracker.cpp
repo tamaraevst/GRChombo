@@ -103,21 +103,44 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
     }
 }
 
-void StarTracker::update_star_centres(int a_field_index)
+void StarTracker::update_star_centres(int a_field_index, std::string direction)
 {
-    double starA_0 = find_centre(a_field_index, 0, 0);
-    m_star_coords[0] = starA_0;
-    double starA_1 = find_centre(a_field_index, 0, 1);
-    m_star_coords[1] = starA_1;
-    double starA_2 = find_centre(a_field_index, 0, 2);
-    m_star_coords[2] = starA_2;
+    if (m_direction == "x")
+    {
+        double starA_0 = find_centre(a_field_index, 0, 0);
+        m_star_coords[0] = starA_0;
+        double starB_0 = find_centre(a_field_index, 1, 0);
+        m_star_coords[3] = starB_0;
+    }
 
-    double starB_0 = find_centre(a_field_index, 1, 0);
-    m_star_coords[3] = starB_0;
-    double starB_1 = find_centre(a_field_index, 1, 1);
-    m_star_coords[4] = starB_1;
-    double starB_2 = find_centre(a_field_index, 1, 2);
-    m_star_coords[5] = starB_2;
+    if (m_direction == "xy")
+    {
+        double starA_0 = find_centre(a_field_index, 0, 0);
+        m_star_coords[0] = starA_0;
+        double starA_1 = find_centre(a_field_index, 0, 1);
+        m_star_coords[1] = starA_1;
+        double starB_0 = find_centre(a_field_index, 1, 0);
+        m_star_coords[3] = starB_0;
+        double starB_1 = find_centre(a_field_index, 1, 1);
+        m_star_coords[4] = starB_1;
+    }
+
+    if (m_direction == "xyz")
+    {
+        double starA_0 = find_centre(a_field_index, 0, 0);
+        m_star_coords[0] = starA_0;
+        double starA_1 = find_centre(a_field_index, 0, 1);
+        m_star_coords[1] = starA_1;
+        double starA_2 = find_centre(a_field_index, 0, 2);
+        m_star_coords[2] = starA_2;
+
+        double starB_0 = find_centre(a_field_index, 1, 0);
+        m_star_coords[3] = starB_0;
+        double starB_1 = find_centre(a_field_index, 1, 1);
+        m_star_coords[4] = starB_1;
+        double starB_2 = find_centre(a_field_index, 1, 2);
+        m_star_coords[5] = starB_2;
+    }
 }
 
 void StarTracker::write_to_dat(std::string a_filename, double a_dt,

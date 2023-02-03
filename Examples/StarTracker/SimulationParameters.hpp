@@ -9,6 +9,7 @@
 // General includes
 #include "GRParmParse.hpp"
 #include "SimulationParametersBase.hpp"
+#include <string>
 
 // Problem specific includes:
 #include "ComplexPotential.hpp"
@@ -87,6 +88,7 @@ public:
                 3 * number_of_stars);
         pp.load("star_points", star_points, 21);
         pp.load("star_track_width", star_track_width, 20.);
+        pp.load("direction_of_motion", star_track_direction_of_motion);
         pp.load("star_track_level", star_track_level, 0);
 
         // Mass extraction
@@ -183,6 +185,7 @@ public:
     std::vector<double> initial_star_centres;
     int star_points;
     double star_track_width;
+    std::string star_track_direction_of_motion;
     int star_track_level;
     int flux_extraction_level; // specifies times (level) to do angmom flux extraction
 };
