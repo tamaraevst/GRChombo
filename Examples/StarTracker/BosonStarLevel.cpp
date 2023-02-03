@@ -264,7 +264,7 @@ void BosonStarLevel::doAnalysis()
         }
 
         // Compute the maximum of mod_phi and write it to a file
-        double mod_phi_max = amr_reductions.max(c_mod_phi);
+        double mod_phi_max = amr_reductions.max(c_chi);
         SmallDataIO mod_phi_max_file("mod_phi_max", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
@@ -309,7 +309,8 @@ void BosonStarLevel::doAnalysis()
     }
 
     if (m_p.do_star_track && m_level == m_p.star_track_level)
-    {
+    {    
+	pout() << "Running a star tracker now" << endl;
         // if at restart time read data from dat file,
         // will default to param file if restart time is 0
         if (fabs(m_time - m_restart_time) < m_dt * 1.1)

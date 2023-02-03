@@ -20,7 +20,7 @@ class StarTracker
     std::vector<double> m_star_coords;
     std::array<double, CH_SPACEDIM> m_centre;
     int m_tracking_level; // level (i.e. times) to execute tracking
-    int m_resolution;     // number of points n, (2n + 1 points to integrate)
+    int m_points;     // number of points n, (2n + 1 points to integrate)
     double m_width;
     std::string m_punctures_filename;
 
@@ -37,11 +37,11 @@ class StarTracker
     void initial_setup(std::array<double, CH_SPACEDIM> a_star_track_centre,
                        bool a_do_star_track, int a_number_of_stars,
                        std::vector<double> a_initial_star_centres,
-                       int a_star_track_resolution, double a_star_track_width)
+                       int a_star_points, double a_star_track_width)
     {
         m_num_stars = a_number_of_stars;
         m_star_coords = a_initial_star_centres;
-        m_resolution = a_star_track_resolution;
+        m_points = a_star_points;
         m_width = a_star_track_width;
         m_centre = a_star_track_centre;
 
@@ -54,7 +54,7 @@ class StarTracker
         }
     }
 
-    void test();
+    // void test();
 
     double gaussian(double x, double a, double b, double c);
 
@@ -64,9 +64,11 @@ class StarTracker
         m_interpolator = a_interpolator;
     }
 
+    double find_centre(int a_field_index, int num_star, int direction);
+
     void update_star_centres(int a_field_index);
 
-    void get_star_centres(std::vector<double> &a_centre);
+    // void get_star_centres(std::vector<double> &a_centre);
 
     void write_to_dat(std::string a_filename, double a_dt, double a_time,
                       double a_restart_time, bool a_first_step);
@@ -75,10 +77,10 @@ class StarTracker
                                   double a_time, double a_restart_time,
                                   bool a_first_step);
 
-    void
-    get_field_value_at_centres(int a_field_index,
-                               std::vector<double> &a_out_data,
-                               AMRInterpolator<Lagrange<4>> *a_interpolator);
+    // void
+    // get_field_value_at_centres(int a_field_index,
+    //                            std::vector<double> &a_out_data,
+    //                            AMRInterpolator<Lagrange<4>> *a_interpolator);
 
   private:
 };

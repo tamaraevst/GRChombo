@@ -85,7 +85,7 @@ public:
         pp.load("number_of_stars", number_of_stars, 1);
         pp.load("initial_star_centres", initial_star_centres,
                 3 * number_of_stars);
-        pp.load("star_track_resolution", star_track_resolution, 21);
+        pp.load("star_points", star_points, 21);
         pp.load("star_track_width", star_track_width, 20.);
         pp.load("star_track_level", star_track_level, 0);
 
@@ -181,7 +181,7 @@ public:
     bool do_star_track;
     int number_of_stars;
     std::vector<double> initial_star_centres;
-    int star_track_resolution;
+    int star_points;
     double star_track_width;
     int star_track_level;
     int flux_extraction_level; // specifies times (level) to do angmom flux extraction

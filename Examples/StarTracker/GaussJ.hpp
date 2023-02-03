@@ -3,8 +3,9 @@
 #include "TensorAlgebra.hpp"
 #include "VarsTools.hpp"
 #include "simd.hpp"
+#include "Matrix.hpp"
 
-template <class data_t> void gaussj(Tensor<2, data_t> &a, Tensor<2, data_t> &b)
+void gaussj(Matrix &a, Matrix &b)
 {
 	int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	double big,dum,pivinv;
@@ -16,8 +17,8 @@ template <class data_t> void gaussj(Tensor<2, data_t> &a, Tensor<2, data_t> &b)
 			if (ipiv[j] != 1)
 				for (k=0;k<n;k++) {
 					if (ipiv[k] == 0) {
-						if (abs(a[j][k]) >= big) {
-							big=abs(a[j][k]);
+						if (abs(a.At(j,k)) >= big) {
+							big=abs(a.At(j,k));
 							irow=j;
 							icol=k;
 						}
@@ -25,33 +26,35 @@ template <class data_t> void gaussj(Tensor<2, data_t> &a, Tensor<2, data_t> &b)
 				}
 		++(ipiv[icol]);
 		if (irow != icol) {
-			for (l=0;l<n;l++) SWAP(a[irow][l],a[icol][l]);
-			for (l=0;l<m;l++) SWAP(b[irow][l],b[icol][l]);
+			for (l=0;l<n;l++) SWAP(a.At(irow,l),a.At(icol,l));
+			for (l=0;l<m;l++) SWAP(b.At(irow,l),b.At(icol,l));
 		}
 		indxr[i]=irow;
 		indxc[i]=icol;
-		if (a[icol][icol] == 0.0) throw("gaussj: Singular Matrix");
-		pivinv=1.0/a[icol][icol];
-		a[icol][icol]=1.0;
-		for (l=0;l<n;l++) a[icol][l] *= pivinv;
-		for (l=0;l<m;l++) b[icol][l] *= pivinv;
+		if (a.At(icol,icol) == 0.0) throw("gaussj: Singular Matrix");
+		pivinv=1.0/a.At(icol,icol);
+		a.At(icol,icol)=1.0;
+		for (l=0;l<n;l++) a.At(icol,l) *= pivinv;
+		for (l=0;l<m;l++) b.At(icol,l) *= pivinv;
 		for (ll=0;ll<n;ll++)
 			if (ll != icol) {
-				dum=a[ll][icol];
-				a[ll][icol]=0.0;
-				for (l=0;l<n;l++) a[ll][l] -= a[icol][l]*dum;
-				for (l=0;l<m;l++) b[ll][l] -= b[icol][l]*dum;
+				dum=a.At(ll,icol);
+				a.At(ll,icol)=0.0;
+				for (l=0;l<n;l++) a.At(ll,l) -= a.At(icol,l)*dum;
+				for (l=0;l<m;l++) b.At(ll,l) -= b.At(icol,l)*dum;
 			}
 	}
 	for (l=n-1;l>=0;l--) {
 		if (indxr[l] != indxc[l])
 			for (k=0;k<n;k++)
-				SWAP(a[k][indxr[l]],a[k][indxc[l]]);
+				SWAP(a.At(k,indxr[l]),a.At(k,indxc[l]));
 	}
 }
 
-template <class data_t> void gaussj(Tensor<2, data_t> &a)
+void gaussj(Matrix &a)
 {
-	Tensor<2, data_t> b(a.nrows(),0);
+	Matrix b(a.nrows(),0);
 	gaussj(a,b);
 }
+
+
