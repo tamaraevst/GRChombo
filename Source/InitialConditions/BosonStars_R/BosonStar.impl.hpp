@@ -495,11 +495,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             double profile2 = weight.profile_chi(starB_centre[0] * cosh(-rapidity2), starB_centre[1], starB_centre[2], radius_width2);
             
             double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
-            double argument_xB_xA = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-            double profile_12 = weight.profile_chi(argument_xB_xA, 0., 0., radius_width1);
+            double argument_xB_xA = starB_centre[0] * cosh(-rapidity2) - starA_centre[0] * cosh(rapidity);
+            double argument_yB_yA = starB_centre[1] - starA_centre[1];
+            double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
             
-            double argument_xA_xB =  (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-            double profile_21 = weight.profile_chi(argument_xA_xB, 0., 0., radius_width2);
+            double argument_xA_xB = starA_centre[0] * cosh(rapidity) - starB_centre[0] * cosh(-rapidity2);
+            double argument_yA_yB = starA_centre[1] - starB_centre[1];
+            double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
             double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
 
             double value1 = (-profile_21 * delta_2 + profile_22 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
