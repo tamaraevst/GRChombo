@@ -101,6 +101,8 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
         fitmrq1.fit();
         return fitmrq1.a[1];
     }
+
+    return 0;
 }
 
 void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
@@ -161,7 +163,7 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
     double fmax = *max_element(vals_f.begin(), vals_f.end());
     double fmin = *min_element(vals_f.begin(), vals_f.end());
 
-    std::vector<double> weight(m_points);
+    double weight;
     double sum1 = 0.0;
     double sum2 = 0.0;
 
@@ -169,9 +171,9 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
     {
         for (int i = 0; i < m_points; i++)
         {
-            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
-            sum1 += x_coords[3 * num_star] * weight[i];
-            sum2 += weight[i];
+            weight = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 = sum1 + x_coords[i] * weight;
+            sum2 = sum2 + weight;
         }    
 
         m_star_coords[3 * num_star] = sum1 / sum2;
@@ -182,9 +184,9 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
     {
         for (int i = 0; i < m_points; i++)
         {
-            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
-            sum1 += y_coords[3 * num_star + 1] * weight[i];
-            sum2 += weight[i];
+            weight = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 += y_coords[i] * weight;
+            sum2 += weight;
         }    
 
         m_star_coords[3 * num_star + 1] = sum1 / sum2;
@@ -194,9 +196,9 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
     {
         for (int i = 0; i < m_points; i++)
         {
-            weight[i] = (vals_f[i] - fmin) / (fmax - fmin);
-            sum1 += z_coords[3 * num_star + 2] * weight[i];
-            sum2 += weight[i];
+            weight = (vals_f[i] - fmin) / (fmax - fmin);
+            sum1 += z_coords[i] * weight;
+            sum2 += weight;
         }    
 
         m_star_coords[3 * num_star + 2] = sum1 / sum2;
