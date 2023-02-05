@@ -68,6 +68,8 @@ public:
         // and then assign that ones that should differ below
         bosonstar2_params = bosonstar_params;
 
+        pp.load("BS_position2", bosonstar2_params.position);
+
         // Are the two stars' profiles identical
         pp.load("identical", identical, false);
 
@@ -77,9 +79,7 @@ public:
             pp.load("central_amplitude_CSF2",
                     bosonstar2_params.central_amplitude_CSF);
             pp.load("BS_rapidity2",
-                    bosonstar2_params.BS_rapidity);
-            pp.load("BS_position2", bosonstar2_params.position);
-        
+                    bosonstar2_params.BS_rapidity);        
         }
 
         // Star Tracking
