@@ -106,7 +106,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     }
     double z = coords.z; //set /tilde{t} to zero
     // double y = coords.y + impact_parameter / 2.;
-    double y = coords.y + starA_centre[0];
+    double y = coords.y + starA_centre[1];
     double r = sqrt(x * x + y * y + z * z);
 
     // First star physical variables
@@ -177,8 +177,7 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double t_p = (-separation) * s_; //set /tilde{t} to zero
     double x_p = (-separation) * c_;
     double z_p = 0.; //set /tilde{t} to zero
-    // double y_p = impact_parameter;
-    double y_p = starB_centre[0];
+    double y_p = impact_parameter;
     double r_p = sqrt(x_p * x_p + y_p * y_p + z_p * z_p);
     double p_p = m_1d_sol.get_p_interp(r_p);
     double dp_p = m_1d_sol.get_dp_interp(r_p);
