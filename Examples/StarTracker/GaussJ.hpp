@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include "DimensionDefinitions.hpp"
 #include "Tensor.hpp"
 #include "TensorAlgebra.hpp"
@@ -31,7 +33,7 @@ void gaussj(Matrix &a, Matrix &b)
 		}
 		indxr[i]=irow;
 		indxc[i]=icol;
-		if (a.At(icol,icol) == 0.0) throw("gaussj: Singular Matrix");
+		if (a.At(icol,icol) == 0.0) throw std::runtime_error("gaussj: Singular Matrix");
 		pivinv=1.0/a.At(icol,icol);
 		a.At(icol,icol)=1.0;
 		for (l=0;l<n;l++) a.At(icol,l) *= pivinv;

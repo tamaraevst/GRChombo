@@ -24,6 +24,7 @@ double StarTracker::gaussian(double x, double a, double b, double c)
 
 double StarTracker::find_centre(int a_field_index, int num_star, int direction)
 {
+    int success;
     double delta;
 
     std::vector<double> x_coords(m_points);
@@ -77,29 +78,35 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
     	vals_f[i] = 1 - vals[i];	
     }
      
-    a_vector[0] = 1 - vals[int(m_points/2)];
+    a_vector[0] = 1 - vals[(m_points-1)/2];
     a_vector[1] = m_star_coords[3 * num_star];
     a_vector[2] = 1.;
 
     if (direction == 0 )
     {
         Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
-        fitmrq1.fit();
-        return fitmrq1.a[1];
+        success = fitmrq1.fit();
+        if (success == 1)
+	{return fitmrq1.a[1];}
+	else {return 0;}
     }
 
     if (direction == 1 )
     {
         Fitmrq fitmrq1(y_coords, vals_f, sigma_vector, a_vector, fgauss);
-        fitmrq1.fit();
-        return fitmrq1.a[1];
+        success = fitmrq1.fit();
+	if (success == 1)
+        {return fitmrq1.a[1];}
+        else {return 0;}
     }
 
     if (direction == 2 )
     {
         Fitmrq fitmrq1(z_coords, vals_f, sigma_vector, a_vector, fgauss);
-        fitmrq1.fit();
-        return fitmrq1.a[1];
+        success = fitmrq1.fit();
+        if (success == 1)
+        {return fitmrq1.a[1];}
+        else {return 0;}
     }
 
     return 0;
@@ -177,7 +184,6 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
         }    
 
         m_star_coords[3 * num_star] = sum1 / sum2;
-        std::cout << sum1 / sum2 << std::endl;
     }
 
     if (direction == 1)
@@ -190,6 +196,7 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
         }    
 
         m_star_coords[3 * num_star + 1] = sum1 / sum2;
+   	std::cout<<m_star_coords[1]<<std::endl;
     }
 
     if (direction == 2)
@@ -211,14 +218,14 @@ void StarTracker::update_star_centres(int a_field_index, double a_dt)
     if (m_direction == "x")
     {
         double starA_0 = find_centre(a_field_index, 0, 0);
-        if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0)
+        if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0 && starA_0 != 0)
             {m_star_coords[0] = starA_0;}
         else 
             {
                 find_max_min(a_field_index, 0, 0);
             }
         double starB_0 = find_centre(a_field_index, 1, 0);
-        if ((abs(starB_0 - m_star_coords[3]) / a_dt) < 1.0)
+        if ((abs(starB_0 - m_star_coords[3]) / a_dt) < 1.0 && starB_0 != 0)
             {m_star_coords[3] = starB_0;}
         else 
             {
@@ -229,14 +236,34 @@ void StarTracker::update_star_centres(int a_field_index, double a_dt)
     if (m_direction == "xy")
     {
         double starA_0 = find_centre(a_field_index, 0, 0);
-        m_star_coords[0] = starA_0;
+	if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0 && starA_0 != 0)
+            {m_star_coords[0] = starA_0;}
+        else
+            {
+                find_max_min(a_field_index, 0, 0);
+	    }
         double starA_1 = find_centre(a_field_index, 0, 1);
-        m_star_coords[1] = starA_1;
+	if (abs((starA_1 - m_star_coords[1]) / a_dt) < 1.0 && starA_1 != 0)
+            {m_star_coords[1] = starA_1;}
+        else
+            {
+                find_max_min(a_field_index, 0, 1);
+	    }
         double starB_0 = find_centre(a_field_index, 1, 0);
-        m_star_coords[3] = starB_0;
+        if (abs((starB_0 - m_star_coords[3]) / a_dt) < 1.0 && starB_0 != 0)
+            {m_star_coords[3] = starB_0;}
+        else
+            {
+                find_max_min(a_field_index, 1, 0);
+	    }
         double starB_1 = find_centre(a_field_index, 1, 1);
-        m_star_coords[4] = starB_1;
-    }
+        if (abs((starB_1 - m_star_coords[4]) / a_dt) < 1.0, starB_1 != 0)
+            {m_star_coords[4] = starB_1;}
+        else
+            {
+                find_max_min(a_field_index, 1, 1);
+	    }
+     }
 
     if (m_direction == "xyz")
     {

@@ -264,7 +264,7 @@ void BosonStarLevel::doAnalysis()
         }
 
         // Compute the maximum of mod_phi and write it to a file
-        double mod_phi_max = amr_reductions.max(c_chi);
+        double mod_phi_max = amr_reductions.max(c_mod_phi);
         SmallDataIO mod_phi_max_file("mod_phi_max", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
@@ -278,7 +278,7 @@ void BosonStarLevel::doAnalysis()
 
 
         // Compute the min of chi and write it to a file
-        double min_chi = amr_reductions.min(c_chi);
+        double min_chi = amr_reductions.min(c_mod_phi);
         SmallDataIO min_chi_file("min_chi", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,

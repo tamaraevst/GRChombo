@@ -2,12 +2,13 @@
 #define FITMRQ_HPP_
 
 #include "Matrix.hpp"
+#include <stdexcept>
 
 class Fitmrq 
 {
 	public:
 
-	static const int NDONE=4, ITMAX=1000;
+	static const int NDONE=4, ITMAX=5000;
 	int ndat, ma, mfit;
 	std::vector<double> &x,&y,&sig;
 	double tol;
@@ -23,7 +24,7 @@ class Fitmrq
 		for (int i=0;i<ma;i++) ia[i] = true;
 	}
 
-	void fit() {
+	int fit() {
 		//std::cout<<"Entering the fit function" << std::endl;
 		int j,k,l,iter,done=0;
 		double alamda=.001,ochisq;
@@ -77,7 +78,8 @@ class Fitmrq
 				chisq=ochisq;
 			}
 		}
-		throw("Fitmrq too many iterations");
+		//throw std::runtime_error("Fitmrq too many iterations");
+		return 0;
 	}
 
 	void hold(const int i, const double val) {ia[i]=false; a[i]=val;}
