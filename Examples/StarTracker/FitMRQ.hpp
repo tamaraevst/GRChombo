@@ -8,7 +8,7 @@ class Fitmrq
 {
 	public:
 
-	static const int NDONE=4, ITMAX=5000;
+	static const int NDONE=4, ITMAX=1000;
 	int ndat, ma, mfit;
 	std::vector<double> &x,&y,&sig;
 	double tol;
@@ -58,7 +58,7 @@ class Fitmrq
 			if (done==NDONE) {
 				covsrt(covar);
 				covsrt(alpha);
-				return;
+				return 1;
 			}
 			for (j=0,l=0;l<ma;l++)
 				if (ia[l]) atry[l]=a[l]+da[j++];
