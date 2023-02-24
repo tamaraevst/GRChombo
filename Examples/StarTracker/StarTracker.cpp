@@ -63,28 +63,34 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
 
         sigma_vector[i] = 1.0;
     }
-
-    m_interpolator->refresh();
+    
+    std::cout << m_star_coords[2]<<std::endl;
+    
+    bool fill_ghosts = false;
+    m_interpolator->refresh(fill_ghosts);
+    
+    //m_interpolator->fill_multilevel_ghosts(
+    //    VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
+    //m_interpolator->refresh();
     InterpolationQuery query(m_points);
-    query.setCoords(0, x_coords.data());
-    query.setCoords(1, y_coords.data());
-    query.setCoords(2, z_coords.data());
-    query.addComp(a_field_index, vals.data(), Derivative::LOCAL,
-                  VariableType::evolution);
+    query.setCoords(0, x_coords.data())
+    	.setCoords(1, y_coords.data())
+    	.setCoords(2, z_coords.data())
+    	.addComp(a_field_index, vals.data());
     m_interpolator->interp(query);
 
     for (int i = 0; i < m_points; i++)
     {
     	vals_f[i] = 1 - vals[i];	
     }
-
+     
     if (direction == 0 )
     {
 	a_vector[0] = 1 - vals[(m_points-1)/2];
-        a_vector[1] = m_star_coords[3 * num_star];
-        a_vector[2] = 1.;
-
-        Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
+    	a_vector[1] = m_star_coords[3 * num_star];
+    	a_vector[2] = 1.;
+        
+	Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
         success = fitmrq1.fit();
         if (success == 1)
 	{return fitmrq1.a[1];}
@@ -100,19 +106,17 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
 	Fitmrq fitmrq1(y_coords, vals_f, sigma_vector, a_vector, fgauss);
         success = fitmrq1.fit();
 	if (success == 1)
-        {std::cout << "found the coordinate" << fitmrq1.a[1] << std::endl;
-	return fitmrq1.a[1];
-	}
+        {return fitmrq1.a[1];}
         else {return 0;}
     }
 
     if (direction == 2 )
     {
 	a_vector[0] = 1 - vals[(m_points-1)/2];
-   	a_vector[1] = m_star_coords[3 * num_star + 2];
-    	a_vector[2] = 1.;        
+    	a_vector[1] = m_star_coords[3 * num_star + 2];
+    	a_vector[2] = 1.;
 
-	Fitmrq fitmrq1(z_coords, vals_f, sigma_vector, a_vector, fgauss);
+        Fitmrq fitmrq1(z_coords, vals_f, sigma_vector, a_vector, fgauss);
         success = fitmrq1.fit();
         if (success == 1)
         {return fitmrq1.a[1];}
@@ -130,6 +134,8 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
     std::vector<double> y_coords(m_points);
     std::vector<double> z_coords(m_points);
 
+    std::vector<double> sigma_vector(m_points);
+    std::vector<double> a_vector(3);
     std::vector<double> vals(m_points);
     std::vector<double> vals_f(m_points);
 
@@ -158,6 +164,7 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
             z_coords[i] = m_star_coords[3 * num_star + 2] + delta;
         }
 
+        sigma_vector[i] = 1.0;
     }
  
     m_interpolator->refresh();
@@ -203,6 +210,7 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
         }    
 
         m_star_coords[3 * num_star + 1] = sum1 / sum2;
+   	std::cout<<m_star_coords[1]<<std::endl;
     }
 
     if (direction == 2)
@@ -235,8 +243,7 @@ void StarTracker::update_star_centres(int a_field_index, double a_dt)
             {m_star_coords[3] = starB_0;}
         else 
             {
-                std::cout << "Breaching threshold" << std::endl;
-		find_max_min(a_field_index, 1, 0);
+                find_max_min(a_field_index, 1, 0);
             }
     }
 

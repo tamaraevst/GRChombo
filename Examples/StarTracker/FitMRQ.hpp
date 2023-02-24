@@ -8,7 +8,7 @@ class Fitmrq
 {
 	public:
 
-	static const int NDONE=4, ITMAX=1000;
+	static const int NDONE=4, ITMAX=5000;
 	int ndat, ma, mfit;
 	std::vector<double> &x,&y,&sig;
 	double tol;
