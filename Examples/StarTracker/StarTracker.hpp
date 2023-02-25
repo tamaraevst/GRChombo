@@ -55,21 +55,17 @@ class StarTracker
         }
     }
 
-    // void test();
-
-    double gaussian(double x, double a, double b, double c);
-
     ALWAYS_INLINE void
     set_interpolator(AMRInterpolator<Lagrange<4>> *a_interpolator)
     {
         m_interpolator = a_interpolator;
     }
 
-    double find_centre(int a_field_index, int num_star, int direction);
+    double find_centre(int num_star, int direction);
 
-    void find_max_min(int a_field_index, int num_star, int direction);
+    void find_max_min(int num_star, int direction);
 
-    void update_star_centres(int a_field_index, double a_dt);
+    void update_star_centres(double a_dt);
 
     // void get_star_centres(std::vector<double> &a_centre);
 

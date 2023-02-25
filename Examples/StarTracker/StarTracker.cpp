@@ -16,13 +16,7 @@
 #include "FitMRQ.hpp"
 #include "FitExample.hpp"
 
-double StarTracker::gaussian(double x, double a, double b, double c)
-{
-    const double z = (x - b) / c;
-    return a * exp(-0.5 * z * z);
-}
-
-double StarTracker::find_centre(int a_field_index, int num_star, int direction)
+double StarTracker::find_centre(int num_star, int direction)
 {
     int success;
     double delta;
@@ -69,14 +63,15 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
     bool fill_ghosts = false;
     m_interpolator->refresh(fill_ghosts);
     
-    //m_interpolator->fill_multilevel_ghosts(
-    //    VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
+    m_interpolator->fill_multilevel_ghosts(
+        VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
     //m_interpolator->refresh();
     InterpolationQuery query(m_points);
     query.setCoords(0, x_coords.data())
     	.setCoords(1, y_coords.data())
     	.setCoords(2, z_coords.data())
-    	.addComp(a_field_index, vals.data());
+    	.addComp(c_chi, vals.data());
+
     m_interpolator->interp(query);
 
     for (int i = 0; i < m_points; i++)
@@ -126,7 +121,7 @@ double StarTracker::find_centre(int a_field_index, int num_star, int direction)
     return 0;
 }
 
-void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
+void StarTracker::find_max_min(int num_star, int direction)
 {
     double delta;
 
@@ -167,13 +162,18 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
         sigma_vector[i] = 1.0;
     }
  
-    m_interpolator->refresh();
+    bool fill_ghosts = false;
+    m_interpolator->refresh(fill_ghosts);
+    
+    m_interpolator->fill_multilevel_ghosts(
+        VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
+    //m_interpolator->refresh();
     InterpolationQuery query(m_points);
-    query.setCoords(0, x_coords.data());
-    query.setCoords(1, y_coords.data());
-    query.setCoords(2, z_coords.data());
-    query.addComp(a_field_index, vals.data(), Derivative::LOCAL,
-                  VariableType::evolution);
+    query.setCoords(0, x_coords.data())
+    	.setCoords(1, y_coords.data())
+    	.setCoords(2, z_coords.data())
+    	.addComp(c_chi, vals.data());
+        
     m_interpolator->interp(query);
 
     for (int i = 0; i < m_points; i++)
@@ -227,72 +227,72 @@ void StarTracker::find_max_min(int a_field_index, int num_star, int direction)
 
 }
 
-void StarTracker::update_star_centres(int a_field_index, double a_dt)
+void StarTracker::update_star_centres(double a_dt)
 {
     if (m_direction == "x")
     {
-        double starA_0 = find_centre(a_field_index, 0, 0);
+        double starA_0 = find_centre(0, 0);
         if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0 && starA_0 != 0)
             {m_star_coords[0] = starA_0;}
         else 
             {
-                find_max_min(a_field_index, 0, 0);
+                find_max_min(0, 0);
             }
-        double starB_0 = find_centre(a_field_index, 1, 0);
+        double starB_0 = find_centre(1, 0);
         if ((abs(starB_0 - m_star_coords[3]) / a_dt) < 1.0 && starB_0 != 0)
             {m_star_coords[3] = starB_0;}
         else 
             {
-                find_max_min(a_field_index, 1, 0);
+                find_max_min(1, 0);
             }
     }
 
     if (m_direction == "xy")
     {
-        double starA_0 = find_centre(a_field_index, 0, 0);
+        double starA_0 = find_centre(0, 0);
 	if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0 && starA_0 != 0)
             {m_star_coords[0] = starA_0;}
         else
             {
-                find_max_min(a_field_index, 0, 0);
+                find_max_min(0, 0);
 	    }
-        double starA_1 = find_centre(a_field_index, 0, 1);
+        double starA_1 = find_centre(0, 1);
 	if (abs((starA_1 - m_star_coords[1]) / a_dt) < 1.0 && starA_1 != 0)
             {m_star_coords[1] = starA_1;}
         else
             {
-                find_max_min(a_field_index, 0, 1);
+                find_max_min(0, 1);
 	    }
-        double starB_0 = find_centre(a_field_index, 1, 0);
+        double starB_0 = find_centre(1, 0);
         if (abs((starB_0 - m_star_coords[3]) / a_dt) < 1.0 && starB_0 != 0)
             {m_star_coords[3] = starB_0;}
         else
             {
-                find_max_min(a_field_index, 1, 0);
+                find_max_min(1, 0);
 	    }
-        double starB_1 = find_centre(a_field_index, 1, 1);
+        double starB_1 = find_centre(1, 1);
         if (abs((starB_1 - m_star_coords[4]) / a_dt) < 1.0, starB_1 != 0)
             {m_star_coords[4] = starB_1;}
         else
             {
-                find_max_min(a_field_index, 1, 1);
+                find_max_min(1, 1);
 	    }
      }
 
     if (m_direction == "xyz")
     {
-        double starA_0 = find_centre(a_field_index, 0, 0);
+        double starA_0 = find_centre(0, 0);
         m_star_coords[0] = starA_0;
-        double starA_1 = find_centre(a_field_index, 0, 1);
+        double starA_1 = find_centre(0, 1);
         m_star_coords[1] = starA_1;
-        double starA_2 = find_centre(a_field_index, 0, 2);
+        double starA_2 = find_centre(0, 2);
         m_star_coords[2] = starA_2;
 
-        double starB_0 = find_centre(a_field_index, 1, 0);
+        double starB_0 = find_centre(1, 0);
         m_star_coords[3] = starB_0;
-        double starB_1 = find_centre(a_field_index, 1, 1);
+        double starB_1 = find_centre(1, 1);
         m_star_coords[4] = starB_1;
-        double starB_2 = find_centre(a_field_index, 1, 2);
+        double starB_2 = find_centre(1, 2);
         m_star_coords[5] = starB_2;
     }
 }
@@ -324,16 +324,6 @@ void StarTracker::write_to_dat(std::string a_filename, double a_dt,
 
     star_centre_file.write_time_data_line(m_star_coords);
 }
-
-// void StarTracker::get_star_centres(std::vector<double> &a_centre)
-// {
-//     int i_max = m_num_stars * 3;
-//     a_centre.resize(i_max);
-//     for (int i = 0; i < i_max; i++)
-//     {
-//         a_centre[i] = m_star_coords[i];
-//     }
-// }
 
 // read a data line from the previous timestep
 void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
@@ -368,59 +358,3 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
         }
     }
 }
-
-// pass this an empty std::vector and it will resize and fill with centre values
-// of field
-// void StarTracker::get_field_value_at_centres(
-//     int a_field_index, std::vector<double> &a_out_data,
-//     AMRInterpolator<Lagrange<4>> *a_interpolator)
-// {
-//     std::cout << "Getting field centre values" << std::endl;
-//     bool gone_NAN = false;
-//     a_out_data.resize(m_num_stars);
-
-//     // detect if gone stars centres have gone nan
-//     for (int i = 0; i < m_num_stars * CH_SPACEDIM; i++)
-//     {
-//         if (std::isnan(m_star_coords[i]))
-//         {
-//             gone_NAN = true;
-//         }
-//     }
-
-//     if (gone_NAN == false)
-//     {
-
-//         std::vector<double> x(m_num_stars);
-//         std::vector<double> y(m_num_stars);
-//         std::vector<double> z(m_num_stars);
-//         std::vector<double> f(m_num_stars);
-
-//         for (int n = 0; n < m_num_stars; n++)
-//         {
-//             x[n] = m_star_coords[n * CH_SPACEDIM];
-//             y[n] = m_star_coords[n * CH_SPACEDIM + 1];
-//             z[n] = m_star_coords[n * CH_SPACEDIM + 2];
-//         }
-
-//         a_interpolator->refresh();
-//         InterpolationQuery query(m_num_stars);
-//         query.setCoords(0, x.data());
-//         query.setCoords(1, y.data());
-//         query.setCoords(2, z.data());
-//         query.addComp(a_field_index, f.data());
-//         a_interpolator->interp(query);
-
-//         for (int n = 0; n < m_num_stars; n++)
-//         {
-//             a_out_data[n] = f[n];
-//         }
-//     }
-//     else
-//     {
-//         for (int n = 0; n < m_num_stars; n++)
-//         {
-//             a_out_data[n] = NAN;
-//         }
-//     }
-// }
