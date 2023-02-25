@@ -34,8 +34,7 @@ int runGRChombo(int argc, char *argv[])
     // and an associated LevelFactory)
     STAMR st_amr;
 
-    st_amr.m_star_tracker.initial_setup(
-        sim_params.star_track_centre, sim_params.do_star_track,
+    st_amr.m_star_tracker.initial_setup(sim_params.do_star_track,
         sim_params.number_of_stars, sim_params.initial_star_centres,
         sim_params.star_points, sim_params.star_track_width, sim_params.star_track_direction_of_motion);
     DefaultLevelFactory<BosonStarLevel> boson_star_level_fact(st_amr,

@@ -34,8 +34,7 @@ class StarTracker
     //! set puncture locations on start (or restart)
     //! this needs to be done before 'setupAMRObject'
     //! if the puncture locations are required for Tagging Criteria
-    void initial_setup(std::array<double, CH_SPACEDIM> a_star_track_centre,
-                       bool a_do_star_track, int a_number_of_stars,
+    void initial_setup(bool a_do_star_track, int a_number_of_stars,
                        std::vector<double> a_initial_star_centres,
                        int a_star_points, double a_star_track_width, std::string a_direction)
     {
@@ -43,16 +42,16 @@ class StarTracker
         m_star_coords = a_initial_star_centres;
         m_points = a_star_points;
         m_width = a_star_track_width;
-        m_centre = a_star_track_centre;
+        // m_centre = a_star_track_centre;
         m_direction = a_direction;
 
-        for (int n = 0; n < m_num_stars; n++)
-        {
-            for (int i = 0; i < CH_SPACEDIM; i++)
-            {
-                m_star_coords[n * CH_SPACEDIM + i] += m_centre[n];
-            }
-        }
+        // for (int n = 0; n < m_num_stars; n++)
+        // {
+        //     for (int i = 0; i < CH_SPACEDIM; i++)
+        //     {
+        //         m_star_coords[n * CH_SPACEDIM + i] += m_centre[n];
+        //     }
+        // }
     }
 
     ALWAYS_INLINE void

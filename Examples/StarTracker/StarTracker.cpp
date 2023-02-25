@@ -81,15 +81,16 @@ double StarTracker::find_centre(int num_star, int direction)
      
     if (direction == 0 )
     {
-	a_vector[0] = 1 - vals[(m_points-1)/2];
+	    a_vector[0] = 1 - vals[(m_points-1)/2];
     	a_vector[1] = m_star_coords[3 * num_star];
     	a_vector[2] = 1.;
         
-	Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
+	    Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
+
         success = fitmrq1.fit();
         if (success == 1)
-	{return fitmrq1.a[1];}
-	else {return 0;}
+	    {return fitmrq1.a[1];}
+	    else {return 0;}
     }
 
     if (direction == 1 )
@@ -98,16 +99,17 @@ double StarTracker::find_centre(int num_star, int direction)
     	a_vector[1] = m_star_coords[3 * num_star + 1];
     	a_vector[2] = 1.;
 
-	Fitmrq fitmrq1(y_coords, vals_f, sigma_vector, a_vector, fgauss);
+	    Fitmrq fitmrq1(y_coords, vals_f, sigma_vector, a_vector, fgauss);
+
         success = fitmrq1.fit();
-	if (success == 1)
+	    if (success == 1)
         {return fitmrq1.a[1];}
         else {return 0;}
     }
 
     if (direction == 2 )
     {
-	a_vector[0] = 1 - vals[(m_points-1)/2];
+	    a_vector[0] = 1 - vals[(m_points-1)/2];
     	a_vector[1] = m_star_coords[3 * num_star + 2];
     	a_vector[2] = 1.;
 
