@@ -41,8 +41,17 @@ public:
         pp.load("eigen", bosonstar_params.eigen, 0);
         pp.load("gridpoints",bosonstar_params.gridpoints,400000);
 
-        pp.load("star_centre", bosonstar_params.star_centre,
-                {0.5 * L, 0.5 * L, 0.5 * L});
+        pp.load("star_centre", bosonstar_params.star_centre, center);
+
+        std::array<double, CH_SPACEDIM> offsetA, offsetB;
+        pp.load("offsetA", offsetA, {0.0, 0.0, 0.0});
+
+        FOR(idir)
+        {
+            bosonstar_params.position[idir] = bosonstar_params.star_centre[idir] + offsetA[idir];
+        }
+
+        //std::cout << bosonstar_params.position[2] << std::endl;
 
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
@@ -56,7 +65,7 @@ public:
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         // pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
-        pp.load("BS_position", bosonstar_params.position);
+        //pp.load("BS_position", bosonstar_params.position);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
@@ -67,8 +76,20 @@ public:
         // Initialize values for bosonstar2_params to same as bosonstar_params
         // and then assign that ones that should differ below
         bosonstar2_params = bosonstar_params;
+	
+        pp.load("offsetB", offsetB, {0.0, 0.0, 0.0});
+        FOR(idir)
+        {
+           bosonstar2_params.position[idir] = bosonstar2_params.star_centre[idir] + offsetB[idir];
+        }
+	//std::cout << "StarA x coordinate" << bosonstar_params.position[0];
+	//std::cout << "StarA y coordinate" << bosonstar_params.position[1];
+	//std::cout << "StarA z coordinate" << bosonstar_params.position[2];
 
-        pp.load("BS_position2", bosonstar2_params.position);
+	//std::cout << "StarB x coordinate" << bosonstar2_params.position[0];
+        //std::cout << "StarB y coordinate" << bosonstar2_params.position[1];
+        //std::cout << "StarB z coordinate" << bosonstar2_params.position[2];
+        //pp.load("BS_position2", bosonstar2_params.position);
 
         // Are the two stars' profiles identical
         pp.load("identical", identical, false);
@@ -79,7 +100,7 @@ public:
             pp.load("central_amplitude_CSF2",
                     bosonstar2_params.central_amplitude_CSF);
             pp.load("BS_rapidity2",
-                    bosonstar2_params.BS_rapidity);        
+                    bosonstar2_params.BS_rapidity);
         }
 
         // Star Tracking
@@ -93,24 +114,17 @@ public:
         pp.load("star_track_width", star_track_width, 20.);
         pp.load("direction_of_motion", star_track_direction_of_motion);
         pp.load("star_track_level", star_track_level, 0);
+	
+	//std::cout << "Writing in initial star centres" << std::endl;		
 
-        std::array<double, CH_SPACEDIM> star_track_centre;
-        std::array<double, CH_SPACEDIM> offsetA, offsetB;
-        pp.load("star_track_centre", star_track_centre, center);
-        pp.load("offsetA", offsetA, {0.0, 0.0, 0.0});
-        pp.load("offsetB", offsetB, {0.0, 0.0, 0.0});
-        FOR(idir)
-        {
-            bosonstar_params.position[idir] = star_track_centre[idir] + offsetA[idir];
-            bosonstar2_params.position[idir] = star_track_centre[idir] + offsetB[idir];
-        }
-        initial_star_centres[0] = bosonstar_params.position[0];
-        initial_star_centres[1] = bosonstar_params.position[1];
-        initial_star_centres[2] = bosonstar_params.position[2];
+	//initial_star_centres[0] = bosonstar_params.position[0];
+        //initial_star_centres[1] = bosonstar_params.position[1];
+        //initial_star_centres[2] = bosonstar_params.position[2];
 
-        initial_star_centres[3] = bosonstar_params.position[3];
-        initial_star_centres[4] = bosonstar_params.position[4];
-        initial_star_centres[5] = bosonstar_params.position[5];
+        //initial_star_centres[3] = bosonstar2_params.position[0];
+        //initial_star_centres[4] = bosonstar2_params.position[1];
+        //initial_star_centres[5] = bosonstar2_params.position[2];
+	
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
@@ -132,7 +146,6 @@ public:
         pp.load("mass_extraction_center",
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
-
         // Weyl extraction
         pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
 
@@ -154,7 +167,6 @@ public:
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
         pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
 
-
         pp.load("flux_extraction_level", flux_extraction_level, 0);
         /*pp.load("flux_number_of_radii", angmomflux_params.number_radii,1);
         pp.load("flux_do", angmomflux_params.do_flux_integration,false);
@@ -167,7 +179,7 @@ public:
         angmomflux_params.radii.resize(angmomflux_params.number_radii);
         pp.load("flux_extraction_radii", angmomflux_params.radii,
                                                 angmomflux_params.number_radii);*/
-    }
+	}
 
     // Tagging thresholds
     Real regrid_threshold_phi, regrid_threshold_chi;
@@ -203,12 +215,13 @@ public:
 //     std::array<double, CH_SPACEDIM> star_track_centre;
     bool do_star_track;
     int number_of_stars;
-    std::vector<double> initial_star_centres;
+    //std::vector<double> initial_star_centres;
     int star_points;
     double star_track_width;
     std::string star_track_direction_of_motion;
     int star_track_level;
     int flux_extraction_level; // specifies times (level) to do angmom flux extraction
+
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

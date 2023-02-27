@@ -18,6 +18,7 @@ class StarTracker
     //! Params for puncture tracking
     int m_num_stars;
     std::vector<double> m_star_coords;
+    //std::vector<double> m_star_coords_2;
     std::array<double, CH_SPACEDIM> m_centre;
     int m_tracking_level; // level (i.e. times) to execute tracking
     int m_points;     // number of points n, (2n + 1 points to integrate)
@@ -35,23 +36,23 @@ class StarTracker
     //! this needs to be done before 'setupAMRObject'
     //! if the puncture locations are required for Tagging Criteria
     void initial_setup(bool a_do_star_track, int a_number_of_stars,
-                       std::vector<double> a_initial_star_centres,
+                       const std::vector<std::array<double, CH_SPACEDIM>> &a_initial_star_centres,
                        int a_star_points, double a_star_track_width, std::string a_direction)
-    {
-        m_num_stars = a_number_of_stars;
-        m_star_coords = a_initial_star_centres;
-        m_points = a_star_points;
+    {	
+	m_num_stars = a_number_of_stars;
+	int size = CH_SPACEDIM * m_num_stars;
+        m_star_coords.resize(size,0);
+        
+	m_points = a_star_points;
         m_width = a_star_track_width;
-        // m_centre = a_star_track_centre;
         m_direction = a_direction;
-
-        // for (int n = 0; n < m_num_stars; n++)
-        // {
-        //     for (int i = 0; i < CH_SPACEDIM; i++)
-        //     {
-        //         m_star_coords[n * CH_SPACEDIM + i] += m_centre[n];
-        //     }
-        // }
+        for (int n = 0; n < m_num_stars; n++)
+         {
+	     for (int i = 0; i < CH_SPACEDIM; i++)
+	     {
+		m_star_coords[n * CH_SPACEDIM + i] = a_initial_star_centres[n][i];
+             }
+         }
     }
 
     ALWAYS_INLINE void

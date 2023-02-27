@@ -42,7 +42,7 @@ double StarTracker::find_centre(int num_star, int direction)
         }
 
         if (direction == 1 )
-        {
+        {	
             x_coords[i] = m_star_coords[3 * num_star];
             y_coords[i] = m_star_coords[3 * num_star + 1] + delta;
             z_coords[i] = m_star_coords[3 * num_star + 2];
@@ -56,9 +56,7 @@ double StarTracker::find_centre(int num_star, int direction)
         }
 
         sigma_vector[i] = 1.0;
-    }
-    
-    std::cout << m_star_coords[2]<<std::endl;
+    } 
     
     bool fill_ghosts = false;
     m_interpolator->refresh(fill_ghosts);
@@ -81,20 +79,20 @@ double StarTracker::find_centre(int num_star, int direction)
      
     if (direction == 0 )
     {
-	    a_vector[0] = 1 - vals[(m_points-1)/2];
+	a_vector[0] = 1 - vals[(m_points-1)/2];
     	a_vector[1] = m_star_coords[3 * num_star];
     	a_vector[2] = 1.;
         
-	    Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
+	Fitmrq fitmrq1(x_coords, vals_f, sigma_vector, a_vector, fgauss);
 
         success = fitmrq1.fit();
         if (success == 1)
-	    {return fitmrq1.a[1];}
-	    else {return 0;}
+	   {return fitmrq1.a[1];}
+	else {return 0;}
     }
 
     if (direction == 1 )
-    {
+    {	
         a_vector[0] = 1 - vals[(m_points-1)/2];
     	a_vector[1] = m_star_coords[3 * num_star + 1];
     	a_vector[2] = 1.;
@@ -109,7 +107,7 @@ double StarTracker::find_centre(int num_star, int direction)
 
     if (direction == 2 )
     {
-	    a_vector[0] = 1 - vals[(m_points-1)/2];
+	a_vector[0] = 1 - vals[(m_points-1)/2];
     	a_vector[1] = m_star_coords[3 * num_star + 2];
     	a_vector[2] = 1.;
 
@@ -164,11 +162,11 @@ void StarTracker::find_max_min(int num_star, int direction)
         sigma_vector[i] = 1.0;
     }
  
-    bool fill_ghosts = false;
+    bool fill_ghosts = true;
     m_interpolator->refresh(fill_ghosts);
     
-    m_interpolator->fill_multilevel_ghosts(
-        VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
+    //m_interpolator->fill_multilevel_ghosts(
+    //    VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
     //m_interpolator->refresh();
     InterpolationQuery query(m_points);
     query.setCoords(0, x_coords.data())
@@ -250,7 +248,7 @@ void StarTracker::update_star_centres(double a_dt)
     }
 
     if (m_direction == "xy")
-    {
+    {	
         double starA_0 = find_centre(0, 0);
 	if (abs((starA_0 - m_star_coords[0]) / a_dt) < 1.0 && starA_0 != 0)
             {m_star_coords[0] = starA_0;}
@@ -258,7 +256,7 @@ void StarTracker::update_star_centres(double a_dt)
             {
                 find_max_min(0, 0);
 	    }
-        double starA_1 = find_centre(0, 1);
+	double starA_1 = find_centre(0, 1);
 	if (abs((starA_1 - m_star_coords[1]) / a_dt) < 1.0 && starA_1 != 0)
             {m_star_coords[1] = starA_1;}
         else
@@ -279,7 +277,7 @@ void StarTracker::update_star_centres(double a_dt)
             {
                 find_max_min(1, 1);
 	    }
-     }
+	}
 
     if (m_direction == "xyz")
     {

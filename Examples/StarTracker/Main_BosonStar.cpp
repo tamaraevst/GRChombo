@@ -28,14 +28,13 @@ int runGRChombo(int argc, char *argv[])
     GRParmParse pp(argc - 2, argv + 2, NULL, in_file);
     SimulationParameters sim_params(pp);
 
-
     // The line below selects the problem that is simulated
     // (To simulate a different problem, define a new child of AMRLevel
     // and an associated LevelFactory)
     STAMR st_amr;
 
     st_amr.m_star_tracker.initial_setup(sim_params.do_star_track,
-        sim_params.number_of_stars, sim_params.initial_star_centres,
+        sim_params.number_of_stars, {sim_params.bosonstar_params.position, sim_params.bosonstar2_params.position},
         sim_params.star_points, sim_params.star_track_width, sim_params.star_track_direction_of_motion);
     DefaultLevelFactory<BosonStarLevel> boson_star_level_fact(st_amr,
                                                                   sim_params);
