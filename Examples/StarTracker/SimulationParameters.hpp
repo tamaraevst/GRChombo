@@ -39,7 +39,7 @@ public:
                 bosonstar_params.central_amplitude_CSF);
         pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("eigen", bosonstar_params.eigen, 0);
-        pp.load("gridpoints",bosonstar_params.gridpoints,400000);
+        pp.load("gridpoints",bosonstar_params.gridpoints, 400000);
 
         pp.load("star_centre", bosonstar_params.star_centre, center);
 
@@ -50,8 +50,6 @@ public:
         {
             bosonstar_params.position[idir] = bosonstar_params.star_centre[idir] + offsetA[idir];
         }
-
-        //std::cout << bosonstar_params.position[2] << std::endl;
 
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
@@ -64,13 +62,10 @@ public:
         pp.load("antiboson", bosonstar_params.antiboson, false);
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
-        // pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
-        //pp.load("BS_position", bosonstar_params.position);
-        pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
         pp.load("radius_width2", bosonstar_params.radius_width2, 20.);
-        pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, -4);
+        pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, 4);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
 
         // Initialize values for bosonstar2_params to same as bosonstar_params
@@ -82,14 +77,6 @@ public:
         {
            bosonstar2_params.position[idir] = bosonstar2_params.star_centre[idir] + offsetB[idir];
         }
-	//std::cout << "StarA x coordinate" << bosonstar_params.position[0];
-	//std::cout << "StarA y coordinate" << bosonstar_params.position[1];
-	//std::cout << "StarA z coordinate" << bosonstar_params.position[2];
-
-	//std::cout << "StarB x coordinate" << bosonstar2_params.position[0];
-        //std::cout << "StarB y coordinate" << bosonstar2_params.position[1];
-        //std::cout << "StarB z coordinate" << bosonstar2_params.position[2];
-        //pp.load("BS_position2", bosonstar2_params.position);
 
         // Are the two stars' profiles identical
         pp.load("identical", identical, false);
@@ -104,28 +91,13 @@ public:
         }
 
         // Star Tracking
-        // pp.load("star_track_centre", star_track_centre,
-        //         {0.5 * L, 0.5 * L, 0.5 * L});
         pp.load("do_star_track", do_star_track, false);
         pp.load("number_of_stars", number_of_stars, 1);
-        // pp.load("initial_star_centres_1", initial_star_centres,
-        //         3 * number_of_stars);
         pp.load("star_points", star_points, 21);
         pp.load("star_track_width", star_track_width, 20.);
         pp.load("direction_of_motion", star_track_direction_of_motion);
         pp.load("star_track_level", star_track_level, 0);
 	
-	//std::cout << "Writing in initial star centres" << std::endl;		
-
-	//initial_star_centres[0] = bosonstar_params.position[0];
-        //initial_star_centres[1] = bosonstar_params.position[1];
-        //initial_star_centres[2] = bosonstar_params.position[2];
-
-        //initial_star_centres[3] = bosonstar2_params.position[0];
-        //initial_star_centres[4] = bosonstar2_params.position[1];
-        //initial_star_centres[5] = bosonstar2_params.position[2];
-	
-
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
         pp.load("mass_write_extraction",
@@ -144,10 +116,7 @@ public:
         pp.load("num_points_theta_mass",
                 mass_extraction_params.num_points_theta, 4);
         pp.load("mass_extraction_center",
-                mass_extraction_params.extraction_center,
-                {0.5 * L, 0.5 * L, 0.5 * L});
-        // Weyl extraction
-        pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
+                mass_extraction_params.extraction_center, center);
 
         // Work out the minimum extraction level
         auto min_extraction_level_it = mass_extraction_params.min_extraction_level();
@@ -158,10 +127,6 @@ public:
 
         // Do we want to calculate and write the Noether Charge to a file
         pp.load("calculate_noether_charge", calculate_noether_charge, false);
-
-        // Variables for outputting to plot files
-        //pp.load("num_plot_vars", num_plot_vars, 0);
-        //pp.load("plot_vars", plot_vars, num_plot_vars, 0);
 
         // Variables for outputting inf-norm
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
@@ -196,26 +161,18 @@ public:
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
 
-    int activate_weyl_extraction;
-
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;
 
     // Do we want to write the Noether Charge to a file
     bool calculate_noether_charge;
 
-    // Vars for outputting in plot files
-    //int num_plot_vars;
-    //std::vector<int> plot_vars;
-
     // Vars for outputting inf-norms
     int num_vars_inf_norm;
     std::vector<int> vars_inf_norm;
 
-//     std::array<double, CH_SPACEDIM> star_track_centre;
     bool do_star_track;
     int number_of_stars;
-    //std::vector<double> initial_star_centres;
     int star_points;
     double star_track_width;
     std::string star_track_direction_of_motion;

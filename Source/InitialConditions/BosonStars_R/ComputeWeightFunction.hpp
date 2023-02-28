@@ -47,12 +47,16 @@ class ComputeWeightFunction
 
         Coordinates<double> coords(current_cell, m_dx,
         m_params_BosonStar.star_centre);
+	
+	std::array<double, CH_SPACEDIM> starA_centre = m_params_BosonStar.position;
+    	std::array<double, CH_SPACEDIM> starB_centre = m_params_BosonStar2.position;
 
-        double separation = m_params_BosonStar.BS_separation;
-        double q = m_params_BosonStar.mass_ratio;
+	double separation = fabs(starA_centre[0] - starB_centre[0]);
+    	double impact_parameter = fabs(starA_centre[1] - starB_centre[1]);
+        
+	double q = m_params_BosonStar.mass_ratio;
         double rapidity = m_params_BosonStar.BS_rapidity;
         double rapidity2 = m_params_BosonStar2.BS_rapidity;
-        double impact_parameter = m_params_BosonStar.BS_impact_parameter;
         double radius_width1 = m_params_BosonStar.radius_width1;
         double radius_width2 = m_params_BosonStar.radius_width2;
 

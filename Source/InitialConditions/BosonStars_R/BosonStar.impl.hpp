@@ -71,8 +71,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     bool BS_BH_binary = m_params_BosonStar.BS_BH_binary;
     bool antiboson = m_params_BosonStar.antiboson;
     double M = m_params_BosonStar.BlackHoleMass;
-    // double separation = m_params_BosonStar.BS_separation;
-    // double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     std::array<double, CH_SPACEDIM> starA_centre = m_params_BosonStar.position;
     std::array<double, CH_SPACEDIM> starB_centre = m_params_BosonStar2.position;
     double q = m_params_BosonStar.mass_ratio;
@@ -83,7 +81,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
     double separation = abs(starA_centre[0] - starB_centre[0]);
     double impact_parameter = abs(starA_centre[1] - starB_centre[1]);
-
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
 
@@ -95,18 +92,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double v_ = tanh(rapidity);
     double t = (coords.x - separation / (q + 1.)) * s_; //set /tilde{t} to zero
     double x = (coords.x - separation / (q + 1.)) * c_;
-    // double t = (coords.x - starA_centre[0]) * s_; //set /tilde{t} to zero
-    // double x = (coords.x - starA_centre[0]) * c_;
     if (BS_BH_binary)
     {
         t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
         x = (coords.x + q * separation / (q + 1.)) * c_;
-        // t = (coords.x + starA_centre[0]) * s_; //set /tilde{t} to zero
-        // x = (coords.x + starA_centre[0]) * c_;
     }
     double z = coords.z; //set /tilde{t} to zero
     double y = coords.y + impact_parameter / (q + 1.);
-    // double y = coords.y + starA_centre[1];
     double r = sqrt(x * x + y * y + z * z);
 
     // First star physical variables
@@ -213,18 +205,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         v_ = tanh(-rapidity2);
         t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
         x = (coords.x + q * separation / (q + 1.)) * c_;
-        // t = (coords.x - starB_centre[0]) * s_; //set /tilde{t} to zero
-        // x = (coords.x - starB_centre[0]) * c_;
         if (BS_BH_binary)
         {
             t = (coords.x - separation / (q + 1.)) * s_; //set /tilde{t} to zero
             x = (coords.x - separation / (q + 1.)) * c_;
-            // t = (coords.x - starB_centre[0]) * s_; //set /tilde{t} to zero
-            // x = (coords.x - starB_centre[0]) * c_;
         }
         z = coords.z;
         y = coords.y - q * impact_parameter / (q + 1.);
-        // y = coords.y + starB_centre[1];
         r = sqrt(x * x + y * y + z * z);
 
         //Second star physical variables
@@ -466,19 +453,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         double profile1 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y + impact_parameter / (q + 1.), coords.z, radius_width1);
         double profile2 = weight.profile_chi((coords.x + q * separation / (q+1)) * cosh(-rapidity2), coords.y - q * impact_parameter / (q + 1.), coords.z, radius_width2);
 
-        // double profile1 = weight.profile_chi((coords.x - starA_centre[0]) * cosh(rapidity), (coords.y - starA_centre[1]), (coords.z - starA_centre[2]), radius_width1);
-        // double profile2 = weight.profile_chi((coords.x - starB_centre[0]) * cosh(-rapidity2), (coords.y - starB_centre[1]), (coords.z - starB_centre[2]), radius_width2);
             
         double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
         double argument_xB_xA = (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-        // double argument_xB_xA = starB_centre[0] * cosh(-rapidity2) - starA_centre[0] * cosh(rapidity);
-        // double argument_yB_yA = starB_centre[1] - starA_centre[1];
         double argument_yB_yA = (impact_parameter / (q + 1.)) * (- q - 1);
         double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
             
         double argument_xA_xB = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-        // double argument_xA_xB = starA_centre[0] * cosh(rapidity) - starB_centre[0] * cosh(-rapidity2);
-        // double argument_yA_yB = starA_centre[1] - starB_centre[1];
         double argument_yA_yB = (impact_parameter / (q + 1.)) * (1 + q);
         double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
         double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
@@ -491,19 +472,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             double profile2 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, coords.z, radius_width1);
             double profile1 = weight.profile_chi((coords.x + q * separation / (q+1)) * cosh(-rapidity2), coords.y, coords.z, radius_width2);
             
-            // double profile1 = weight.profile_chi((coords.x - starA_centre[0]) * cosh(rapidity), (coords.y - starA_centre[1]), (coords.z - starA_centre[2]), radius_width1);
-            // double profile2 = weight.profile_chi((coords.x - starB_centre[0]) * cosh(-rapidity2), (coords.y - starB_centre[1]), (coords.z - starB_centre[2]), radius_width2);
                 
             double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
             double argument_xB_xA = (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-            // double argument_xB_xA = starB_centre[0] * cosh(-rapidity2) - starA_centre[0] * cosh(rapidity);
-            // double argument_yB_yA = starB_centre[1] - starA_centre[1];
             double argument_yB_yA = (impact_parameter / (q + 1.)) * (- q - 1);
             double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
                 
             double argument_xA_xB = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-            // double argument_xA_xB = starA_centre[0] * cosh(rapidity) - starB_centre[0] * cosh(-rapidity2);
-            // double argument_yA_yB = starA_centre[1] - starB_centre[1];
             double argument_yA_yB = (impact_parameter / (q + 1.)) * (1 + q);
             double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
             double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
@@ -521,25 +496,6 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         gammaUU[0][0] = 1. / g_xx;
         gammaUU[1][1] = 1. / g_yy;
         gammaUU[2][2] = 1. / g_zz;
-
-        // vars.chi = chi_;
-
-        // g_xx = g_xx_1 + g_xx_2 - 1.0;
-        // g_yy = g_yy_1 + g_yy_2 - 1.0;
-        // g_zz = g_zz_1 + g_zz_2 - 1.0;
-
-        //Now, compute upper and lower components
-        // gammaLL[0][0] = g_xx;
-        // gammaLL[1][1] = g_yy;
-        // gammaLL[2][2] = g_zz;
-        // gammaUU[0][0] = 1. / g_xx;
-        // gammaUU[1][1] = 1. / g_yy;
-        // gammaUU[2][2] = 1. / g_zz;
-
-        // Define initial conformal factor
-        // chi_ = pow(g_xx * g_yy * g_zz, -1. / 3.);
-
-        // chi_plain = chi_;
 
         vars.chi = pow(chi_, - 4.0 / conformal_power);
 

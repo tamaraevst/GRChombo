@@ -15,9 +15,6 @@ struct BosonStar_params_t
     double central_amplitude_CSF; //!< Central amplitude of the star
     double phase;
     int eigen; // radial eigenstate of the boson star (0=ground)
-    double BS_separation;
-    double BS_impact_parameter;
-    std::array<double, CH_SPACEDIM> position;
     bool BS_binary;
     bool BS_BH_binary;
     bool antiboson;
@@ -30,6 +27,7 @@ struct BosonStar_params_t
     double radius_width1;
     double radius_width2;
     int conformal_factor_power;
+    std::array<double, CH_SPACEDIM> position;
     std::array<double, CH_SPACEDIM> star_centre; //!< coordinates of the centre of the star
 };
 

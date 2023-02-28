@@ -58,11 +58,11 @@ double StarTracker::find_centre(int num_star, int direction)
         sigma_vector[i] = 1.0;
     } 
     
-    bool fill_ghosts = false;
+    bool fill_ghosts = true;
     m_interpolator->refresh(fill_ghosts);
     
-    m_interpolator->fill_multilevel_ghosts(
-        VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
+    //m_interpolator->fill_multilevel_ghosts(
+    //    VariableType::evolution, Interval(c_chi, c_chi), m_tracking_level);
     //m_interpolator->refresh();
     InterpolationQuery query(m_points);
     query.setCoords(0, x_coords.data())

@@ -96,6 +96,7 @@ void BosonStarLevel::initialData()
     BoxLoops::loop(ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 
     fillAllGhosts();
+
 }
 
 // Things to do before outputting a checkpoint file
@@ -194,7 +195,7 @@ void BosonStarLevel::doAnalysis()
                         complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
                         Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
     
-    if (m_p.activate_weyl_extraction == 1 &&
+    if (m_p.activate_extraction == 1 &&
        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
     {
         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
@@ -261,7 +262,8 @@ void BosonStarLevel::doAnalysis()
                 noether_charge_file.write_header_line({"Noether Charge"});
             }
             noether_charge_file.write_time_data_line({noether_charge});
-        }
+	    
+	}
 
         // Compute the maximum of mod_phi and write it to a file
         double mod_phi_max = amr_reductions.max(c_mod_phi);
@@ -291,7 +293,7 @@ void BosonStarLevel::doAnalysis()
         min_chi_file.write_time_data_line({min_chi});
 
 
-        // constraeints calculated pre check and pre plot so done here already
+        // constraints calculated pre check and pre plot so done here already
 
         double L2_Ham = amr_reductions.norm(c_Ham, 2, true);
         double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), 2, true);
@@ -307,7 +309,6 @@ void BosonStarLevel::doAnalysis()
         }
         constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
     }
-
     if (m_p.do_star_track && m_level == m_p.star_track_level)
     {    
 	pout() << "Running a star tracker now" << endl;
