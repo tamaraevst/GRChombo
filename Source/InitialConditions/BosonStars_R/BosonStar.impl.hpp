@@ -71,16 +71,14 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     bool BS_BH_binary = m_params_BosonStar.BS_BH_binary;
     bool antiboson = m_params_BosonStar.antiboson;
     double M = m_params_BosonStar.BlackHoleMass;
-    std::array<double, CH_SPACEDIM> starA_centre = m_params_BosonStar.position;
-    std::array<double, CH_SPACEDIM> starB_centre = m_params_BosonStar2.position;
+    double separation = m_params_BosonStar.BS_separation;
+    double impact_parameter = m_params_BosonStar.BS_impact_parameter;
     double q = m_params_BosonStar.mass_ratio;
     double radius_width1 = m_params_BosonStar.radius_width1;
     double radius_width2 = m_params_BosonStar.radius_width2;
     int conformal_power = m_params_BosonStar.conformal_factor_power;
     int initial_data_choice = m_params_BosonStar.id_choice;
 
-    double separation = abs(starA_centre[0] - starB_centre[0]);
-    double impact_parameter = abs(starA_centre[1] - starB_centre[1]);
     // Define boosts and coordinate objects, suppose star 1 is on the left of the centre of mass 
     // and star 2 is on the right of centre of mass
 
