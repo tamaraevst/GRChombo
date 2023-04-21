@@ -65,12 +65,12 @@ star_centre = 512 512 0
 scalar_mass = 1.0
 phi4_coeff = 0.0
 solitonic = true # if false, next line is irrelevant. Make true for solitonic potential
-sigma_soliton = 0.05 # try central density ~ 0.05, the soliton is very sensitive
+sigma_soliton = 0.2 # try central density ~ 0.05, the soliton is very sensitive
 
 ##############################################################
 # Level data
 # Maximum number of times you can regrid above coarsest level
-max_level = 0 # There are (max_level+1) grids, so min is zero
+max_level = 7 # There are (max_level+1) grids, so min is zero
 
 # Frequency of regridding at each level
 # Need one for each level, ie max_level+1 items

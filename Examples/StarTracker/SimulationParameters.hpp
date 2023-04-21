@@ -9,7 +9,6 @@
 // General includes
 #include "GRParmParse.hpp"
 #include "SimulationParametersBase.hpp"
-#include <string>
 
 // Problem specific includes:
 #include "ComplexPotential.hpp"
@@ -39,44 +38,32 @@ public:
                 bosonstar_params.central_amplitude_CSF);
         pp.load("phase", bosonstar_params.phase, 0.0);
         pp.load("eigen", bosonstar_params.eigen, 0);
-        pp.load("gridpoints",bosonstar_params.gridpoints, 400000);
+        pp.load("gridpoints",bosonstar_params.gridpoints,400000);
 
         pp.load("star_centre", bosonstar_params.star_centre, center);
-
-        std::array<double, CH_SPACEDIM> offsetA, offsetB;
-        pp.load("offsetA", offsetA, {0.0, 0.0, 0.0});
-
-        FOR(idir)
-        {
-            bosonstar_params.position[idir] = bosonstar_params.star_centre[idir] + offsetA[idir];
-        }
 
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);
         pp.load("solitonic", potential_params.solitonic, false);
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
-        pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("BS_binary", bosonstar_params.BS_binary, false);
         pp.load("BS_BH_binary", bosonstar_params.BS_BH_binary, false);
         pp.load("antiboson", bosonstar_params.antiboson, false);
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
+        pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
+        pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
+        pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
         pp.load("radius_width1", bosonstar_params.radius_width1, 10.);
         pp.load("radius_width2", bosonstar_params.radius_width2, 20.);
-        pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, 4);
+        pp.load("conformal_factor_power", bosonstar_params.conformal_factor_power, -4);
         pp.load("G_Newton", bosonstar_params.Newtons_constant, 1.0);
-
-        // Initialize values for bosonstar2_params to same as bosonstar_params
+        
+	// Initialize values for bosonstar2_params to same as bosonstar_params
         // and then assign that ones that should differ below
         bosonstar2_params = bosonstar_params;
-	
-        pp.load("offsetB", offsetB, {0.0, 0.0, 0.0});
-        FOR(idir)
-        {
-           bosonstar2_params.position[idir] = bosonstar2_params.star_centre[idir] + offsetB[idir];
-        }
 
         // Are the two stars' profiles identical
         pp.load("identical", identical, false);
@@ -90,14 +77,33 @@ public:
                     bosonstar2_params.BS_rapidity);
         }
 
-        // Star Tracking
+	//std::array<double, CH_SPACEDIM> positionA, positionB;
+
+	positionA[0] = (bosonstar_params.star_centre[0] - bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
+	positionA[1] = bosonstar_params.star_centre[1] + bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
+	positionA[2] = bosonstar_params.star_centre[2];
+
+	positionB[0] = (bosonstar_params.star_centre[0] + bosonstar_params.mass_ratio * bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
+	positionB[1] = bosonstar_params.star_centre[1] - bosonstar_params.mass_ratio * bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
+        positionB[2] = bosonstar_params.star_centre[2];
+
+	pout() << "Star A is at x-position " << positionA[0] << endl;
+        pout() << "Star A is at y-position " << positionA[1] << endl;
+        pout() << "Star A is at z-position " << positionA[2] << endl;	
+
+	pout() << "Star B is at x-position " << positionB[0] << endl;
+        pout() << "Star B is at y-position " << positionB[1] << endl;	
+	pout() << "Star B is at z-position " << positionB[2] << endl;
+	
+	// Star Tracking
         pp.load("do_star_track", do_star_track, false);
         pp.load("number_of_stars", number_of_stars, 1);
-        pp.load("star_points", star_points, 21);
-        pp.load("star_track_width", star_track_width, 20.);
+        pp.load("star_points", star_points, 81);
+        pp.load("star_track_width_A", star_track_width_A, 4.);
+	pp.load("star_track_width_B", star_track_width_B, 4.);
         pp.load("direction_of_motion", star_track_direction_of_motion);
-        pp.load("star_track_level", star_track_level, 0);
-	
+        pp.load("star_track_level", star_track_level, 5);
+
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
         pp.load("mass_write_extraction",
@@ -116,7 +122,11 @@ public:
         pp.load("num_points_theta_mass",
                 mass_extraction_params.num_points_theta, 4);
         pp.load("mass_extraction_center",
-                mass_extraction_params.extraction_center, center);
+                mass_extraction_params.extraction_center,
+                {0.5 * L, 0.5 * L, 0.5 * L});
+
+        // Weyl extraction
+        pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
 
         // Work out the minimum extraction level
         auto min_extraction_level_it = mass_extraction_params.min_extraction_level();
@@ -128,9 +138,14 @@ public:
         // Do we want to calculate and write the Noether Charge to a file
         pp.load("calculate_noether_charge", calculate_noether_charge, false);
 
+        // Variables for outputting to plot files
+        //pp.load("num_plot_vars", num_plot_vars, 0);
+        //pp.load("plot_vars", plot_vars, num_plot_vars, 0);
+
         // Variables for outputting inf-norm
         pp.load("num_vars_inf_norm", num_vars_inf_norm, 0);
         pp.load("vars_inf_norm", vars_inf_norm, num_vars_inf_norm, 0);
+
 
         pp.load("flux_extraction_level", flux_extraction_level, 0);
         /*pp.load("flux_number_of_radii", angmomflux_params.number_radii,1);
@@ -144,7 +159,7 @@ public:
         angmomflux_params.radii.resize(angmomflux_params.number_radii);
         pp.load("flux_extraction_radii", angmomflux_params.radii,
                                                 angmomflux_params.number_radii);*/
-	}
+    }
 
     // Tagging thresholds
     Real regrid_threshold_phi, regrid_threshold_chi;
@@ -156,16 +171,22 @@ public:
     BosonStar_params_t bosonstar_params;
     BosonStar_params_t bosonstar2_params;
     Potential::params_t potential_params;
-    
+
     // Mass extraction
     int activate_mass_extraction;
     extraction_params_t mass_extraction_params;
+
+    int activate_weyl_extraction;
 
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;
 
     // Do we want to write the Noether Charge to a file
     bool calculate_noether_charge;
+
+    // Vars for outputting in plot files
+    //int num_plot_vars;
+    //std::vector<int> plot_vars;
 
     // Vars for outputting inf-norms
     int num_vars_inf_norm;
@@ -174,11 +195,14 @@ public:
     bool do_star_track;
     int number_of_stars;
     int star_points;
-    double star_track_width;
+    double star_track_width_A;
+    double star_track_width_B;
     std::string star_track_direction_of_motion;
     int star_track_level;
-    int flux_extraction_level; // specifies times (level) to do angmom flux extraction
 
+    std::array<double, CH_SPACEDIM> positionA, positionB;
+
+    int flux_extraction_level; // specifies times (level) to do angmom flux extraction
 };
 
 #endif /* SIMULATIONPARAMETERS_HPP_ */

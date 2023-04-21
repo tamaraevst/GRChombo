@@ -7,7 +7,7 @@
 #include "simd.hpp"
 #include "Matrix.hpp"
 
-void gaussj(Matrix &a, Matrix &b)
+int gaussj(Matrix &a, Matrix &b)
 {
 	int i,icol,irow,j,k,l,ll,n=a.nrows(),m=b.ncols();
 	double big,dum,pivinv;
@@ -33,7 +33,8 @@ void gaussj(Matrix &a, Matrix &b)
 		}
 		indxr[i]=irow;
 		indxc[i]=icol;
-		if (a.At(icol,icol) == 0.0) throw std::runtime_error("gaussj: Singular Matrix");
+		if (a.At(icol,icol) == 0.0) return 0; 
+		//throw std::runtime_error("gaussj: Singular Matrix");
 		pivinv=1.0/a.At(icol,icol);
 		a.At(icol,icol)=1.0;
 		for (l=0;l<n;l++) a.At(icol,l) *= pivinv;
@@ -51,12 +52,15 @@ void gaussj(Matrix &a, Matrix &b)
 			for (k=0;k<n;k++)
 				SWAP(a.At(k,indxr[l]),a.At(k,indxc[l]));
 	}
+	return 1;
 }
 
-void gaussj(Matrix &a)
+int gaussj(Matrix &a)
 {
 	Matrix b(a.nrows(),0);
-	gaussj(a,b);
+	int gsuccess = gaussj(a,b);
+	if (gsuccess == 0) {return 0;}
+	else {return 1;}
 }
 
 
