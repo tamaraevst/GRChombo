@@ -88,15 +88,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
     double c_ = cosh(rapidity);
     double s_ = sinh(rapidity);
     double v_ = tanh(rapidity);
-    double t = (coords.x - separation / (q + 1.)) * s_; //set /tilde{t} to zero
-    double x = (coords.x - separation / (q + 1.)) * c_;
-    if (BS_BH_binary)
-    {
-        t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
-        x = (coords.x + q * separation / (q + 1.)) * c_;
-    }
+    double t = (coords.x - q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
+    double x = (coords.x - q * separation / (q + 1.)) * c_;
     double z = coords.z; //set /tilde{t} to zero
-    double y = coords.y + impact_parameter / (q + 1.);
+    double y = coords.y + q * impact_parameter / (q + 1.);
     double r = sqrt(x * x + y * y + z * z);
 
     // First star physical variables
@@ -201,15 +196,10 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         c_ = cosh(-rapidity2);
         s_ = sinh(-rapidity2);
         v_ = tanh(-rapidity2);
-        t = (coords.x + q * separation / (q + 1.)) * s_; //set /tilde{t} to zero
-        x = (coords.x + q * separation / (q + 1.)) * c_;
-        if (BS_BH_binary)
-        {
-            t = (coords.x - separation / (q + 1.)) * s_; //set /tilde{t} to zero
-            x = (coords.x - separation / (q + 1.)) * c_;
-        }
+        t = (coords.x + separation / (q + 1.)) * s_; //set /tilde{t} to zero
+        x = (coords.x + separation / (q + 1.)) * c_;
         z = coords.z;
-        y = coords.y - q * impact_parameter / (q + 1.);
+        y = coords.y - impact_parameter / (q + 1.);
         r = sqrt(x * x + y * y + z * z);
 
         //Second star physical variables
@@ -448,42 +438,22 @@ void BosonStar::compute(Cell<data_t> current_cell) const
         chi_plain = pow(g_xx * g_yy * g_zz, n_power);
 
         //Find all the profile functions needed
-        double profile1 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y + impact_parameter / (q + 1.), coords.z, radius_width1);
-        double profile2 = weight.profile_chi((coords.x + q * separation / (q+1)) * cosh(-rapidity2), coords.y - q * impact_parameter / (q + 1.), coords.z, radius_width2);
+        double profile1 = weight.profile_chi((coords.x - q * separation / (q+1)) * cosh(rapidity), coords.y + q * impact_parameter / (q + 1.), coords.z, radius_width1);
+        double profile2 = weight.profile_chi((coords.x + separation / (q+1)) * cosh(-rapidity2), coords.y - impact_parameter / (q + 1.), coords.z, radius_width2);
 
             
         double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
-        double argument_xB_xA = (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-        double argument_yB_yA = (impact_parameter / (q + 1.)) * (- q - 1);
+        double argument_xB_xA = (separation / (q+1)) * (cosh(-rapidity2) + q * cosh(rapidity));
+        double argument_yB_yA = (impact_parameter / (q + 1.)) * (- 1. - q);
         double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
             
-        double argument_xA_xB = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-        double argument_yA_yB = (impact_parameter / (q + 1.)) * (1 + q);
+        double argument_xA_xB = (separation / (q + 1)) * (- q * cosh(rapidity) - cosh(-rapidity2));
+        double argument_yA_yB = (impact_parameter / (q + 1.)) * (q + 1);
         double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
         double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
 
         double value1 = (-profile_21 * delta_2 + profile_22 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
         double value2 = (profile_11 * delta_2 - profile_12 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
-
-        if (BS_BH_binary)
-        {
-            double profile2 = weight.profile_chi((coords.x - separation / (q+1)) * cosh(rapidity), coords.y, coords.z, radius_width1);
-            double profile1 = weight.profile_chi((coords.x + q * separation / (q+1)) * cosh(-rapidity2), coords.y, coords.z, radius_width2);
-            
-                
-            double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
-            double argument_xB_xA = (separation / (q+1)) * (-q * cosh(-rapidity2) - cosh(rapidity));
-            double argument_yB_yA = (impact_parameter / (q + 1.)) * (- q - 1);
-            double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
-                
-            double argument_xA_xB = (separation / (q + 1)) * (cosh(rapidity) + q * cosh(-rapidity2));
-            double argument_yA_yB = (impact_parameter / (q + 1.)) * (1 + q);
-            double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
-            double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
-
-            double value1 = (-profile_21 * delta_2 + profile_22 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
-            double value2 = (profile_11 * delta_2 - profile_12 * delta_1)/(profile_11 * profile_22 - profile_12 * profile_21);
-        }
 
         chi_ = chi_plain + profile1 * value1 + profile2 * value2;
 

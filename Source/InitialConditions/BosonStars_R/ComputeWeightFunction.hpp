@@ -58,8 +58,8 @@ class ComputeWeightFunction
 
         WeightFunction weightfunction;
 
-        double profile_func1 = weightfunction.profile_chi((coords.x-separation/(q+1))*cosh(rapidity), coords.y+impact_parameter/(q+1.), coords.z, radius_width1);
-        double profile_func2 = weightfunction.profile_chi((coords.x+q*separation/(q+1))*cosh(-rapidity2), coords.y- q*impact_parameter/(q+1.), coords.z, radius_width2);
+        double profile_func1 = weightfunction.profile_chi((coords.x-q*separation/(q+1))*cosh(rapidity), coords.y+q*impact_parameter/(q+1.), coords.z, radius_width1);
+        double profile_func2 = weightfunction.profile_chi((coords.x+separation/(q+1))*cosh(-rapidity2), coords.y- impact_parameter/(q+1.), coords.z, radius_width2);
 
         current_cell.store_vars(profile_func1, c_profile1);
         current_cell.store_vars(profile_func2, c_profile2);

@@ -79,12 +79,12 @@ public:
 
 	//std::array<double, CH_SPACEDIM> positionA, positionB;
 
-	positionA[0] = (bosonstar_params.star_centre[0] - bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
-	positionA[1] = bosonstar_params.star_centre[1] + bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
+	positionA[0] = (bosonstar_params.star_centre[0] + bosonstar_params.mass_ratio * bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
+	positionA[1] = bosonstar_params.star_centre[1] - bosonstar_params.mass_ratio * bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
 	positionA[2] = bosonstar_params.star_centre[2];
 
-	positionB[0] = (bosonstar_params.star_centre[0] + bosonstar_params.mass_ratio * bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
-	positionB[1] = bosonstar_params.star_centre[1] - bosonstar_params.mass_ratio * bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
+	positionB[0] = (bosonstar_params.star_centre[0] - bosonstar_params.BS_separation / (bosonstar_params.mass_ratio + 1.));
+	positionB[1] = bosonstar_params.star_centre[1] + bosonstar_params.BS_impact_parameter / (bosonstar_params.mass_ratio + 1.);
         positionB[2] = bosonstar_params.star_centre[2];
 
 	pout() << "Star A is at x-position " << positionA[0] << endl;
