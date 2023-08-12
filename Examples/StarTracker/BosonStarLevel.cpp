@@ -13,6 +13,7 @@
 
 // For RHS update
 #include "MatterCCZ4.hpp"
+// #include "IntegratedMovingPunctureGauge.hpp"
 
 // For constraints calculation
 #include "NewMatterConstraints.hpp"
@@ -93,6 +94,8 @@ void BosonStarLevel::initialData()
     BoxLoops::loop(ComputeWeightFunction(m_p.bosonstar_params, m_p.bosonstar2_params, m_dx), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS, disable_simd());
 
     fillAllGhosts();
+    // BoxLoops::loop(IntegratedMovingPunctureGauge(m_p.ccz4_params),
+    //             m_state_new, m_state_new, EXCLUDE_GHOST_CELLS, disable_simd());
     
 }
 
@@ -157,6 +160,9 @@ void BosonStarLevel::specificEvalRHS(GRLevelData &a_soln, GRLevelData &a_rhs,
     MatterCCZ4RHS<ComplexScalarFieldWithPotential> my_ccz4_matter(
         complex_scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
         m_p.G_Newton);
+    // MatterCCZ4RHS<ComplexScalarFieldWithPotential, IntegratedMovingPunctureGauge, FourthOrderDerivatives> my_ccz4_matter(
+    //     complex_scalar_field, m_p.ccz4_params, m_dx, m_p.sigma, m_p.formulation,
+    //     m_p.G_Newton);
     SetValue set_analysis_vars_zero(0.0, Interval(c_Pi_Im + 1, NUM_VARS - 1));
     auto compute_pack =
         make_compute_pack(my_ccz4_matter, set_analysis_vars_zero);
