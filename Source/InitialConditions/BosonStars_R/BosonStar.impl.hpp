@@ -222,10 +222,13 @@ void BosonStar::compute(Cell<data_t> current_cell) const
 
         pc_os = psi_ * psi_ * c_ *c_ - omega_ * omega_ * s_ * s_;
         lapse_2 = omega_ * psi_ / (sqrt(pc_os));
-        w_ = m_1d_sol2.get_w();
         if (antiboson)
         {
-            phase_ = - (w_ * t);
+            w_ = - m_1d_sol2.get_w();
+        }
+        else
+        {
+            w_ = m_1d_sol2.get_w();
         }
         phase_ = w_ * t;
         beta_x = s_ * c_ * (psi_ * psi_ - omega_ * omega_) / (pc_os);
