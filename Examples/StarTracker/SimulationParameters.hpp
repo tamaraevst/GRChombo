@@ -28,6 +28,7 @@ public:
     {
         // for regridding
         pp.load("regrid_threshold_phi", regrid_threshold_phi);
+	pp.load("regrid_threshold_rho", regrid_threshold_rho);
         pp.load("regrid_threshold_chi", regrid_threshold_chi);
 
         // Gravitional constant
@@ -162,7 +163,7 @@ public:
     }
 
     // Tagging thresholds
-    Real regrid_threshold_phi, regrid_threshold_chi;
+    Real regrid_threshold_phi, regrid_threshold_chi, regrid_threshold_rho;
 
     // Initial data for matter and potential
     double G_Newton;

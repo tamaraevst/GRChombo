@@ -21,6 +21,7 @@
 
 // For tag cells
 #include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
+#include "ChiandRhoTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ComputePack.hpp"
@@ -466,8 +467,8 @@ void BosonStarLevel::doAnalysis()
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
-   BoxLoops::loop(ComplexPhiAndChiExtractionTaggingCriterion(m_dx, m_level,
-                   m_p.mass_extraction_params, m_p.regrid_threshold_phi,
+   BoxLoops::loop(ChiandRhoTaggingCriterion(m_dx, m_level,
+                   m_p.mass_extraction_params, m_p.regrid_threshold_rho,
                    m_p.regrid_threshold_chi), current_state, tagging_criterion);
 
 }
