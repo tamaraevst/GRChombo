@@ -22,7 +22,7 @@
 #include "TwoPuncturesInitialData.hpp"
 #include "Weyl4.hpp"
 #include "WeylExtraction.hpp"
-#include "ConstraintViolations.hpp"
+// #include "ConstraintViolations.hpp"
 
 // Things to do during the advance step after RK4 steps
 void BinaryBHLevel::specificAdvance()

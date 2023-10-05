@@ -17,6 +17,7 @@
 #include "MultiLevelTask.hpp"
 #include "SetupFunctions.hpp"
 #include "SimulationParameters.hpp"
+#include "CallDoAnalysis.hpp"
 // TPAMR.hpp includes BHAMR.hpp
 #include "TPAMR.hpp" // TPAMR code conditional compiled on USE_TWOPUNCTURES
 
@@ -84,7 +85,7 @@ int runGRChombo(int argc, char *argv[])
     RefCountedPtr<CallDoAnalysis> call_do_analysis_ptr(new CallDoAnalysis);
     RefCountedPtr<Scheduler> scheduler_ptr(new Scheduler);
     scheduler_ptr->schedule(call_do_analysis_ptr, sim_params.max_steps);
-    gr_amr.schedule(scheduler_ptr);
+    bh_amr.schedule(scheduler_ptr);
 
     std::chrono::time_point<Clock> start_time = Clock::now();
 

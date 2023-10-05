@@ -54,6 +54,7 @@ public:
         pp.load("BlackHoleMass", bosonstar_params.BlackHoleMass, 0.);
         pp.load("BS_rapidity", bosonstar_params.BS_rapidity, 0.0);
         pp.load("BS_separation", bosonstar_params.BS_separation, 0.0);
+        pp.load("BS_mass", bosonstar_params.mass);
         pp.load("BS_impact_parameter", bosonstar_params.BS_impact_parameter, 0.0);
         pp.load("id_choice", bosonstar_params.id_choice, 2);
         pp.load("mass_ratio", bosonstar_params.mass_ratio, 1.0);
@@ -76,6 +77,7 @@ public:
                     bosonstar2_params.central_amplitude_CSF);
             pp.load("BS_rapidity2",
                     bosonstar2_params.BS_rapidity);
+            pp.load("BS_mass2", bosonstar2_params.mass);
         }
 
 	//std::array<double, CH_SPACEDIM> positionA, positionB;
@@ -104,6 +106,11 @@ public:
 	pp.load("star_track_width_B", star_track_width_B, 4.);
         pp.load("direction_of_motion", star_track_direction_of_motion);
         pp.load("star_track_level", star_track_level, 5);
+        
+        //Tagging
+        pp.load("tag_radius_A", tag_radius_A, 4.);
+	pp.load("tag_radius_B", tag_radius_B, 4.);
+        pp.load("tag_buffer", tag_buffer, 0.5);
 
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
@@ -164,6 +171,7 @@ public:
 
     // Tagging thresholds
     Real regrid_threshold_phi, regrid_threshold_chi, regrid_threshold_rho;
+    Real tag_radius_A, tag_radius_B, tag_buffer;
 
     // Initial data for matter and potential
     double G_Newton;

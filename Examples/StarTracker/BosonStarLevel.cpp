@@ -22,6 +22,7 @@
 // For tag cells
 #include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
 #include "ChiandRhoTaggingCriterion.hpp"
+#include "BosonChiPunctureExtractionTaggingCriterion.hpp"
 
 // Problem specific includes
 #include "ComputePack.hpp"
@@ -296,7 +297,7 @@ void BosonStarLevel::doAnalysis()
         min_chi_file.write_time_data_line({min_chi});
 
 
-        // constraeints calculated pre check and pre plot so done here already
+        // constraints calculated pre check and pre plot so done here already
 
         double L2_Ham = amr_reductions.norm(c_Ham, 2, true);
         double L2_Mom = amr_reductions.norm(Interval(c_Mom1, c_Mom3), 2, true);
@@ -467,8 +468,39 @@ void BosonStarLevel::doAnalysis()
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
-   BoxLoops::loop(ChiandRhoTaggingCriterion(m_dx, m_level,
+//    BoxLoops::loop(ChiandRhoTaggingCriterion(m_dx, m_level,
+//                    m_p.mass_extraction_params, m_p.regrid_threshold_rho,
+//                    m_p.regrid_threshold_chi), current_state, tagging_criterion);
+
+    if (m_p.do_star_track == true)
+    {
+        const vector<double> puncture_radii = {m_p.tag_radius_A,
+                                                m_p.tag_radius_B};
+        const vector<double> puncture_masses = {m_p.bosonstar_params.mass,
+                                                m_p.bosonstar2_params.mass};
+
+        std::vector<double> star_coords =
+            m_st_amr.m_star_tracker.get_puncture_coords();
+
+        std::vector<std::array<double, CH_SPACEDIM>> puncture_coords;
+
+        for (int ipuncture = 0; ipuncture < 2; ipuncture++)
+        {
+            FOR(i) {puncture_coords[ipuncture][i] = star_coords[ipuncture * CH_SPACEDIM + i];}
+        }
+
+            // m_st_amr.m_star_tracker.get_puncture_coords();
+        BoxLoops::loop(BosonChiPunctureExtractionTaggingCriterion(
+                           m_dx, m_level, m_p.max_level, m_p.extraction_params,
+                           puncture_coords, m_p.activate_extraction,
+                           m_p.do_star_track, puncture_radii, puncture_masses, m_p.tag_buffer),
+                       current_state, tagging_criterion);
+    }
+    else
+    {
+        BoxLoops::loop(ChiandRhoTaggingCriterion(m_dx, m_level,
                    m_p.mass_extraction_params, m_p.regrid_threshold_rho,
                    m_p.regrid_threshold_chi), current_state, tagging_criterion);
+    }
 
 }

@@ -18,7 +18,6 @@ class StarTracker
     //! Params for puncture tracking
     int m_num_stars;
     std::vector<double> m_star_coords;
-    //std::vector<double> m_star_coords_2;
     std::array<double, CH_SPACEDIM> m_centre;
     int m_tracking_level; // level (i.e. times) to execute tracking
     int m_points;     // number of points n, (2n + 1 points to integrate)
@@ -76,6 +75,12 @@ class StarTracker
     void read_old_centre_from_dat(std::string a_filename, double a_dt,
                                   double a_time, double a_restart_time,
                                   bool a_first_step);
+    // function to get punctures
+    ALWAYS_INLINE const std::vector<double> &
+    get_puncture_coords() const
+    {
+        return m_star_coords;
+    }
 };
 
 #endif /* STARTRACKER_HPP_ */

@@ -447,11 +447,11 @@ void BosonStar::compute(Cell<data_t> current_cell) const
             
         double profile_11 = weight.profile_chi(0., 0., 0., radius_width1);
         double argument_xB_xA = (separation / (q+1)) * (cosh(-rapidity2) + q * cosh(rapidity));
-        double argument_yB_yA = (impact_parameter / (q + 1.)) * (- 1. - q);
+        double argument_yB_yA = -impact_parameter;
         double profile_12 = weight.profile_chi(argument_xB_xA, argument_yB_yA, 0., radius_width1);
             
         double argument_xA_xB = (separation / (q + 1)) * (- q * cosh(rapidity) - cosh(-rapidity2));
-        double argument_yA_yB = (impact_parameter / (q + 1.)) * (q + 1);
+        double argument_yA_yB = impact_parameter;
         double profile_21 = weight.profile_chi(argument_xA_xB, argument_yA_yB, 0., radius_width2);
         double profile_22 = weight.profile_chi(0., 0., 0., radius_width2);
 
