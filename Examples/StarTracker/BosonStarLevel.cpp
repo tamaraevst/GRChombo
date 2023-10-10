@@ -479,22 +479,14 @@ void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
         const vector<double> puncture_masses = {m_p.bosonstar_params.mass,
                                                 m_p.bosonstar2_params.mass};
 
-        std::vector<double> star_coords =
+        const std::vector<double> star_coords =
             m_st_amr.m_star_tracker.get_puncture_coords();
-
-        std::vector<std::array<double, CH_SPACEDIM>> puncture_coords;
-
-        for (int ipuncture = 0; ipuncture < 2; ipuncture++)
-        {
-            FOR(i) {puncture_coords[ipuncture][i] = star_coords[ipuncture * CH_SPACEDIM + i];}
-        }
-
-            // m_st_amr.m_star_tracker.get_puncture_coords();
+	
         BoxLoops::loop(BosonChiPunctureExtractionTaggingCriterion(
                            m_dx, m_level, m_p.max_level, m_p.extraction_params,
-                           puncture_coords, m_p.activate_extraction,
+                           star_coords, m_p.activate_extraction,
                            m_p.do_star_track, puncture_radii, puncture_masses, m_p.tag_buffer),
-                       current_state, tagging_criterion);
+                       current_state, tagging_criterion);	
     }
     else
     {

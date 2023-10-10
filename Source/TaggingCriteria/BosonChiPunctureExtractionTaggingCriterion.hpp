@@ -29,7 +29,7 @@ class BosonChiPunctureExtractionTaggingCriterion
     const SphericalExtraction::params_t m_params;
     const std::vector<double> m_puncture_radii;
     const std::vector<double> m_puncture_masses;
-    const std::vector<std::array<double, CH_SPACEDIM>> &m_puncture_coords;
+    const std::vector<double> &m_puncture_coords;
     const double m_buffer;
 
   public:
@@ -50,7 +50,7 @@ class BosonChiPunctureExtractionTaggingCriterion
     BosonChiPunctureExtractionTaggingCriterion(
         const double dx, const int a_level, const int a_max_level,
         const SphericalExtraction::params_t a_params,
-        const std::vector<std::array<double, CH_SPACEDIM>> &a_puncture_coords,
+        const std::vector<double> &a_puncture_coords,
         const bool activate_extraction = false,
         const bool track_punctures = false,
         const std::vector<double> a_puncture_radii = {4.0, 4.0}, 
@@ -108,23 +108,26 @@ class BosonChiPunctureExtractionTaggingCriterion
             // next finest level
             const double factor = pow(2.0, min(m_max_level - m_level - 1, 2));
             // loop over puncture numbers
-            for (int ipuncture = 0; ipuncture < m_puncture_radii.size(); ++ipuncture)
+            for (int ipuncture = 0; ipuncture < 2; ++ipuncture)
             {
+                std::array<double, CH_SPACEDIM> puncture_centre;
+
+                FOR1(i) {puncture_centre[i] =  m_puncture_coords[3 * ipuncture + i];}
                 // where am i?
-                const Coordinates<data_t> coords(current_cell, m_dx,
-                                                 m_puncture_coords[ipuncture]);
+                const Coordinates<data_t> coords(current_cell, m_dx, puncture_centre);
                 const data_t r = coords.get_radius();
 
                 auto regrid =
                     simd_compare_lt(r, (1.0 + m_buffer) * factor *
                                            m_puncture_masses[ipuncture]);
+
                 criterion = simd_conditional(regrid, 100.0, criterion);
             }
 
             double puncture_separation2 = 0.0;
             FOR1(idir)
                 {
-                    double displacement = m_puncture_coords[0][idir] - m_puncture_coords[1][idir];
+                    double displacement = m_puncture_coords[idir] - m_puncture_coords[3+idir];
                     puncture_separation2 += displacement * displacement;
                 }
 
@@ -141,8 +144,8 @@ class BosonChiPunctureExtractionTaggingCriterion
                 FOR1(idir)
                 {
                     center_of_mass[idir] =
-                    (m_puncture_masses[0] * m_puncture_coords[0][idir] +
-                    m_puncture_masses[1] * m_puncture_coords[1][idir]) / sum_masses;
+                    (m_puncture_masses[0] * m_puncture_coords[idir] +
+                    m_puncture_masses[1] * m_puncture_coords[3+idir]) / sum_masses;
                 }
             
                 Coordinates<data_t> coords(current_cell, m_dx, center_of_mass);
@@ -166,10 +169,14 @@ class BosonChiPunctureExtractionTaggingCriterion
             // loop over puncture radii
             for (int ipuncture = 0; ipuncture < m_puncture_radii.size();
                  ++ipuncture)
-            {
+            { 
+                std::array<double, CH_SPACEDIM> puncture_centre;
+                
+                FOR1(i) {puncture_centre[i] =  m_puncture_coords[3 * ipuncture + i];}
+	     
                 // where am i?
                 const Coordinates<data_t> coords(current_cell, m_dx,
-                                                 m_puncture_coords[ipuncture]);
+                                                 puncture_centre);
                 const data_t r = coords.get_radius();
                 // decide whether to tag based on distance to horizon
                 // plus a fudge factor of 1.5
