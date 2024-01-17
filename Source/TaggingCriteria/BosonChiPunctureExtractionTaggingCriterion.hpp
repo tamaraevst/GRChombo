@@ -119,11 +119,11 @@ class BosonChiPunctureExtractionTaggingCriterion
                 double displacement =
                     puncture_centre1[idir] - puncture_centre2[idir];
                 puncture_separation2 += displacement * displacement;
-            }
+	    }
 
 	    double puncture_separation = sqrt(puncture_separation2);
 
-	    const int merger_horizon_max_level =
+            const int merger_horizon_max_level =
                 min(m_horizon_max_levels[0], m_horizon_max_levels[1]);
 
             const int merger_puncture_max_level =
