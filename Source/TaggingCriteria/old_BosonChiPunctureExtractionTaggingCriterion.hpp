@@ -160,11 +160,9 @@ class BosonChiPunctureExtractionTaggingCriterion
 
                         auto regrid = simd_compare_lt(
                             max_abs_xyz,
-                            factor * (m_puncture_radii[ipuncture] / 2. +
+                            factor * (m_puncture_masses[ipuncture] +
                                       m_buffer));
-			// NOTE: you can also use factor * (m_puncture_masses[ipuncture] * 2. +
-                        // m_buffer) in the simd_compare_lt call; this would result in milder tagging. 
-			
+
                         criterion = simd_conditional(regrid, 100.0, criterion);
                     }
 		else if (m_level < m_puncture_max_levels[ipuncture])
@@ -176,7 +174,7 @@ class BosonChiPunctureExtractionTaggingCriterion
                             2.0, m_horizon_max_levels[ipuncture] - m_level - 2);
 
                         auto regrid = simd_compare_lt(
-                            max_abs_xyz, factor * m_puncture_radii[ipuncture] / 2.);
+                            max_abs_xyz, factor * m_puncture_masses[ipuncture]);
 
                         criterion = simd_conditional(regrid, 100.0, criterion);
                     }
@@ -185,7 +183,7 @@ class BosonChiPunctureExtractionTaggingCriterion
                         // remove any finer levels for BHs with
                         // puncture_max_level < max_level
                         auto dont_regrid = simd_compare_lt(
-                            max_abs_xyz, m_puncture_radii[ipuncture] / 2. +
+                            max_abs_xyz, m_puncture_masses[ipuncture] +
                                              m_buffer);
                         criterion =
                             simd_conditional(dont_regrid, 0.0, criterion);
@@ -228,7 +226,7 @@ class BosonChiPunctureExtractionTaggingCriterion
                     const double factor = pow(
                         2.0, min(merger_horizon_max_level - m_level - 1, 2));
                     auto regrid2 = simd_compare_lt(
-                        max_abs_xyz, factor * (m_puncture_radii[0] / 2. + m_puncture_radii[1] / 2. + m_buffer));
+                        max_abs_xyz, factor * (sum_masses + m_buffer));
                     criterion = simd_conditional(regrid2, 100.0, criterion);
                 }
                 else if (m_level < merger_puncture_max_level)
@@ -240,7 +238,7 @@ class BosonChiPunctureExtractionTaggingCriterion
                         pow(2.0, merger_horizon_max_level - m_level - 2);
 
                     auto regrid2 =
-                        simd_compare_lt(max_abs_xyz, factor * (m_puncture_radii[0] / 2. + m_puncture_radii[1] / 2.));
+                        simd_compare_lt(max_abs_xyz, factor * sum_masses);
 
                     criterion = simd_conditional(regrid2, 100.0, criterion);
                 }

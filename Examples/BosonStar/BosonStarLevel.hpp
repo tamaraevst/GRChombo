@@ -11,6 +11,7 @@
 // Problem specific includes
 #include "ComplexPotential.hpp"
 #include "ComplexScalarField.hpp"
+#include "STAMR.hpp"
 
 //!  A class for the evolution of a single boson star.
 /*!
@@ -22,6 +23,8 @@ class BosonStarLevel : public GRAMRLevel
     friend class DefaultLevelFactory<BosonStarLevel>;
     // Inherit the contructors from GRAMRLevel
     using GRAMRLevel::GRAMRLevel;
+
+    STAMR &m_st_amr = dynamic_cast<STAMR &>(m_gr_amr);
 
     // Typedef for scalar field
     typedef ComplexScalarField<Potential> ComplexScalarFieldWithPotential;
@@ -46,9 +49,6 @@ class BosonStarLevel : public GRAMRLevel
     virtual void specificUpdateODE(GRLevelData &a_soln,
                                    const GRLevelData &a_rhs,
                                    Real a_dt) override;
-
-    //! Specify which variables to write at plot intervals
-    virtual void specificWritePlotHeader(std::vector<int> &plot_states) const;
 
     //! Tell Chombo how to tag cells for regridding
     virtual void computeTaggingCriterion(FArrayBox &tagging_criterion,
