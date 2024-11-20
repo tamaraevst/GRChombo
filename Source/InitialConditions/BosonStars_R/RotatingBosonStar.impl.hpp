@@ -90,8 +90,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double g_yy_1 = l_val / g_val * (cos(phi)*cos(phi) + sin(phi)*sin(phi)*g_val);
     double g_xx_1 = l_val / g_val * (cos(phi)*cos(phi)*g_val + sin(phi)*sin(phi));
     double g_xy_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
-    double g_yx_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
-    double g_xx, g_yy, g_zz;
+    // double g_yx_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
 
     //Add on to evolution equations
     vars.phi_Re += A_val * cos(phase_);
@@ -102,34 +101,36 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     // pout() << "Computed real and imaginary scalar part expressions " << endl;
 
     //Initialise extrinsic curvature and metric with upper indices
-    double KLL_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double KLL_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaUU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double gammaUU_1[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double gammaUU_2[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double K1;
 
     // Fill them in
-    gammaUU_1[0][0] = l_val / f_val * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
-    gammaUU_1[0][1] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
-    gammaUU_1[1][1] = f_val/(g_val*l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
-    gammaUU_1[1][0] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
-    gammaUU_1[2][2] = 1. / g_zz_1;
+    gammaLL[0][0] = g_xx_1;
+    gammaLL[1][1] = g_yy_1;
+    gammaLL[2][2] = g_zz_1;
+    gammaLL[0][1] = g_xy_1;
+    gammaLL[1][0] = gammaLL[0][1];
+
+    gammaUU[0][0] = l_val / f_val * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
+    gammaUU[0][1] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
+    gammaUU[1][1] = f_val/(g_val*l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
+    gammaUU[1][0] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
+    gammaUU[2][2] = 1. / g_zz_1;
 
     // pout() << "Computed metric expressions " << endl;
 
-    KLL_1[2][2] = 0;
-    KLL_1[1][1] = -KLL_1[0][0];
-    KLL_1[0][1] = -(cos(2.*phi)*l_val*(1./tan(theta)*sin(theta)*sin(theta)*dthomega_val + sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
-    KLL_1[0][2] = (l_val*sin(phi)*(-sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
-    KLL_1[1][0] = KLL_1[0][1];
-    KLL_1[2][0] = KLL_1[0][2];
-    KLL_1[1][2] = -KLL_1[0][2];
-    KLL_1[2][1] = KLL[1][2];
-    KLL_1[0][0] = (l_val*sin(2.*phi)*(1./tan(theta) * sin(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4*f_val*r*lapse);
-    FOR2(i,j) K1 += gammaUU_1[i][j] * KLL_1[i][j];
+    KLL[2][2] = 0;
+    KLL[1][1] = -KLL[0][0];
+    KLL[0][1] = -(cos(2.*phi)*l_val*(1./tan(theta)*sin(theta)*sin(theta)*dthomega_val + sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
+    KLL[0][2] = (l_val*sin(phi)*(-sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
+    KLL[1][0] = KLL[0][1];
+    KLL[2][0] = KLL[0][2];
+    KLL[1][2] = -KLL[0][2];
+    KLL[2][1] = KLL[1][2];
+    KLL[0][0] = (l_val*sin(2.*phi)*(1./tan(theta) * sin(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4*f_val*r*lapse);
+    FOR2(i,j) K1 += gammaUU[i][j] * KLL[i][j];
 
     // pout() << "Computed Kij expressions " << endl;
 
@@ -144,7 +145,6 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
     FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
-    FOR4(i,j,k,l) KLL[i][j] += gammaLL[i][l] * (gammaUU_1[l][k] * KLL_1[k][j]);
     FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
     FOR2(i,j) vars.A[i][j] = vars.chi * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 

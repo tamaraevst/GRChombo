@@ -125,8 +125,8 @@ calculate_constraint_violations = 1
 calculate_noether_charge = 1
 
 # Vars to write to plot files
-num_plot_vars = 9
-plot_vars = chi K lapse phi_Re mod_phi N Weyl4_Re rho Qphi_density
+num_plot_vars = 15
+plot_vars = chi K mod_phi lapse shift1 shift2 A11 A22 A33 h11 h22 h33 h12 h13 h23
 
 # Vars to output infinity norm for at end of coarse time steps
 num_vars_inf_norm = 3
