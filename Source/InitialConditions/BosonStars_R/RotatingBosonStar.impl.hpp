@@ -73,10 +73,11 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double dromega_val = rotating_BS_sol.get_dromega_interp(xvar, theta, n, m);
 
     double lapse = sqrt(f_val + (l_val*sin(theta)*sin(theta)*(-1+omega_val))*omega_val/f_val);
-    double beta_x = -1. /f_val * (cos(phi)*l_val*r*pow(sin(theta), 3)*omega_val);
-    double beta_y = -1. /f_val * (l_val*r*pow(sin(theta), 3) * sin(phi) * omega_val);
-    double beta_z = -1. /f_val * (cos(theta)*l_val*r*pow(sin(theta), 2)*omega_val);
-    double beta_phi = -(l_val/f_val) * r * omega_val * sin(theta) * sin(theta); 
+    double beta_x = 1. /f_val * (sin(phi)*l_val*r*sin(theta)*omega_val);
+    double beta_y = 1. /f_val * (l_val*r*sin(theta)*cos(phi)*omega_val);
+    double beta_z = 0;
+    // double beta_phi = -(l_val/f_val) * r * omega_val * sin(theta) * sin(theta); 
+    double beta_phi = - omega_val/r; 
 
     vars.shift[0] += beta_x;
     vars.shift[1] += beta_y;
@@ -87,8 +88,8 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double phase_ = phi;
 
     double g_zz_1 = (g_val * l_val) / f_val;
-    double g_yy_1 = l_val / g_val * (cos(phi)*cos(phi) + sin(phi)*sin(phi)*g_val);
-    double g_xx_1 = l_val / g_val * (cos(phi)*cos(phi)*g_val + sin(phi)*sin(phi));
+    double g_yy_1 = l_val / f_val * (cos(phi)*cos(phi) + sin(phi)*sin(phi)*g_val);
+    double g_xx_1 = l_val / f_val * (cos(phi)*cos(phi)*g_val + sin(phi)*sin(phi));
     double g_xy_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
     // double g_yx_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
 
@@ -104,7 +105,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
     double gammaUU[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
-    double K1;
+    double K;
 
     // Fill them in
     gammaLL[0][0] = g_xx_1;
@@ -113,10 +114,10 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     gammaLL[0][1] = g_xy_1;
     gammaLL[1][0] = gammaLL[0][1];
 
-    gammaUU[0][0] = l_val / f_val * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
-    gammaUU[0][1] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
-    gammaUU[1][1] = f_val/(g_val*l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
-    gammaUU[1][0] = -cos(phi) * f_val * (-1 + g_val) * sin(phi) / (g_val * l_val);
+    gammaUU[0][0] = f_val / (g_val * l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
+    gammaUU[0][1] = (-cos(phi) * f_val * (-1. + g_val) * sin(phi)) / (g_val * l_val);
+    gammaUU[1][1] = gammaUU[0][0];
+    gammaUU[1][0] = gammaUU[0][1];
     gammaUU[2][2] = 1. / g_zz_1;
 
     // pout() << "Computed metric expressions " << endl;
@@ -130,11 +131,10 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     KLL[1][2] = -KLL[0][2];
     KLL[2][1] = KLL[1][2];
     KLL[0][0] = (l_val*sin(2.*phi)*(1./tan(theta) * sin(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4*f_val*r*lapse);
-    FOR2(i,j) K1 += gammaUU[i][j] * KLL[i][j];
 
     // pout() << "Computed Kij expressions " << endl;
 
-    double chi_arg = (g_val * g_val * l_val * l_val * l_val * pow(r, 4) * sin(theta) * sin(theta)) / (pow(f_val, 3));
+    double chi_arg = (g_val * g_val * l_val * l_val * l_val  / (pow(f_val, 3)));
     vars.chi = pow(chi_arg, -1. / 3.);
 
     // pout() << "Computed BBSN conformal factor expressions " << endl;
