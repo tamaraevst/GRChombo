@@ -36,6 +36,8 @@ void RotatingBosonStar::compute_1d_rotating_solution()
 template <class data_t>
 void RotatingBosonStar::compute(Cell<data_t> current_cell) const
 {   
+    double theta, phi;
+
     MatterCCZ4<ComplexScalarField<>>::Vars<data_t> vars;
     // Load variables (should be set to zero if this is a single BS)
     
@@ -51,8 +53,24 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double z = coords.z;
     double y = coords.y;
     double r = sqrt(x * x + y * y + z * z);
-    double theta = acos(z/r);
-    double phi = atan(y/x);
+    if (r < 1e-6)
+    {
+        theta = 0.0;
+    }
+    else{
+        theta = acos(z/r);
+    }
+    if (fabs(x) < 1e-3 && x>0)
+    {
+        phi = M_PI/2.0;
+    }
+    else if (fabs(x) < 1e-3 && x<0)
+    {
+        phi = -M_PI/2.0;
+    }
+    else{
+        phi = atan(y/x);
+    }
 
     // Compactified coordinate
     double xvar = r / (1. + r);
