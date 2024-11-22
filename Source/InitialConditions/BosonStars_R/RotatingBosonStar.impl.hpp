@@ -114,23 +114,40 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     gammaLL[0][1] = g_xy_1;
     gammaLL[1][0] = gammaLL[0][1];
 
-    gammaUU[0][0] = f_val / (g_val * l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));
+    gammaUU[0][0] = f_val / (g_val * l_val) * (cos(phi)*cos(phi) + g_val * sin(phi)*sin(phi));
     gammaUU[0][1] = (-cos(phi) * f_val * (-1. + g_val) * sin(phi)) / (g_val * l_val);
-    gammaUU[1][1] = gammaUU[0][0];
+    gammaUU[1][1] = f_val / (g_val * l_val) * (cos(phi)*cos(phi) * g_val + sin(phi)*sin(phi));;
     gammaUU[1][0] = gammaUU[0][1];
     gammaUU[2][2] = 1. / g_zz_1;
 
-    // pout() << "Computed metric expressions " << endl;
+    ///////////////////////
+    //  For debugging    //
+    ///////////////////////
+    // double check11 = gammaLL[0][0]*gammaUU[0][0] + gammaLL[0][1]*gammaUU[1][0] + gammaLL[0][2] * gammaUU[2][0];
+    // double check01 = gammaLL[0][0]*gammaUU[0][1] + gammaLL[0][1]*gammaUU[1][1] + gammaLL[0][2] * gammaUU[2][1];
+    // double check02 = gammaLL[0][0]*gammaUU[0][2] + gammaLL[0][1]*gammaUU[1][2] + gammaLL[0][2] * gammaUU[2][2];
+    // if (fabs(check11-1.0)>1e-3)
+    // {   
+    //     pout() << "check11 is not 1 but " << check11 << endl;
+    // }
+    // if (fabs(check01-0.0)>1e-3)
+    // {   
+    //     pout() << "check01 is not 0 but " << check01 << endl;
+    // }
+    // if (fabs(check02-0.0)>1e-3)
+    // {   
+    //     pout() << "check02 is not 0 but " << check02 << endl;
+    // }
 
-    KLL[2][2] = 0;
-    KLL[1][1] = -KLL[0][0];
-    KLL[0][1] = -(cos(2.*phi)*l_val*(1./tan(theta)*sin(theta)*sin(theta)*dthomega_val + sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
-    KLL[0][2] = (l_val*sin(phi)*(-sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
+    KLL[0][0] = (l_val*sin(2.*phi)*(cos(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(-omega_val + r*dromega_val)))/(4*f_val*r*lapse);
+    KLL[0][1] = -KLL[0][0]/(tan(2.*phi));
     KLL[1][0] = KLL[0][1];
+    KLL[1][1] = -KLL[0][0];
+    KLL[0][2] = (-l_val*sin(phi)*(sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
     KLL[2][0] = KLL[0][2];
-    KLL[1][2] = -KLL[0][2];
+    KLL[1][2] = -KLL[0][2]/tan(phi);
     KLL[2][1] = KLL[1][2];
-    KLL[0][0] = (l_val*sin(2.*phi)*(1./tan(theta) * sin(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4*f_val*r*lapse);
+    KLL[2][2] = 0;
 
     // pout() << "Computed Kij expressions " << endl;
 
@@ -145,7 +162,16 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
     FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
+    // FOR2(i,j) 
+    // {
+    //     vars.K += KLL[i][j] * gammaUU[i][j];
+    //     if (vars.K != 0)
+    //     {
+    //         pout() << "At i " << i << " and j " << j << "we have " << vars.K << endl;
+    //     }
+    // }
     FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
+    // vars.K = 0.0;
     FOR2(i,j) vars.A[i][j] = vars.chi * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
 
     current_cell.store_vars(vars);
