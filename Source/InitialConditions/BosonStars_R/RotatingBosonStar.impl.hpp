@@ -60,17 +60,17 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     else{
         theta = acos(z/r);
     }
-    if (fabs(x) < 1e-3 && x>0)
-    {
-        phi = M_PI/2.0;
-    }
-    else if (fabs(x) < 1e-3 && x<0)
-    {
-        phi = -M_PI/2.0;
-    }
-    else{
-        phi = atan(y/x);
-    }
+    // if (x==0 < 0 && y>0)
+    // {
+    //     phi = M_PI/2.0;
+    // }
+    // else if (x==0 && y<0)
+    // {
+    //     phi = -M_PI/2.0;
+    // }
+    // else{
+    phi = atan2(y,x);
+    // }
 
     // Compactified coordinate
     double xvar = r / (1. + r);
