@@ -245,7 +245,7 @@ double RotatingBosonStarSolution::get_amp_interp(double r, double theta, int n, 
     MayDay::Error("Error: x1 is empty. Make sure to initialize it before calling get_amp_interp().");
     }
 
-    Poly2D_interp bilinear_interpolation(x2,x1,amp,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,amp);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -255,7 +255,7 @@ double RotatingBosonStarSolution::get_f_interp(const double r, const double thet
 {
     double interpolated_value; 
 
-    Poly2D_interp bilinear_interpolation(x2,x1,f,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,f);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -265,7 +265,7 @@ double RotatingBosonStarSolution::get_l_interp(const double r, const double thet
 {
     double interpolated_value; 
 
-    Poly2D_interp bilinear_interpolation(x2,x1,l,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,l);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -275,7 +275,7 @@ double RotatingBosonStarSolution::get_g_interp(const double r, const double thet
 {
     double interpolated_value; 
 
-    Poly2D_interp bilinear_interpolation(x2,x1,g,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,g);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -285,7 +285,7 @@ double RotatingBosonStarSolution::get_omega_interp(const double r, const double 
 {
     double interpolated_value; 
 
-    Poly2D_interp bilinear_interpolation(x2,x1,omega,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,omega);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -295,7 +295,7 @@ double RotatingBosonStarSolution::get_dthomega_interp(const double r, const doub
 {
     double interpolated_value; 
     
-    Poly2D_interp bilinear_interpolation(x2,x1,dthomega,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,dthomega);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
@@ -305,7 +305,7 @@ double RotatingBosonStarSolution::get_dromega_interp(const double r, const doubl
 {
     double interpolated_value; 
 
-    Poly2D_interp bilinear_interpolation(x2,x1,dromega,5,5);
+    Spline2D_interp bilinear_interpolation(x2,x1,dromega);
     interpolated_value = bilinear_interpolation.interp(theta, r);
     
     return interpolated_value;
