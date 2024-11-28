@@ -142,12 +142,12 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     // }
 
     KLL[0][0] = (l_val*sin(2.*phi)*(cos(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(-omega_val + r*dromega_val)))/(4*f_val*r*lapse);
-    KLL[0][1] = -KLL[0][0]/(tan(2.*phi));
+    KLL[0][1] = -(l_val*cos(2.*phi)*(cos(theta) * sin(theta) * dthomega_val+sin(theta)*sin(theta)*(-omega_val + r*dromega_val)))/(4*f_val*r*lapse);
     KLL[1][0] = KLL[0][1];
     KLL[1][1] = -KLL[0][0];
     KLL[0][2] = (-l_val*sin(phi)*(sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
     KLL[2][0] = KLL[0][2];
-    KLL[1][2] = -KLL[0][2]/tan(phi);
+    KLL[1][2] = (l_val*cos(phi)*(sin(theta)*sin(theta)*dthomega_val + cos(theta)*sin(theta)*(omega_val - r*dromega_val)))/(4.*f_val*r*lapse);
     KLL[2][1] = KLL[1][2];
     KLL[2][2] = 0;
 
