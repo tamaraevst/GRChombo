@@ -53,24 +53,8 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double z = coords.z;
     double y = coords.y;
     double r = sqrt(x * x + y * y + z * z);
-    if (r < 1e-6)
-    {
-        theta = 0.0;
-    }
-    else{
-        theta = acos(z/r);
-    }
-    // if (x==0 < 0 && y>0)
-    // {
-    //     phi = M_PI/2.0;
-    // }
-    // else if (x==0 && y<0)
-    // {
-    //     phi = -M_PI/2.0;
-    // }
-    // else{
+    theta = acos(z/r);
     phi = atan2(y,x);
-    // }
 
     // Compactified coordinate
     double xvar = r / (1. + r);
@@ -81,7 +65,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     int n = rotating_BS_sol.n;
     int m = rotating_BS_sol.m;
     
-    double A_val = rotating_BS_sol.get_amp_interp(xvar, theta, n, m);
+    double A_val = rotating_BS_sol.get_amp_interp(xvar, theta, n, m)/sqrt(2);
     // DEBUG_OUT(A_val);
     double f_val = rotating_BS_sol.get_f_interp(xvar, theta, n, m);
     double g_val = rotating_BS_sol.get_g_interp(xvar, theta, n, m);
@@ -90,9 +74,9 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double dthomega_val = rotating_BS_sol.get_dthomega_interp(xvar, theta, n, m);
     double dromega_val = rotating_BS_sol.get_dromega_interp(xvar, theta, n, m);
 
-    double lapse = sqrt(f_val + (l_val*sin(theta)*sin(theta)*(-1+omega_val))*omega_val/f_val);
-    double beta_x = 1. /f_val * (sin(phi)*l_val*r*sin(theta)*omega_val);
-    double beta_y = 1. /f_val * (l_val*r*sin(theta)*cos(phi)*omega_val);
+    double lapse = sqrt(fabs(f_val));
+    double beta_x = sin(theta)*sin(phi)*omega_val;
+    double beta_y = -sin(theta)*cos(phi)*omega_val;
     double beta_z = 0;
     // double beta_phi = -(l_val/f_val) * r * omega_val * sin(theta) * sin(theta); 
     double beta_phi = - omega_val/r; 
@@ -188,9 +172,9 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     //         pout() << "At i " << i << " and j " << j << "we have " << vars.K << endl;
     //     }
     // }
-    FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
-    // vars.K = 0.0;
-    FOR2(i,j) vars.A[i][j] = vars.chi * (KLL[i][j] - one_third * vars.K * gammaLL[i][j]);
+    // FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
+    vars.K = 0.0;
+    FOR2(i,j) vars.A[i][j] = vars.chi * KLL[i][j];
 
     current_cell.store_vars(vars);
 }

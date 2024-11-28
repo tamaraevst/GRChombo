@@ -40,6 +40,7 @@ class RotatingBosonStarSolution
     double get_omega_interp(const double r, const double theta, int n, int m) const;
     double get_dthomega_interp(const double r, const double theta, int n, int m) const;
     double get_dromega_interp(const double r, const double theta, int n, int m) const;
+    double interp2D(MatDoub Z, double x_interp, double y_interp) const;
     // double get_BSfrequency() const;
     void writeMatrixToFile(const MatDoub& yy, const std::string& filename);
     void main(std::string m_base_path);
