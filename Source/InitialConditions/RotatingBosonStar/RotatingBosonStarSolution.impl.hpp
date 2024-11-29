@@ -12,8 +12,7 @@
 
 #include <iostream>
 #include <vector>
-#include <fstream> // Needed for std::ifstream
-#include "lagrange.hpp"
+#include <fstream> // Needed for std::ifstream 
 
 RotatingBosonStarSolution::RotatingBosonStarSolution() {}
 // inline RotatingBosonStarSolution::RotatingBosonStarSolution(std::string base_path, double BSfreq)
