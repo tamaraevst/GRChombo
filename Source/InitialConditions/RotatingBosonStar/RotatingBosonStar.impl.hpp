@@ -65,7 +65,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     int n = rotating_BS_sol.n;
     int m = rotating_BS_sol.m;
     
-    double A_val = rotating_BS_sol.get_amp_interp(xvar, theta, n, m)/sqrt(2);
+    double A_val = rotating_BS_sol.get_amp_interp(xvar, theta, n, m)*sqrt(2);
     // DEBUG_OUT(A_val);
     double f_val = rotating_BS_sol.get_f_interp(xvar, theta, n, m);
     double g_val = rotating_BS_sol.get_g_interp(xvar, theta, n, m);
