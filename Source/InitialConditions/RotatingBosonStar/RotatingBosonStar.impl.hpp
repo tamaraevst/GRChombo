@@ -60,13 +60,11 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double xvar = r / (1. + r);
 
     double ff = m_params_RotatingBosonStar.BS_frequency;
-    // rotating_BS_sol.get_BSfrequency();
 
     int n = rotating_BS_sol.n;
     int m = rotating_BS_sol.m;
     
     double A_val = rotating_BS_sol.get_amp_interp(xvar, theta, n, m)*sqrt(2);
-    // DEBUG_OUT(A_val);
     double f_val = rotating_BS_sol.get_f_interp(xvar, theta, n, m);
     double g_val = rotating_BS_sol.get_g_interp(xvar, theta, n, m);
     double l_val = rotating_BS_sol.get_l_interp(xvar, theta, n, m);
@@ -78,14 +76,11 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double beta_x = sin(theta)*sin(phi)*omega_val;
     double beta_y = -sin(theta)*cos(phi)*omega_val;
     double beta_z = 0;
-    // double beta_phi = -(l_val/f_val) * r * omega_val * sin(theta) * sin(theta); 
     double beta_phi = - omega_val/r; 
 
     vars.shift[0] += beta_x;
     vars.shift[1] += beta_y;
-    vars.shift[2] +- beta_z;
-
-    // pout() << "Computed lapse and shift expressions \n" << endl;
+    vars.shift[2] += beta_z;
 
     double phase_ = phi;
 
@@ -93,15 +88,12 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double g_yy_1 = l_val / f_val * (cos(phi)*cos(phi) + sin(phi)*sin(phi)*g_val);
     double g_xx_1 = l_val / f_val * (cos(phi)*cos(phi)*g_val + sin(phi)*sin(phi));
     double g_xy_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
-    // double g_yx_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
 
     //Add on to evolution equations
     vars.phi_Re += A_val * cos(phase_);
     vars.phi_Im += A_val * sin(phase_);
     vars.Pi_Re += (A_val / lapse) * (ff - beta_phi)*sin(phase_);
     vars.Pi_Im += -(A_val / lapse) * (ff - beta_phi)*cos(phase_);
-
-    // pout() << "Computed real and imaginary scalar part expressions " << endl;
 
     //Initialise extrinsic curvature and metric with upper indices
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
@@ -151,12 +143,8 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     KLL[2][1] = KLL[1][2];
     KLL[2][2] = 0;
 
-    // pout() << "Computed Kij expressions " << endl;
-
     double chi_arg = (g_val * g_val * l_val * l_val * l_val  / (pow(f_val, 3)));
     vars.chi = pow(chi_arg, -1. / 3.);
-
-    // pout() << "Computed BBSN conformal factor expressions " << endl;
 
     // Define initial lapse
     vars.lapse += lapse;
@@ -164,14 +152,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     // Define initial trace of K and A_ij
     double one_third = 1./3.;
     FOR2(i,j) vars.h[i][j] = vars.chi * gammaLL[i][j];
-    // FOR2(i,j) 
-    // {
-    //     vars.K += KLL[i][j] * gammaUU[i][j];
-    //     if (vars.K != 0)
-    //     {
-    //         pout() << "At i " << i << " and j " << j << "we have " << vars.K << endl;
-    //     }
-    // }
+
     // FOR2(i,j) vars.K += KLL[i][j] * gammaUU[i][j];
     vars.K = 0.0;
     FOR2(i,j) vars.A[i][j] = vars.chi * KLL[i][j];
