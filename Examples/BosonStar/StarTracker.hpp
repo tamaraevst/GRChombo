@@ -72,8 +72,7 @@ class StarTracker
     void write_to_dat(std::string a_filename, double a_dt, double a_time,
                       double a_restart_time, bool a_first_step);
 
-    void read_old_centre_from_dat(std::string a_filename, double a_dt,
-                                  double a_time, double a_restart_time,
+    void read_old_centre_from_dat(std::string a_filename,
                                   bool a_first_step);
     // function to get punctures
     ALWAYS_INLINE const std::vector<double> &

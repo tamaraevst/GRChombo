@@ -322,7 +322,7 @@ void BosonStarLevel::doAnalysis()
         if (fabs(m_time - m_restart_time) < m_dt * 1.1)
         {
             m_st_amr.m_star_tracker.read_old_centre_from_dat(
-                "StarCentres", m_dt, m_time, m_restart_time, first_step);
+                "StarCentres", first_step);
         }
         m_st_amr.m_star_tracker.update_star_centres(m_dt);
         m_st_amr.m_star_tracker.write_to_dat("StarCentres", m_dt, m_time,

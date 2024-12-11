@@ -346,35 +346,28 @@ void StarTracker::write_to_dat(std::string a_filename, double a_dt,
 }
 
 //Read a data line from the previous timestep
-void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
-                                           double a_time, double a_restart_time,
+void StarTracker::read_old_centre_from_dat(std::string a_filename,
                                            bool a_first_step)
 {
+    int int_step = m_interpolator->getAMR().s_step;
+    double current_time = m_interpolator->getAMR().getCurrentTime();
+    double dt = (current_time / int_step);
+
+    SmallDataIO star_centre_file(a_filename, dt, current_time, current_time,
+                                     SmallDataIO::APPEND, a_first_step);
+    
     std::vector<double> data_line;
-    if (a_time > a_dt / 3.)
+    star_centre_file.get_specific_data_line(data_line, current_time);
+
+    CH_assert(data_line.size() % CH_SPACEDIM == 0);
+
+    bool length_match = data_line.size() == m_num_stars * CH_SPACEDIM;
+
+    for (int i = 0; i < data_line.size(); i++)
     {
-        SmallDataIO star_centre_file(a_filename, a_dt, a_time, a_restart_time,
-                                     SmallDataIO::READ, a_first_step);
-        star_centre_file.get_specific_data_line(data_line, a_time - a_dt);
-
-        bool length_match = data_line.size() == m_num_stars * CH_SPACEDIM;
-
-        if (length_match)
-        {
-            for (int i = 0; i < data_line.size(); i++)
-            {
-                m_star_coords[i] = data_line[i];
-            }
-        }
-        else
-        {
-            for (int i = 0; i < m_star_coords.size(); i++)
-            {
-                m_star_coords[i] = NAN;
-            }
-            std::cout
-                << "Array Size Mismatch While Loading Star Centre From File ! "
-                << std::endl;
-        }
+        m_star_coords[i] = data_line[i];
     }
+
+    pout() << "Star A restarted at : " << m_star_coords[0] << " " << m_star_coords[1] << " " << m_star_coords[2] << endl;
+    pout() << "Star B restarted at : " << m_star_coords[3] << " " << m_star_coords[4] << " " << m_star_coords[5] << endl;
 }
