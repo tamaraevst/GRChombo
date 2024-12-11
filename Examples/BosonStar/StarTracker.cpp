@@ -350,15 +350,19 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename,
                                            bool a_first_step)
 {
     int int_step = m_interpolator->getAMR().s_step;
+    pout() << "Int_step variable is = " << int_step << endl;
     double current_time = m_interpolator->getAMR().getCurrentTime();
+    pout() << "Current_time variable is = " << int_step << endl;
     double dt = (current_time / int_step);
+    pout() << "Dt variable is = " << int_step << endl;
 
     SmallDataIO star_centre_file(a_filename, dt, current_time, current_time,
                                      SmallDataIO::APPEND, a_first_step);
     
     std::vector<double> data_line;
     star_centre_file.get_specific_data_line(data_line, current_time);
-
+    pout() << "Data line size " << data_line.size() << endl;
+    pout() << "Data line restarted at : " << data_line[0] << " " << data_line[1] << " " << data_line[2] << data_line[3] << data_line[4] << data_line[5] << endl;
     CH_assert(data_line.size() % CH_SPACEDIM == 0);
 
     bool length_match = data_line.size() == m_num_stars * CH_SPACEDIM;
