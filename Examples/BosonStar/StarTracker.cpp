@@ -346,21 +346,20 @@ void StarTracker::write_to_dat(std::string a_filename, double a_dt,
 }
 
 //Read a data line from the previous timestep
-void StarTracker::read_old_centre_from_dat(std::string a_filename,
+void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
+                                           double a_time, double a_restart_time,
                                            bool a_first_step)
 {
-    int int_step = m_interpolator->getAMR().s_step;
-    pout() << "Int_step variable is = " << int_step << endl;
-    double current_time = m_interpolator->getAMR().getCurrentTime();
-    pout() << "Current_time variable is = " << current_time << endl;
-    double dt = (current_time / int_step);
-    pout() << "Dt variable is = " << dt << endl;
-
-    SmallDataIO star_centre_file(a_filename, dt, current_time, current_time,
-                                     SmallDataIO::APPEND, a_first_step);
-    
     std::vector<double> data_line;
-    star_centre_file.get_specific_data_line(data_line, current_time);
+
+    pout() << "A-time is" << a_time << endl;
+    pout() << "A-restart-time is" << a_restart_time << endl;
+    pout() << "A-dt is" << a_dt << endl;
+
+    SmallDataIO star_centre_file(a_filename, a_dt, a_time, a_restart_time,
+                                     SmallDataIO::READ, a_first_step);
+    
+    star_centre_file.get_specific_data_line(data_line, a_time - a_dt);
     pout() << "Data line size " << data_line.size() << endl;
     pout() << "Data line restarted at : " << data_line[0] << " " << data_line[1] << " " << data_line[2] << " " <<  data_line[3] << " " << data_line[4] << " " << data_line[5] << " " << data_line[6] << endl;
     CH_assert(data_line.size() % CH_SPACEDIM == 0);
@@ -374,4 +373,5 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename,
 
     pout() << "Star A restarted at : " << m_star_coords[0] << " " << m_star_coords[1] << " " << m_star_coords[2] << endl;
     pout() << "Star B restarted at : " << m_star_coords[3] << " " << m_star_coords[4] << " " << m_star_coords[5] << endl;
+
 }
