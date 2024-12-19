@@ -43,6 +43,13 @@ public:
         pp.load("solitonic", potential_params.solitonic, false);
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
 
+        //Tagging
+        pp.load("tag_radius_A", tag_radius_A, 4.);
+        pp.load("star_radius", puncture_radius, 4.);
+        pp.load("star_mass", puncture_mass, 4.);
+        pp.load("tag_buffer", tag_buffer, 0.5);
+	pp.load("tag_puncture_max_level", tag_puncture_max_level, max_level);
+
         // Mass extraction
         pp.load("activate_mass_extraction", activate_mass_extraction, 0);
         pp.load("mass_write_extraction",
@@ -98,6 +105,9 @@ public:
     // Tagging thresholds
     double G_Newton;
     Real regrid_threshold_phi, regrid_threshold_chi;
+    Real tag_radius_A, tag_buffer;
+    Real puncture_mass, puncture_radius;
+    int tag_puncture_max_level;
 
     RotatingBosonStar_params_t rotating_bosonstar_params;
     Potential::params_t potential_params;
