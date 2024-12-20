@@ -44,7 +44,6 @@ public:
         pp.load("sigma_soliton", potential_params.sigma_soliton, 0.02);
 
         //Tagging
-        pp.load("tag_radius_A", tag_radius_A, 4.);
         pp.load("star_radius", puncture_radius, 4.);
         pp.load("star_mass", puncture_mass, 4.);
         pp.load("tag_buffer", tag_buffer, 0.5);
