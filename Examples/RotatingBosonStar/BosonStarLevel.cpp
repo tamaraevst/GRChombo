@@ -277,7 +277,8 @@ void BosonStarLevel::doAnalysis()
 
 
         // Compute the min of chi and write it to a file
-        double min_chi = amr_reductions.min(c_chi);
+        AMRReductions<VariableType::evolution> amr_reductions_ev(m_gr_amr);
+        double min_chi = amr_reductions_ev.min(c_chi);
         SmallDataIO min_chi_file("min_chi", m_dt, m_time,
                                      m_restart_time,
                                      SmallDataIO::APPEND,
