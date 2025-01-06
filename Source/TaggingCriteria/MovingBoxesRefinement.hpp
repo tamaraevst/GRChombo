@@ -64,13 +64,15 @@ class MovingBoxesRefinement
     template <class data_t> void compute(Cell<data_t> current_cell) const
     {
         // first test the gradients for regions of high curvature
-        const auto d2 = m_deriv.template diff2<Vars>(current_cell);
-        data_t mod_d2_chi = 0;
-        FOR(idir, jdir)
-        {
-            mod_d2_chi += d2.chi[idir][jdir] * d2.chi[idir][jdir];
-        }
-        data_t criterion = m_dx * sqrt(mod_d2_chi);
+        // const auto d2 = m_deriv.template diff2<Vars>(current_cell);
+        // data_t mod_d2_chi = 0;
+        // FOR(idir, jdir)
+        // {
+        //     mod_d2_chi += d2.chi[idir][jdir] * d2.chi[idir][jdir];
+        // }
+        // data_t criterion = m_dx * sqrt(mod_d2_chi);
+
+        data_t criterion;
 
         std::array<double, CH_SPACEDIM> puncture_centre1;
 
