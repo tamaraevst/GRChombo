@@ -83,7 +83,7 @@ class MovingBoxesRefinement
 		const data_t max_abs_xy =
                         simd_max(abs(coords.x), abs(coords.y));
 		
-		if (m_level >= m_puncture_max_level)
+		if (m_level <= m_puncture_max_level)
                     {
                         // we want the 2nd and 3rd levels above
                         // puncture_max_level to be twice the size of the next
