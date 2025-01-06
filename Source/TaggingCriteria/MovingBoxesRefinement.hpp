@@ -83,7 +83,7 @@ class MovingBoxesRefinement
 		const data_t max_abs_xy =
                         simd_max(abs(coords.x), abs(coords.y));
 		
-		if (m_level <= m_puncture_max_level)
+		if (m_level >= m_puncture_max_level)
                     {
                         // we want the 2nd and 3rd levels above
                         // puncture_max_level to be twice the size of the next
@@ -100,8 +100,8 @@ class MovingBoxesRefinement
                         // m_buffer) in the simd_compare_lt call; this would result in milder tagging. 
 			
                         criterion = simd_conditional(regrid, 100.0, criterion);
-                    }
-		else
+                     }
+	 	else
                     {
                         // remove any finer levels for BHs with
                         // puncture_max_level < max_level
