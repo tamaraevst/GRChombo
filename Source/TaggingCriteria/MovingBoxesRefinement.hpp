@@ -89,7 +89,7 @@ class MovingBoxesRefinement
                         // puncture_max_level to be twice the size of the next
                         // finest level
                         const double factor =
-                            pow(2.0, m_puncture_max_level -
+                            pow(1.5, m_puncture_max_level -
                                              m_level - 1);
 
                         auto regrid = simd_compare_lt(
