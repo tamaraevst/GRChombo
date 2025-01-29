@@ -289,7 +289,19 @@ void BosonStarLevel::doAnalysis()
             min_chi_file.write_header_line({"min chi"});
         }
         min_chi_file.write_time_data_line({min_chi});
-
+        
+	// Compute the min of lapse and write it to a file
+        double min_lapse = amr_reductions_ev.min(c_lapse);
+        SmallDataIO min_lapse_file("min_lapse", m_dt, m_time,
+                                     m_restart_time,
+                                     SmallDataIO::APPEND,
+                                     first_step);
+        min_lapse_file.remove_duplicate_time_data();
+        if (m_time == 0.)
+        {
+            min_lapse_file.write_header_line({"min lapse"});
+        }
+        min_lapse_file.write_time_data_line({min_lapse});
 
         // constraeints calculated pre check and pre plot so done here already
 
@@ -447,13 +459,13 @@ void BosonStarLevel::doAnalysis()
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
                                                const FArrayBox &current_state)
 {
-//    BoxLoops::loop(ComplexPhiAndChiExtractionTaggingCriterion(m_dx, m_level,
-//                    m_p.extraction_params, m_p.regrid_threshold_phi,
-//                    m_p.regrid_threshold_chi, m_p.activate_extraction), current_state, tagging_criterion);
+    BoxLoops::loop(ComplexPhiAndChiExtractionTaggingCriterion(m_dx, m_level,
+                    m_p.extraction_params, m_p.regrid_threshold_phi,
+                    m_p.regrid_threshold_chi, m_p.activate_extraction), current_state, tagging_criterion);
 
-      BoxLoops::loop(MovingBoxesRefinement(
-                           m_dx, m_level, m_p.tag_puncture_max_level,
-                           m_p.center, m_p.puncture_radius, m_p.puncture_mass, m_p.tag_buffer),
-                      current_state, tagging_criterion);	
+//      BoxLoops::loop(MovingBoxesRefinement(
+//                           m_dx, m_level, m_p.tag_puncture_max_level,
+//                           m_p.center, m_p.puncture_radius, m_p.puncture_mass, m_p.tag_buffer),
+//                      current_state, tagging_criterion);	
 
 }
