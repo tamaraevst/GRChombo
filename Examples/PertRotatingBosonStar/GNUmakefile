@@ -24,6 +24,6 @@ src_dirs := $(GRCHOMBO_SOURCE)/utils \
             $(GRCHOMBO_SOURCE)/GRChomboCore  \
             $(GRCHOMBO_SOURCE)/TaggingCriteria  \
             $(GRCHOMBO_SOURCE)/AMRInterpolator  \
-            $(GRCHOMBO_SOURCE)/InitialConditions/RotatingBosonStar 
+            $(GRCHOMBO_SOURCE)/InitialConditions/PertRotatingBosonStar 
 
 include $(CHOMBO_HOME)/mk/Make.test

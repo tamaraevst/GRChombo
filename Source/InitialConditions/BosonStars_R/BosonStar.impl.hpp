@@ -13,7 +13,6 @@
 #include "BosonStarSolution.hpp" //for BosonStarSolution class
 #include "WeightFunction.hpp"
 #include "DebuggingTools.hpp"
-#include "Max.hpp"
 
 inline BosonStar::BosonStar(BosonStar_params_t a_params_BosonStar, BosonStar_params_t a_params_BosonStar2,
                     Potential::params_t a_params_potential, double a_G_Newton,
