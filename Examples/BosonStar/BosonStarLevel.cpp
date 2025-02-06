@@ -319,7 +319,9 @@ void BosonStarLevel::doAnalysis()
 	pout() << "Running a star tracker now" << endl;
         // if at restart time read data from dat file,
         // will default to param file if restart time is 0
-        if (fabs(m_time - m_restart_time) < m_dt * 1.1)
+    int current_step = m_gr_amr.m_interpolator->getAMR().s_step;
+
+    if (current_step != 0)
         {
             m_st_amr.m_star_tracker.read_old_centre_from_dat(
                 "StarCentres", m_dt, m_time, m_restart_time, first_step);
