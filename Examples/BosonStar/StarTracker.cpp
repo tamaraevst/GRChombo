@@ -355,8 +355,6 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
     std::vector<double> data_line;
     std::vector<double> star_coords;
 
-    if (a_time > a_dt / 3.)
-    {
         SmallDataIO star_centre_file(a_filename, a_dt, a_time, a_restart_time,
                                      SmallDataIO::READ, a_first_step);
         star_centre_file.get_specific_data_line(data_line, a_time - a_dt);
@@ -372,7 +370,6 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
             {
                 star_coords[i] = data_line[i];
             }
-
             pout() << "Star A restarted at : " << star_coords[0] << " "
                    << star_coords[1] << " " << star_coords[2] << endl;
             pout() << "Star B restarted at : " << star_coords[3] << " "
@@ -380,12 +377,7 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
         }
         else
         {
-            for (int i = 0; i < star_coords.size(); i++)
-            {
-                star_coords[i] = NAN;
-            }
             MayDay::Error("Array size mismatch, when loading star positions "
                           "from StarCentres.dat file!");
         }
-    }
 }
