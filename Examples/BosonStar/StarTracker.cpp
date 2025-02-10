@@ -353,27 +353,25 @@ void StarTracker::read_old_centre_from_dat(std::string a_filename, double a_dt,
     
     int size;
     std::vector<double> data_line;
-    std::vector<double> star_coords;
 
-        SmallDataIO star_centre_file(a_filename, a_dt, a_time, a_restart_time,
+    SmallDataIO star_centre_file(a_filename, a_dt, a_time, a_restart_time,
                                      SmallDataIO::READ, a_first_step);
-        star_centre_file.get_specific_data_line(data_line, a_time - a_dt);
+    star_centre_file.get_specific_data_line(data_line, a_time - a_dt);
 
-        bool length_match = data_line.size() == m_num_stars * CH_SPACEDIM;
+    bool length_match = data_line.size() == m_num_stars * CH_SPACEDIM;
 
-        size = CH_SPACEDIM * m_num_stars;
-        star_coords.resize(size, 0);
+    size = CH_SPACEDIM * m_num_stars;
 
-        if (length_match)
+    if (length_match)
+    {
+        for (int i = 0; i < data_line.size(); i++)
         {
-            for (int i = 0; i < data_line.size(); i++)
-            {
-                star_coords[i] = data_line[i];
-            }
-            pout() << "Star A restarted at : " << star_coords[0] << " "
-                   << star_coords[1] << " " << star_coords[2] << endl;
-            pout() << "Star B restarted at : " << star_coords[3] << " "
-                   << star_coords[4] << " " << star_coords[5] << endl;
+            m_star_coords[i] = data_line[i];
+        }
+        pout() << "Star A restarted at : " << m_star_coords[0] << " "
+                   << m_star_coords[1] << " " << m_star_coords[2] << endl;
+        pout() << "Star B restarted at : " << m_star_coords[3] << " "
+                   << m_star_coords[4] << " " << m_star_coords[5] << endl;
         }
         else
         {
