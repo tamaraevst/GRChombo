@@ -45,7 +45,7 @@
 
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
-#include "NoetherCharge.hpp"
+#include "NoetherChargeDiagnostics.hpp"
 
 // For Ang Mom Integrating
 #include "AngMomFlux.hpp"
@@ -108,7 +108,7 @@ void BosonStarLevel::preCheckpointLevel()
                      m_dx, m_p.formulation, m_p.G_Newton),
                      MatterConstraints<ComplexScalarFieldWithPotential>(
                      complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
-                     Interval(c_Mom1, c_Mom3)), NoetherCharge(),
+                     Interval(c_Mom1, c_Mom3)), NoetherChargeDiagnostics<FourthOrderDerivatives>(m_dx),
                      EMTensor<ComplexScalarFieldWithPotential>(
                      complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
                      Interval(c_s11,c_s33))),
@@ -130,7 +130,7 @@ void BosonStarLevel::prePlotLevel()
                       m_dx, m_p.formulation, m_p.G_Newton),
                       MatterConstraints<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
-                      Interval(c_Mom1, c_Mom3)), NoetherCharge(),
+                      Interval(c_Mom1, c_Mom3)), NoetherChargeDiagnostics<FourthOrderDerivatives>(m_dx),
                       EMTensor<ComplexScalarFieldWithPotential>(
                       complex_scalar_field, m_dx, c_rho, Interval(c_s1,c_s3),
                       Interval(c_s11,c_s33))),
@@ -236,7 +236,7 @@ void BosonStarLevel::doAnalysis()
     // noether charge, max mod phi, min chi, constraint violations
     if (at_level_timestep_multiple(0))
     {
-        BoxLoops::loop(NoetherCharge(), m_state_new, m_state_diagnostics,
+        BoxLoops::loop(NoetherChargeDiagnostics<FourthOrderDerivatives>(m_dx), m_state_new, m_state_diagnostics,
                   EXCLUDE_GHOST_CELLS);
     }
     if (m_level == 0)
