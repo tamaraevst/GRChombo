@@ -50,6 +50,9 @@ enum
 
     c_testHam,
 
+    c_dt_mod_phi,
+    c_gamma_tt,
+
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -75,7 +78,9 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
         
     "profile1", "profile2",
     
-    "testHam"
+    "testHam", 
+
+    "dt_A_sq", "abs_gamma_tt",
     
      };
     
