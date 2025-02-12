@@ -318,142 +318,22 @@ void BosonStarLevel::doAnalysis()
             constraints_file.write_header_line({"L^2_Ham", "L^2_Mom", "L^1_Ham", "L^1_Mom",});
         }
         constraints_file.write_time_data_line({L2_Ham, L2_Mom, L1_Ham, L1_Mom});
-    }
+    
 
-    //if (m_p.do_flux_integration && m_level==m_p.angmomflux_params.extraction_level)
-    double temp_dx;
-    if (m_p.do_flux_integration && at_level_timestep_multiple(m_p.flux_extraction_level))
-    {
-        CH_TIME("BosonStarLevel::doAnalysis::FphiSphi");
-        Potential potential(m_p.potential_params);
-        ComplexScalarFieldWithPotential complex_scalar_field(potential);
-
-        // execute only on the finest level
-        if (m_level==m_p.flux_extraction_level)
-        //if (m_level==m_p.max_level)
+    // Compute the maximum of mod_phi and write it to a file
+        double dt_phi_max = amr_reductions.max(c_dt_mod_phi);
+        double dt_gamma_max = amr_reductions.max(c_gamma_tt);
+        SmallDataIO dt_max_file("dt_max", m_dt, m_time,
+                                 m_restart_time,
+                                 SmallDataIO::APPEND,
+                                 first_step);
+        dt_max_file.remove_duplicate_time_data();
+        if (m_time == 0.)
         {
-            double S_phi_integral; // integral of angmomsource
-            double Q_phi_integral; // integral of angmomsource
-            std::vector<AMRLevel *> all_level_ptrs = getAMRLevelHierarchy().stdVector();
-            std::vector<double> S_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
-            std::vector<double> Q_phi_integrals(m_p.angmomflux_params.num_extraction_radii); // vector storing all integrals
-
-            //temp_dx = m_p.coarsest_dx;
-            // fill grid with angmom variables on every level
-            for (auto level_ptr : all_level_ptrs)
-            {
-                BosonStarLevel *bs_level_ptr =
-                    dynamic_cast<BosonStarLevel *>(level_ptr);
-                if (bs_level_ptr == nullptr)
-                {
-                    break;
-                }
-                temp_dx = bs_level_ptr->m_dx;
-                BoxLoops::loop(EMTensor_and_mom_flux<ComplexScalarFieldWithPotential>(
-                complex_scalar_field, temp_dx, m_p.L, m_p.angmomflux_params.center,
-                                     c_Fphi_flux, c_Sphi_source, c_Qphi_density,
-                                                     c_rho, Interval(c_s1,c_s3),
-                             Interval(c_s11,c_s33)),  bs_level_ptr->m_state_new,
-                                bs_level_ptr->m_state_diagnostics, EXCLUDE_GHOST_CELLS);
-            }
-            // loop through levels and fill ghosts
-            for (auto level_ptr : all_level_ptrs)
-            {
-                BosonStarLevel *bs_level_ptr =
-                    dynamic_cast<BosonStarLevel *>(level_ptr);
-                if (bs_level_ptr == nullptr)
-                {
-                    break;
-                }
-                bs_level_ptr->fillAllGhosts();
-            }
-
-            for (int i=m_p.angmomflux_params.num_extraction_radii-1; i>=0; i--)
-            {
-                temp_dx = m_p.coarsest_dx;
-                for (auto level_ptr : all_level_ptrs)
-                {
-                    BosonStarLevel *bs_level_ptr =
-                        dynamic_cast<BosonStarLevel *>(level_ptr);
-                    if (bs_level_ptr == nullptr)
-                    {
-                        break;
-                    }
-
-                  // set angmomsource and density to zero outside of extraction radii
-                  temp_dx = bs_level_ptr->m_dx;
-                  BoxLoops::loop(SourceIntPreconditioner<ComplexScalarFieldWithPotential>
-              (complex_scalar_field, temp_dx, m_p.L, m_p.angmomflux_params.center,
-                                                 c_Sphi_source, c_Qphi_density,
-                                    m_p.angmomflux_params.extraction_radii[i]),
-                          bs_level_ptr->m_state_new, bs_level_ptr->m_state_diagnostics,
-                                                          INCLUDE_GHOST_CELLS);
-                }
-                // old code passed this coarse dx, maybe this doesnt work now?
-                AMRReductions<VariableType::diagnostic> amr_reductions(m_gr_amr);
-                S_phi_integral = amr_reductions.sum(c_Sphi_source);
-                S_phi_integrals[i] = S_phi_integral;
-                Q_phi_integral = amr_reductions.sum(c_Qphi_density);
-                Q_phi_integrals[i] = Q_phi_integral;
-            }
-
-
-            // save the Source integral to dat file
-            std::vector<string> title_line(m_p.angmomflux_params.num_extraction_radii);
-            string dummy_string;
-            for (int j=0; j<m_p.angmomflux_params.num_extraction_radii; j++)
-            {
-                dummy_string = "r = " + to_string(m_p.angmomflux_params.extraction_radii[j]);
-                title_line[j] = dummy_string;
-            }
-
-            SmallDataIO angmomsource_file("AngMomSource", m_dt, m_time,
-                                          m_restart_time,
-                                          SmallDataIO::APPEND,
-                                          first_step);
-
-            if (m_time > 0) angmomsource_file.remove_duplicate_time_data();
-
-            if (m_time == 0.)
-            {
-                angmomsource_file.write_header_line(title_line);
-            }
-
-            angmomsource_file.write_time_data_line(S_phi_integrals);
-
-
-            // save the Density integral to dat file
-            std::vector<string> title_line2(m_p.angmomflux_params.num_extraction_radii);
-            string dummy_string2;
-            for (int j=0; j<m_p.angmomflux_params.num_extraction_radii; j++)
-            {
-                dummy_string2 = "r = " + to_string(m_p.angmomflux_params.extraction_radii[j]);
-                title_line2[j] = dummy_string2;
-            }
-
-            SmallDataIO density_file("AngMomDensity", m_dt, m_time,
-                                          m_restart_time,
-                                          SmallDataIO::APPEND,
-                                          first_step);
-
-            if (m_time > 0) density_file.remove_duplicate_time_data();
-
-            if (m_time == 0.)
-            {
-                density_file.write_header_line(title_line2);
-            }
-
-            density_file.write_time_data_line(Q_phi_integrals);
-
-
-
-            // Refresh the interpolator and do the interpolation
-            m_gr_amr.m_interpolator->refresh();
-            // setup and do angmomflux integral
-            AngMomFlux ang_mom_flux(m_p.angmomflux_params,m_time,m_dt,m_restart_time,first_step);
-            ang_mom_flux.run(m_gr_amr.m_interpolator);
+            dt_max_file.write_header_line({"max(dt phi)", "max(dt gtt)"});
         }
-    }
+        dt_max_file.write_time_data_line({dt_phi_max, dt_gamma_max});
+ }
 }
 
 void BosonStarLevel::computeTaggingCriterion(FArrayBox &tagging_criterion,
