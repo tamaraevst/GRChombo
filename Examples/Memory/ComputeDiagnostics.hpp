@@ -10,18 +10,15 @@
 #include "CCZ4RHS.hpp"
 #include "Cell.hpp"
 #include "FourthOrderDerivatives.hpp"
-#include "MovingPunctureGauge.hpp"
 #include "TensorAlgebra.hpp"
 #include "DimensionDefinitions.hpp"
 #include "GRInterval.hpp"
 #include "VarsTools.hpp"
 
-template <class gauge_t = MovingPunctureGauge,
-          class deriv_t = FourthOrderDerivatives>
-class ComputeDiagnostics : public CCZ4RHS<gauge_t>
+template <class deriv_t = FourthOrderDerivatives>
+class ComputeDiagnostics
 {
-    using CCZ4 = CCZ4RHS<gauge_t, deriv_t>;
-
+protected:
     /// CCZ4 variables
     template <class data_t> using Vars = CCZ4Vars::VarsWithGauge<data_t>; 
 
@@ -29,44 +26,30 @@ class ComputeDiagnostics : public CCZ4RHS<gauge_t>
     template <class data_t>
     using Diff2Vars = CCZ4Vars::Diff2VarsWithGauge<data_t>;
 
-    struct params_t
-    {
-        // lapse params:
-        double lapse_advec_coeff = 0.; //!< Switches advection terms in
-                                       //! the lapse condition on/off
-        double lapse_power = 1.; //!< The power p in \f$\partial_t \alpha = - c
-                                 //!\alpha^p(K-2\Theta)\f$
-        double lapse_coeff = 2.; //!< The coefficient c in \f$\partial_t \alpha
-                                 //!= -c \alpha^p(K-2\Theta)\f$
-        // shift params:
-        double shift_Gamma_coeff = 0.75; //!< Gives the F in \f$\partial_t
-                                         //!  \beta^i =  F B^i\f$
-        double shift_advec_coeff = 0.;   //!< Switches advection terms in the
-                                         //! shift condition on/off
-        double eta = 1.; //!< The eta in \f$\partial_t B^i = \partial_t \tilde
-                         //!\Gamma - \eta B^i\f$
-    };
-
-     /// Constructor 
-    ComputeDiagnostics<gauge_t, deriv_t>(
-        params_t a_params, double a_dx,  std::array<double, CH_SPACEDIM> a_center  
-    ) : m_params(a_params), m_dx(a_dx), m_center(a_center) {}
-
-    protected:
-    params_t m_params;
+    double m_lapse_advec_coeff;
+    double m_lapse_coeff;
+    double m_lapse_power;
+    double m_shift_advec_coeff;
+    double m_shift_Gamma_coeff;
     double m_dx;
-    std::array<double, CH_SPACEDIM> m_center
-}
+    std::array<double, CH_SPACEDIM> m_center;
+    const deriv_t m_deriv;
+
+public:
+
+/// Constructor 
+    ComputeDiagnostics(double a_lapse_advec_coeff, double a_lapse_coeff, double a_lapse_power, double a_shift_advec_coeff, double a_shift_Gamma_coeff, double a_dx,  std::array<double, CH_SPACEDIM> a_center  
+) : m_lapse_advec_coeff(a_lapse_advec_coeff), m_lapse_coeff(a_lapse_coeff), m_lapse_power(a_lapse_power), m_shift_advec_coeff(a_shift_advec_coeff), m_shift_Gamma_coeff(a_shift_Gamma_coeff), m_deriv(a_dx), m_center(a_center) {}
  
-template <class gauge_t, class deriv_t>
-template <class data_t>
-void ComputeDiagnostics<gauge_t, deriv_t>::compute(Cell<data_t> current_cell) const
+template <class data_t> void compute(Cell<data_t> current_cell) const
 {
     const auto vars = current_cell.template load_vars<Vars>();
     const auto d1 = m_deriv.template diff1<Vars>(current_cell);
     const auto d2 = m_deriv.template diff2<Diff2Vars>(current_cell); 
     const auto advec =
         m_deriv.template advection<Vars>(current_cell, vars.shift); 
+
+    using namespace TensorAlgebra;
 
     // Spatial 3 metric, g_{ij}
     Tensor<2, data_t> g; 
@@ -110,12 +93,12 @@ void ComputeDiagnostics<gauge_t, deriv_t>::compute(Cell<data_t> current_cell) co
     data_t chir;
     Tensor<2, data_t> gr;
 
-    Coordinates<data_t> coords(current_cell, m_dx, m_center);
+    Coordinates<double> coords(current_cell, m_dx, m_center);
     double r = sqrt(coords.x * coords.x + coords.y * coords.y + coords.z * coords.z);
 
     FOR(i,j)
     {
-        hr[i][j] = 1./r * (coord.x * d1.h[0][i][j] + coord.y * d1.h[1][i][j] + coord.z * d1.h[2][i][j]);
+        hr[i][j] = 1./r * (coords.x * d1.h[0][i][j] + coords.y * d1.h[1][i][j] + coords.z * d1.h[2][i][j]);
     }
 
     chir = 1./r * (coords.x * d1.chi[0] + coords.y * d1.chi[1] + coords.z * d1.chi[2]);
@@ -129,9 +112,9 @@ void ComputeDiagnostics<gauge_t, deriv_t>::compute(Cell<data_t> current_cell) co
 
     data_t lapset;
 
-    lapset = m_params.lapse_advec_coeff * advec.lapse -
-                    m_params.lapse_coeff *
-                        pow(vars.lapse, m_params.lapse_power) *
+    lapset = m_lapse_advec_coeff * advec.lapse -
+                    m_lapse_coeff *
+                        pow(vars.lapse, m_lapse_power) *
                         (vars.K - 2 * vars.Theta);
         
     // find d_r derivative of lapse 
@@ -145,8 +128,8 @@ void ComputeDiagnostics<gauge_t, deriv_t>::compute(Cell<data_t> current_cell) co
 
     FOR(i)
         {
-            shiftt[i] = m_params.shift_advec_coeff * advec.shift[i] +
-                           m_params.shift_Gamma_coeff * vars.B[i];
+            shiftt[i] = m_shift_advec_coeff * advec.shift[i] +
+                           m_shift_Gamma_coeff * vars.B[i];
         }
 
     // d_r derivative of shift
@@ -191,5 +174,7 @@ void ComputeDiagnostics<gauge_t, deriv_t>::compute(Cell<data_t> current_cell) co
     current_cell.store_vars(lapset, c_lapset);
     current_cell.store_vars(lapser, c_lapser);
 } 
+
+};
 
 #endif /* COMPUTEDIAGNOSTICS_HPP_ */

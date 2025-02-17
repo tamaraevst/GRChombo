@@ -40,6 +40,8 @@
 // For GW extraction
 #include "MatterWeyl4.hpp"
 #include "WeylExtraction.hpp"
+
+#include "ComputeDiagnostics.hpp"
 #include "MetricxxExtraction.hpp"
 #include "MetricxyExtraction.hpp"
 #include "MetricxzExtraction.hpp"
@@ -220,6 +222,8 @@ void BosonStarLevel::doAnalysis()
                m_dx, m_p.formulation, m_p.G_Newton), ADMMass(m_p.center, m_dx));
     BoxLoops::loop(weyl4_adm_compute_pack, m_state_new, m_state_diagnostics,
                         EXCLUDE_GHOST_CELLS);
+    BoxLoops::loop(ComputeDiagnostics<FourthOrderDerivatives>(m_p.ccz4_params.lapse_advec_coeff, m_p.ccz4_params.lapse_coeff, m_p.ccz4_params.lapse_power, m_p.ccz4_params.shift_advec_coeff, m_p.ccz4_params.shift_Gamma_coeff, m_dx, m_p.center), m_state_new, m_state_diagnostics,
+                        EXCLUDE_GHOST_CELLS);
     BoxLoops::loop(MatterConstraints<ComplexScalarFieldWithPotential>(
                         complex_scalar_field, m_dx, m_p.G_Newton, c_Ham,
                         Interval(c_Mom1, c_Mom3)), m_state_new, m_state_diagnostics, EXCLUDE_GHOST_CELLS);
@@ -237,7 +241,6 @@ void BosonStarLevel::doAnalysis()
                 pout() << "BinaryBSLevel::specificPostTimeStep:"
                           " Extracting gravitational waves." << endl;
             }
-
 
             // Refresh the interpolator and do the interpolation
             m_gr_amr.m_interpolator->refresh();
