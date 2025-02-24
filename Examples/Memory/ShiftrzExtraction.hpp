@@ -72,7 +72,7 @@ class ShiftrzExtraction : public SphericalExtraction
         for (int imode = 0; imode < m_num_modes; ++imode)
         {
             const auto &mode = m_modes[imode];
-            std::string integrals_filename = "shiftrz" +
+            std::string integrals_filename = "DrShiftz" +
                                              std::to_string(mode.first) +
                                              std::to_string(mode.second);
             std::vector<std::vector<double>> integrals_for_writing = {
