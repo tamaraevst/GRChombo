@@ -119,6 +119,33 @@ public:
         pp.load("memory_extraction_center",
                 memory_extraction_params.extraction_center,
                 center);
+        if (pp.contains("modes"))
+                {
+                    pp.load("memory_num_modes", memory_extraction_params.num_modes);
+                    std::vector<int> extraction_modes_vect(
+                        2 * memory_extraction_params.num_modes);
+                    pp.load("memory_modes", extraction_modes_vect,
+                            2 * memory_extraction_params.num_modes);
+                            memory_extraction_params.modes.resize(memory_extraction_params.num_modes);
+                    for (int i = 0; i < memory_extraction_params.num_modes; ++i)
+                    {
+                        memory_extraction_params.modes[i].first =
+                            extraction_modes_vect[2 * i];
+                            memory_extraction_params.modes[i].second =
+                            extraction_modes_vect[2 * i + 1];
+                    }
+                }
+        else
+                {
+                    // by default extraction (l,m) = (2,0), (2,1) and (2,2)
+                    memory_extraction_params.num_modes = 3;
+                    memory_extraction_params.modes.resize(3);
+                    for (int i = 0; i < 3; ++i)
+                    {
+                        memory_extraction_params.modes[i].first = 2;
+                        memory_extraction_params.modes[i].second = i;
+                    }
+                }
 
         // Weyl extraction
         pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
