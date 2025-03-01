@@ -99,6 +99,27 @@ public:
                 mass_extraction_params.extraction_center,
                 {0.5 * L, 0.5 * L, 0.5 * L});
 
+        // Memory extraction
+        pp.load("activate_memory_extraction", activate_memory_extraction, 1);
+        pp.load("memory_write_extraction",
+                memory_extraction_params.write_extraction,
+                false);
+        pp.load("num_memory_extraction_radii",
+                memory_extraction_params.num_extraction_radii, 1);
+        pp.load("memory_extraction_levels",
+                memory_extraction_params.extraction_levels,
+                memory_extraction_params.num_extraction_radii, 0);
+        pp.load("memory_extraction_radii",
+                memory_extraction_params.extraction_radii,
+                memory_extraction_params.num_extraction_radii, 0.1);
+        pp.load("num_points_phi_memory", memory_extraction_params.num_points_phi,
+                2);
+        pp.load("num_points_theta_memory",
+                memory_extraction_params.num_points_theta, 4);
+        pp.load("memory_extraction_center",
+                memory_extraction_params.extraction_center,
+                center);
+
         // Weyl extraction
         pp.load("activate_gw_extraction", activate_weyl_extraction, 0);
 
@@ -148,7 +169,9 @@ public:
 
     // Mass extraction
     int activate_mass_extraction;
+    int activate_memory_extraction;
     extraction_params_t mass_extraction_params;
+    extraction_params_t memory_extraction_params;
 
     int activate_weyl_extraction;
 
