@@ -53,6 +53,47 @@ enum
     c_dt_mod_phi,
     c_gamma_tt,
 
+    c_mode_dtA_01_re,
+    c_mode_dtA_01_im,
+    c_mode_dtA_02_re,
+    c_mode_dtA_02_im,
+    c_mode_dtA_03_re,
+    c_mode_dtA_03_im,
+    c_mode_dtA_04_re,
+    c_mode_dtA_04_im,
+    c_mode_dtA_05_re,
+    c_mode_dtA_05_im,
+    c_mode_dtA_06_re,
+    c_mode_dtA_06_im,
+    c_mode_dtA_07_re,
+    c_mode_dtA_07_im,
+    c_mode_dtA_08_re,
+    c_mode_dtA_08_im,
+    c_mode_dtA_09_re,
+    c_mode_dtA_09_im,
+    c_mode_dtA_10_re,
+    c_mode_dtA_10_im,
+    c_mode_dtA_11_re,
+    c_mode_dtA_11_im,
+    c_mode_dtA_12_re,
+    c_mode_dtA_12_im,
+    c_mode_dtA_13_re,
+    c_mode_dtA_13_im,
+    c_mode_dtA_14_re,
+    c_mode_dtA_14_im,
+    c_mode_dtA_15_re,
+    c_mode_dtA_15_im,
+    c_mode_dtA_16_re,
+    c_mode_dtA_16_im,
+    c_mode_dtA_17_re,
+    c_mode_dtA_17_im,
+    c_mode_dtA_18_re,
+    c_mode_dtA_18_im,
+    c_mode_dtA_19_re,
+    c_mode_dtA_19_im,
+    c_mode_dtA_20_re,
+    c_mode_dtA_20_im,
+
     NUM_DIAGNOSTIC_VARS
 };
 
@@ -81,9 +122,11 @@ static const std::array<std::string, NUM_DIAGNOSTIC_VARS> variable_names = {
     "testHam", 
 
     "dt_A_sq", "abs_gamma_tt",
+
+    "mode_dtA_01_re", "mode_dtA_01_im", "mode_dtA_02_re", "mode_dtA_02_im", "mode_dtA_03_re", "mode_dtA_03_im", "mode_dtA_04_re", "mode_dtA_04_im", "mode_dtA_05_re", "mode_dtA_05_im", "mode_dtA_06_re", "mode_dtA_06_im", "mode_dtA_07_re", "mode_dtA_07_im", "mode_dtA_08_re", "mode_dtA_08_im", "mode_dtA_09_re", "mode_dtA_09_im", "mode_dtA_10_re", "mode_dtA_10_im", "mode_dtA_11_re", "mode_dtA_11_im", "mode_dtA_12_re", "mode_dtA_12_im", "mode_dtA_13_re", "mode_dtA_13_im", "mode_dtA_14_re", "mode_dtA_14_im", "mode_dtA_15_re", "mode_dtA_15_im", "mode_dtA_16_re", "mode_dtA_16_im", "mode_dtA_17_re", "mode_dtA_17_im", "mode_dtA_18_re", "mode_dtA_18_im", "mode_dtA_19_re", "mode_dtA_19_im", "mode_dtA_20_re", "mode_dtA_20_im"
     
      };
     
-    }
+}
 
 #endif /* DIAGNOSTICVARIABLES_HPP */
