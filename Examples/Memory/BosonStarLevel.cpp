@@ -261,131 +261,178 @@ void BosonStarLevel::doAnalysis()
  
              // Refresh the interpolator and do the interpolation
              m_gr_amr.m_interpolator->refresh();
-             WeylExtraction gw_extraction(m_p.memory_extraction_params, m_dt, m_time,
-                                          first_step, m_restart_time);
-             gw_extraction.execute_query(m_gr_amr.m_interpolator);
- 
              MetricxxExtraction gxx_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxx_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+             
+             m_gr_amr.m_interpolator->refresh();
              MetricxyExtraction gxy_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxy_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetricxzExtraction gxz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricyyExtraction gyy_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyy_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetricyzExtraction gyz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetriczzExtraction gzz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gzz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetricxxrExtraction gxxr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxxr_extraction.execute_query(m_gr_amr.m_interpolator);
  
+             m_gr_amr.m_interpolator->refresh();
              MetricxxtExtraction gxxt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxxt_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricxyrExtraction gxyr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxyr_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetricxytExtraction gxyt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxyt_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetricxzrExtraction gxzr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxzr_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricxztExtraction gxzt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxzt_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricyyrExtraction gyyr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyyr_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricyytExtraction gyyt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyyt_extraction.execute_query(m_gr_amr.m_interpolator);
  
+             m_gr_amr.m_interpolator->refresh();
              MetricyzrExtraction gyzr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyzr_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetricyztExtraction gyzt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gyzt_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              MetriczzrExtraction gzzr_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gzzr_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              MetriczztExtraction gzzt_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gzzt_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftxExtraction shiftx_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftx_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftyExtraction shifty_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shifty_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftzExtraction shiftz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShifttxExtraction shifttx_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shifttx_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+            
+             m_gr_amr.m_interpolator->refresh();
              ShifttyExtraction shiftty_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftty_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShifttzExtraction shifttz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shifttz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftrxExtraction shiftrx_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftrx_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftryExtraction shiftry_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftry_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              ShiftrzExtraction shiftrz_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              shiftrz_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              LapseExtraction lapse_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              lapse_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              LapserExtraction lapser_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              lapser_extraction.execute_query(m_gr_amr.m_interpolator);
- 
+                
+             m_gr_amr.m_interpolator->refresh();
              LapsetExtraction lapset_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              lapset_extraction.execute_query(m_gr_amr.m_interpolator);
          }
      }
+
+     if (m_p.activate_weyl_extraction == 1 &&
+        at_level_timestep_multiple(m_p.extraction_params.min_extraction_level()))
+     {
+         CH_TIME("BosonStarLevel::doAnalysis::Weyl4&ADMMass");
+         
+         // Do the extraction on the min extraction level
+         if (m_level == m_p.extraction_params.min_extraction_level())
+         {
+             if (m_verbosity)
+             {
+                 pout() << "BinaryBSLevel::specificPostTimeStep:"
+                           " Extracting gravitational waves." << endl;
+             }
+ 
+ 
+             // Refresh the interpolator and do the interpolation
+             m_gr_amr.m_interpolator->refresh();
+             WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
+                                          first_step, m_restart_time);
+             gw_extraction.execute_query(m_gr_amr.m_interpolator);
+    }
 
     // noether charge, max mod phi, min chi, constraint violations
     if (at_level_timestep_multiple(0))
