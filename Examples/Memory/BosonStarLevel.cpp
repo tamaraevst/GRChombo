@@ -432,6 +432,7 @@ void BosonStarLevel::doAnalysis()
              WeylExtraction gw_extraction(m_p.extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gw_extraction.execute_query(m_gr_amr.m_interpolator);
+         }
     }
 
     // noether charge, max mod phi, min chi, constraint violations
