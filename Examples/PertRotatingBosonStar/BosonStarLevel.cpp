@@ -23,7 +23,6 @@
 #include "ComplexPhiAndChiExtractionTaggingCriterion.hpp"
 #include "MovingBoxesRefinement.hpp"
 
-
 // Problem specific includes
 #include "ComputePack.hpp"
 #include "ComplexPotential.hpp"
@@ -46,6 +45,7 @@
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherChargeDiagnostics.hpp"
+#include "ModeDecomposition.hpp"
 
 // For Ang Mom Integrating
 #include "AngMomFlux.hpp"
@@ -261,6 +261,59 @@ void BosonStarLevel::doAnalysis()
             }
             noether_charge_file.write_time_data_line({noether_charge});
         }
+        
+        double dtA_00_re = amr_reductions.sum(c_dt_mod_phi);
+        double dtA_01_re = amr_reductions.sum(c_mode_dtA_01_re);
+        double dtA_01_im = amr_reductions.sum(c_mode_dtA_01_im);
+        double dtA_02_re = amr_reductions.sum(c_mode_dtA_02_re);
+        double dtA_02_im = amr_reductions.sum(c_mode_dtA_02_im);
+        double dtA_03_re = amr_reductions.sum(c_mode_dtA_03_re);
+        double dtA_03_im = amr_reductions.sum(c_mode_dtA_03_im);
+        double dtA_04_re = amr_reductions.sum(c_mode_dtA_04_re);
+        double dtA_04_im = amr_reductions.sum(c_mode_dtA_04_im);
+        double dtA_05_re = amr_reductions.sum(c_mode_dtA_05_re);
+        double dtA_05_im = amr_reductions.sum(c_mode_dtA_05_im);
+        double dtA_06_re = amr_reductions.sum(c_mode_dtA_06_re);
+        double dtA_06_im = amr_reductions.sum(c_mode_dtA_06_im);
+        double dtA_07_re = amr_reductions.sum(c_mode_dtA_07_re);
+        double dtA_07_im = amr_reductions.sum(c_mode_dtA_07_im);
+        double dtA_08_re = amr_reductions.sum(c_mode_dtA_08_re);
+        double dtA_08_im = amr_reductions.sum(c_mode_dtA_08_im);
+        double dtA_09_re = amr_reductions.sum(c_mode_dtA_09_re);
+        double dtA_09_im = amr_reductions.sum(c_mode_dtA_09_im);
+        double dtA_10_re = amr_reductions.sum(c_mode_dtA_10_re);
+        double dtA_10_im = amr_reductions.sum(c_mode_dtA_10_im);
+        double dtA_11_re = amr_reductions.sum(c_mode_dtA_11_re);
+        double dtA_11_im = amr_reductions.sum(c_mode_dtA_11_im);
+        double dtA_12_re = amr_reductions.sum(c_mode_dtA_12_re);
+        double dtA_12_im = amr_reductions.sum(c_mode_dtA_12_im);
+        double dtA_13_re = amr_reductions.sum(c_mode_dtA_13_re);
+        double dtA_13_im = amr_reductions.sum(c_mode_dtA_13_im);
+        double dtA_14_re = amr_reductions.sum(c_mode_dtA_14_re);
+        double dtA_14_im = amr_reductions.sum(c_mode_dtA_14_im);
+        double dtA_15_re = amr_reductions.sum(c_mode_dtA_15_re);
+        double dtA_15_im = amr_reductions.sum(c_mode_dtA_15_im);
+        double dtA_16_re = amr_reductions.sum(c_mode_dtA_16_re);
+        double dtA_16_im = amr_reductions.sum(c_mode_dtA_16_im);
+        double dtA_17_re = amr_reductions.sum(c_mode_dtA_17_re);
+        double dtA_17_im = amr_reductions.sum(c_mode_dtA_17_im);
+        double dtA_18_re = amr_reductions.sum(c_mode_dtA_18_re);
+        double dtA_18_im = amr_reductions.sum(c_mode_dtA_18_im);
+        double dtA_19_re = amr_reductions.sum(c_mode_dtA_19_re);
+        double dtA_19_im = amr_reductions.sum(c_mode_dtA_19_im);
+        double dtA_20_re = amr_reductions.sum(c_mode_dtA_20_re);
+        double dtA_20_im = amr_reductions.sum(c_mode_dtA_20_im);
+
+        SmallDataIO dtA_modes_file("dtA_modes", m_dt, m_time,
+            m_restart_time,
+            SmallDataIO::APPEND,
+            first_step);
+        dtA_modes_file.remove_duplicate_time_data();
+        if (m_time == 0.)
+        {
+            dtA_modes_file.write_header_line({"dtA00", "dtA01 Re", "dtA01 Im", "dtA02 Re", "dtA02 Im", "dtA03 Re", "dtA03 Im", "dtA04 Re", "dtA04 Im", "dtA05 Re", "dtA05 Im", "dtA06 Re", "dtA06 Im", "dtA07 Re", "dtA07 Im", "dtA08 Re", "dtA08 Im", "dtA09 Re", "dtA09 Im", "dtA10 Re", "dtA10 Im", "dtA11 Re", "dtA11 Im", "dtA12 Re", "dtA12 Im", "dtA13 Re", "dtA13 Im", "dtA14 Re", "dtA14 Im", "dtA15 Re", "dtA15 Im", "dtA16 Re", "dtA16 Im", "dtA17 Re", "dtA17 Im", "dtA18 Re", "dtA18 Im", "dtA19 Re", "dtA19 Im", "dtA20 Re", "dtA20 Im"});
+        }
+        dtA_modes_file.write_time_data_line({dtA_00_re, dtA_01_re, dtA_01_im, dtA_02_re, dtA_02_im, dtA_03_re, dtA_03_im, dtA_04_re, dtA_04_im, dtA_05_re, dtA_05_im, dtA_06_re, dtA_06_im, dtA_07_re, dtA_07_im, dtA_08_re, dtA_08_im, dtA_09_re, dtA_09_im, dtA_10_re, dtA_10_im, dtA_11_re, dtA_11_im, dtA_12_re, dtA_12_im, dtA_13_re, dtA_13_im, dtA_14_re, dtA_14_im, dtA_15_re, dtA_15_im, dtA_16_re, dtA_16_im, dtA_17_re, dtA_17_im, dtA_18_re, dtA_18_im, dtA_19_re, dtA_19_im, dtA_20_re, dtA_20_im});
 
         // Compute the maximum of mod_phi and write it to a file
         double mod_phi_max = amr_reductions.max(c_mod_phi);
