@@ -238,6 +238,8 @@ void BosonStarLevel::doAnalysis()
     {
         BoxLoops::loop(NoetherChargeDiagnostics<FourthOrderDerivatives>(m_dx), m_state_new, m_state_diagnostics,
                   EXCLUDE_GHOST_CELLS);
+        BoxLoops::loop(ModeDecomposition(m_dx, m_p.center), m_state_new, m_state_diagnostics,
+                  EXCLUDE_GHOST_CELLS);
     }
     if (m_level == 0)
     {
