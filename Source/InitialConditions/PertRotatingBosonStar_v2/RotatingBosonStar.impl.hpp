@@ -92,8 +92,12 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     //Add on to evolution equations
     vars.phi_Re += A_val * (cos(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)));
     vars.phi_Im += A_val * (sin(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)));
-    vars.Pi_Re += (A_val / lapse) * (ff - beta_phi)*sin(phase_);
-    vars.Pi_Im += -(A_val / lapse) * (ff - beta_phi)*cos(phase_);
+    vars.Pi_Re += (A_val / lapse) * ((ff - beta_phi)*sin(phase_) 
+                        + beta_phi * m_params_RotatingBosonStar.pertA * sin(phase_) 
+                        * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)) * cos(phase_)) ;
+    vars.Pi_Im += -(A_val / lapse) * ((ff - beta_phi)*cos(phase_) 
+                        - beta_phi * m_params_RotatingBosonStar.pertA * sin(phase_) 
+                        * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)) * sin(phase_));
 
     //Initialise extrinsic curvature and metric with upper indices
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};
