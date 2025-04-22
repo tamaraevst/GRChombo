@@ -79,6 +79,9 @@
 #include "LapsetExtraction.hpp"
 #include "LapserExtraction.hpp"
 
+#include "PhiExtraction.hpp"
+#include "PiExtraction.hpp"
+
 // For Noether Charge calculation
 #include "SmallDataIO.hpp"
 #include "NoetherCharge.hpp"
@@ -237,8 +240,13 @@ void BosonStarLevel::doAnalysis()
          if (m_level == m_p.memory_extraction_params.min_extraction_level())
          {
  
-             // Refresh the interpolator and do the interpolation
-             m_gr_amr.m_interpolator->refresh(true);
+            // Refresh the interpolator and do the interpolation
+            bool fill_ghosts = false;
+            m_gr_amr.m_interpolator->refresh(fill_ghosts);
+            m_gr_amr.fill_multilevel_ghosts(
+                VariableType::diagnostic, Interval(c_gxx, c_lapser),
+                m_p.memory_extraction_params.min_extraction_level());
+
              MetricxxExtraction gxx_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              gxx_extraction.execute_query(m_gr_amr.m_interpolator);
@@ -358,6 +366,14 @@ void BosonStarLevel::doAnalysis()
              LapsetExtraction lapset_extraction(m_p.memory_extraction_params, m_dt, m_time,
                                           first_step, m_restart_time);
              lapset_extraction.execute_query(m_gr_amr.m_interpolator);
+
+             PhiExtraction phi_extraction(m_p.memory_extraction_params, m_dt, m_time,
+                first_step, m_restart_time);
+             phi_extraction.execute_query(m_gr_amr.m_interpolator);
+
+             PiExtraction pi_extraction(m_p.memory_extraction_params, m_dt, m_time,
+                first_step, m_restart_time);
+             pi_extraction.execute_query(m_gr_amr.m_interpolator);
          }
      }
 
