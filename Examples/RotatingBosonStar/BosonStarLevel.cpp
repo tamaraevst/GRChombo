@@ -216,6 +216,20 @@ void BosonStarLevel::doAnalysis()
         }
     }
 
+    if (m_p.do_star_track && m_level == m_p.star_track_level)
+    {
+    int current_step = m_gr_amr.m_interpolator->getAMR().s_step;
+
+    if (current_step != 0 && (m_time - m_restart_time) < m_dt * 1.1)
+    {
+        m_st_amr.m_star_tracker.read_old_centre_from_dat(
+                "StarCentres", m_dt, m_time, m_restart_time, first_step);
+    }
+    m_st_amr.m_star_tracker.update_star_centres(m_dt);
+    m_st_amr.m_star_tracker.write_to_dat("StarCentres", m_dt, m_time,
+                                             m_restart_time, first_step);
+    }
+
     if (m_p.activate_mass_extraction == 1 &&
         m_level == m_p.mass_extraction_params.min_extraction_level())
     {
@@ -238,7 +252,9 @@ void BosonStarLevel::doAnalysis()
     {
         BoxLoops::loop(NoetherChargeDiagnostics<FourthOrderDerivatives>(m_dx), m_state_new, m_state_diagnostics,
                   EXCLUDE_GHOST_CELLS);
-        BoxLoops::loop(ModeDecomposition(m_dx, m_p.center), m_state_new, m_state_diagnostics,
+        const std::array<double, CH_SPACEDIM> star_coords =
+                  m_st_amr.m_star_tracker.get_puncture_coords();
+        BoxLoops::loop(ModeDecomposition(m_dx, star_coords), m_state_new, m_state_diagnostics,
                   EXCLUDE_GHOST_CELLS);
     }
     if (m_level == 0)
