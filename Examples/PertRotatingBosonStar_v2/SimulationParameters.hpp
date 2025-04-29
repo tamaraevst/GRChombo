@@ -38,6 +38,14 @@ public:
         pp.load("BS_frequency", rotating_bosonstar_params.BS_frequency, 0.15910835770266477);
         pp.load("pertubation_amp", rotating_bosonstar_params.pertA, 1e-4);
 
+        positionA[0] = rotating_bosonstar_params.star_centre[0];
+	positionA[1] = rotating_bosonstar_params.star_centre[1];
+	positionA[2] = rotating_bosonstar_params.star_centre[2];
+
+	pout() << "Star A is at x-position " << positionA[0] << endl;
+        pout() << "Star A is at y-position " << positionA[1] << endl;
+        pout() << "Star A is at z-position " << positionA[2] << endl;
+
         // Potential params
         pp.load("scalar_mass", potential_params.scalar_mass, 1.0);
         pp.load("phi4_coeff", potential_params.phi4_coeff, 0.0);
@@ -81,6 +89,13 @@ public:
         pp.load("calculate_constraint_violations",
                 calculate_constraint_violations, false);
 
+        // Star Tracking
+        pp.load("do_star_track", do_star_track, false);
+        pp.load("star_points", star_points, 31);
+        pp.load("star_track_width_A", star_track_width_A, 4.);
+        pp.load("direction_of_motion", star_track_direction_of_motion);
+        pp.load("star_track_level", star_track_level, 5);
+
         // Do we want to calculate and write the Noether Charge to a file
         pp.load("calculate_noether_charge", calculate_noether_charge, false);
 
@@ -117,6 +132,16 @@ public:
     extraction_params_t mass_extraction_params;
 
     int activate_weyl_extraction;
+
+    bool do_star_track;
+    int number_of_stars;
+    int star_points;
+    double star_track_width_A;
+    double star_track_width_B;
+    std::string star_track_direction_of_motion;
+    int star_track_level;
+
+    std::array<double, CH_SPACEDIM> positionA;
 
     // Do we want to write a file with the L2 norms of contraints?
     bool calculate_constraint_violations;
