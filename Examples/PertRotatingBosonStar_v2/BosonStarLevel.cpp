@@ -254,7 +254,7 @@ void BosonStarLevel::doAnalysis()
                   EXCLUDE_GHOST_CELLS);
         const std::array<double, CH_SPACEDIM> star_coords =
                   m_st_amr.m_star_tracker.get_puncture_coords();
-        BoxLoops::loop(ModeDecomposition(m_dx, m_p.center), m_state_new, m_state_diagnostics,
+        BoxLoops::loop(ModeDecomposition(m_dx, star_coords), m_state_new, m_state_diagnostics,
                   EXCLUDE_GHOST_CELLS);
     }
     if (m_level == 0)
