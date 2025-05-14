@@ -60,6 +60,7 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double xvar = r / (1. + r);
 
     double ff = m_params_RotatingBosonStar.BS_frequency;
+    int mconstant = m_params_RotatingBosonStar.m_constant;
 
     int n = rotating_BS_sol.n;
     int m = rotating_BS_sol.m;
@@ -90,14 +91,14 @@ void RotatingBosonStar::compute(Cell<data_t> current_cell) const
     double g_xy_1 = (cos(phi)/f_val)*(-1+g_val)*l_val*sin(phi);
 
     //Add on to evolution equations
-    vars.phi_Re += A_val * (cos(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)));
-    vars.phi_Im += A_val * (sin(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)));
+    vars.phi_Re += A_val * (cos(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(mconstant * phase_)));
+    vars.phi_Im += A_val * (sin(phase_) * exp(-m_params_RotatingBosonStar.pertA * cos(mconstant * phase_)));
     vars.Pi_Re += (A_val / lapse) * ((ff - beta_phi)*sin(phase_) 
-                        + beta_phi * m_params_RotatingBosonStar.pertA * sin(phase_) 
-                        * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)) * cos(phase_)) ;
+                        + beta_phi * m_params_RotatingBosonStar.pertA * mconstant * sin(mconstant * phase_) 
+                        * exp(-m_params_RotatingBosonStar.pertA * cos(mconstant * phase_)) * cos(phase_)) ;
     vars.Pi_Im += -(A_val / lapse) * ((ff - beta_phi)*cos(phase_) 
-                        - beta_phi * m_params_RotatingBosonStar.pertA * sin(phase_) 
-                        * exp(-m_params_RotatingBosonStar.pertA * cos(phase_)) * sin(phase_));
+                        - beta_phi * m_params_RotatingBosonStar.pertA * mconstant * sin(mconstant * phase_) 
+                        * exp(-m_params_RotatingBosonStar.pertA * cos(mconstant * phase_)) * sin(phase_));
 
     //Initialise extrinsic curvature and metric with upper indices
     double KLL[3][3] = {{0.,0.,0.},{0.,0.,0.},{0.,0.,0.}};

@@ -15,6 +15,7 @@ struct RotatingBosonStar_params_t
     std::string base_path;
     double BS_frequency;
     double pertA; // petrubutaion to BS amplitude 
+    int m_constant; // m constant for the perturbation
 };
 
 #endif /* ROTATINGBOSONSTARPARAMS_HPP_ */

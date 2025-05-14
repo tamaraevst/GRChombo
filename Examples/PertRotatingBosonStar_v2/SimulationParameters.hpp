@@ -37,6 +37,7 @@ public:
         pp.load("initial_data_path", rotating_bosonstar_params.base_path, std::string(""));
         pp.load("BS_frequency", rotating_bosonstar_params.BS_frequency, 0.15910835770266477);
         pp.load("pertubation_amp", rotating_bosonstar_params.pertA, 1e-4);
+        pp.load("mconstant", rotating_bosonstar_params.m_constant, 1);
 
         positionA[0] = rotating_bosonstar_params.star_centre[0];
 	positionA[1] = rotating_bosonstar_params.star_centre[1];
